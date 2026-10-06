@@ -1,0 +1,51 @@
+{
+  "categories": [
+    {
+      "slug": "all",
+      "name": "All Collections",
+      "label": "All",
+      "description": "The complete atelier edit spanning artisanal embroidery, heirloom tailoring, and pure natural yarns.",
+      "order": 0
+    },
+    {
+      "slug": "outerwear",
+      "name": "Outerwear",
+      "label": "Outerwear",
+      "description": "Tailored chore jackets, kimono overcoats, and embroidered denim outerwear.",
+      "image": "/images/categories/outerwear.jpg",
+      "order": 1
+    },
+    {
+      "slug": "knitwear",
+      "name": "Knitwear",
+      "label": "Knitwear",
+      "description": "Pure cashmere cardigans, merino sweaters, and chain-stitched crewnecks.",
+      "image": "/images/categories/knitwear.jpg",
+      "order": 2
+    },
+    {
+      "slug": "tops",
+      "name": "Tops & Shirts",
+      "label": "Tops",
+      "description": "Heavyweight organic cotton box tees, silk-floss oxfords, and band-collar tunics.",
+      "image": "/images/categories/tops.jpg",
+      "order": 3
+    },
+    {
+      "slug": "bottoms",
+      "name": "Bottoms",
+      "label": "Bottoms",
+      "description": "Pleated wide-leg trousers, raw selvedge denim, and kantha-embroidered work pants.",
+      "image": "/images/categories/bottoms.jpg",
+      "order": 4
+    },
+    {
+      "slug": "accessories",
+      "name": "Accessories",
+      "label": "Accessories",
+      "description": "Embroidered silk scarves, raw canvas tote bags, and heirloom monogram badges.",
+      "image": "/images/categories/accessories.jpg",
+      "order": 5
+    }
+  ]
+}
