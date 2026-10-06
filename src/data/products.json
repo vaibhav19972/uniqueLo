@@ -1,0 +1,369 @@
+{
+  "products": [
+    {
+      "slug": "botanical-silk-embroidered-jacket",
+      "name": "Botanical Silk Embroidered Jacket",
+      "subtitle": "Hand-stitched flora on heavy washed organic cotton canvas",
+      "description": "An unstructured atelier workwear jacket featuring intricate hand-embroidered botanical floral vine motifs along the collar, lapel, and back yoke using pure mulberry silk floss.",
+      "categorySlug": "outerwear",
+      "tags": ["jacket", "embroidery", "hand-stitched", "silk", "outerwear"],
+      "variants": [
+        { "sku": "bse-ind-s", "color": "Indigo", "colorHex": "#1d2a44", "size": "S", "priceCents": 58000, "status": "in-stock" },
+        { "sku": "bse-ind-m", "color": "Indigo", "colorHex": "#1d2a44", "size": "M", "priceCents": 58000, "status": "in-stock" },
+        { "sku": "bse-ind-l", "color": "Indigo", "colorHex": "#1d2a44", "size": "L", "priceCents": 58000, "status": "low-stock", "quantity": 2 },
+        { "sku": "bse-ecr-s", "color": "Ecru", "colorHex": "#f4efe6", "size": "S", "priceCents": 58000, "status": "in-stock" },
+        { "sku": "bse-ecr-m", "color": "Ecru", "colorHex": "#f4efe6", "size": "M", "priceCents": 58000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/botanical-silk-jacket-1.jpg", "alt": "Botanical Silk Embroidered Jacket — front view", "color": "#1d2a44" },
+        { "src": "/images/products/botanical-silk-jacket-2.jpg", "alt": "Botanical Silk Embroidered Jacket — macro stitch detail", "color": "#1d2a44" }
+      ],
+      "featured": true,
+      "embroidery": {
+        "technique": "botanical-chain",
+        "techniqueLabel": "Hand-stitched Chain & Satin Needlework",
+        "artisanHours": 18,
+        "placement": ["Collar", "Back Yoke", "Left Cuff"],
+        "threadComposition": "100% Spun Mulberry Silk Floss",
+        "motifStory": "Inspired by 18th-century botanical field plates, meticulously rendered with micro-chain loops."
+      },
+      "customizable": true,
+      "material": ["100% GOTS Organic Cotton Canvas", "Mulberry Silk Floss"],
+      "care": ["Delicate dry clean only", "Store folded in breathable garment bag"],
+      "fit": "Boxy relaxed atelier fit, true to size"
+    },
+    {
+      "slug": "celestial-zardozi-wool-coat",
+      "name": "Celestial Zardozi Wool Overcoat",
+      "subtitle": "24K metallic gold bullion thread on double-faced melton wool",
+      "description": "A tailored single-breasted overcoat accented with historic Zardozi wire embroidery depicting constellations and celestial geometry along the notched lapels and sleeve cuffs.",
+      "categorySlug": "outerwear",
+      "tags": ["coat", "zardozi", "metallic", "wool", "outerwear", "couture"],
+      "variants": [
+        { "sku": "czw-blk-38", "color": "Nocturne Black", "colorHex": "#121214", "size": "38", "priceCents": 125000, "status": "in-stock" },
+        { "sku": "czw-blk-40", "color": "Nocturne Black", "colorHex": "#121214", "size": "40", "priceCents": 125000, "status": "in-stock" },
+        { "sku": "czw-blk-42", "color": "Nocturne Black", "colorHex": "#121214", "size": "42", "priceCents": 125000, "status": "low-stock", "quantity": 1 }
+      ],
+      "images": [
+        { "src": "/images/products/celestial-zardozi-coat-1.jpg", "alt": "Celestial Zardozi Wool Overcoat — silhouette view", "color": "#121214" },
+        { "src": "/images/products/celestial-zardozi-coat-2.jpg", "alt": "Celestial Zardozi Wool Overcoat — metallic wire embroidery detail", "color": "#121214" }
+      ],
+      "featured": true,
+      "embroidery": {
+        "technique": "hand-zardozi",
+        "techniqueLabel": "Authentic Hand Zardozi Wirework",
+        "artisanHours": 32,
+        "placement": ["Lapel Peaks", "Back Collar", "Sleeve Cuffs"],
+        "threadComposition": "Gilt French Wire & Metallic Zari Thread",
+        "motifStory": "Astral cartography crafted with traditional coiled bullion wires hand-anchored onto heavy melton wool."
+      },
+      "customizable": false,
+      "material": ["100% Virgin Melton Wool", "Cupro Bemberg Lining"],
+      "care": ["Specialist couture dry clean only"],
+      "fit": "Structured tailored silhouette, hits mid-calf"
+    },
+    {
+      "slug": "kantha-quilted-chore-jacket",
+      "name": "Heirloom Kantha Quilted Chore Jacket",
+      "subtitle": "Repurposed vintage indigo textiles with continuous running stitch",
+      "description": "Each piece is completely unique, built from vintage hand-dyed indigo textiles layered and reinforced with thousands of dense Kantha running stitches by women artisan collectives.",
+      "categorySlug": "outerwear",
+      "tags": ["jacket", "kantha", "indigo", "quilted", "outerwear"],
+      "variants": [
+        { "sku": "kqj-ind-s", "color": "Vintage Indigo", "colorHex": "#23334d", "size": "S", "priceCents": 64000, "status": "in-stock" },
+        { "sku": "kqj-ind-m", "color": "Vintage Indigo", "colorHex": "#23334d", "size": "M", "priceCents": 64000, "status": "in-stock" },
+        { "sku": "kqj-ind-l", "color": "Vintage Indigo", "colorHex": "#23334d", "size": "L", "priceCents": 64000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/kantha-chore-jacket-1.jpg", "alt": "Heirloom Kantha Quilted Chore Jacket — full view", "color": "#23334d" },
+        { "src": "/images/products/kantha-chore-jacket-2.jpg", "alt": "Heirloom Kantha Quilted Chore Jacket — running stitch texture", "color": "#23334d" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "kantha-quilt",
+        "techniqueLabel": "Traditional Kantha Running Stitch Quilt",
+        "artisanHours": 24,
+        "placement": ["Full Garment Body", "Sleeves"],
+        "threadComposition": "100% Unbleached Cotton Thread",
+        "motifStory": "Centuries-old Bengali quilting method where layered fabrics are bonded through rhythmic parallel needlework."
+      },
+      "customizable": false,
+      "material": ["Upcycled Handloom Cotton", "Plant Indigo Dye"],
+      "care": ["Cold hand wash separately", "Line dry in shade"],
+      "fit": "Casual straight box cut"
+    },
+    {
+      "slug": "flora-crewel-cashmere-cardigan",
+      "name": "Flora Crewel Cashmere Cardigan",
+      "subtitle": "Two-ply Mongolian cashmere with hand crewel wool embroidery",
+      "description": "Ultra-soft 2-ply Mongolian cashmere cardigan framed by raised crewel embroidery in autumnal earth tones, depicting alpine wild roses and lichen mosses.",
+      "categorySlug": "knitwear",
+      "tags": ["cardigan", "cashmere", "crewel", "knitwear", "wool"],
+      "variants": [
+        { "sku": "fcc-oat-s", "color": "Oatmeal", "colorHex": "#d9d2c5", "size": "S", "priceCents": 69000, "status": "in-stock" },
+        { "sku": "fcc-oat-m", "color": "Oatmeal", "colorHex": "#d9d2c5", "size": "M", "priceCents": 69000, "status": "in-stock" },
+        { "sku": "fcc-oat-l", "color": "Oatmeal", "colorHex": "#d9d2c5", "size": "L", "priceCents": 69000, "status": "low-stock", "quantity": 3 },
+        { "sku": "fcc-chc-s", "color": "Charcoal", "colorHex": "#2c2c2e", "size": "S", "priceCents": 69000, "status": "in-stock" },
+        { "sku": "fcc-chc-m", "color": "Charcoal", "colorHex": "#2c2c2e", "size": "M", "priceCents": 69000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/crewel-cashmere-cardigan-1.jpg", "alt": "Flora Crewel Cashmere Cardigan — model shot", "color": "#d9d2c5" },
+        { "src": "/images/products/crewel-cashmere-cardigan-2.jpg", "alt": "Flora Crewel Cashmere Cardigan — raised crewel wool relief", "color": "#d9d2c5" }
+      ],
+      "featured": true,
+      "embroidery": {
+        "technique": "crewel-needlework",
+        "techniqueLabel": "Jacobean Raised Crewel Needlework",
+        "artisanHours": 16,
+        "placement": ["Front Placket", "Left Chest Panel"],
+        "threadComposition": "2-Ply Appleton Wool Crewel Yarn",
+        "motifStory": "Textured wool-on-knit stitchery producing dimensional moss, stem, and petal textures."
+      },
+      "customizable": true,
+      "material": ["100% Grade-A Mongolian Cashmere", "Natural Horn Buttons"],
+      "care": ["Hand wash cold with wool shampoo or dry clean"],
+      "fit": "Relaxed drape, ribbed hem and cuffs"
+    },
+    {
+      "slug": "french-knot-merino-turtleneck",
+      "name": "French-Knot Merino Turtleneck",
+      "subtitle": "Extra-fine 19.5 micron merino with tactile beaded stitch constellation",
+      "description": "Seamless knit turtleneck adorned with hundreds of hand-twisted French knots across the yoke, creating a subtle tactile relief reminiscent of morning dew.",
+      "categorySlug": "knitwear",
+      "tags": ["knitwear", "merino", "french-knot", "sweater"],
+      "variants": [
+        { "sku": "fkm-crm-s", "color": "Cream", "colorHex": "#f8f5ee", "size": "S", "priceCents": 44000, "status": "in-stock" },
+        { "sku": "fkm-crm-m", "color": "Cream", "colorHex": "#f8f5ee", "size": "M", "priceCents": 44000, "status": "in-stock" },
+        { "sku": "fkm-crm-l", "color": "Cream", "colorHex": "#f8f5ee", "size": "L", "priceCents": 44000, "status": "in-stock" },
+        { "sku": "fkm-ter-m", "color": "Terracotta", "colorHex": "#c06b52", "size": "M", "priceCents": 44000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/french-knot-turtleneck-1.jpg", "alt": "French-Knot Merino Turtleneck — studio styling", "color": "#f8f5ee" },
+        { "src": "/images/products/french-knot-turtleneck-2.jpg", "alt": "French-Knot Merino Turtleneck — macro cluster detail", "color": "#f8f5ee" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "french-knot",
+        "techniqueLabel": "Hand-Wound French Knot Needlecraft",
+        "artisanHours": 12,
+        "placement": ["Collar Base", "Front Shoulder Yoke"],
+        "threadComposition": "Spun Merino & Fine Silk Yarns",
+        "motifStory": "Micro-sculpted spiral knots delivering an organic pebble-grain dimension that catches natural light."
+      },
+      "customizable": false,
+      "material": ["100% Extra-Fine Australian Merino Wool"],
+      "care": ["Dry clean or hand wash flat"],
+      "fit": "Tailored slim fit through shoulders and torso"
+    },
+    {
+      "slug": "atelier-monogram-poplin-shirt",
+      "name": "Atelier Monogram Poplin Shirt",
+      "subtitle": "120s two-ply Giza Egyptian cotton with personalized crest option",
+      "description": "An essential tailoring piece cut from crisp Egyptian cotton poplin, engineered with an open placement zone ready for your bespoke monogram or atelier crest.",
+      "categorySlug": "tops",
+      "tags": ["shirt", "poplin", "monogram", "bespoke", "tops"],
+      "variants": [
+        { "sku": "amp-wht-38", "color": "Paper White", "colorHex": "#ffffff", "size": "38", "priceCents": 32000, "status": "in-stock" },
+        { "sku": "amp-wht-40", "color": "Paper White", "colorHex": "#ffffff", "size": "40", "priceCents": 32000, "status": "in-stock" },
+        { "sku": "amp-wht-42", "color": "Paper White", "colorHex": "#ffffff", "size": "42", "priceCents": 32000, "status": "in-stock" },
+        { "sku": "amp-sky-40", "color": "Sky Blue", "colorHex": "#d4e2ed", "size": "40", "priceCents": 32000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/monogram-poplin-shirt-1.jpg", "alt": "Atelier Monogram Poplin Shirt — clean look", "color": "#ffffff" },
+        { "src": "/images/products/monogram-poplin-shirt-2.jpg", "alt": "Atelier Monogram Poplin Shirt — monogram embroidery detail", "color": "#ffffff" }
+      ],
+      "featured": true,
+      "embroidery": {
+        "technique": "monogram-bespoke",
+        "techniqueLabel": "Bespoke Atelier Monogram & Crest",
+        "artisanHours": 4,
+        "placement": ["Left Chest", "Left Sleeve Placket", "Collar Leaf"],
+        "threadComposition": "Gutterman High-Tenacity Mercerized Cotton",
+        "motifStory": "Precision hand-guided satin stitches tailored specifically to each patron's initials."
+      },
+      "customizable": true,
+      "material": ["100% Egyptian Giza Cotton Poplin (120/2)"],
+      "care": ["Machine wash warm delicate", "Medium iron while damp"],
+      "fit": "Contemporary refined relaxed cut with split back yoke"
+    },
+    {
+      "slug": "vine-embroidered-heavyweight-tee",
+      "name": "Vine Embroidered Heavyweight Tee",
+      "subtitle": "280 GSM dry-touch jersey with satin-stitch botanical collar",
+      "description": "Crafted from custom 280 GSM ringspun cotton jersey with high-density satin-stitch flora entwined along the ribbed neckline and chest pocket.",
+      "categorySlug": "tops",
+      "tags": ["tee", "t-shirt", "satin-stitch", "tops", "heavyweight"],
+      "variants": [
+        { "sku": "veh-snd-s", "color": "Sand Mineral", "colorHex": "#e6decb", "size": "S", "priceCents": 18000, "status": "in-stock" },
+        { "sku": "veh-snd-m", "color": "Sand Mineral", "colorHex": "#e6decb", "size": "M", "priceCents": 18000, "status": "in-stock" },
+        { "sku": "veh-snd-l", "color": "Sand Mineral", "colorHex": "#e6decb", "size": "L", "priceCents": 18000, "status": "in-stock" },
+        { "sku": "veh-blk-m", "color": "Faded Black", "colorHex": "#2b2a2a", "size": "M", "priceCents": 18000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/vine-heavyweight-tee-1.jpg", "alt": "Vine Embroidered Heavyweight Tee — studio front", "color": "#e6decb" },
+        { "src": "/images/products/vine-heavyweight-tee-2.jpg", "alt": "Vine Embroidered Heavyweight Tee — collar embroidery zoom", "color": "#e6decb" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "satin-stitch",
+        "techniqueLabel": "High-Density Satin Stitching",
+        "artisanHours": 6,
+        "placement": ["Neckline Rib", "Chest Pocket Hem"],
+        "threadComposition": "Mercerized Organic Cotton Thread",
+        "motifStory": "Contoured botanicals drafted with seamless stitch tension to preserve garment stretch."
+      },
+      "customizable": true,
+      "material": ["100% Organic Heavyweight Ringspun Cotton (280 GSM)"],
+      "care": ["Machine wash cold inside out", "Air dry flat"],
+      "fit": "Boxy drop-shoulder fit"
+    },
+    {
+      "slug": "selvedge-sashiko-embroidered-denim",
+      "name": "Selvedge Sashiko Embroidered Denim",
+      "subtitle": "14oz Japanese redline selvedge with traditional sashiko geometry",
+      "description": "Woven on vintage Toyoda shuttle looms in Okayama and finished with geometric Sashiko stitching across the front thighs and back yoke for enhanced structural resilience.",
+      "categorySlug": "bottoms",
+      "tags": ["denim", "sashiko", "selvedge", "jeans", "bottoms"],
+      "variants": [
+        { "sku": "ssd-raw-30", "color": "Raw Indigo", "colorHex": "#152238", "size": "30", "priceCents": 52000, "status": "in-stock" },
+        { "sku": "ssd-raw-32", "color": "Raw Indigo", "colorHex": "#152238", "size": "32", "priceCents": 52000, "status": "in-stock" },
+        { "sku": "ssd-raw-34", "color": "Raw Indigo", "colorHex": "#152238", "size": "34", "priceCents": 52000, "status": "low-stock", "quantity": 1 }
+      ],
+      "images": [
+        { "src": "/images/products/sashiko-selvedge-denim-1.jpg", "alt": "Selvedge Sashiko Embroidered Denim — front profile", "color": "#152238" },
+        { "src": "/images/products/sashiko-selvedge-denim-2.jpg", "alt": "Selvedge Sashiko Embroidered Denim — macro white sashiko stitching", "color": "#152238" }
+      ],
+      "featured": true,
+      "embroidery": {
+        "technique": "kantha-quilt",
+        "techniqueLabel": "Japanese Traditional Sashiko Reinforcement",
+        "artisanHours": 14,
+        "placement": ["Right Thigh", "Left Knee", "Back Pockets"],
+        "threadComposition": "Heavy Unwaxed Sashiko Cotton Cord",
+        "motifStory": "Ancestral rice-grain stitch motifs originally conceived to reinforce worker clothing against wear."
+      },
+      "customizable": false,
+      "material": ["14oz Okayama Cotton Selvedge Denim", "Solid Brass Hardware"],
+      "care": ["Wash infrequently in cold water", "Hang dry"],
+      "fit": "Straight leg, medium rise"
+    },
+    {
+      "slug": "pleated-silk-zari-wool-trousers",
+      "name": "Pleated Silk-Zari Wool Trousers",
+      "subtitle": "Italian wool-mohair blend with fine metallic thread side-stripe",
+      "description": "Double-pleated tailored trousers featuring an artisanal side-seam galon hand-embroidered in antique copper and gold metallic zari floss.",
+      "categorySlug": "bottoms",
+      "tags": ["trousers", "wool", "zari", "tailoring", "bottoms"],
+      "variants": [
+        { "sku": "pzt-olv-46", "color": "Deep Olive", "colorHex": "#393e36", "size": "46", "priceCents": 48000, "status": "in-stock" },
+        { "sku": "pzt-olv-48", "color": "Deep Olive", "colorHex": "#393e36", "size": "48", "priceCents": 48000, "status": "in-stock" },
+        { "sku": "pzt-olv-50", "color": "Deep Olive", "colorHex": "#393e36", "size": "50", "priceCents": 48000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/pleated-zari-trousers-1.jpg", "alt": "Pleated Silk-Zari Wool Trousers — drape and cut", "color": "#393e36" },
+        { "src": "/images/products/pleated-zari-trousers-2.jpg", "alt": "Pleated Silk-Zari Wool Trousers — metallic stripe needlecraft detail", "color": "#393e36" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "metallic-zari",
+        "techniqueLabel": "Metallic Zari Thread Inlay",
+        "artisanHours": 10,
+        "placement": ["Outer Side Seams", "Ticket Pocket Rim"],
+        "threadComposition": "Copper & Silver Core Metallic Zari",
+        "motifStory": "A modern homage to ceremonial livery stripes, hand-laid with continuous lustrous cords."
+      },
+      "customizable": false,
+      "material": ["85% Virgin Wool, 15% Mohair", "Cupro Knee Lining"],
+      "care": ["Dry clean only"],
+      "fit": "High-rise relaxed taper with crisp front crease"
+    },
+    {
+      "slug": "heritage-flora-embroidered-silk-scarf",
+      "name": "Heritage Flora Embroidered Silk Scarf",
+      "subtitle": "Pure mulberry silk twill with hand-rolled edges and hand embroidery",
+      "description": "A square 90x90cm luxury silk twill foulard detailed with intricate botanical flora along each corner quadrant, hand-embroidered with shaded satin stitch needlework.",
+      "categorySlug": "accessories",
+      "tags": ["scarf", "silk", "satin-stitch", "accessories"],
+      "variants": [
+        { "sku": "hfs-bge-os", "color": "Oat Beige", "colorHex": "#e5ded3", "size": "OS", "priceCents": 26000, "status": "in-stock" },
+        { "sku": "hfs-ter-os", "color": "Terracotta", "colorHex": "#c06b52", "size": "OS", "priceCents": 26000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/embroidered-silk-scarf-1.jpg", "alt": "Heritage Flora Embroidered Silk Scarf — folded styling", "color": "#e5ded3" },
+        { "src": "/images/products/embroidered-silk-scarf-2.jpg", "alt": "Heritage Flora Embroidered Silk Scarf — satin stitch corner embroidery", "color": "#e5ded3" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "satin-stitch",
+        "techniqueLabel": "Fine Shaded Silk Satin Stitch",
+        "artisanHours": 15,
+        "placement": ["Four Corner Medallions"],
+        "threadComposition": "100% Unspun Raw Silk Floss",
+        "motifStory": "Delicate color-gradient needle shading capturing the translucency of alpine blossoms."
+      },
+      "customizable": true,
+      "material": ["100% Mulberry Silk Twill (18mm)", "Hand-Rolled Hem"],
+      "care": ["Dry clean only", "Cool iron with pressing cloth"],
+      "fit": "90cm x 90cm square scarf"
+    },
+    {
+      "slug": "artisanal-needlework-canvas-tote",
+      "name": "Artisanal Needlework Canvas Tote",
+      "subtitle": "20oz heavyweight organic cotton duck with monogram patch",
+      "description": "Architectural carryall constructed from indestructible 20oz duck canvas, finished with reinforced bridle leather straps and a bespoke chain-stitched atelier crest.",
+      "categorySlug": "accessories",
+      "tags": ["tote", "bag", "canvas", "accessories", "monogram"],
+      "variants": [
+        { "sku": "act-nat-os", "color": "Natural Canvas", "colorHex": "#eae5da", "size": "OS", "priceCents": 21000, "status": "in-stock" },
+        { "sku": "act-blk-os", "color": "Coal", "colorHex": "#1f1e1d", "size": "OS", "priceCents": 21000, "status": "in-stock" }
+      ],
+      "images": [
+        { "src": "/images/products/needlework-canvas-tote-1.jpg", "alt": "Artisanal Needlework Canvas Tote — side-profile", "color": "#eae5da" },
+        { "src": "/images/products/needlework-canvas-tote-2.jpg", "alt": "Artisanal Needlework Canvas Tote — handle needlepoint reinforcement", "color": "#eae5da" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "monogram-bespoke",
+        "techniqueLabel": "Heavy Guage Monogram & Chain Stitch",
+        "artisanHours": 5,
+        "placement": ["Front Pocket Panel"],
+        "threadComposition": "Bonded Heavy Marine Cotton Cord",
+        "motifStory": "High-tension needlework tailored to withstand daily urban travel and heavy carry loads."
+      },
+      "customizable": true,
+      "material": ["20oz Organic Duck Canvas", "Vegetable-Tanned Bridle Leather"],
+      "care": ["Spot clean with mild soap and soft brush"],
+      "fit": "38cm W x 42cm H x 14cm D"
+    },
+    {
+      "slug": "nocturne-velvet-crewel-vest",
+      "name": "Nocturne Velvet Crewel Waistcoat",
+      "subtitle": "Deep cotton-silk velvet with metallic zari botanical embroidery",
+      "description": "Tailored vest crafted from midnight cotton-silk velvet, accented with botanical flora worked in antique gold zari and crewel needlework along the vest front.",
+      "categorySlug": "tops",
+      "tags": ["vest", "velvet", "zari", "crewel", "tops"],
+      "variants": [
+        { "sku": "nvv-mid-s", "color": "Midnight Black", "colorHex": "#141416", "size": "S", "priceCents": 46000, "status": "in-stock" },
+        { "sku": "nvv-mid-m", "color": "Midnight Black", "colorHex": "#141416", "size": "M", "priceCents": 46000, "status": "in-stock" },
+        { "sku": "nvv-mid-l", "color": "Midnight Black", "colorHex": "#141416", "size": "L", "priceCents": 46000, "status": "low-stock", "quantity": 2 }
+      ],
+      "images": [
+        { "src": "/images/products/nocturne-velvet-vest-1.jpg", "alt": "Nocturne Velvet Crewel Waistcoat — front view", "color": "#141416" },
+        { "src": "/images/products/nocturne-velvet-vest-2.jpg", "alt": "Nocturne Velvet Crewel Waistcoat — metallic thread detail on velvet", "color": "#141416" }
+      ],
+      "featured": false,
+      "embroidery": {
+        "technique": "metallic-zari",
+        "techniqueLabel": "Zari Wire & Fine Silk Relief",
+        "artisanHours": 20,
+        "placement": ["Front Lapel Borders", "Pocket Welts"],
+        "threadComposition": "Genuine Metallic Thread & Mulberry Silk",
+        "motifStory": "Glimmering needlework tailored against the deep light-absorbing pile of velvet."
+      },
+      "customizable": false,
+      "material": ["Cotton-Silk Velvet", "Mother-of-Pearl Buttons"],
+      "care": ["Dry clean only"],
+      "fit": "Tailored waistcoat cut with adjustable cinch back"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+/* src/styles/tokens.css — single source of truth for all design values. */
+:root {
+   /* ─────────────────────────────────────
+      Colors
+      ───────────────────────────────────── */
+   --color-cream:      #f6f4ef; /* page background */
+   --color-paper:      #ffffff; /* cards, drawer, menus */
+   --color-ink:        #1a1a1a; /* primary text, buttons */
+   --color-ink-muted:  #6b6b6b; /* secondary text */
+   --color-stone:      #e5e2dc; /* borders, dividers */
+   --color-warm-gray:  #9f9c96; /* placeholders, disabled */
+   --color-accent:     #c06b52; /* CTAs, hover focus */
+   --color-error:      #c9372d;
+   --color-success:    #2f6b3a;
+
+   /* ─────────────────────────────────────
+      Typography
+      ───────────────────────────────────── */
+   --font-sans:  'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+   --font-serif: 'Melodrama', 'Playfair Display', Georgia, 'Times New Roman', serif;
+
+   --text-xs:    0.75rem;  /* 12px */
+   --text-sm:    0.875rem; /* 14px */
+   --text-base:  1rem;     /* 16px */
+   --text-lg:    1.125rem; /* 18px */
+   --text-xl:    1.25rem;  /* 20px */
+   --text-2xl:   1.5rem;   /* 24px */
+   --text-3xl:   2rem;     /* 32px */
+   --text-4xl:   2.5rem;   /* 40px */
+   --text-5xl:   3.5rem;   /* 56px */
+   --text-6xl:   5rem;     /* 80px */
+   --text-hero:  clamp(3rem, 8vw, 9rem);
+
+   --leading-tight:   1;
+   --leading-snug:    1.15;
+   --leading-normal:  1.5;
+   --leading-relaxed: 1.7;
+
+   --tracking-tight:  -0.04em;
+   --tracking-normal: 0;
+   --tracking-wide:   0.05em;
+   --tracking-loose:  0.12em;
+
+   /* ─────────────────────────────────────
+      Spacing (matches Tailwind v4 scale)
+      ───────────────────────────────────── */
+   --spacing-0:  0;
+   --spacing-1:  0.25rem; /* 4px  */
+   --spacing-2:  0.5rem;  /* 8px  */
+   --spacing-3:  0.75rem; /* 12px */
+   --spacing-4:  1rem;    /* 16px */
+   --spacing-5:  1.5rem;  /* 24px */
+   --spacing-6:  2rem;    /* 32px */
+   --spacing-8:  3rem;    /* 48px */
+   --spacing-10: 4rem;    /* 64px */
+   --spacing-12: 6rem;    /* 96px */
+   --spacing-16: 8rem;    /* 128px */
+   --spacing-20: 12rem;   /* 192px */
+
+   --section-gap: var(--spacing-16);
+
+   /* ─────────────────────────────────────
+      Layout
+      ───────────────────────────────────── */
+   --container-max: 90rem;         /* 1440px */
+   --container-padding: 1rem;       /* mobile */
+   --container-padding-md: 1.5rem;  /* >=768px */
+   --container-padding-lg: 2rem;    /* >=1024px */
+   --container-padding-xl: 3rem;    /* >=1280px */
+
+   --header-height: 4.5rem; /* 72px */
+   --drawer-width:  28rem;  /* 448px */
+
+   /* ─────────────────────────────────────
+      Radius
+      ───────────────────────────────────── */
+   --radius-none: 0;
+   --radius-sm:   0.125rem;
+   --radius-md:   0.25rem;
+   --radius-lg:   0.5rem;
+   --radius-xl:   1rem;
+   --radius-full: 9999px;
+
+   /* ─────────────────────────────────────
+      Shadows (only for floating layers)
+      ───────────────────────────────────── */
+   --shadow-sm:    0 1px 2px rgba(26, 26, 26, 0.04);
+   --shadow-md:    0 4px 12px rgba(26, 26, 26, 0.06);
+   --shadow-lg:    0 12px 40px rgba(26, 26, 26, 0.08);
+   --shadow-float: 0 24px 60px rgba(26, 26, 26, 0.12);
+
+   /* ─────────────────────────────────────
+      Z-Index
+      ───────────────────────────────────── */
+   --z-base:     0;
+   --z-above:    10;
+   --z-dropdown: 100;
+   --z-sticky:   200;
+   --z-drawer:   300;
+   --z-modal:    400;
+   --z-toast:    500;
+   --z-cursor:   900;
+
+   /* ─────────────────────────────────────
+      Easing (motion system)
+      ───────────────────────────────────── */
+   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+   --ease-in-expo:  cubic-bezier(0.7, 0, 0.84, 0);
+   --ease-elastic:  cubic-bezier(0.68, -0.55, 0.265, 1.55);
+   --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+   --ease-dramatic: cubic-bezier(0.87, 0, 0.13, 1);
+
+   /* Durations */
+   --duration-instant:  100ms;
+   --duration-fast:     200ms;
+   --duration-normal:   400ms;
+   --duration-slow:     700ms;
+   --duration-dramatic: 1100ms;
+
+   /* Stagger base */
+   --stagger: 60ms;
+}
+
+/* High-contrast / dark mode can be added later by overriding tokens.
+   Phase 1 ships in light mode only. */
