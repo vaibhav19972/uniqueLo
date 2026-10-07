@@ -80,7 +80,19 @@ export const QuickViewModal: React.FC = () => {
                   activeImageIndex === idx ? 'border-accent ring-1 ring-accent' : 'border-stone opacity-70 hover:opacity-100'
                 }`}
               >
-                <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.tried) {
+                      target.dataset.tried = 'true';
+                      if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
+                      else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
+                    }
+                  }}
+                />
               </button>
             ))}
           </div>

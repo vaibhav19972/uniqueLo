@@ -202,7 +202,19 @@ export const ProductDetail: React.FC = () => {
                       : 'border-stone opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.dataset.tried) {
+                        target.dataset.tried = 'true';
+                        if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
+                        else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
+                      }
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -220,6 +232,14 @@ export const ProductDetail: React.FC = () => {
                   src={activeImage.src}
                   alt={activeImage.alt}
                   className="w-full h-full object-cover select-none"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.dataset.tried) {
+                      target.dataset.tried = 'true';
+                      if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
+                      else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
+                    }
+                  }}
                 />
 
                 {/* Macro Loupe Lens Hover Window (Pillar 1) */}

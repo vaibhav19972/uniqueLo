@@ -58,12 +58,12 @@
       ],
       "images": [
         {
-          "src": "/images/products/botanical-silk-jacket-1.jpg",
+          "src": "/images/products/botanical-silk-jacket-1.png",
           "alt": "Botanical Silk Embroidered Jacket — front view",
           "color": "#1d2a44"
         },
         {
-          "src": "/images/products/botanical-silk-jacket-2.jpg",
+          "src": "/images/products/botanical-silk-jacket-2.png",
           "alt": "Botanical Silk Embroidered Jacket — macro stitch detail",
           "color": "#1d2a44"
         }
@@ -140,12 +140,12 @@
       ],
       "images": [
         {
-          "src": "/images/products/celestial-zardozi-coat-1.jpg",
+          "src": "/images/products/celestial-zardozi-coat-1.png",
           "alt": "Celestial Zardozi Wool Overcoat — silhouette view",
           "color": "#121214"
         },
         {
-          "src": "/images/products/celestial-zardozi-coat-2.jpg",
+          "src": "/images/products/celestial-zardozi-coat-2.png",
           "alt": "Celestial Zardozi Wool Overcoat — metallic wire embroidery detail",
           "color": "#121214"
         }
@@ -315,12 +315,12 @@
       ],
       "images": [
         {
-          "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
+          "src": "/images/products/crewel-cashmere-cardigan-1.png",
           "alt": "Flora Crewel Cashmere Cardigan — model shot",
           "color": "#d9d2c5"
         },
         {
-          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
+          "src": "/images/products/crewel-cashmere-cardigan-2.png",
           "alt": "Flora Crewel Cashmere Cardigan — raised crewel wool relief",
           "color": "#d9d2c5"
         }
@@ -800,7 +800,7 @@
       ],
       "images": [
         {
-          "src": "/images/products/embroidered-silk-scarf-1.jpg",
+          "src": "/images/products/embroidered-silk-scarf-1.png",
           "alt": "Heritage Flora Embroidered Silk Scarf — folded styling",
           "color": "#e5ded3"
         },
