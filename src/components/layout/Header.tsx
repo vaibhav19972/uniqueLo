@@ -36,8 +36,8 @@ export const Header: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Atelier', path: '/' },
     { name: 'Collections', path: '/shop' },
+    { name: 'Craft Taxonomy', path: '/atelier' },
   ];
 
   const handleWishlistClick = () => {
@@ -77,10 +77,9 @@ export const Header: React.FC = () => {
           >
             <span className="font-serif text-2xl sm:text-3xl tracking-wider text-ink font-normal uppercase transition-colors group-hover:text-accent flex items-center gap-1.5">
               <span>UNIQUELO</span>
-              <span className="text-accent text-sm animate-pulse">✦</span>
             </span>
-            <span className="text-[9px] font-sans tracking-[0.25em] text-ink-muted uppercase -mt-1">
-              HAUTE NEEDLECRAFT
+            <span className="text-[9px] font-sans tracking-[0.2em] text-ink-muted uppercase -mt-0.5">
+              Hand-Embroidered Essentials • Made in India
             </span>
           </Link>
         </div>

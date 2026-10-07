@@ -30,6 +30,11 @@ create table if not exists public.products (
   material text[] default '{}',
   care text[] default '{}',
   fit text,
+  batch_number integer default 1,
+  batch_total integer default 50,
+  craft_region text,
+  craft_cluster text,
+  fabric_gsm text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

@@ -1,98 +1,77 @@
-# 07 — Backend & Admin (Strapi v5)
+# 07 — Backend & Cloud Architecture (Supabase + Vercel)
 
-> **Source of truth for the backend and admin direction.** The storefront (Phases 0–5)
-> is a pure static frontend by design; all persistence, media, and roles live behind
-> `src/lib/data.ts`. This doc defines how that seam becomes a real backend without
-> rewriting the UI.
+> **Source of truth for the UniqueLo backend and database architecture.**
+> Aligned with the TMS project deployment pattern: immediate deployment on **Vercel** 
+> (SPA edge CDN) paired with **Supabase** (managed PostgreSQL with Row Level Security, 
+> auth, and realtime storage), backed by multi-stage Docker containers for real production servers.
+> All data querying lives behind `src/lib/supabase.ts` and `src/lib/data.ts` with zero-config 
+> bundled fallback.
 
 ---
 
 ## 1. Decision record
 
-**Chosen: Strapi v5 (self-hosted).**
+**Chosen: Supabase (Managed Postgres + RLS) + Vercel Edge SPA.**
 
-| Requirement | How Strapi covers it |
+| Requirement | How Supabase + Vercel covers it |
 |---|---|
-| Inventory management per variant | Product Variant content type with `quantity` int; stock status derived server-side or in `data.ts` |
-| Add / customize / upload products | Admin panel + REST upload media library; Product schema mirrors `src/lib/data.ts` types exactly |
-| Manage products per category | Category content type with ordered relation to Products |
-| Editor dashboard (articles + prices) | Built-in roles: custom **Editor** role with write access to Article + Product prices only |
-| Journal / editorial storytelling | Article content type with rich text + media |
-| Headless-ready swap (STAR_GOAL §A) | Only `src/lib/data.ts` changes; components untouched |
-
-Rejected alternatives (recorded for future re-evaluation): Medusa v2 (heavier infra,
-editorial content would need extension anyway), Sanity (admin UI would be hand-built).
+| Immediate cloud deployment | Vercel provides instant zero-config preview & production deployments with SPA routing (`vercel.json`) |
+| Relational data model | Full PostgreSQL schema (`supabase/schema.sql`) for products, variants, craft taxonomy, reviews, and orders |
+| Role-Based Security & Permissions | PostgreSQL Row Level Security (RLS) policies enforce public read access and secured admin/order writes |
+| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`products.json`) if keys are unset |
+| Inventory & Variant Tracking | `product_variants` table tracks SKU, size, colorway, cents price, quantity, and stock status |
+| Craft Provenance & Macro Media | `embroidery_details` table stores artisan hours, guild clusters, regions, stitch types, and thread compositions |
+| Production Server Containerization | Multi-stage `Dockerfile` with optimized Alpine Nginx reverse proxy + `docker-compose.prod.yml` |
 
 ---
 
 ## 2. Architecture
 
 ```
-┌────────────────────────┐        ┌──────────────────────────────┐
-│  Storefront (Vite SPA) │  REST  │  Strapi v5                   │
-│  React 19 + TS         │◄──────►│  /api/products               │
-│  TanStack Query        │  JSON  │  /api/categories             │
-│  Zustand (cart, UI)    │        │  /api/articles               │
-│  ...unchanged...       │        │  Admin: /admin (roles, CRUD) │
-└────────────────────────┘        └──────────────┬───────────────┘
-                                                 │
-                                          SQLite (dev) → Postgres (prod)
-                                          Media library (local → S3/R2)
+┌─────────────────────────────────┐           ┌──────────────────────────────────────┐
+│  Storefront (Vercel Edge CDN)   │           │  Supabase Cloud (PostgreSQL 16)      │
+│  React 19 + TypeScript + Vite   │   HTTPS   │  Tables: products, categories,       │
+│  TanStack Query caching layer   │◄─────────►│  product_variants, embroidery,       │
+│  Zustand (Cart, Customizer, UI) │  REST/SQL │  reviews, newsletter, orders         │
+│  Failsafe: bundled JSON fallback│           │  Security: Row Level Security (RLS)  │
+└─────────────────────────────────┘           └──────────────────────────────────────┘
+                 │                                                │
+                 ▼                                                ▼
+┌─────────────────────────────────┐           ┌──────────────────────────────────────┐
+│  Self-Hosted Linux / Docker     │           │  Storage & Edge                      │
+│  Multi-stage Dockerfile         │           │  Supabase Storage Bucket: product-media│
+│  Nginx 1.25 Alpine reverse proxy│           │  CDN Caching & HTTP/2 Headers        │
+└─────────────────────────────────┘           └──────────────────────────────────────┘
 ```
 
-- **Monorepo layout:** keep the Vite app at repo root; add `backend/` directory
-  containing the Strapi project. One repo, two processes.
-- **Dev:** `npm run dev` (Vite :5173) + `npm run dev` inside `backend/` (Strapi :1337).
-- **Prod (first deployment):** static storefront on any static host (Netlify/Vercel/
-  Cloudflare Pages) + Strapi on a small VPS/Railway with Postgres.
-
-### Public API access
-Strapi default is **authenticated-only**. For catalog browsing use the **Public role**
-with `find` + `findOne` allowed on Product, Category, Article (read-only, published
-entries only). All writes go through `/admin` with role checks. When checkout exists,
- introduce an API token for cart/order endpoints.
+- **Environment Configuration:**
+  - `VITE_SUPABASE_URL`: Supabase project URL (`https://your-project.supabase.co`)
+  - `VITE_SUPABASE_ANON_KEY`: Safe public anon JWT key
+  - Fallback mode: If environment variables are empty or Supabase is unreachable, the store operates without error using local static JSON.
 
 ---
 
-## 3. Content types
+## 3. Database Schema (`supabase/schema.sql`)
 
-Field names deliberately match `src/lib/data.ts` interfaces 1:1 so the mapping layer
-stays trivial.
+Field names match `src/lib/data.ts` TypeScript types 1:1.
 
-### Product (collection)
-| Field | Type | Notes |
-|---|---|---|
-| `slug` | uid | unique, from `name` |
-| `name` | text (required) | |
-| `subtitle` | text | |
-| `description` | richtext | |
-| `category` | relation → Category (many-to-one) | replaces `categorySlug` |
-| `tags` | json (string[]) | |
-| `variants` | component (repeatable) → `product-variant` | |
-| `images` | media (multiple) | store `alt` via media metadata |
-| `featured` | boolean | |
-| `editorialImages` | media (multiple) | |
-| `embroidery` | component (single) → `embroidery-detail` | |
-| `customizable` | boolean | |
-| `material` | json (string[]) | |
-| `care` | json (string[]) | |
-| `fit` | text | |
+### `categories`
+`id` (uuid, PK), `slug` (text, unique), `name` (text), `label` (text), `description` (text), `image` (text), `display_order` (int).
 
-### Component: `product-variant`
-`sku` (uid, required), `color` text, `colorHex` text, `size` text,
-`priceCents` integer (required), `compareAtPriceCents` integer,
-`quantity` integer, `status` enum(`in-stock` `low-stock` `out-of-stock`).
+### `products`
+`id` (uuid, PK), `slug` (text, unique), `name` (text), `subtitle` (text), `description` (text), `category_id` (FK → categories), `tags` (text[]), `featured` (bool), `customizable` (bool), `fit` (text), `batch_number` (int), `batch_total` (int), `craft_region` (text), `craft_cluster` (text), `fabric_gsm` (text), `created_at` (timestamptz).
 
-> Keep price **in cents** everywhere. Never floats. Same contract as the frontend.
+### `product_variants`
+`id` (uuid, PK), `product_id` (FK → products), `sku` (text, unique), `color` (text), `color_hex` (text), `size` (text), `price_cents` (int), `compare_at_price_cents` (int), `quantity` (int), `status` (text: in-stock, low-stock, out-of-stock).
 
-### Component: `embroidery-detail`
-`technique` enum (same 8 values as `EmbroideryTechnique`), `techniqueLabel` text,
-`artisanHours` integer, `placement` json(string[]), `threadComposition` text,
-`motifStory` text, `macroImage` media (single).
+### `embroidery_details`
+`id` (uuid, PK), `product_id` (FK → products, unique), `technique` (text), `technique_label` (text), `artisan_hours` (int), `placement` (text[]), `thread_composition` (text), `motif_story` (text), `macro_image` (text).
 
-### Category (collection)
-`slug` uid, `name` text, `label` text, `description` text, `image` media,
-`order` integer (sort categories in nav).
+### `reviews`
+`id` (uuid, PK), `product_slug` (text), `author` (text), `rating` (int), `title` (text), `comment` (text), `verified` (bool), `created_at` (timestamptz).
+
+### `newsletter_subscribers` & `orders`
+Direct capture tables for marketing dispatches and customer checkouts.order` integer (sort categories in nav).
 
 ### Article (collection) — for the Editor dashboard / Atelier Journal
 `slug` uid, `title` text (required), `excerpt` text, `body` richtext,
@@ -108,55 +87,41 @@ Strapi ships an admin panel; configure roles once in **Settings → Roles**:
 | Role | Can do |
 |---|---|
 | **Admin** (built-in Super Admin) | Everything incl. roles, plugins, settings |
-| **Editor** (custom) | CRUD on Article; edit Product `priceCents` / `compareAtPriceCents` / `featured`; publish/unpublish both. **No** delete of products, **no** settings |
-| **Staff** (optional, later) | Read-only catalog view for stock updates |
+---
 
-Notes:
-- Price editing by editors: grant Product `update` permission; enforce field-level
-restrictions with Strapi's field permissions (v5 admin roles support per-field
-action scopes on content types) — restrict destroy + create, allow update.
-- The admin panel is usable as-is for the editor dashboard in Phase 9; a custom
-dashboard UI is only worth building later (see Phase 9 notes).
+## 4. Security & Permissions (PostgreSQL RLS)
+
+Supabase applies fine-grained Row Level Security (RLS) on each table:
+
+| Table | RLS Policy | Access Scope |
+|---|---|---|
+| `categories` | Public SELECT | All visitors can browse active categories |
+| `products` | Public SELECT | All visitors can browse active catalog garments |
+| `product_variants` | Public SELECT | Public inventory and size/color availability |
+| `embroidery_details` | Public SELECT | Public craft provenance and stitch details |
+| `reviews` | Public SELECT + Authenticated/Anon INSERT | Visitors can read verified reviews and submit new feedback |
+| `newsletter_subscribers`| Public INSERT | Newsletter and dispatch lead capture |
+| `orders` & `order_items`| Authenticated/Anon INSERT | Secured customer order placement |
 
 ---
 
-## 5. `data.ts` migration seam (Phase 7/8)
+## 5. `data.ts` Migration Seam & Client Architecture
 
-Current: synchronous functions reading imported JSON. Target: async client with the
-**same exported names and shapes**.
+All database queries pass through `src/lib/supabase.ts` into `src/lib/data.ts`.
+Components use TanStack Query hooks (`useProducts()`, `useProduct(slug)`, `useCraftTechniques()`).
 
-```ts
-// Target API shape (src/lib/data.ts) — same types, now async
-export async function getProducts(): Promise<Product[]>
-export async function getCategories(): Promise<Category[]>
-export async function getProduct(slug: string): Promise<Product | undefined>
-// ...getFeaturedProducts, getProductsByCategory, filterProducts unchanged logic
-```
-
-- Introduce **TanStack Query** for fetch/cache; components use hooks
-  (`useProducts()`, `useProduct(slug)`) that call `data.ts` functions.
-- `products.json` / `categories.json` become **dev seed data** (loaded into Strapi
-  during Phase 8 via seed script so the admin manages the same catalog).
-- Stock status stays derived: `quantity: 0 → out-of-stock`, `1–3 → low-stock`,
-  `>3 → in-stock` (server returns raw quantity; data layer derives status if absent).
-
-### REST mapping
-| Frontend call | Strapi endpoint |
-|---|---|
-| `getProducts()` | `GET /api/products?populate=deep` |
-| `getProduct(slug)` | `GET /api/products?filters[slug][$eq]=:slug&populate=deep` |
-| `getCategories()` | `GET /api/categories?sort=order` |
-| `getFeaturedProducts()` | `GET /api/products?filters[featured][$eq]=true` |
-
-Media URLs from Strapi are absolute; adapt `ProductImage.src` via a small
-`resolveImageUrl()` helper so local `/images/...` paths keep working from JSON seed.
+- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, `src/lib/data.ts` smoothly falls back to bundled `src/data/products.json`.
+- **Image URL Resolution:** `resolveImageUrl()` supports both relative local assets (`/images/products/...`) and Supabase Storage URLs.
+- **Stock Status Derivation:** Real-time quantity thresholds (`0 → out-of-stock`, `1–3 → low-stock`, `>3 → in-stock`).
 
 ---
 
-## 6. Phasing (extends docs/05-phases)
+## 6. Phasing Alignment (extends docs/05-phases)
 
-| Phase | Delivers |
-|---|---|
-| **7** | Async data layer + TanStack Query, JSON → dev seed, storefront unchanged UX |
-| **8** | Strapi backend stood up, content types modeled, catalog seeded, `data.ts` → REST |
+| Phase | Delivers | Status |
+|---|---|---|
+| **Phase 7** | Async data layer, TanStack Query hooks (`useCatalog.ts`), React 19 compatibility | Completed |
+| **Phase 8** | Supabase DDL schema (`schema.sql`), Seed dataset (`seed.sql`), Vercel SPA deploy config (`vercel.json`), Docker prod setup | Completed |
+| **Phase 9** | Supabase Auth, Admin/Editor product management dashboard, Stripe/Razorpay live webhook integration | Next |
+
 | **9** | Editor role configured, product upload + price edit + category management via admin, Article CMS flow live |
