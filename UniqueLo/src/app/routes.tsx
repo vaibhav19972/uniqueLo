@@ -5,6 +5,7 @@ import { Shop } from '../pages/Shop';
 import { ProductDetail } from '../pages/ProductDetail';
 import { Atelier } from '../pages/Atelier';
 import { AtelierTechnique } from '../pages/AtelierTechnique';
+import { Admin } from '../pages/Admin';
 import { NotFound } from '../pages/NotFound';
 
 export const routes: RouteObject[] = [
@@ -31,6 +32,10 @@ export const routes: RouteObject[] = [
       {
         path: 'atelier/:techniqueSlug',
         element: <AtelierTechnique />,
+      },
+      {
+        path: 'admin',
+        element: <Admin />,
       },
       {
         path: '*',
