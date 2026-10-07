@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import { useQueryClient } from '@tanstack/react-query';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { useProducts, catalogKeys } from '../hooks/useCatalog';
+import { useProducts } from '../hooks/useCatalog';
 import { useToastStore } from '../stores/toast';
 import { formatPrice, type EmbroideryTechnique } from '../lib/data';
+import { NotFound } from './NotFound';
 
 interface VariantForm {
   sku: string;
@@ -91,13 +91,12 @@ const PRESET_IMAGES = [
   { label: 'Silk Scarf 1', src: '/images/products/embroidered-silk-scarf-1.png' },
 ];
 
-export const Admin: React.FC = () => {
-  const queryClient = useQueryClient();
+const AdminStudio: React.FC = () => {
+
   const showToast = useToastStore((s) => s.showToast);
   const { data: existingProducts, isLoading } = useProducts();
 
   const [activeTab, setActiveTab] = useState<'create' | 'catalog' | 'sql-help'>('create');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
@@ -136,16 +135,20 @@ export const Admin: React.FC = () => {
   const [isUploading1, setIsUploading1] = useState(false);
   const [isUploading2, setIsUploading2] = useState(false);
 
-  // Upload directly to Supabase Storage
+  // Upload directly to Supabase Storage CDN
   const handleUploadImage = async (file: File, target: 1 | 2) => {
     if (!file) return;
     const setUploading = target === 1 ? setIsUploading1 : setIsUploading2;
     const setSrc = target === 1 ? setImage1Src : setImage2Src;
 
+    // Set immediate preview
+    const localPreviewUrl = URL.createObjectURL(file);
+
     if (!isSupabaseConfigured() || !supabase) {
+      setSrc(localPreviewUrl);
       showToast({
-        title: 'Supabase Not Configured',
-        description: 'Set your Supabase credentials to upload directly to Storage CDN.',
+        title: 'Preview Loaded',
+        description: 'Local preview active. Configure Supabase to upload to Cloud CDN.',
         type: 'info',
       });
       return;
@@ -171,14 +174,16 @@ export const Admin: React.FC = () => {
       setSrc(publicUrlData.publicUrl);
       showToast({
         title: '✦ Image Uploaded to CDN',
-        description: 'File uploaded to Supabase Storage without Git commits.',
+        description: 'Public URL generated and embedded into your JSON & SQL!',
         type: 'success',
       });
     } catch (err: any) {
       console.warn('[Storage Upload Error]:', err);
+      // Fallback to local preview so user still sees the picture
+      setSrc(localPreviewUrl);
       showToast({
-        title: 'Storage Notice',
-        description: err?.message || 'Bucket "product-images" required. See SQL tab for 1-click bucket setup!',
+        title: 'Storage Bucket Notice',
+        description: `Could not save to bucket "${err?.message || 'product-images'}". Check SQL tab to create bucket!`,
         type: 'info',
       });
     } finally {
@@ -463,111 +468,6 @@ INSERT INTO public.embroidery_details (
     threadComposition,
     motifStory,
   ]);
-
-  // Publish to Supabase Action
-  const handlePublishToSupabase = async () => {
-    if (!name.trim() || !slug.trim()) {
-      showToast({ title: 'Missing Name or Slug', description: 'Please enter a product title and slug.', type: 'info' });
-      return;
-    }
-    if (variants.length === 0) {
-      showToast({ title: 'No Variants', description: 'Please add at least one variant before publishing.', type: 'info' });
-      return;
-    }
-
-    if (!isSupabaseConfigured() || !supabase) {
-      showToast({
-        title: 'Supabase Not Configured Locally',
-        description: 'VITE_SUPABASE_URL is not set. Use "Copy SQL" to run on Supabase directly!',
-        type: 'info',
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const finalSlug = slug.trim();
-      const tags = tagsInput.split(',').map((t) => t.trim()).filter(Boolean);
-      const material = materialsInput.split(',').map((t) => t.trim()).filter(Boolean);
-      const care = careInput.split(',').map((t) => t.trim()).filter(Boolean);
-      const placement = placementInput.split(',').map((t) => t.trim()).filter(Boolean);
-
-      // 1. Insert product
-      const { error: prodErr } = await supabase.from('products').upsert({
-        slug: finalSlug,
-        name,
-        subtitle,
-        description,
-        category_slug: categorySlug,
-        tags,
-        featured,
-        customizable,
-        material,
-        care,
-        fit,
-        batch_number: batchNumber,
-        batch_total: batchTotal,
-        craft_region: craftRegion,
-        craft_cluster: craftCluster,
-        fabric_gsm: fabricGsm,
-      });
-
-      if (prodErr) throw prodErr;
-
-      // 2. Insert product images
-      await supabase.from('product_images').delete().eq('product_slug', finalSlug);
-      const { error: imgErr } = await supabase.from('product_images').insert([
-        { product_slug: finalSlug, src: image1Src, alt: image1Alt || name, sort_order: 0 },
-        { product_slug: finalSlug, src: image2Src, alt: image2Alt || name, sort_order: 1 },
-      ]);
-      if (imgErr) throw imgErr;
-
-      // 3. Insert variants
-      const variantRows = variants.map((v) => ({
-        sku: v.sku,
-        product_slug: finalSlug,
-        color: v.color,
-        color_hex: v.colorHex,
-        size: v.size,
-        price_cents: Math.round(v.price * 100),
-        status: v.status,
-        quantity: v.quantity,
-      }));
-      const { error: varErr } = await supabase.from('variants').upsert(variantRows);
-      if (varErr) throw varErr;
-
-      // 4. Insert embroidery details
-      const { error: embErr } = await supabase.from('embroidery_details').upsert({
-        product_slug: finalSlug,
-        technique,
-        technique_label: techniqueLabel,
-        artisan_hours: artisanHours,
-        placement,
-        thread_composition: threadComposition,
-        motif_story: motifStory,
-      });
-      if (embErr) throw embErr;
-
-      // Invalidate React Query catalog
-      await queryClient.invalidateQueries({ queryKey: catalogKeys.products });
-
-      showToast({
-        title: '✦ Product Published!',
-        description: `"${name}" is now live on Supabase & storefront.`,
-        type: 'success',
-      });
-      setActiveTab('catalog');
-    } catch (err: any) {
-      console.error('[Admin Publish Error]:', err);
-      showToast({
-        title: 'Publish Error',
-        description: err?.message || 'Check database permissions or copy SQL directly.',
-        type: 'info',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -1223,54 +1123,82 @@ INSERT INTO public.embroidery_details (
             {/* Right 4 Columns: Image Previews & Action Deck */}
             <div className="lg:col-span-4 space-y-6 sticky top-24">
               {/* Image Configuration & Previews */}
-              <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-5">
-                <div className="border-b border-stone/30 pb-2.5">
-                  <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Visuals</span>
-                  <h3 className="font-serif text-lg text-ink">Product Imagery</h3>
+              <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-6">
+                <div className="border-b border-stone/30 pb-2.5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Visuals</span>
+                    <h3 className="font-serif text-lg text-ink">Product Imagery & Upload</h3>
+                  </div>
+                  <span className="text-[10px] text-ink-muted uppercase tracking-wider font-mono">
+                    CDN Linked
+                  </span>
                 </div>
 
-                {/* Image 1 */}
-                <div className="space-y-2">
+                {/* Image 1: Main Silhouette */}
+                <div className="space-y-3 p-3.5 bg-cream/60 border border-stone/40 rounded-sm">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                    <span className="text-xs font-serif font-bold text-ink">
                       1. Main Silhouette Image (3:4)
-                    </label>
-                    <label className={`text-[10px] uppercase tracking-wider px-2 py-0.5 border cursor-pointer transition-colors ${
-                      isUploading1 ? 'bg-stone/20 text-ink-muted border-stone/30' : 'bg-accent/10 border-accent/40 text-accent hover:bg-accent hover:text-cream'
-                    }`}>
-                      <span>{isUploading1 ? '⏳ Uploading...' : '📁 Upload Device Photo'}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        disabled={isUploading1}
-                        className="hidden"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 1);
-                        }}
-                      />
-                    </label>
+                    </span>
+                    {image1Src.startsWith('http') && (
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
+                        CDN Active
+                      </span>
+                    )}
                   </div>
-                  <input
-                    type="text"
-                    value={image1Src}
-                    onChange={(e) => setImage1Src(e.target.value)}
-                    placeholder="/images/products/... or https://..."
-                    className="w-full bg-cream border border-stone/60 px-3 py-1.5 text-xs font-mono text-ink"
-                  />
+
+                  {/* Prominent Upload Button */}
+                  <label className={`w-full py-2.5 px-3 border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                    isUploading1
+                      ? 'border-accent bg-accent/10 text-accent font-medium'
+                      : 'border-accent/50 bg-paper hover:border-accent hover:bg-accent/5 text-ink'
+                  }`}>
+                    <span className="text-base">{isUploading1 ? '⏳' : '📁'}</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider">
+                      {isUploading1 ? 'Uploading to Supabase CDN...' : 'Upload Image from Device'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isUploading1}
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 1);
+                      }}
+                    />
+                  </label>
+
+                  {/* URL Display (embedded directly into JSON & SQL) */}
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                      Image 1 URL (Embedded in JSON):
+                    </label>
+                    <input
+                      type="text"
+                      value={image1Src}
+                      onChange={(e) => setImage1Src(e.target.value)}
+                      placeholder="/images/products/... or https://..."
+                      className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
                   {/* Preset quick picker */}
-                  <div className="flex flex-wrap gap-1">
-                    {PRESET_IMAGES.slice(0, 4).map((p, i) => (
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    <span className="text-[9px] text-ink-muted uppercase self-center mr-1">Presets:</span>
+                    {PRESET_IMAGES.slice(0, 3).map((p, i) => (
                       <button
                         key={i}
                         type="button"
                         onClick={() => setImage1Src(p.src)}
-                        className="text-[10px] px-2 py-0.5 bg-cream border border-stone/40 hover:border-accent text-ink-muted"
+                        className="text-[9px] px-1.5 py-0.5 bg-paper border border-stone/40 hover:border-accent text-ink-muted"
                       >
-                        {p.label}
+                        {p.label.split(' ')[0]} {i + 1}
                       </button>
                     ))}
                   </div>
-                  <div className="aspect-[3/4] max-w-[200px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative mt-2">
+
+                  {/* Live Thumbnail Preview */}
+                  <div className="aspect-[3/4] max-w-[180px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative shadow-inner">
                     <img
                       src={image1Src}
                       alt="Front Preview"
@@ -1279,41 +1207,62 @@ INSERT INTO public.embroidery_details (
                         (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
                       }}
                     />
-                    <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5 uppercase tracking-wider">
-                      Front Silhouette
+                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
+                      Silhouette (3:4)
                     </span>
                   </div>
                 </div>
 
-                {/* Image 2 */}
-                <div className="space-y-2 pt-4 border-t border-stone/20">
+                {/* Image 2: Macro Loupe Detail */}
+                <div className="space-y-3 p-3.5 bg-cream/60 border border-stone/40 rounded-sm">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                    <span className="text-xs font-serif font-bold text-ink">
                       2. Macro Stitch Relief (PDP Loupe)
-                    </label>
-                    <label className={`text-[10px] uppercase tracking-wider px-2 py-0.5 border cursor-pointer transition-colors ${
-                      isUploading2 ? 'bg-stone/20 text-ink-muted border-stone/30' : 'bg-accent/10 border-accent/40 text-accent hover:bg-accent hover:text-cream'
-                    }`}>
-                      <span>{isUploading2 ? '⏳ Uploading...' : '📁 Upload Macro Photo'}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        disabled={isUploading2}
-                        className="hidden"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 2);
-                        }}
-                      />
-                    </label>
+                    </span>
+                    {image2Src.startsWith('http') && (
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
+                        CDN Active
+                      </span>
+                    )}
                   </div>
-                  <input
-                    type="text"
-                    value={image2Src}
-                    onChange={(e) => setImage2Src(e.target.value)}
-                    placeholder="/images/products/... or https://..."
-                    className="w-full bg-cream border border-stone/60 px-3 py-1.5 text-xs font-mono text-ink"
-                  />
-                  <div className="aspect-[3/4] max-w-[200px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative mt-2">
+
+                  {/* Prominent Upload Button */}
+                  <label className={`w-full py-2.5 px-3 border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                    isUploading2
+                      ? 'border-accent bg-accent/10 text-accent font-medium'
+                      : 'border-accent/50 bg-paper hover:border-accent hover:bg-accent/5 text-ink'
+                  }`}>
+                    <span className="text-base">{isUploading2 ? '⏳' : '🔍'}</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider">
+                      {isUploading2 ? 'Uploading to Supabase CDN...' : 'Upload Macro Photo from Device'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={isUploading2}
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 2);
+                      }}
+                    />
+                  </label>
+
+                  {/* URL Display (embedded directly into JSON & SQL) */}
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                      Image 2 URL (Embedded in JSON):
+                    </label>
+                    <input
+                      type="text"
+                      value={image2Src}
+                      onChange={(e) => setImage2Src(e.target.value)}
+                      placeholder="/images/products/... or https://..."
+                      className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
+                  {/* Live Thumbnail Preview */}
+                  <div className="aspect-[3/4] max-w-[180px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative shadow-inner">
                     <img
                       src={image2Src}
                       alt="Macro Preview"
@@ -1322,51 +1271,74 @@ INSERT INTO public.embroidery_details (
                         (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
                       }}
                     />
-                    <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5 uppercase tracking-wider">
-                      Macro Loupe
+                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
+                      Macro Relief
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Action Deck */}
+              {/* Action Deck (Option 2: Air-Gapped Secure Workflow) */}
               <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-4">
-                <h3 className="font-serif text-lg text-ink border-b border-stone/30 pb-2">
-                  Publishing Deck
-                </h3>
+                <div className="flex items-center justify-between border-b border-stone/30 pb-2">
+                  <h3 className="font-serif text-lg text-ink">Publishing Deck</h3>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-medium">
+                    🛡️ Air-Gapped Secure
+                  </span>
+                </div>
 
+                <p className="text-[11px] text-ink-muted leading-relaxed font-light">
+                  Public database write access is strictly locked down. All catalog updates run through your authenticated Supabase Console.
+                </p>
+
+                {/* Primary Action Button */}
                 <button
                   type="button"
-                  disabled={isSubmitting}
-                  onClick={handlePublishToSupabase}
-                  className="w-full py-3 bg-accent text-cream hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {isSubmitting ? (
-                    <span>Publishing to Database...</span>
-                  ) : (
-                    <>
-                      <span>✦</span>
-                      <span>Publish Directly to Supabase</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generatedSQL, 'Ready-to-run SQL query')}
-                  className="w-full py-2.5 bg-ink text-cream hover:bg-ink-muted transition-colors text-xs uppercase tracking-widest font-medium cursor-pointer flex items-center justify-center gap-2"
+                  onClick={() => copyToClipboard(generatedSQL, 'Ready-to-run multi-table SQL query')}
+                  className="w-full py-3 bg-accent text-cream hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer flex items-center justify-center gap-2 shadow-sm"
                 >
                   <span>📋</span>
-                  <span>Copy SQL Query (for Supabase Editor)</span>
+                  <span>Copy SQL Query (Ready to Run)</span>
                 </button>
 
+                {/* Direct Link to Supabase SQL Editor */}
+                <a
+                  href={`https://supabase.com/dashboard/project/${(import.meta.env.VITE_SUPABASE_URL || '').replace(/^https?:\/\//, '').split('.')[0] || 'heimnfjuwmmmejqcjbbd'}/sql/new`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 bg-ink text-cream hover:bg-ink-muted transition-colors text-xs uppercase tracking-widest font-medium flex items-center justify-center gap-2 text-center"
+                >
+                  <span>Open Supabase SQL Editor ↗</span>
+                </a>
+
+                {/* Copy JSON snippet */}
                 <button
                   type="button"
                   onClick={() => copyToClipboard(generatedJSON, 'products.json snippet')}
                   className="w-full py-2 bg-cream border border-stone/60 hover:bg-stone/10 transition-colors text-xs uppercase tracking-widest font-medium text-ink cursor-pointer"
                 >
-                  Copy products.json Code
+                  Copy products.json Code (With Image URLs)
                 </button>
+
+                {/* JSON Preview Collapsible */}
+                <details className="pt-1 text-xs text-ink-muted">
+                  <summary className="cursor-pointer uppercase tracking-wider text-[10px] font-semibold text-accent hover:underline select-none">
+                    Preview Generated JSON Object
+                  </summary>
+                  <pre className="mt-2 p-3 bg-ink text-cream font-mono text-[10px] rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
+                    {generatedJSON}
+                  </pre>
+                </details>
+
+                {/* SQL Code Preview Collapsible */}
+                <details className="pt-2 border-t border-stone/20 text-xs text-ink-muted">
+                  <summary className="cursor-pointer uppercase tracking-wider text-[10px] font-semibold text-accent hover:underline select-none">
+                    View Generated SQL Statement
+                  </summary>
+                  <pre className="mt-2 p-3 bg-ink text-cream font-mono text-[10px] rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
+                    {generatedSQL}
+                  </pre>
+                </details>
 
                 {slug && (
                   <Link
@@ -1526,4 +1498,20 @@ FOR INSERT WITH CHECK (bucket_id = 'product-images');`}
       </div>
     </div>
   );
+};
+
+export const Admin: React.FC = () => {
+  // Security Guard: Restrict access strictly to local environment
+  const isLocalEnvironment =
+    import.meta.env.DEV ||
+    (typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '0.0.0.0'));
+
+  if (!isLocalEnvironment) {
+    return <NotFound />;
+  }
+
+  return <AdminStudio />;
 };
