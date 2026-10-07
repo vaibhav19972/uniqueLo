@@ -116,11 +116,6 @@ export const Footer: React.FC = () => {
                   Kashmir Crewel Wool
                 </Link>
               </li>
-              <li>
-                <Link to="/admin" className="hover:text-cream transition-colors text-accent/90 font-medium flex items-center gap-1 pt-1">
-                  <span>✦</span> Studio Admin (/admin)
-                </Link>
-              </li>
             </ul>
           </div>
 
