@@ -14,6 +14,10 @@
 | **3** | Shop page + filtering | Shop grid, tabs, filters, animated layout, quick-add |
 | **4** | Cart + drawer + route transitions | Cart store, drawer UI, add/remove, subtotal |
 | **5** | Polish + QA + build optimization | Reduced motion pass, Lighthouse, responsive audit, prod build passes |
+| **6** | Identity & anti-generic pass | Real Satoshi + Melodrama self-hosted fonts, art-direction rules enforced, placeholder audit |
+| **7** | Async data layer | `data.ts` becomes async (TanStack Query), JSON files become dev seed data, storefront UX unchanged |
+| **8** | Strapi backend | Content types modeled (Product/Variant/Category/Article), catalog seeded, `data.ts` swaps to REST |
+| **9** | Editor dashboard | Editor role (articles + prices), product upload, category management, inventory per variant |
 
 ---
 
@@ -258,7 +262,100 @@ Production-ready build with accessibility, performance, and responsive passes.
 
 ---
 
-## 9. How to Assign Work to Other Agents
+## 9. Phase 6 — Identity & Anti-Generic Pass
+
+### Goal
+Remove every "template/AI-generated" signal so the storefront reads as an
+art-directed brand site, not a generated one.
+
+### Task Cards
+
+| ID | Task | Acceptance |
+|----|------|------------|
+| P6.1 | Self-host brand fonts | `public/fonts/` contains Satoshi (variable or 400/500/700) + Melodrama woff2; `fonts.css` with `@font-face` + `font-display: swap`; index.html Google Fonts link removed; no FOUT flash of fallback serif. |
+| P6.2 | Enforce art-direction rules | `docs/02-design-system` anti-generic rules section exists and components comply. |
+| P6.3 | Placeholder audit | Every script-generated image is either replaced or explicitly documented in `docs/06-assets-and-placeholders` with replacement intent. |
+
+### Phase 6 Verification
+
+- [ ] `npm run build` passes.
+- [ ] DevTools network shows fonts served locally (no `fonts.googleapis.com` request).
+- [ ] Computed font-family on `body` is Satoshi; on editorial headings is Melodrama.
+
+---
+
+## 10. Phase 7 — Async Data Layer
+
+### Goal
+Prepare the seam for Strapi: `src/lib/data.ts` exports become async, cached via
+TanStack Query, with JSON files demoted to dev seed data. Storefront UX unchanged.
+
+### Task Cards
+
+| ID | Task | Acceptance |
+|----|------|------------|
+| P7.1 | Add TanStack Query | QueryClientProvider in `src/app/App.tsx`; `@tanstack/react-query` installed. |
+| P7.2 | Async `data.ts` | All getters return Promises; JSON import paths kept as dev fallback when `VITE_API_URL` unset. |
+| P7.3 | Query hooks | `src/hooks/useCatalog.ts` with `useProducts`, `useProduct(slug)`, `useCategories` consuming `data.ts`. |
+| P7.4 | Migrate consumers | Shop/Home/ProductGrid/etc. use hooks; loading + error states styled per design system. |
+
+### Phase 7 Verification
+
+- [ ] `npm run build` passes.
+- [ ] With no backend running, storefront renders identically from seed JSON.
+- [ ] No component imports `../data/products.json` directly.
+
+---
+
+## 11. Phase 8 — Strapi Backend
+
+### Goal
+Stand up Strapi v5 in `backend/`, model content types per `docs/07-backend`,
+seed the catalog, and point `data.ts` at REST.
+
+### Task Cards
+
+| ID | Task | Acceptance |
+|----|------|------------|
+| P8.1 | Strapi project | `backend/` runs on :1337; SQLite in dev; first admin user created. |
+| P8.2 | Content types | Product, product-variant component, embroidery-detail component, Category, Article match `docs/07-backend` field tables. |
+| P8.3 | Public read permissions | Public role can `find`/`findOne` published Products, Categories, Articles; no write. |
+| P8.4 | Seed catalog | Script imports `products.json`/`categories.json` incl. variant + embroidery components and media. |
+| P8.5 | REST data layer | `data.ts` fetches from Strapi when `VITE_API_URL` set; `resolveImageUrl()` maps media URLs. |
+
+### Phase 8 Verification
+
+- [ ] `npm run build` passes.
+- [ ] Storefront renders the same catalog from Strapi as it did from JSON.
+- [ ] Editing a price in Strapi admin changes it on the storefront after refresh.
+
+---
+
+## 12. Phase 9 — Editor Dashboard
+
+### Goal
+Non-developer workflow: an Editor logs into `/admin` and can manage articles,
+edit prices, upload products with variants, and manage categories + inventory.
+
+### Task Cards
+
+| ID | Task | Acceptance |
+|----|------|------------|
+| P9.1 | Editor role | Custom Strapi role: full CRUD on Article; update-only on Product (price/featured fields); publish rights; no settings/delete access. |
+| P9.2 | Product upload flow | Editor creates a product in admin: images to media library, variants with price/quantity, category assignment, embroidery details. |
+| P9.3 | Inventory workflow | Editor adjusts variant `quantity`; storefront stock status (in/low/out) reflects it. |
+| P9.4 | Article workflow | Editor drafts, previews, publishes an Atelier Journal article; storefront Journal route renders it. |
+| P9.5 | Journal route | `/journal` + `/journal/:slug` frontend routes reading Article data via `data.ts`. |
+
+### Phase 9 Verification
+
+- [ ] `npm run build` passes.
+- [ ] Editor account can log in, publish an article, edit a price, and upload a product — without touching code.
+- [ ] Admin (Super Admin) can delete products and manage roles; Editor cannot.
+
+---
+
+## 13. How to Assign Work to Other Agents
 
 When another agent joins, give it:
 

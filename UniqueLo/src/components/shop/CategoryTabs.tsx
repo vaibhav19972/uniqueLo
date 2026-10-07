@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { getCategories } from '../../lib/data';
+import { useCategories } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
 
 export const CategoryTabs: React.FC = () => {
-  const categories = useMemo(() => getCategories(), []);
+  const { data: categories } = useCategories();
   const activeCategory = useFiltersStore((state) => state.filters.categorySlug);
   const setCategory = useFiltersStore((state) => state.setCategory);
 
   return (
     <div className="w-full border-b border-stone/60 overflow-x-auto scrollbar-none bg-paper">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex space-x-8 sm:space-x-12 min-w-max">
-        {categories.map((cat) => {
+        {(categories ?? []).map((cat) => {
           const isActive = activeCategory === cat.slug;
           return (
             <button

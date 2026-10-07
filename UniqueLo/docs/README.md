@@ -24,6 +24,7 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | **[04 — Motion System](./04-motion-system/README.md)** | Cinema-Grade Choreography | Lenis inertia scroll, GSAP ScrollTrigger pinning, Framer Motion UI transitions, and strict reduced-motion rules. |
 | **[05 — Build Phases](./05-phases/README.md)** | Phase-Gated Execution | Atomic task cards (P0 through P5), acceptance criteria, and build-verification checkpoints. |
 | **[06 — Assets & Placeholders](./06-assets-and-placeholders/README.md)** | Visual Asset Pipeline | Tonal color block placeholders, aspect ratio rules, asset registry, and photography transition strategy. |
+| **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts`, Product/Category/Article management, Editor role (articles + prices), inventory per variant, and the `data.ts` async migration seam. |
 
 ---
 

@@ -1,9 +1,10 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { getFeaturedProducts, formatPrice, getDefaultVariant, type Product } from '../../lib/data';
+import { useFeaturedProducts } from '../../hooks/useCatalog';
+import { formatPrice, getDefaultVariant, type Product } from '../../lib/data';
 import { prefersReducedMotion } from '../../lib/motion';
 import { useCartStore } from '../../stores/cart';
 import { useCustomizerStore } from '../../stores/customizer';
@@ -15,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 export const FeaturedProducts: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const featured = useMemo(() => getFeaturedProducts(6), []);
+  const { data: featured } = useFeaturedProducts(6);
 
   const addItem = useCartStore((state) => state.addItem);
   const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
@@ -73,7 +74,7 @@ export const FeaturedProducts: React.FC = () => {
           ref={trackRef}
           className="flex gap-6 sm:gap-8 px-4 sm:px-6 lg:px-12 w-max will-change-transform"
         >
-          {featured.map((product: Product) => {
+          {(featured ?? []).map((product: Product) => {
             const defaultVariant = getDefaultVariant(product);
             const frontImage = product.images[0]?.src || '/images/placeholders/hero.jpg';
             const macroImage = product.images[1]?.src || frontImage;
@@ -100,7 +101,7 @@ export const FeaturedProducts: React.FC = () => {
                       aspectRatio="3/4"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-mono">
+                    <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
                       3x Macro Stitch
                     </div>
                   </div>

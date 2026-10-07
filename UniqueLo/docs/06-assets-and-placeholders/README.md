@@ -55,6 +55,13 @@ Example:
 
 Update `products.json` image `src` to the real path once it exists. Until then, point `src` to the placeholder.
 
+**Current state (Phase 6 audit):** the catalog's image paths point directly to real
+files in `public/images/products/`, `public/images/categories/`, and
+`public/images/campaigns/` — but those files are tonal placeholder blocks generated
+per the spec in §4. The placeholder twins in `public/images/placeholders/` exist only
+as broken-link fallbacks for the shared `Image` component. The naming-rule example
+above pre-dates the actual catalog slugs.
+
 ---
 
 ## 4. Generating Placeholders
@@ -102,9 +109,24 @@ Use this table to track real assets as they arrive. Update it when a file is swa
 | Category | tops | `/images/categories/tops.jpg` | placeholder | TBD | |
 | Category | bottoms | `/images/categories/bottoms.jpg` | placeholder | TBD | |
 | Category | accessories | `/images/categories/accessories.jpg` | placeholder | TBD | |
-| Product | cashmere-robe-coat | `/images/products/cashmere-robe-coat-1.jpg` | placeholder | TBD | Need front + detail |
-| Product | cashmere-robe-coat | `/images/products/cashmere-robe-coat-2.jpg` | placeholder | TBD | Need hover image |
-| ... | ... | ... | ... | ... | ... |
+| Product | botanical-silk-embroidered-jacket | `/images/products/botanical-silk-jacket-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | celestial-zardozi-wool-coat | `/images/products/celestial-zardozi-coat-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | kantha-quilted-chore-jacket | `/images/products/kantha-chore-jacket-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | flora-crewel-cashmere-cardigan | `/images/products/crewel-cashmere-cardigan-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | french-knot-merino-turtleneck | `/images/products/french-knot-turtleneck-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | atelier-monogram-poplin-shirt | `/images/products/monogram-poplin-shirt-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | vine-embroidered-heavyweight-tee | `/images/products/vine-heavyweight-tee-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | selvedge-sashiko-embroidered-denim | `/images/products/sashiko-selvedge-denim-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | pleated-silk-zari-wool-trousers | `/images/products/pleated-zari-trousers-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | heritage-flora-embroidered-silk-scarf | `/images/products/embroidered-silk-scarf-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | artisanal-needlework-canvas-tote | `/images/products/needlework-canvas-tote-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Product | nocturne-velvet-crewel-vest | `/images/products/nocturne-velvet-vest-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
+| Editorial | atelier-craft | `/images/campaigns/atelier-craft.jpg` | placeholder | TBD | EditorialSplit secondary frame |
+| Editorial | editorial-split | `/images/campaigns/editorial-split.jpg` | placeholder | TBD | EditorialSplit primary frame |
+| Lookbook | lookbook 01–03 | `/images/campaigns/lookbook-0{1,2,3}.jpg` | placeholder | TBD | Lookbook carousel |
+
+> All paths verified to exist on disk (Phase 6 audit). Every product slug in
+> `products.json` maps to real files for both silhouette + macro views.
 
 ---
 

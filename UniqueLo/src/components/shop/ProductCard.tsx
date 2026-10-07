@@ -19,7 +19,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const macroImage = product.images[1]?.src || frontImage;
 
   return (
-    <div className="group flex flex-col bg-paper border border-stone/60 transition-all duration-300 hover:shadow-lg">
+    <div className="group flex flex-col bg-paper border border-stone/60 transition-colors duration-300 hover:border-ink/40">
       {/* Visual Canvas: Image Swap on Hover */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
         {/* Silhouette Image */}
@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             aspectRatio="3/4"
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2 py-0.5 text-[9px] uppercase tracking-widest font-mono">
+          <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2 py-0.5 text-[9px] uppercase tracking-widest font-sans">
             3x Stitch Macro
           </div>
         </div>

@@ -303,3 +303,51 @@ Keep the default Tailwind scale for utilities that are not explicitly overridden
 - Add new font families or weights without updating this file and loading the assets.
 - Invent new breakpoints or container widths.
 
+---
+
+## 12. Anti-Generic Art Direction (Phase 6 enforcement)
+
+These rules exist to keep the site looking *designed*, not generated. They are
+checkable in code review, and every new component must pass them.
+
+### 12.1 Typography discipline
+- **The brand fonts are Satoshi and Melodrama — self-hosted in `public/fonts/`.**
+  Inter/Playfair are fallback stacks only, never intentional choices. If the
+  computed font on a page is a fallback, that's a bug (usually: fonts not loaded).
+- Editorial display text (heroes, section titles, pull quotes) is **Melodrama**;
+  everything functional is **Satoshi**. Mixing them anywhere else dilutes both.
+- Never center long-form paragraphs. Editorial text is left-aligned with a max
+  measure of ~65 characters.
+- Avoid `font-weight` jumps between adjacent elements (e.g., 400 → 700 mid-UI);
+  step through the loaded weights.
+
+### 12.2 Color restraint
+- **One accent moment per viewport.** The terracotta accent appears at most once
+  per screenful (a CTA, an underline, a price tag) — never as section backgrounds,
+  gradients, or borders en masse.
+- Do not introduce new colors for states/success/warning beyond the token set.
+- Photography carries the color of the site; UI stays neutral (cream/ink/stone).
+
+### 12.3 Layout & shadow discipline
+- **Asymmetric, type-led compositions over card grids.** If a section reads as
+  "3 equal cards in a row," redesign it: offset columns, oversized numerals,
+  hairline dividers, varying image ratios.
+- Shadows only on true floating layers (drawer, modal, sticky header on scroll).
+  Cards sit flat; separation comes from whitespace and hairlines (`--color-stone`).
+- Full-bleed imagery is allowed to touch viewport edges; UI containers never
+  exceed `--container-max`.
+- Section rhythm alternates: full-width editorial → contained grid → full-bleed.
+  Two consecutive same-shape sections is a smell.
+
+### 12.4 Motion restraint
+- Motion reveals content (masks, fades on scroll entry); it never decorates
+  (pulsing badges, floating blobs, parallax on everything).
+- One signature scroll interaction per page (e.g., pinned lookbook), not five.
+
+### 12.5 Content & imagery voice
+- No emoji in UI, and no stock-photo-looking imagery inside editorial sections.
+- Microcopy is short, declarative, and brand-voiced ("Cut for movement",
+  not "Sign up for our amazing newsletter!").
+- Generated placeholder images are acceptable only during build phases and must
+  be tracked in `docs/06-assets-and-placeholders` with replacement intent.
+
