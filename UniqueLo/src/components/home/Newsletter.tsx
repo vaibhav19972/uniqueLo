@@ -17,22 +17,22 @@ export const Newsletter: React.FC = () => {
     <section className="py-24 bg-cream border-b border-stone/50 text-center">
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-          Privileged Access
+          Edition Releases • Made in India
         </span>
 
         <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2">
-          The Needlecraft Gazette
+          The Craft Dispatch
         </h2>
 
         <p className="mt-4 text-xs sm:text-sm text-ink-muted leading-relaxed font-light">
-          Subscribe to receive quarterly monograph essays on historical embroidery techniques, 
-          private salon viewings, and priority access to numbered capsule editions.
+          Receive private drop notifications for numbered capsule runs, regional artisan guild 
+          field notes, and priority access to new heavyweight essentials.
         </p>
 
         <div className="mt-8">
           {isSubmitted ? (
             <div className="p-4 bg-paper border border-stone/60 inline-block text-xs text-accent font-medium tracking-wide">
-              ✦ Your invitation request is received. Welcome to the UniqueLo Atelier.
+              ✦ You are registered with the UniqueLo Dispatch. We honor your inbox.
             </div>
           ) : (
             <form

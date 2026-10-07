@@ -145,6 +145,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Info Body */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-paper">
         <div>
+          <div className="flex items-center justify-between text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-1">
+            <span>{product.craftRegion || 'Made in India'}</span>
+            <span>Ed. {product.batchNumber || 8}/{product.batchTotal || 50}</span>
+          </div>
+
           <div className="flex justify-between items-start gap-2">
             <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors">
               <h3 className="font-serif text-base sm:text-lg text-ink font-normal leading-snug">
@@ -160,12 +165,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
         </div>
 
-        {/* Footer Meta */}
+        {/* Footer Meta: Color Dots & Artisan Hours */}
         <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
-          <span>{product.variants.length} Options</span>
+          {/* Color Dots */}
+          <div className="flex items-center gap-1.5">
+            {Array.from(new Set(product.variants.map((v) => v.colorHex))).slice(0, 4).map((hex, i) => (
+              <span
+                key={i}
+                className="w-2.5 h-2.5 rounded-full border border-stone/70"
+                style={{ backgroundColor: hex }}
+              />
+            ))}
+            <span className="text-[9px] text-ink-muted ml-0.5">({product.variants.length})</span>
+          </div>
+
           {product.embroidery?.artisanHours && (
-            <span className="font-medium text-accent">
-              ✦ {product.embroidery.artisanHours}h Needlework
+            <span className="font-medium text-ink">
+              {product.embroidery.artisanHours}h Needlework
             </span>
           )}
         </div>

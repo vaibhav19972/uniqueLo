@@ -79,3 +79,19 @@ export function useReviews(slug: string | undefined): UseQueryResult<Review[]> {
     enabled: Boolean(slug),
   });
 }
+
+/** Indian craft technique taxonomy */
+export function useCraftTechniques() {
+  return useQuery({
+    queryKey: ['catalog', 'craftTechniques'],
+    queryFn: () => import('../lib/data').then((m) => m.getCraftTechniques()),
+  });
+}
+
+export function useCraftTechnique(slug: string | undefined) {
+  return useQuery({
+    queryKey: ['catalog', 'craftTechnique', slug || ''],
+    queryFn: () => import('../lib/data').then((m) => (slug ? m.getCraftTechnique(slug) : undefined)),
+    enabled: Boolean(slug),
+  });
+}

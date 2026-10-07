@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { useProduct, useProducts, useReviews } from '../hooks/useCatalog';
 import { useCartStore } from '../stores/cart';
@@ -38,6 +38,44 @@ export const ProductDetail: React.FC = () => {
   const [isZooming, setIsZooming] = useState(false);
   const [zoomCoords, setZoomCoords] = useState({ x: 0, y: 0, percentX: 0, percentY: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sticky Purchase Bar State
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const buyBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (buyBoxRef.current) {
+        const rect = buyBoxRef.current.getBoundingClientRect();
+        setShowStickyBar(rect.bottom < 80);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // India Pincode Delivery ETA State
+  const [pincode, setPincode] = useState('');
+  const [pincodeEta, setPincodeEta] = useState<string | null>(null);
+
+  const checkPincode = () => {
+    if (pincode.length === 6) {
+      const cityMap: Record<string, string> = {
+        '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
+        '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
+        '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
+        '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
+        '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
+        '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
+        '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
+      };
+      const prefix = pincode.substring(0, 2);
+      const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
+      setPincodeEta(`Serviceable: ${cityInfo} • Cash on Delivery / UPI Available`);
+    } else {
+      setPincodeEta('Please enter a valid 6-digit Indian PIN code.');
+    }
+  };
 
   const currentVariant = useMemo(() => {
     if (!product) return null;
@@ -231,17 +269,28 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           {/* RIGHT: Product Buy Box & Tailoring Specs */}
-          <div className="lg:col-span-5 flex flex-col justify-between">
+          <div ref={buyBoxRef} className="lg:col-span-5 flex flex-col justify-between">
             <div>
-              {/* Category & Rating */}
-              <div className="flex items-center justify-between text-xs mb-3">
-                <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
-                  {product.categorySlug} Edition
-                </span>
-                <div className="flex items-center gap-1.5 text-xs text-ink">
-                  <span className="text-accent">★★★★★</span>
-                  <span className="font-medium">4.9</span>
-                  <span className="text-ink-muted text-[11px]">({reviews?.length || 24} reviews)</span>
+              {/* Category, Craft Region & Batch Scarcity Marker */}
+              <div className="flex flex-col gap-1.5 mb-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
+                    {product.craftRegion || 'Made in India'} // {product.categorySlug}
+                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-ink">
+                    <span className="text-accent">★★★★★</span>
+                    <span className="font-medium">4.9</span>
+                    <span className="text-ink-muted text-[11px]">({reviews?.length || 24} collector reviews)</span>
+                  </div>
+                </div>
+
+                {/* Quiet Batch Scarcity Marker */}
+                <div className="inline-flex items-center gap-2 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
+                  <span className="text-ink font-medium">
+                    Edition {product.batchNumber || 12} of {product.batchTotal || 50}
+                  </span>
+                  <span>•</span>
+                  <span>{product.craftCluster || 'Atelier Guild'}</span>
                 </div>
               </div>
 
@@ -260,12 +309,34 @@ export const ProductDetail: React.FC = () => {
                     {formatPrice(currentVariant.priceCents)}
                   </span>
                   <span className="text-xs text-accent font-medium tracking-wide">
-                    Complimentary White-Glove Shipping
+                    Complimentary Express Shipping
                   </span>
                 </div>
                 <p className="text-[11px] text-ink-muted mt-1 font-light">
-                  Or 4 interest-free payments of {formatPrice(Math.round(currentVariant.priceCents / 4))} with Atelier Reserve.
+                  Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
                 </p>
+              </div>
+
+              {/* Non-Accordion Initial Garment Specifications (Mobile-Optimized) */}
+              <div className="my-5 p-4 bg-paper border border-stone/70">
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
+                    <span className="text-ink font-medium">{product.fabricGsm || '280 GSM Organic Cotton'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Hand Needlework</span>
+                    <span className="text-ink font-medium">{product.embroidery?.artisanHours || 14} Hours by Guild</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
+                    <span className="text-ink font-medium">{product.embroidery?.techniqueLabel || 'Regional Needlecraft'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
+                    <span className="text-ink font-medium">{product.fit || 'Atelier Relaxed Fit'}</span>
+                  </div>
+                </div>
               </div>
 
               {/* Variant Picker: Colors */}
@@ -298,17 +369,17 @@ export const ProductDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Variant Picker: Sizes */}
+              {/* Variant Picker: Sizes (India sizes first) */}
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-sans tracking-widest uppercase text-ink font-medium">
-                    Garment Size: <span className="text-ink-muted font-normal">{currentVariant.size}</span>
+                    Size: <span className="text-ink-muted font-normal">{currentVariant.size}</span>
                   </span>
                   <button
                     onClick={() => setIsSizeGuideOpen(true)}
                     className="text-[11px] uppercase tracking-widest text-accent hover:underline font-medium"
                   >
-                    Size Guide & Dimensions →
+                    India & International Sizing →
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
@@ -316,17 +387,22 @@ export const ProductDetail: React.FC = () => {
                     .filter((v) => v.color === currentVariant.color)
                     .map((v) => {
                       const isSelected = currentVariant.sku === v.sku;
+                      const sizeLabel =
+                        v.size === 'S' ? '38 (S)' :
+                        v.size === 'M' ? '40 (M)' :
+                        v.size === 'L' ? '42 (L)' :
+                        v.size === 'XL' ? '44 (XL)' : v.size;
                       return (
                         <button
                           key={v.sku}
                           onClick={() => setSelectedVariant(v)}
-                          className={`min-w-[48px] h-10 px-4 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
+                          className={`min-w-[64px] h-10 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
                             isSelected
                               ? 'bg-ink text-cream border-ink font-medium shadow-sm'
                               : 'bg-paper text-ink border-stone hover:border-ink/60'
                           }`}
                         >
-                          <span>{v.size}</span>
+                          <span>{sizeLabel}</span>
                         </button>
                       );
                     })}
@@ -336,8 +412,8 @@ export const ProductDetail: React.FC = () => {
                   <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                   <span className="text-ink-muted text-[11px]">
                     {currentVariant.quantity && currentVariant.quantity <= 2
-                      ? `Rare inventory: Only ${currentVariant.quantity} pieces remaining in atelier`
-                      : 'In stock — ready for immediate white-glove dispatch'}
+                      ? `Small batch alert: Only ${currentVariant.quantity} pieces left in atelier`
+                      : 'In stock — ready for dispatch from regional workshop'}
                   </span>
                 </div>
               </div>
@@ -385,6 +461,44 @@ export const ProductDetail: React.FC = () => {
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </button>
+              </div>
+
+              {/* India Pincode Delivery ETA & Trust Block (Task S1.9) */}
+              <div className="mt-5 p-4 bg-paper border border-stone/80 rounded-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-sans uppercase tracking-widest text-ink font-medium">
+                    Estimated Delivery & Pincode Checker
+                  </span>
+                  <span className="text-[10px] text-accent font-medium">Pan-India Express</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Enter 6-digit PIN code (e.g. 110001, 400001)"
+                    className="flex-1 bg-cream border border-stone px-3 py-2 text-xs text-ink placeholder:text-warm-gray focus:outline-accent"
+                  />
+                  <button
+                    type="button"
+                    onClick={checkPincode}
+                    className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase tracking-wider transition-colors font-medium"
+                  >
+                    Check
+                  </button>
+                </div>
+                {pincodeEta && (
+                  <p className="text-xs text-ink font-medium bg-cream p-2.5 border border-stone/50">
+                    ✦ {pincodeEta}
+                  </p>
+                )}
+                <div className="pt-2 border-t border-stone/40 grid grid-cols-2 gap-2 text-[10px] text-ink-muted uppercase tracking-wider font-light">
+                  <span>✓ Cash on Delivery (COD)</span>
+                  <span>✓ UPI / NetBanking / Cards</span>
+                  <span>✓ Free Express Shipping</span>
+                  <span>✓ 7-Day Doorstep Exchange</span>
+                </div>
               </div>
 
               {/* Bespoke Personalization CTA */}
@@ -719,6 +833,49 @@ export const ProductDetail: React.FC = () => {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sticky Quick-Buy Bar for High-Conversion Scroll (Competitor Parity) */}
+      {showStickyBar && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-paper/95 backdrop-blur-md border-t border-stone shadow-xl py-3 px-4 sm:px-8 transition-transform duration-300">
+          <div className="max-w-[var(--container-max)] mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={activeImage.src}
+                alt={product.name}
+                className="w-10 h-12 object-cover border border-stone shadow-xs"
+              />
+              <div className="hidden sm:block">
+                <span className="font-serif text-sm text-ink block leading-tight font-medium">
+                  {product.name}
+                </span>
+                <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
+                  Edition {product.batchNumber || 12}/{product.batchTotal || 50} • {currentVariant.color} / {currentVariant.size}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <span className="font-sans text-base sm:text-lg font-medium text-ink block leading-none">
+                  {formatPrice(currentVariant.priceCents)}
+                </span>
+                <span className="text-[10px] text-accent font-medium font-sans">
+                  Express Dispatch Included
+                </span>
+              </div>
+
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleAddToCart}
+                className="text-xs uppercase tracking-widest px-6 h-10 shadow-sm"
+              >
+                Add to Bag
+              </Button>
+            </div>
           </div>
         </div>
       )}

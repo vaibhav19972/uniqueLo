@@ -58,6 +58,11 @@ export interface Product {
   material?: string[];
   care?: string[];
   fit?: string;
+  batchNumber?: number;
+  batchTotal?: number;
+  craftRegion?: string;
+  craftCluster?: string;
+  fabricGsm?: string;
 }
 
 export interface Category {
@@ -174,7 +179,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, category_slug, tags, featured, customizable, material, care, fit,
+          slug, name, subtitle, description, category_slug, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -193,6 +198,11 @@ export async function getProducts(): Promise<Product[]> {
           material: item.material || [],
           care: item.care || [],
           fit: item.fit,
+          batchNumber: item.batch_number,
+          batchTotal: item.batch_total,
+          craftRegion: item.craft_region,
+          craftCluster: item.craft_cluster,
+          fabricGsm: item.fabric_gsm,
           variants: (item.variants || []).map((v: any) => ({
             sku: v.sku,
             color: v.color,
@@ -524,4 +534,97 @@ export async function subscribeNewsletter(email: string): Promise<{ success: boo
     }
   }
   return { success: true, message: 'Welcome to the UniqueLo Atelier circle. Your complimentary code is ATELIER10.' };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Indian Craft Provenance Taxonomy (Stream 3)
+// ─────────────────────────────────────────────────────────────────────
+
+export interface CraftTechniqueInfo {
+  slug: string;
+  name: string;
+  region: string;
+  cluster: string;
+  artisanPace: string;
+  historicalContext: string;
+  description: string;
+  stitchType: string;
+  image: string;
+}
+
+export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
+  {
+    slug: 'zardozi',
+    name: 'Zardozi Wirework',
+    region: 'Jaipur & Agra',
+    cluster: 'Pink City Bullion Guild',
+    artisanPace: '28–34 hours per garment',
+    historicalContext: 'Dating back to the Rigveda and Mughal imperial courts, Zardozi translates literally to gold sewing. Artisans hand-anchor coiled metallic bullion wires and French spirals onto heavy wool.',
+    description: 'Raised three-dimensional metallic relief worked with gilded zari thread. Built to catch low ambient light without losing structural tension.',
+    stitchType: 'Anchor Bullion & Metallic Wire',
+    image: '/images/products/celestial-zardozi-coat-2.jpg',
+  },
+  {
+    slug: 'botanical-chain',
+    name: 'Chikankari & Botanical Chain',
+    region: 'Lucknow, Uttar Pradesh',
+    cluster: 'Old City Needlework Collective',
+    artisanPace: '14–20 hours per garment',
+    historicalContext: 'Rooted in 16th-century Awadh patronage, Chikankari combines delicate shadow-work and tight chain looping using unbleached mulberry silk floss.',
+    description: 'Fluid floral and vine geometries stitched with calibrated tension directly onto heavy organic cotton and washed canvas.',
+    stitchType: 'Chain Stitch & Shadow Work',
+    image: '/images/products/botanical-silk-jacket-2.jpg',
+  },
+  {
+    slug: 'kantha-quilt',
+    name: 'Kantha Running Needlework',
+    region: 'Bolpur & Murshidabad, West Bengal',
+    cluster: 'Shantiniketan Artisan Guild',
+    artisanPace: '20–26 hours per garment',
+    historicalContext: 'Centuries-old Bengali craft where layered handloom and vintage indigo fabrics are reinforced into structural quilts through rhythmic, parallel running stitches.',
+    description: 'Thousands of close-set running stitches that bond multiple fabric layers together, yielding a distinctive crinkled, heirloom drape.',
+    stitchType: 'Running Stitch & Quilt Bond',
+    image: '/images/products/kantha-chore-jacket-2.jpg',
+  },
+  {
+    slug: 'crewel-needlework',
+    name: 'Kashmiri Crewel Needlecraft',
+    region: 'Anantnag & Srinagar, Kashmir',
+    cluster: 'Valley Aari Craftspersons',
+    artisanPace: '18–24 hours per garment',
+    historicalContext: 'Executed using a fine pointed aari hook, Kashmiri crewel work renders wild flora and alpine botanicals in thick 2-ply natural wool yarn.',
+    description: 'Thick, dimensional wool embroidery on Mongolian cashmere and hand-woven wool coats that provides both tactile relief and natural insulation.',
+    stitchType: 'Pointed Aari Hook Chain',
+    image: '/images/products/crewel-cashmere-cardigan-2.jpg',
+  },
+  {
+    slug: 'satin-stitch',
+    name: 'High-Density Satin Needlecraft',
+    region: 'Varanasi, Uttar Pradesh',
+    cluster: 'Ghat Artisan Weavers',
+    artisanPace: '12–16 hours per garment',
+    historicalContext: 'Originating in classical handloom textile hubs, high-density satin stitching lays long, unbroken loops of mercerized thread edge-to-edge.',
+    description: 'Creates a mirror-like textile sheen and dense color saturation that remains completely flat against the skin without backing irritation.',
+    stitchType: 'Flat Satin Parallel Stitch',
+    image: '/images/products/vine-heavyweight-tee-2.jpg',
+  },
+  {
+    slug: 'sashiko-selvedge',
+    name: 'Sashiko Structural Needlecraft',
+    region: 'Kutch & Okayama Collaboration',
+    cluster: 'Craft Textile Atelier',
+    artisanPace: '16–22 hours per garment',
+    historicalContext: 'Functional geometric needlework developed to reinforce heavy workwear textiles, combining Indian hand-dyeing with Japanese selvedge denim looms.',
+    description: 'Crisp white cotton thread anchored in geometric lattices that strengthen high-friction zones and age with unique patina.',
+    stitchType: 'Structural Geometric Grid',
+    image: '/images/products/sashiko-selvedge-denim-2.jpg',
+  },
+];
+
+export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
+  return [...CRAFT_TECHNIQUES];
+}
+
+export async function getCraftTechnique(slug: string): Promise<CraftTechniqueInfo | undefined> {
+  return CRAFT_TECHNIQUES.find((c) => c.slug === slug);
 }

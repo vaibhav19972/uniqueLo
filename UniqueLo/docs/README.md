@@ -22,9 +22,9 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | **[02 — Design System](./02-design-system/README.md)** | "Refined Editorial Minimal" | Color tokens, typography scale (Satoshi × Melodrama), surface hierarchy, 8pt spacing grid, and accessibility standards. |
 | **[03 — Data Contracts](./03-data-contracts/README.md)** | Schemas & Data Layer | Pure data-access contracts (`src/lib/data.ts`), embroidery craft metadata, pricing in cents, and cart types. |
 | **[04 — Motion System](./04-motion-system/README.md)** | Cinema-Grade Choreography | Lenis inertia scroll, GSAP ScrollTrigger pinning, Framer Motion UI transitions, and strict reduced-motion rules. |
-| **[05 — Build Phases](./05-phases/README.md)** | Phase-Gated Execution | Atomic task cards (P0 through P5), acceptance criteria, and build-verification checkpoints. |
+| **[05 — Build Phases](./05-phases/README.md)** | Phase-Gated Execution | Atomic task cards (P0 through P9), acceptance criteria, build-verification checkpoints. Updated brand experience plan at `.hermes/plans/2026-10-07_133000-design-plan-v2.md`. |
 | **[06 — Assets & Placeholders](./06-assets-and-placeholders/README.md)** | Visual Asset Pipeline | Tonal color block placeholders, aspect ratio rules, asset registry, and photography transition strategy. |
-| **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts`, Product/Category/Article management, Editor role (articles + prices), inventory per variant, and the `data.ts` async migration seam. |
+| **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts` (Product/Variant/Category/Article/CraftTechnique), Editor role (articles + prices), product upload with craft/region fields, inventory per variant, and the `data.ts` async migration seam. |
 
 ---
 

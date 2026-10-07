@@ -80,23 +80,22 @@ export const Hero: React.FC = () => {
 
       {/* Hero Editorial Typography & CTAs */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center pt-8">
-        <span className="text-xs sm:text-sm font-sans tracking-[0.3em] uppercase text-accent mb-4">
-          Where Haute Needlecraft Meets Digital Luxury
+        <span className="text-xs sm:text-sm font-sans tracking-[0.25em] uppercase text-accent mb-4 font-medium">
+          Hand-Embroidered Essentials • Made in India
         </span>
 
         <h1
           ref={headlineRef}
           className="font-serif text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-[1.05] text-cream max-w-4xl"
         >
-          Threads Woven with Intent.
+          Needlecraft for Everyday Living.
         </h1>
 
         <p
           ref={sublineRef}
           className="mt-6 text-sm sm:text-base lg:text-lg font-light text-stone/90 max-w-2xl leading-relaxed tracking-wide font-sans"
         >
-          Explore garments sculpted through three-dimensional thread relief, 
-          metallic zari wires, and unhurried artisanal hours. Digital fashion made tangible.
+          Heavyweight organic cotton tees, chore jackets, and relaxed shirting enriched with verifiable regional Indian embroidery. Crafted in historic ateliers across Jaipur, Lucknow, and Bengal. Built to endure.
         </p>
 
         {/* Action Group */}

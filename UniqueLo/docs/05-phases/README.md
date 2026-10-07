@@ -14,10 +14,10 @@
 | **3** | Shop page + filtering | Shop grid, tabs, filters, animated layout, quick-add |
 | **4** | Cart + drawer + route transitions | Cart store, drawer UI, add/remove, subtotal |
 | **5** | Polish + QA + build optimization | Reduced motion pass, Lighthouse, responsive audit, prod build passes |
-| **6** | Identity & anti-generic pass | Real Satoshi + Melodrama self-hosted fonts, art-direction rules enforced, placeholder audit |
-| **7** | Async data layer | `data.ts` becomes async (TanStack Query), JSON files become dev seed data, storefront UX unchanged |
-| **8** | Strapi backend | Content types modeled (Product/Variant/Category/Article), catalog seeded, `data.ts` swaps to REST |
-| **9** | Editor dashboard | Editor role (articles + prices), product upload, category management, inventory per variant |
+| **6** | Identity & brand experience pass | Real Satoshi + Melodrama self-hosted fonts, anti-generic rules, PDP/Atelier/Journal design per `.hermes/plans/2026-10-07_133000-design-plan-v2.md` |
+| **7** | Async data layer | `data.ts` becomes async (TanStack Query), JSON dev seed, storefront UX unchanged, hooks for product/categories/techniques |
+| **8** | Backend (Strapi v5) | Content types modeled (Product/Variant/Category/Article/CraftTechnique), catalog seeded, `data.ts` swaps to REST |
+| **9** | Editor dashboard | Editor role (articles + prices), product upload with craft/region fields, category management, inventory per variant |
 
 ---
 
@@ -266,7 +266,9 @@ Production-ready build with accessibility, performance, and responsive passes.
 
 ### Goal
 Remove every "template/AI-generated" signal so the storefront reads as an
-art-directed brand site, not a generated one.
+art-directed brand site, not a generated one. The detailed brand experience
+plan is in `.hermes/plans/2026-10-07_133000-design-plan-v2.md` and should be
+treated as the active design direction for Phases 6+.
 
 ### Task Cards
 

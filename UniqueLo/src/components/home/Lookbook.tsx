@@ -55,10 +55,10 @@ export const Lookbook: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2 text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
               <span>✦</span>
-              <span>Visual Anthology</span>
+              <span>Wardrobe Anthology • Made in India</span>
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl text-cream mt-2">
-              The Atelier Lookbook
+              Everyday Needlecraft in Motion
             </h2>
           </div>
 
