@@ -31,6 +31,7 @@ export const FilterBar: React.FC = () => {
     toggleSize,
     toggleTechnique,
     setPriceMax,
+    setSearchQuery,
     setSort,
     resetFilters,
   } = useFiltersStore();
@@ -39,37 +40,63 @@ export const FilterBar: React.FC = () => {
     filters.colors.length +
     filters.sizes.length +
     (filters.techniques?.length || 0) +
-    (filters.priceMax ? 1 : 0);
+    (filters.priceMax ? 1 : 0) +
+    (filters.searchQuery ? 1 : 0);
 
   return (
     <div className="w-full bg-cream border-b border-stone/60">
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-4">
-        {/* Toggle Bar */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center space-x-2 text-xs font-sans tracking-[0.2em] uppercase font-medium text-ink hover:text-accent transition-colors cursor-pointer"
-          >
-            <svg
-              className={`w-4 h-4 transition-transform duration-300 ${
-                isOpen ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-3.5">
+        
+        {/* Top Control Bar: Search + Filter Toggle + Sort */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          
+          {/* Left: Filter Toggle & Search Bar */}
+          <div className="flex items-center gap-4 flex-1">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center space-x-2 text-xs font-sans tracking-[0.2em] uppercase font-medium text-ink hover:text-accent transition-colors cursor-pointer"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7" />
-            </svg>
-            <span>Filters</span>
-            {activeFilterCount > 0 && (
-              <span className="ml-1 w-5 h-5 rounded-full bg-accent text-paper text-[10px] inline-flex items-center justify-center font-bold">
-                {activeFilterCount}
+              <svg
+                className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7" />
+              </svg>
+              <span>Facet Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-accent text-paper text-[10px] inline-flex items-center justify-center font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {/* Instant Search Box */}
+            <div className="relative flex-1 max-w-xs">
+              <input
+                type="text"
+                value={filters.searchQuery || ''}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search stitches, coats, flora..."
+                className="w-full bg-paper border border-stone/80 pl-8 pr-3 py-1.5 text-xs text-ink placeholder:text-warm-gray focus:outline-accent"
+              />
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone text-xs">
+                🔍
               </span>
-            )}
-          </button>
+              {filters.searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink text-xs"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* Right Side: Sort Selector */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between sm:justify-end space-x-3">
             <label htmlFor="sort-select" className="text-xs uppercase tracking-widest text-ink-muted hidden sm:inline">
               Sort By:
             </label>
@@ -86,9 +113,60 @@ export const FilterBar: React.FC = () => {
           </div>
         </div>
 
+        {/* Active Filter Chips Bar */}
+        {activeFilterCount > 0 && (
+          <div className="mt-3 pt-3 border-t border-stone/40 flex flex-wrap items-center gap-2">
+            <span className="text-[10px] uppercase tracking-widest text-ink-muted font-medium mr-1">
+              Active:
+            </span>
+
+            {filters.searchQuery && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Query: "{filters.searchQuery}"
+                <button onClick={() => setSearchQuery('')} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            {filters.techniques?.map((t) => (
+              <span key={t} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                {t}
+                <button onClick={() => toggleTechnique(t)} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            ))}
+
+            {filters.colors.map((c) => (
+              <span key={c} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Color: {c}
+                <button onClick={() => toggleColor(c)} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            ))}
+
+            {filters.sizes.map((s) => (
+              <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Size: {s}
+                <button onClick={() => toggleSize(s)} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            ))}
+
+            {filters.priceMax && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Max: {formatPrice(filters.priceMax)}
+                <button onClick={() => setPriceMax(undefined)} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            <button
+              onClick={resetFilters}
+              className="text-[11px] uppercase tracking-widest text-accent hover:underline font-medium ml-2"
+            >
+              Reset All
+            </button>
+          </div>
+        )}
+
         {/* Expandable Filter Tray */}
         {isOpen && (
-          <div className="pt-6 pb-2 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 animate-in fade-in duration-200">
             {/* 1. Embroidery Technique */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
@@ -194,15 +272,6 @@ export const FilterBar: React.FC = () => {
                 <span>$150.00</span>
                 <span>{maxPriceCents !== undefined ? formatPrice(maxPriceCents) : '…'}</span>
               </div>
-
-              {activeFilterCount > 0 && (
-                <button
-                  onClick={resetFilters}
-                  className="mt-4 text-xs uppercase tracking-widest text-accent hover:underline font-medium"
-                >
-                  Clear All Filters ({activeFilterCount})
-                </button>
-              )}
             </div>
           </div>
         )}

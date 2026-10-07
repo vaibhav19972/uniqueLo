@@ -86,25 +86,27 @@ export const FeaturedProducts: React.FC = () => {
               >
                 {/* Image Container with Macro Swap on Hover */}
                 <div className="relative aspect-[3/4] overflow-hidden bg-stone">
-                  {/* Default Image */}
-                  <Image
-                    src={frontImage}
-                    alt={product.images[0]?.alt || product.name}
-                    aspectRatio="3/4"
-                    className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                  />
-                  {/* Macro Hover Image */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <Link to={`/product/${product.slug}`} className="block w-full h-full">
+                    {/* Default Image */}
                     <Image
-                      src={macroImage}
-                      alt={product.images[1]?.alt || `${product.name} Macro Detail`}
+                      src={frontImage}
+                      alt={product.images[0]?.alt || product.name}
                       aspectRatio="3/4"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
                     />
-                    <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
-                      3x Macro Stitch
+                    {/* Macro Hover Image */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <Image
+                        src={macroImage}
+                        alt={product.images[1]?.alt || `${product.name} Macro Detail`}
+                        aspectRatio="3/4"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
+                        ✦ 3x Macro Stitch
+                      </div>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Craft Technique Tag */}
                   {product.embroidery && (
@@ -142,7 +144,7 @@ export const FeaturedProducts: React.FC = () => {
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <Link to="/shop">
+                      <Link to={`/product/${product.slug}`}>
                         <h3 className="font-serif text-lg text-ink font-medium leading-snug group-hover:text-accent transition-colors">
                           {product.name}
                         </h3>

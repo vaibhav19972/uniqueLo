@@ -1,27 +1,44 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import {
   getProducts,
+  getProduct,
   getCategories,
   getFeaturedProducts,
   getAllColors,
   getAllSizes,
+  getAllTechniques,
   getMaxPriceCents,
+  getReviews,
   type Product,
   type Category,
+  type Review,
+  type EmbroideryTechnique,
 } from '../lib/data';
 
 export const catalogKeys = {
   products: ['catalog', 'products'] as const,
+  product: (slug: string) => ['catalog', 'product', slug] as const,
   categories: ['catalog', 'categories'] as const,
   featured: (limit?: number) => ['catalog', 'featured', limit ?? 'all'] as const,
   colors: ['catalog', 'colors'] as const,
   sizes: ['catalog', 'sizes'] as const,
+  techniques: ['catalog', 'techniques'] as const,
   maxPrice: ['catalog', 'maxPrice'] as const,
+  reviews: (slug: string) => ['catalog', 'reviews', slug] as const,
 };
 
-/** All products (cache source for cart-line resolution, shop grid, etc.) */
+/** All products */
 export function useProducts(): UseQueryResult<Product[]> {
   return useQuery({ queryKey: catalogKeys.products, queryFn: getProducts });
+}
+
+/** Single product by slug */
+export function useProduct(slug: string | undefined): UseQueryResult<Product | undefined> {
+  return useQuery({
+    queryKey: catalogKeys.product(slug || ''),
+    queryFn: () => (slug ? getProduct(slug) : Promise.resolve(undefined)),
+    enabled: Boolean(slug),
+  });
 }
 
 /** All categories, ordered */
@@ -44,7 +61,21 @@ export function useAllSizes(): UseQueryResult<string[]> {
   return useQuery({ queryKey: catalogKeys.sizes, queryFn: getAllSizes });
 }
 
+/** Unique embroidery techniques across the catalog */
+export function useAllTechniques(): UseQueryResult<{ technique: EmbroideryTechnique; label: string }[]> {
+  return useQuery({ queryKey: catalogKeys.techniques, queryFn: getAllTechniques });
+}
+
 /** Maximum variant price across the catalog */
 export function useMaxPriceCents(): UseQueryResult<number> {
   return useQuery({ queryKey: catalogKeys.maxPrice, queryFn: getMaxPriceCents });
+}
+
+/** Customer reviews for a product */
+export function useReviews(slug: string | undefined): UseQueryResult<Review[]> {
+  return useQuery({
+    queryKey: catalogKeys.reviews(slug || ''),
+    queryFn: () => (slug ? getReviews(slug) : Promise.resolve([])),
+    enabled: Boolean(slug),
+  });
 }

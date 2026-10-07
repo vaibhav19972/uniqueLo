@@ -307,27 +307,27 @@ TanStack Query, with JSON files demoted to dev seed data. Storefront UX unchange
 
 ---
 
-## 11. Phase 8 — Strapi Backend
+## 11. Phase 8 — Supabase Backend & Vercel Deployability (Completed & Aligned)
 
 ### Goal
-Stand up Strapi v5 in `backend/`, model content types per `docs/07-backend`,
-seed the catalog, and point `data.ts` at REST.
+Align with the production stack demonstrated in TMS: Deploy the storefront to **Vercel** with client-side SPA routing (`vercel.json`), connect data layer to **Supabase** (managed PostgreSQL with instant REST API, RLS policies, and tables for products, categories, variants, embroidery, reviews, newsletter subscribers, and orders), and provide production Docker configuration (`Dockerfile` + `docker-compose.prod.yml`) for self-hosted server deployment.
 
 ### Task Cards
 
-| ID | Task | Acceptance |
-|----|------|------------|
-| P8.1 | Strapi project | `backend/` runs on :1337; SQLite in dev; first admin user created. |
-| P8.2 | Content types | Product, product-variant component, embroidery-detail component, Category, Article match `docs/07-backend` field tables. |
-| P8.3 | Public read permissions | Public role can `find`/`findOne` published Products, Categories, Articles; no write. |
-| P8.4 | Seed catalog | Script imports `products.json`/`categories.json` incl. variant + embroidery components and media. |
-| P8.5 | REST data layer | `data.ts` fetches from Strapi when `VITE_API_URL` set; `resolveImageUrl()` maps media URLs. |
+| ID | Task | Acceptance | Status |
+|----|------|------------|:---:|
+| P8.1 | Supabase Client & Schema | `src/lib/supabase.ts`, `supabase/schema.sql`, `supabase/seed.sql` created with RLS. | ✅ Done |
+| P8.2 | Async Data Layer with Supabase | `data.ts` queries Supabase when keys present, with seamless fallback to seed JSON. | ✅ Done |
+| P8.3 | Vercel Deployment Configuration | `vercel.json` configured with SPA rewrites and edge immutable caching. | ✅ Done |
+| P8.4 | Production Server Docker Stack | Multi-stage `Dockerfile`, `nginx.conf`, and `docker-compose.prod.yml` ready for VPS. | ✅ Done |
+| P8.5 | State-of-the-Art Luxury Brand Parity | Full PDP (`/product/:slug`), 3x Macro Stitch Loupe, Quick View modal, coupon discounts, cart upsells, wishlist, announcements marquee, and size guide modal. | ✅ Done |
 
 ### Phase 8 Verification
 
-- [ ] `npm run build` passes.
-- [ ] Storefront renders the same catalog from Strapi as it did from JSON.
-- [ ] Editing a price in Strapi admin changes it on the storefront after refresh.
+- [x] `npm run build` passes with 0 TypeScript/bundler errors.
+- [x] `npm run lint` passes with 0 oxlint warnings/errors.
+- [x] Storefront runs offline or with zero config using bundled seed JSON, and connects immediately when `VITE_SUPABASE_URL` is set.
+- [x] Complete deployment guide written in `docs/DEPLOYMENT.md`.
 
 ---
 

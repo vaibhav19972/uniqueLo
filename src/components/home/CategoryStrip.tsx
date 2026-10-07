@@ -44,25 +44,42 @@ export const CategoryStrip: React.FC = () => {
               onClick={() => setCategory(cat.slug)}
               className="flex-shrink-0 w-64 sm:w-auto group block snap-start focus-visible:outline-accent"
             >
-              <div className="relative overflow-hidden bg-stone aspect-[4/5] border border-stone/60">
+              <div className="relative overflow-hidden bg-stone aspect-[4/5] border border-stone/60 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:border-ink/50 group-hover:-translate-y-1">
+                {/* Decorative Needlework Stitch Border Template Overlay */}
+                <div className="absolute inset-2 border border-dashed border-cream/40 z-10 pointer-events-none group-hover:border-accent/70 transition-colors" />
+
                 <Image
                   src={cat.image || '/images/placeholders/hero.jpg'}
                   alt={cat.name}
                   aspectRatio="4/5"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                
+                {/* Subtle Gradient & Shimmer */}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent opacity-85 group-hover:opacity-95 transition-opacity" />
 
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-cream">
-                  <span className="text-[9px] uppercase tracking-[0.25em] text-stone/80">
-                    Category 0{cat.order}
+                {/* Floating Tag */}
+                <div className="absolute top-4 left-4 z-20">
+                  <span className="bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5 backdrop-blur-xs font-medium border border-stone/60">
+                    Ed. 0{cat.order}
                   </span>
-                  <h3 className="font-serif text-lg text-cream leading-tight group-hover:text-accent transition-colors">
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-cream z-20">
+                  <span className="text-[9px] uppercase tracking-[0.25em] text-accent font-medium block mb-0.5">
+                    Atelier Edition
+                  </span>
+                  <h3 className="font-serif text-xl text-cream leading-tight group-hover:text-accent transition-colors">
                     {cat.name}
                   </h3>
-                  <p className="text-[11px] text-stone/70 font-light line-clamp-1 mt-0.5">
+                  <p className="text-[11px] text-stone/80 font-light line-clamp-2 mt-1 leading-relaxed">
                     {cat.description}
                   </p>
+                  
+                  <div className="mt-3 flex items-center gap-1.5 text-[10px] text-cream uppercase tracking-widest font-sans opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span>Explore Wardrobe</span>
+                    <span className="text-accent">→</span>
+                  </div>
                 </div>
               </div>
             </Link>
