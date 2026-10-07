@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router';
-import { getCategories } from '../../lib/data';
+import { useCategories } from '../../hooks/useCatalog';
 import { Image } from '../ui/Image';
 import { useFiltersStore } from '../../stores/filters';
 
 export const CategoryStrip: React.FC = () => {
-  const categories = useMemo(() => {
-    return getCategories().filter((c) => c.slug !== 'all');
-  }, []);
+  const { data: categories } = useCategories();
+  const visibleCategories = useMemo(() => {
+    return (categories ?? []).filter((c) => c.slug !== 'all');
+  }, [categories]);
 
   const setCategory = useFiltersStore((state) => state.setCategory);
 
@@ -36,7 +37,7 @@ export const CategoryStrip: React.FC = () => {
 
         {/* Categories Strip */}
         <div className="flex overflow-x-auto sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 pb-4 sm:pb-0 scrollbar-none snap-x">
-          {categories.map((cat) => (
+          {visibleCategories.map((cat) => (
             <Link
               key={cat.slug}
               to="/shop"

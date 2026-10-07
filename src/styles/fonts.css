@@ -1,0 +1,33 @@
+/* src/styles/fonts.css — self-hosted brand fonts (Fontshare, free license). */
+
+/* ═══════════════════════════════════════════════════════════════════
+   Satoshi — brand sans (all functional text: nav, body, buttons)
+   Variable font: weight 300–900 in one ~43KB file.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Melodrama — editorial serif (display: heroes, section titles, quotes)
+   Variable font: weight 300–900 in one ~40KB file.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Melodrama';
+  src: url('/fonts/Melodrama-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}

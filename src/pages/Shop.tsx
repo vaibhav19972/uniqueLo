@@ -1,16 +1,31 @@
 import React, { useMemo } from 'react';
-import { getProducts, filterProducts } from '../lib/data';
+import { filterProducts } from '../lib/data';
+import { useProducts } from '../hooks/useCatalog';
 import { useFiltersStore } from '../stores/filters';
 import { CategoryTabs } from '../components/shop/CategoryTabs';
 import { FilterBar } from '../components/shop/FilterBar';
 import { ProductGrid } from '../components/shop/ProductGrid';
 
+function CatalogState({ message, detail }: { message: string; detail?: string }) {
+  return (
+    <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center text-stone text-xl mb-4">
+        ✦
+      </div>
+      <h3 className="font-serif text-2xl text-ink">{message}</h3>
+      {detail && (
+        <p className="text-xs text-ink-muted mt-2 font-light leading-relaxed">{detail}</p>
+      )}
+    </div>
+  );
+}
+
 export const Shop: React.FC = () => {
-  const allProducts = useMemo(() => getProducts(), []);
+  const { data: allProducts, isPending, isError, error } = useProducts();
   const filters = useFiltersStore((state) => state.filters);
 
   const filteredProducts = useMemo(() => {
-    return filterProducts(allProducts, filters);
+    return filterProducts(allProducts ?? [], filters);
   }, [allProducts, filters]);
 
   return (
@@ -25,7 +40,7 @@ export const Shop: React.FC = () => {
             The Atelier Collections
           </h1>
           <p className="text-xs sm:text-sm text-ink-muted max-w-2xl mt-3 font-light leading-relaxed">
-            Every piece is constructed from heirloom natural textiles and enriched with 
+            Every piece is constructed from heirloom natural textiles and enriched with
             three-dimensional hand needlecraft. Inspect individual stitch reliefs or customize with bespoke monograms.
           </p>
         </div>
@@ -39,7 +54,16 @@ export const Shop: React.FC = () => {
 
       {/* Main Grid Container */}
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pb-24">
-        <ProductGrid products={filteredProducts} />
+        {isError ? (
+          <CatalogState
+            message="The Collection Could Not Be Reached"
+            detail={error instanceof Error ? error.message : 'Please try again shortly.'}
+          />
+        ) : isPending ? (
+          <CatalogState message="Curating the Collection" />
+        ) : (
+          <ProductGrid products={filteredProducts} />
+        )}
       </div>
     </div>
   );

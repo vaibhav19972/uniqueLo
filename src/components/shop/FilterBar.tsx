@@ -1,12 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
-  getAllColors,
-  getAllSizes,
-  getMaxPriceCents,
   formatPrice,
   type SortKey,
   type EmbroideryTechnique,
 } from '../../lib/data';
+import { useAllColors, useAllSizes, useMaxPriceCents } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
 
 const EMBROIDERY_TECHNIQUES: { key: EmbroideryTechnique; label: string }[] = [
@@ -23,9 +21,9 @@ const EMBROIDERY_TECHNIQUES: { key: EmbroideryTechnique; label: string }[] = [
 export const FilterBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const colors = useMemo(() => getAllColors(), []);
-  const sizes = useMemo(() => getAllSizes(), []);
-  const maxPriceCents = useMemo(() => getMaxPriceCents(), []);
+  const { data: colors } = useAllColors();
+  const { data: sizes } = useAllSizes();
+  const { data: maxPriceCents } = useMaxPriceCents();
 
   const {
     filters,
@@ -122,7 +120,7 @@ export const FilterBar: React.FC = () => {
                 Color Palette
               </h4>
               <div className="flex flex-wrap gap-2">
-                {colors.map((c) => {
+                {colors?.map((c) => {
                   const isSelected = filters.colors.includes(c.name);
                   return (
                     <button
@@ -153,7 +151,7 @@ export const FilterBar: React.FC = () => {
                 Garment Size
               </h4>
               <div className="flex flex-wrap gap-1.5">
-                {sizes.map((s) => {
+                {sizes?.map((s) => {
                   const isSelected = filters.sizes.includes(s);
                   return (
                     <button
@@ -185,15 +183,16 @@ export const FilterBar: React.FC = () => {
               <input
                 type="range"
                 min={15000}
-                max={maxPriceCents}
+                max={maxPriceCents ?? 15000}
                 step={2500}
-                value={filters.priceMax || maxPriceCents}
+                value={filters.priceMax || maxPriceCents || 15000}
                 onChange={(e) => setPriceMax(Number(e.target.value))}
                 className="w-full accent-accent cursor-pointer"
+                disabled={maxPriceCents === undefined}
               />
               <div className="flex justify-between text-[10px] text-ink-muted mt-1">
                 <span>$150.00</span>
-                <span>{formatPrice(maxPriceCents)}</span>
+                <span>{maxPriceCents !== undefined ? formatPrice(maxPriceCents) : '…'}</span>
               </div>
 
               {activeFilterCount > 0 && (

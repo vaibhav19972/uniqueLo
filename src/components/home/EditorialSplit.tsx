@@ -13,7 +13,7 @@ export const EditorialSplit: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           {/* Left Column: Editorial Imagery Pair */}
           <div className="lg:col-span-6 relative">
-            <div className="relative z-10 w-4/5 ml-auto border border-stone/80 shadow-lg">
+            <div className="relative z-10 w-4/5 ml-auto border border-stone/80">
               <Image
                 src="/images/campaigns/editorial-split.jpg"
                 alt="Artisan needleworker crafting botanical chain stitches"
@@ -22,7 +22,7 @@ export const EditorialSplit: React.FC = () => {
               />
             </div>
             {/* Secondary overlapping frame */}
-            <div className="absolute top-1/4 left-0 z-20 w-3/5 border border-stone/80 shadow-2xl bg-paper p-3 hidden sm:block">
+            <div className="absolute top-1/4 left-0 z-20 w-3/5 border border-stone/80 bg-paper p-3 hidden sm:block">
               <Image
                 src="/images/campaigns/atelier-craft.jpg"
                 alt="Macro metallic zari thread tension and bullion wire detail"
@@ -30,7 +30,7 @@ export const EditorialSplit: React.FC = () => {
                 className="w-full object-cover"
               />
               <div className="p-2 text-center">
-                <span className="text-[9px] uppercase tracking-[0.25em] text-accent font-mono">
+                <span className="text-[9px] uppercase tracking-[0.25em] text-accent font-sans">
                   Master Zardozi Needlecraft
                 </span>
               </div>

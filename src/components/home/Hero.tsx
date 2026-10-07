@@ -74,7 +74,7 @@ export const Hero: React.FC = () => {
         ref={badgeRef}
         className="absolute top-8 sm:top-12 left-4 sm:left-8 z-10 hidden sm:flex items-center space-x-3 text-[11px] uppercase tracking-[0.22em] text-cream/80 border border-stone/30 bg-ink/50 backdrop-blur-md px-4 py-1.5"
       >
-        <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-accent" />
         <span>Atelier Edition 2026 — Hand Zardozi & Botanical Stitch</span>
       </div>
 

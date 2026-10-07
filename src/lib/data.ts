@@ -102,48 +102,240 @@ export interface CartLine {
   customization?: CartCustomization;
 }
 
-// Data access instances
-const productsData: Product[] = (rawProducts as { products: Product[] }).products;
-const categoriesData: Category[] = (rawCategories as { categories: Category[] }).categories;
+// ─────────────────────────────────────────────────────────────────────
+// Async data layer (Phase 7)
+//
+// Two sources behind one seam:
+//  • VITE_API_URL set  → fetch from Strapi (Phase 8, docs/07-backend)
+//  • VITE_API_URL unset → bundled seed JSON (identical types)
+//
+// All UI consumes this module or the hooks in src/hooks/useCatalog.ts.
+// ─────────────────────────────────────────────────────────────────────
+
+const API_URL: string | undefined = import.meta.env.VITE_API_URL;
+
+/** Map local/relative image paths and Strapi media URLs to fetchable URLs. */
+export function resolveImageUrl(src: string): string {
+  if (!src) return '/images/placeholders/hero.jpg';
+  // Absolute URLs (Strapi media library) pass through
+  if (src.startsWith('http://') || src.startsWith('https://')) return src;
+  // Strapi-relative media paths → API origin
+  if (src.startsWith('/') && API_URL && (src.includes('/uploads/') || src.startsWith('/api/'))) {
+    return `${API_URL}${src}`;
+  }
+  // Local public assets pass through unchanged
+  return src;
+}
+
+/** Derive stock status from quantity when a backend omits/carries raw counts. */
+function deriveStatus(quantity: number | undefined, status?: ProductStatus): ProductStatus {
+  if (typeof quantity === 'number') {
+    if (quantity <= 0) return 'out-of-stock';
+    if (quantity <= 3) return 'low-stock';
+    return 'in-stock';
+  }
+  return status ?? 'in-stock';
+}
+
+// ── Strapi response normalization ───────────────────────────────────
+
+interface StrapiVariantPayload {
+  sku: string;
+  color: string;
+  colorHex: string;
+  size: string;
+  priceCents: number;
+  compareAtPriceCents?: number;
+  quantity?: number;
+  status?: ProductStatus;
+}
+
+interface StrapiProductPayload {
+  slug: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  categorySlug?: string;
+  category?: { slug: string } | null;
+  tags?: string[] | { tag: string }[];
+  variants?: StrapiVariantPayload[];
+  images?: { url: string; alternativeText?: string }[];
+  featured?: boolean;
+  editorialImages?: { url: string; alternativeText?: string }[];
+  embroidery?: {
+    technique: EmbroideryTechnique;
+    techniqueLabel: string;
+    artisanHours?: number;
+    placement?: string[];
+    threadComposition?: string;
+    motifStory?: string;
+    macroImage?: { url: string; alternativeText?: string };
+  } | null;
+  customizable?: boolean;
+  material?: string[];
+  care?: string[];
+  fit?: string;
+}
+
+function normalizeImages(
+  media: { url: string; alternativeText?: string }[] | undefined,
+  fallbackName: string
+): ProductImage[] {
+  if (!media) return [];
+  return media.map((m) => ({
+    src: resolveImageUrl(m.url),
+    alt: m.alternativeText || fallbackName,
+  }));
+}
+
+function normalizeProduct(raw: StrapiProductPayload): Product {
+  return {
+    slug: raw.slug,
+    name: raw.name,
+    subtitle: raw.subtitle ?? '',
+    description: raw.description ?? '',
+    categorySlug: raw.category?.slug ?? raw.categorySlug ?? '',
+    tags: Array.isArray(raw.tags)
+      ? raw.tags.map((t) => (typeof t === 'string' ? t : t.tag))
+      : [],
+    variants: (raw.variants ?? []).map((v) => ({
+      sku: v.sku,
+      color: v.color,
+      colorHex: v.colorHex,
+      size: v.size,
+      priceCents: v.priceCents,
+      compareAtPriceCents: v.compareAtPriceCents,
+      status: deriveStatus(v.quantity, v.status),
+      quantity: v.quantity,
+    })),
+    images: normalizeImages(
+      raw.images?.map((m) => ({ url: resolveImageUrl(m.url), alternativeText: m.alternativeText })),
+      raw.name
+    ),
+    featured: raw.featured ?? false,
+    editorialImages: normalizeImages(
+      raw.editorialImages?.map((m) => ({ url: resolveImageUrl(m.url), alternativeText: m.alternativeText })),
+      raw.name
+    ),
+    embroidery: raw.embroidery
+      ? {
+          technique: raw.embroidery.technique,
+          techniqueLabel: raw.embroidery.techniqueLabel,
+          artisanHours: raw.embroidery.artisanHours,
+          placement: raw.embroidery.placement ?? [],
+          threadComposition: raw.embroidery.threadComposition ?? '',
+          motifStory: raw.embroidery.motifStory ?? '',
+          macroImage: raw.embroidery.macroImage
+            ? {
+                src: resolveImageUrl(raw.embroidery.macroImage.url),
+                alt: raw.embroidery.macroImage.alternativeText || raw.name,
+              }
+            : undefined,
+        }
+      : undefined,
+    customizable: raw.customizable ?? false,
+    material: raw.material ?? [],
+    care: raw.care ?? [],
+    fit: raw.fit,
+  };
+}
+
+// ── Seed data (bundled JSON, dev fallback) ──────────────────────────
+
+const seedProducts: Product[] = (rawProducts as { products: Product[] }).products.map(
+  (p) => ({
+    ...p,
+    images: p.images.map((i) => ({ ...i, src: resolveImageUrl(i.src) })),
+    editorialImages: p.editorialImages?.map((i) => ({ ...i, src: resolveImageUrl(i.src) })),
+  })
+);
+const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
+
+// ── Tiny fetch helper (Strapi REST) ─────────────────────────────────
+
+async function strapiFetch<T>(path: string): Promise<T> {
+  if (!API_URL) throw new Error('VITE_API_URL is not configured');
+  const res = await fetch(`${API_URL}${path}`);
+  if (!res.ok) {
+    throw new Error(`Strapi request failed: ${res.status} ${res.statusText} (${path})`);
+  }
+  return (await res.json()) as T;
+}
+
+// ── Public API (same names as before, now async) ────────────────────
 
 /** All products */
-export function getProducts(): Product[] {
-  return [...productsData];
+export async function getProducts(): Promise<Product[]> {
+  if (API_URL) {
+    const data = await strapiFetch<{ data: StrapiProductPayload[] }>(
+      '/api/products?populate=deep&sort=slug'
+    );
+    return data.data.map(normalizeProduct);
+  }
+  return [...seedProducts];
 }
 
 /** All categories, ordered */
-export function getCategories(): Category[] {
-  return [...categoriesData].sort((a, b) => a.order - b.order);
+export async function getCategories(): Promise<Category[]> {
+  if (API_URL) {
+    const data = await strapiFetch<{
+      data: (Omit<Category, 'image'> & { image?: { url: string } | null })[];
+    }>('/api/categories?sort=order:asc&populate=image');
+    return data.data.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      label: c.label,
+      description: c.description,
+      image: c.image?.url ? resolveImageUrl(c.image.url) : undefined,
+      order: c.order,
+    }));
+  }
+  return [...seedCategories].sort((a, b) => a.order - b.order);
 }
 
 /** One category by slug */
-export function getCategory(slug: string): Category | undefined {
-  return categoriesData.find((c) => c.slug === slug);
+export async function getCategory(slug: string): Promise<Category | undefined> {
+  const categories = await getCategories();
+  return categories.find((c) => c.slug === slug);
 }
 
 /** One product by slug */
-export function getProduct(slug: string): Product | undefined {
-  return productsData.find((p) => p.slug === slug);
+export async function getProduct(slug: string): Promise<Product | undefined> {
+  if (API_URL) {
+    const data = await strapiFetch<{ data: StrapiProductPayload[] }>(
+      `/api/products?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=deep`
+    );
+    const raw = data.data[0];
+    return raw ? normalizeProduct(raw) : undefined;
+  }
+  return seedProducts.find((p) => p.slug === slug);
 }
 
 /** Products for a category, or all if 'all' */
-export function getProductsByCategory(categorySlug: string | 'all'): Product[] {
-  if (categorySlug === 'all') {
-    return [...productsData];
-  }
-  return productsData.filter((p) => p.categorySlug === categorySlug);
+export async function getProductsByCategory(categorySlug: string | 'all'): Promise<Product[]> {
+  const products = await getProducts();
+  if (categorySlug === 'all') return products;
+  return products.filter((p) => p.categorySlug === categorySlug);
 }
 
 /** Featured products for home page, sorted by order in JSON */
-export function getFeaturedProducts(limit?: number): Product[] {
-  const featured = productsData.filter((p) => p.featured);
+export async function getFeaturedProducts(limit?: number): Promise<Product[]> {
+  if (API_URL) {
+    const data = await strapiFetch<{ data: StrapiProductPayload[] }>(
+      '/api/products?filters[featured][$eq]=true&populate=deep'
+    );
+    const featured = data.data.map(normalizeProduct);
+    return typeof limit === 'number' ? featured.slice(0, limit) : featured;
+  }
+  const featured = seedProducts.filter((p) => p.featured);
   return typeof limit === 'number' ? featured.slice(0, limit) : featured;
 }
 
 /** Unique colors across all products */
-export function getAllColors(): { name: string; hex: string }[] {
+export async function getAllColors(): Promise<{ name: string; hex: string }[]> {
+  const products = await getProducts();
   const map = new Map<string, string>();
-  for (const product of productsData) {
+  for (const product of products) {
     for (const v of product.variants) {
       if (!map.has(v.color)) {
         map.set(v.color, v.colorHex);
@@ -154,9 +346,10 @@ export function getAllColors(): { name: string; hex: string }[] {
 }
 
 /** Unique sizes across all products, sorted naturally */
-export function getAllSizes(): string[] {
+export async function getAllSizes(): Promise<string[]> {
+  const products = await getProducts();
   const set = new Set<string>();
-  for (const product of productsData) {
+  for (const product of products) {
     for (const v of product.variants) {
       set.add(v.size);
     }
@@ -179,9 +372,10 @@ export function getAllSizes(): string[] {
 }
 
 /** Maximum price among all variants */
-export function getMaxPriceCents(): number {
+export async function getMaxPriceCents(): Promise<number> {
+  const products = await getProducts();
   let max = 0;
-  for (const product of productsData) {
+  for (const product of products) {
     for (const v of product.variants) {
       if (v.priceCents > max) {
         max = v.priceCents;
@@ -244,7 +438,7 @@ export function filterProducts(
       return maxB - maxA;
     });
   }
-  // 'newest' preserves array order from JSON
+  // 'newest' preserves underlying order
 
   return result;
 }

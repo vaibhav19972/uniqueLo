@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
 import { useCartStore } from '../../stores/cart';
-import { getProducts, getCartLine, formatPrice, type CartLine } from '../../lib/data';
+import { useProducts } from '../../hooks/useCatalog';
+import { getCartLine, formatPrice, type CartLine } from '../../lib/data';
 import { CartLineItem } from './CartLineItem';
 import { Button } from '../ui/Button';
 
@@ -12,11 +13,11 @@ export const CartDrawer: React.FC = () => {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
 
-  const products = useMemo(() => getProducts(), []);
+  const { data: products } = useProducts();
 
   const cartLines = useMemo(() => {
     return items
-      .map((item) => getCartLine(item, products))
+      .map((item) => getCartLine(item, products ?? []))
       .filter((line): line is CartLine => line !== null);
   }, [items, products]);
 

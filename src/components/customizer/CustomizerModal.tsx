@@ -64,9 +64,9 @@ export const CustomizerModal: React.FC = () => {
           </div>
 
           {/* Simulated Garment Fabric Texture with Needlework SVG */}
-          <div className="my-8 w-64 h-64 sm:w-72 sm:h-72 rounded-sm bg-[#161618] border border-stone/20 flex flex-col items-center justify-center relative shadow-inner overflow-hidden">
+          <div className="my-8 w-64 h-64 sm:w-72 sm:h-72 rounded-sm bg-ink border border-stone/20 flex flex-col items-center justify-center relative overflow-hidden">
             {/* Fabric weave grain */}
-            <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:12px_12px]" />
+            <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(var(--color-paper)_1px,transparent_1px)] [background-size:12px_12px]" />
 
             {/* Simulated Embroidery Needlework Stitches */}
             <div className="relative z-10 flex flex-col items-center">
