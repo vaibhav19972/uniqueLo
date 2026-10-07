@@ -562,7 +562,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Dating back to the Rigveda and Mughal imperial courts, Zardozi translates literally to gold sewing. Artisans hand-anchor coiled metallic bullion wires and French spirals onto heavy wool.',
     description: 'Raised three-dimensional metallic relief worked with gilded zari thread. Built to catch low ambient light without losing structural tension.',
     stitchType: 'Anchor Bullion & Metallic Wire',
-    image: '/images/products/celestial-zardozi-coat-2.jpg',
+    image: '/images/products/celestial-zardozi-coat-2.png',
   },
   {
     slug: 'botanical-chain',
@@ -573,7 +573,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Rooted in 16th-century Awadh patronage, Chikankari combines delicate shadow-work and tight chain looping using unbleached mulberry silk floss.',
     description: 'Fluid floral and vine geometries stitched with calibrated tension directly onto heavy organic cotton and washed canvas.',
     stitchType: 'Chain Stitch & Shadow Work',
-    image: '/images/products/botanical-silk-jacket-2.jpg',
+    image: '/images/products/botanical-silk-jacket-2.png',
   },
   {
     slug: 'kantha-quilt',
@@ -595,7 +595,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Executed using a fine pointed aari hook, Kashmiri crewel work renders wild flora and alpine botanicals in thick 2-ply natural wool yarn.',
     description: 'Thick, dimensional wool embroidery on Mongolian cashmere and hand-woven wool coats that provides both tactile relief and natural insulation.',
     stitchType: 'Pointed Aari Hook Chain',
-    image: '/images/products/crewel-cashmere-cardigan-2.jpg',
+    image: '/images/products/crewel-cashmere-cardigan-2.png',
   },
   {
     slug: 'satin-stitch',
