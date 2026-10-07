@@ -984,6 +984,96 @@
       "craftRegion": "India",
       "craftCluster": "Artisanal Needlework Guild",
       "fabricGsm": "280 GSM Premium Natural Textile"
+    },
+    {
+      "slug": "royal-aari-organic-tee",
+      "name": "Royal Aari Organic Cotton Tee",
+      "subtitle": "280 GSM heavyweight jersey with hand-hooked chain-stitch crest",
+      "description": "Cut from custom 280 GSM combed organic cotton jersey, finished with hand-hooked Kashmiri Aari floral needlework on the chest pocket.",
+      "categorySlug": "tops",
+      "tags": [
+        "tee",
+        "t-shirt",
+        "aari",
+        "tops",
+        "organic",
+        "heavyweight"
+      ],
+      "variants": [
+        {
+          "sku": "rot-blk-s",
+          "color": "Washed Black",
+          "colorHex": "#18181b",
+          "size": "S",
+          "priceCents": 38000,
+          "status": "in-stock"
+        },
+        {
+          "sku": "rot-blk-m",
+          "color": "Washed Black",
+          "colorHex": "#18181b",
+          "size": "M",
+          "priceCents": 38000,
+          "status": "in-stock"
+        },
+        {
+          "sku": "rot-blk-l",
+          "color": "Washed Black",
+          "colorHex": "#18181b",
+          "size": "L",
+          "priceCents": 38000,
+          "status": "low-stock",
+          "quantity": 3
+        },
+        {
+          "sku": "rot-ecr-m",
+          "color": "Natural Ecru",
+          "colorHex": "#f4efe6",
+          "size": "M",
+          "priceCents": 38000,
+          "status": "in-stock"
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/botanical-silk-jacket-1.png",
+          "alt": "Royal Aari Organic Cotton Tee — front silhouette",
+          "color": "#18181b"
+        },
+        {
+          "src": "/images/products/botanical-silk-jacket-1.png",
+          "alt": "Royal Aari Organic Cotton Tee — macro Aari stitch detail",
+          "color": "#18181b"
+        }
+      ],
+      "featured": true,
+      "customizable": true,
+      "material": [
+        "100% GOTS Organic Cotton Jersey (280 GSM)",
+        "Mercerized Cotton Embroidery Floss"
+      ],
+      "care": [
+        "Machine wash gentle cold (30°C) inside out",
+        "Line dry in shade",
+        "Do not iron directly on embroidery"
+      ],
+      "fit": "Boxy atelier drop-shoulder fit, true to size",
+      "batchNumber": 14,
+      "batchTotal": 60,
+      "craftRegion": "Srinagar, Jammu & Kashmir",
+      "craftCluster": "Valley Aari Needlecraft Guild",
+      "fabricGsm": "280 GSM Ringspun Combed Cotton",
+      "embroidery": {
+        "technique": "botanical-chain",
+        "techniqueLabel": "Kashmiri Hand-Hooked Aari Chain Stitch",
+        "artisanHours": 8,
+        "placement": [
+          "Chest Pocket",
+          "Back Collar Yoke"
+        ],
+        "threadComposition": "100% Mercerized Egyptian Cotton Thread",
+        "motifStory": "Traditional Chinar leaf geometry reinterpreted into a modern minimalist pocket motif."
+      }
     }
   ]
 }

@@ -185,61 +185,69 @@ export async function getProducts(): Promise<Product[]> {
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
         `);
 
-      if (!error && data && data.length > 0) {
-        return data.map((item: any) => ({
-          slug: item.slug,
-          name: item.name,
-          subtitle: item.subtitle,
-          description: item.description,
-          categorySlug: item.category_slug,
-          tags: item.tags || [],
-          featured: item.featured || false,
-          customizable: item.customizable || false,
-          material: item.material || [],
-          care: item.care || [],
-          fit: item.fit,
-          batchNumber: item.batch_number,
-          batchTotal: item.batch_total,
-          craftRegion: item.craft_region,
-          craftCluster: item.craft_cluster,
-          fabricGsm: item.fabric_gsm,
-          variants: (item.variants || []).map((v: any) => ({
-            sku: v.sku,
-            color: v.color,
-            colorHex: v.color_hex,
-            size: v.size,
-            priceCents: v.price_cents,
-            compareAtPriceCents: v.compare_at_price_cents,
-            status: v.status || 'in-stock',
-            quantity: v.quantity,
-          })),
-          images: (item.product_images || [])
-            .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
-            .map((img: any) => ({
-              src: img.src,
-              alt: img.alt,
-              color: img.color,
+      if (error) {
+        console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
+      } else if (data && data.length > 0) {
+        return data.map((item: any) => {
+          const emb = Array.isArray(item.embroidery_details)
+            ? item.embroidery_details[0]
+            : item.embroidery_details;
+
+          return {
+            slug: item.slug,
+            name: item.name,
+            subtitle: item.subtitle,
+            description: item.description,
+            categorySlug: item.category_slug,
+            tags: item.tags || [],
+            featured: item.featured || false,
+            customizable: item.customizable || false,
+            material: item.material || [],
+            care: item.care || [],
+            fit: item.fit,
+            batchNumber: item.batch_number,
+            batchTotal: item.batch_total,
+            craftRegion: item.craft_region,
+            craftCluster: item.craft_cluster,
+            fabricGsm: item.fabric_gsm,
+            variants: (item.variants || []).map((v: any) => ({
+              sku: v.sku,
+              color: v.color,
+              colorHex: v.color_hex,
+              size: v.size,
+              priceCents: v.price_cents,
+              compareAtPriceCents: v.compare_at_price_cents,
+              status: v.status || 'in-stock',
+              quantity: v.quantity,
             })),
-          embroidery: item.embroidery_details?.[0]
-            ? {
-                technique: item.embroidery_details[0].technique,
-                techniqueLabel: item.embroidery_details[0].technique_label,
-                artisanHours: item.embroidery_details[0].artisan_hours,
-                placement: item.embroidery_details[0].placement || [],
-                threadComposition: item.embroidery_details[0].thread_composition,
-                motifStory: item.embroidery_details[0].motif_story,
-                macroImage: item.embroidery_details[0].macro_image_src
-                  ? {
-                      src: item.embroidery_details[0].macro_image_src,
-                      alt: item.embroidery_details[0].macro_image_alt || item.name,
-                    }
-                  : undefined,
-              }
-            : undefined,
-        }));
+            images: (item.product_images || [])
+              .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+              .map((img: any) => ({
+                src: img.src,
+                alt: img.alt,
+                color: img.color,
+              })),
+            embroidery: emb
+              ? {
+                  technique: emb.technique,
+                  techniqueLabel: emb.technique_label,
+                  artisanHours: emb.artisan_hours,
+                  placement: emb.placement || [],
+                  threadComposition: emb.thread_composition,
+                  motifStory: emb.motif_story,
+                  macroImage: emb.macro_image_src
+                    ? {
+                        src: emb.macro_image_src,
+                        alt: emb.macro_image_alt || item.name,
+                      }
+                    : undefined,
+                }
+              : undefined,
+          };
+        });
       }
-    } catch {
-      // Fallback below
+    } catch (err) {
+      console.warn('[UniqueLo] Exception querying Supabase products; using fallback seed data:', err);
     }
   }
 
@@ -432,8 +440,17 @@ export function formatPrice(cents: number): string {
 }
 
 export function getDefaultVariant(product: Product): ProductVariant {
-  const inStock = product.variants.find((v) => v.status === 'in-stock');
-  return inStock || product.variants[0];
+  const inStock = product.variants?.find((v) => v.status === 'in-stock');
+  if (inStock) return inStock;
+  if (product.variants && product.variants.length > 0) return product.variants[0];
+  return {
+    sku: `${product.slug}-default`,
+    color: 'Standard',
+    colorHex: '#18181b',
+    size: 'Standard',
+    priceCents: 0,
+    status: 'in-stock',
+  };
 }
 
 export function getSizesForColor(product: Product, color: string): ProductVariant[] {
