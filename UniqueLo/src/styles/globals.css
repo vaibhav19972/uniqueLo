@@ -3,18 +3,28 @@
 @import './tokens.css';
 
 /* Map design tokens into the Tailwind theme so utilities like `bg-cream`,
-   `text-ink`, `font-serif`, `text-hero` resolve from tokens.css. */
+   `text-ink`, `font-serif`, `text-hero`, `bg-gold-zari` resolve from tokens.css. */
 @theme {
     /* colors */
-    --color-cream:      var(--color-cream);
-    --color-paper:      var(--color-paper);
-    --color-ink:        var(--color-ink);
-    --color-ink-muted:  var(--color-ink-muted);
-    --color-stone:      var(--color-stone);
-    --color-warm-gray:  var(--color-warm-gray);
-    --color-accent:     var(--color-accent);
-    --color-error:      var(--color-error);
-    --color-success:    var(--color-success);
+    --color-cream:           var(--color-cream);
+    --color-paper:           var(--color-paper);
+    --color-ink:             var(--color-ink);
+    --color-ink-muted:       var(--color-ink-muted);
+    --color-stone:           var(--color-stone);
+    --color-warm-gray:       var(--color-warm-gray);
+    
+    --color-accent:          var(--color-accent);
+    --color-accent-hover:    var(--color-accent-hover);
+    --color-saffron:         var(--color-saffron);
+    --color-gold-zari:       var(--color-gold-zari);
+    --color-pistachio:       var(--color-pistachio);
+    --color-pistachio-light: var(--color-pistachio-light);
+    --color-riviera:         var(--color-riviera);
+    --color-blush:           var(--color-blush);
+    --color-parchment:       var(--color-parchment);
+    
+    --color-error:           var(--color-error);
+    --color-success:         var(--color-success);
 
     /* fonts */
     --font-sans:  var(--font-sans);
@@ -33,6 +43,7 @@
     html {
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      scroll-behavior: smooth;
     }
 
     body {
@@ -49,7 +60,7 @@
       border-color: var(--color-stone);
     }
 
-    /* Always-visible focus ring for keyboard users (pointer exempt). */
+    /* Always-visible focus ring for keyboard users */
     :focus-visible {
       outline: 2px solid var(--color-accent);
       outline-offset: 2px;
@@ -57,7 +68,68 @@
 }
 
 /* ─────────────────────────────────────
-   Reduced-motion reset (motion system, §7)
+   Stitched Needlework & Playful Utilities
+   ───────────────────────────────────── */
+.stitch-border {
+  border: 1.5px dashed var(--color-stone);
+}
+
+.stitch-border-gold {
+  border: 1.5px dashed var(--color-gold-zari);
+}
+
+.stitch-border-terracotta {
+  border: 1.5px dashed var(--color-accent);
+}
+
+/* Subtle Floating Animation for Badges */
+@keyframes needle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-needle-float {
+  animation: needle-float 4s ease-in-out infinite;
+}
+
+/* Marquee scrolling ticker */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-stone);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-gray);
+}
+
+/* ─────────────────────────────────────
+   Reduced-motion reset
    ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     *,

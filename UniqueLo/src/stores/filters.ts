@@ -8,6 +8,7 @@ interface FiltersStore {
   toggleSize: (size: string) => void;
   toggleTechnique: (technique: EmbroideryTechnique) => void;
   setPriceMax: (priceMax?: number) => void;
+  setSearchQuery: (query: string) => void;
   setSort: (sort: SortKey) => void;
   resetFilters: () => void;
 }
@@ -18,6 +19,7 @@ const initialFilters: FilterState = {
   sizes: [],
   techniques: [],
   priceMax: undefined,
+  searchQuery: '',
   sort: 'newest',
 };
 
@@ -42,7 +44,7 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
     set((state) => {
       const exists = state.filters.sizes.includes(size);
       const next = exists
-        ? state.filters.sizes.filter((s) => s !== size)
+        ? state.filters.sizes.filter((c) => c !== size)
         : [...state.filters.sizes, size];
       return { filters: { ...state.filters, sizes: next } };
     }),
@@ -60,6 +62,11 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
   setPriceMax: (priceMax) =>
     set((state) => ({
       filters: { ...state.filters, priceMax },
+    })),
+
+  setSearchQuery: (searchQuery) =>
+    set((state) => ({
+      filters: { ...state.filters, searchQuery },
     })),
 
   setSort: (sort) =>
