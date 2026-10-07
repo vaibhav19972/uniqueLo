@@ -333,10 +333,10 @@ INSERT INTO public.products (
   featured = EXCLUDED.featured;
 
 -- 2. Insert Images
-INSERT INTO public.product_images (product_slug, src, alt, sort_order) 
+INSERT INTO public.product_images (product_slug, src, alt, color, sort_order) 
 VALUES 
-  ('${finalSlug}', '${image1Src}', '${(image1Alt || name).replace(/'/g, "''")}', 0),
-  ('${finalSlug}', '${image2Src}', '${(image2Alt || name).replace(/'/g, "''")}', 1);
+  ('${finalSlug}', '${image1Src}', '${(image1Alt || name).replace(/'/g, "''")}', '${(variants[0]?.colorHex || '#121214').replace(/'/g, "''")}', 0),
+  ('${finalSlug}', '${image2Src}', '${(image2Alt || name).replace(/'/g, "''")}', '${(variants[0]?.colorHex || '#121214').replace(/'/g, "''")}', 1);
 
 -- 3. Insert Variants
 INSERT INTO public.variants (sku, product_slug, color, color_hex, size, price_cents, status, quantity) 
