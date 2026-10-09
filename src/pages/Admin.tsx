@@ -197,14 +197,14 @@ const AdminStudio: React.FC = () => {
     { name: 'Natural Ecru', hex: '#f4efe6' },
   ]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>(['S', 'M', 'L']);
-  const [defaultPrice, setDefaultPrice] = useState<number>(340);
+  const [defaultPrice, setDefaultPrice] = useState<number>(28220);
   const [variants, setVariants] = useState<VariantForm[]>([
     {
       sku: 'top-obs-s',
       color: 'Obsidian Noir',
       colorHex: '#121214',
       size: 'S',
-      price: 340,
+      price: 28220,
       status: 'in-stock',
       quantity: 10,
     },
@@ -213,7 +213,7 @@ const AdminStudio: React.FC = () => {
       color: 'Obsidian Noir',
       colorHex: '#121214',
       size: 'M',
-      price: 340,
+      price: 28220,
       status: 'in-stock',
       quantity: 10,
     },
@@ -222,7 +222,7 @@ const AdminStudio: React.FC = () => {
       color: 'Obsidian Noir',
       colorHex: '#121214',
       size: 'L',
-      price: 340,
+      price: 28220,
       status: 'low-stock',
       quantity: 2,
     },
@@ -231,7 +231,7 @@ const AdminStudio: React.FC = () => {
       color: 'Natural Ecru',
       colorHex: '#f4efe6',
       size: 'M',
-      price: 340,
+      price: 28220,
       status: 'in-stock',
       quantity: 8,
     },
@@ -1006,7 +1006,7 @@ INSERT INTO public.embroidery_details (
 
                   <div className="flex items-center gap-4 pt-2">
                     <div className="flex items-center gap-2">
-                      <label className="text-xs text-ink-muted uppercase tracking-wider font-medium">Default Price ($):</label>
+                      <label className="text-xs text-ink-muted uppercase tracking-wider font-medium">Default Price (₹):</label>
                       <input
                         type="number"
                         value={defaultPrice}
@@ -1062,7 +1062,7 @@ INSERT INTO public.embroidery_details (
                           <td className="py-2 px-3 font-mono font-bold">{v.size}</td>
                           <td className="py-2 px-3">
                             <div className="flex items-center gap-1 font-mono">
-                              <span>$</span>
+                              <span>₹</span>
                               <input
                                 type="number"
                                 value={v.price}

@@ -121,7 +121,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                       </p>
                       <div className="pt-1">
                         <a
-                          href="/atelier/zardozi"
+                          href="/atelier/hand-zardozi"
                           className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-cream hover:text-accent transition-colors"
                         >
                           <span>Inspect Zardozi Process</span>

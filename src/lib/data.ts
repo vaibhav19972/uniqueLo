@@ -3,7 +3,7 @@ import rawCategories from '../data/categories.json';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
-export type Currency = 'USD';
+export type Currency = 'INR';
 
 export interface ProductImage {
   src: string;
@@ -30,6 +30,7 @@ export type EmbroideryTechnique =
   | 'kantha-quilt'
   | 'metallic-zari'
   | 'botanical-chain'
+  | 'sashiko-selvedge'
   | 'monogram-bespoke';
 
 export interface EmbroideryDetail {
@@ -433,15 +434,20 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
 }
 
 export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(Math.round(cents / 100));
 }
 
 export function getDefaultVariant(product: Product): ProductVariant {
   const inStock = product.variants?.find((v) => v.status === 'in-stock');
   if (inStock) return inStock;
+  const lowStock = product.variants?.find((v) => v.status === 'low-stock');
+  if (lowStock) return lowStock;
+  const available = product.variants?.find((v) => v.status !== 'out-of-stock');
+  if (available) return available;
   if (product.variants && product.variants.length > 0) return product.variants[0];
   return {
     sku: `${product.slug}-default`,
@@ -553,6 +559,77 @@ export async function subscribeNewsletter(email: string): Promise<{ success: boo
   return { success: true, message: 'Welcome to the UniqueLo Atelier circle. Your complimentary code is ATELIER10.' };
 }
 
+export type PaymentMethod = 'upi' | 'cod' | 'card';
+
+export interface CreateOrderInput {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  pincode?: string;
+  paymentMethod: PaymentMethod;
+  subtotalCents: number;
+  discountCents: number;
+  shippingCents: number;
+  totalCents: number;
+  couponCode?: string | null;
+  giftNote?: string | null;
+  shippingAddress: string;
+  lines: { productSlug: string; variantSku: string; productName: string; color: string; size: string; quantity: number; priceCents: number; customization?: CartCustomization }[];
+}
+
+export async function createOrder(input: CreateOrderInput): Promise<{ success: boolean; orderId?: string; message: string }> {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_name: input.customerName,
+          customer_email: input.customerEmail,
+          status: input.paymentMethod === 'cod' ? 'confirmed-cod' : 'confirmed',
+          subtotal_cents: input.subtotalCents,
+          discount_cents: input.discountCents,
+          shipping_cents: input.shippingCents,
+          total_cents: input.totalCents,
+          coupon_code: input.couponCode || null,
+          gift_note: input.giftNote || null,
+          shipping_address: {
+            address: input.shippingAddress,
+            phone: input.customerPhone || null,
+            pincode: input.pincode || null,
+            payment_method: input.paymentMethod,
+          },
+        })
+        .select('id')
+        .single();
+      if (orderError) throw orderError;
+      const orderId = (order as { id: string }).id;
+      if (input.lines.length > 0) {
+        const { error: itemsError } = await supabase.from('order_items').insert(
+          input.lines.map((l) => ({
+            order_id: orderId,
+            product_slug: l.productSlug,
+            variant_sku: l.variantSku,
+            product_name: l.productName,
+            color: l.color,
+            size: l.size,
+            quantity: l.quantity,
+            price_cents: l.priceCents,
+            customization: l.customization || null,
+          }))
+        );
+        if (itemsError) throw itemsError;
+      }
+      return { success: true, orderId, message: 'Order placed successfully.' };
+    } catch (err) {
+      console.warn('[UniqueLo] createOrder failed:', err);
+      return { success: false, message: 'Could not save order. Please try again or choose COD.' };
+    }
+  }
+  // Dev fallback — no Supabase configured
+  await new Promise((r) => setTimeout(r, 600));
+  return { success: true, orderId: `local-${Date.now()}`, message: 'Order confirmed (local mode).' };
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Indian Craft Provenance Taxonomy (Stream 3)
 // ─────────────────────────────────────────────────────────────────────
@@ -570,17 +647,6 @@ export interface CraftTechniqueInfo {
 }
 
 export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
-  {
-    slug: 'zardozi',
-    name: 'Zardozi Wirework',
-    region: 'Jaipur & Agra',
-    cluster: 'Pink City Bullion Guild',
-    artisanPace: '28–34 hours per garment',
-    historicalContext: 'Dating back to the Rigveda and Mughal imperial courts, Zardozi translates literally to gold sewing. Artisans hand-anchor coiled metallic bullion wires and French spirals onto heavy wool.',
-    description: 'Raised three-dimensional metallic relief worked with gilded zari thread. Built to catch low ambient light without losing structural tension.',
-    stitchType: 'Anchor Bullion & Metallic Wire',
-    image: '/images/products/celestial-zardozi-coat-2.png',
-  },
   {
     slug: 'botanical-chain',
     name: 'Chikankari & Botanical Chain',
@@ -636,6 +702,50 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     stitchType: 'Structural Geometric Grid',
     image: '/images/products/sashiko-selvedge-denim-2.jpg',
   },
+  {
+    slug: 'hand-zardozi',
+    name: 'Hand Zardozi Wirework',
+    region: 'Jaipur, Rajasthan',
+    cluster: 'Pink City Bullion Guild',
+    artisanPace: '28–34 hours per garment',
+    historicalContext: 'Mughal-court gold sewing: coiled bullion wires and French spirals hand-anchored onto wool and silk. The atelier standard for bridal-grade relief.',
+    description: 'Raised metallic relief with gilded wire, built to catch low light without losing tension.',
+    stitchType: 'Anchor Bullion & Metallic Wire',
+    image: '/images/products/celestial-zardozi-coat-2.png',
+  },
+  {
+    slug: 'metallic-zari',
+    name: 'Metallic Zari & Tilla',
+    region: 'Varanasi & Surat',
+    cluster: 'Ghat Zari Weavers Collective',
+    artisanPace: '20–28 hours per garment',
+    historicalContext: 'Silver-gilt zari cords couched with silk core along pleats and borders — temple and court textile lineage adapted to modern tailoring.',
+    description: 'Continuous metallic inlay that holds pleat structure while adding heirloom sheen.',
+    stitchType: 'Couched Metallic Cord',
+    image: '/images/products/pleated-zari-trousers-2.jpg',
+  },
+  {
+    slug: 'french-knot',
+    name: 'French Knot Needlecraft',
+    region: 'Kashmir & Kutch',
+    cluster: 'Highland Knot Artisans',
+    artisanPace: '14–18 hours per garment',
+    historicalContext: 'Hand-wound spiral knots in merino and silk floss — pebble-grain texture that reads as sculpture up close and solid colour at distance.',
+    description: 'Micro-sculpted knots delivering tactile dimension on knitwear and heavyweight jersey.',
+    stitchType: 'Hand-Wound Spiral Knot',
+    image: '/images/products/french-knot-turtleneck-2.jpg',
+  },
+  {
+    slug: 'monogram-bespoke',
+    name: 'Bespoke Monogram & Crest',
+    region: 'Jaipur Atelier',
+    cluster: 'Pink City Monogram Atelier',
+    artisanPace: '6–10 hours per commission',
+    historicalContext: 'Patron-initial satin work and crest embroidery — the atelier personalisation studio for shirts, scarves and heirloom linens.',
+    description: 'Precision satin initials tailored to the patron, with archival thread and placement choice.',
+    stitchType: 'Precision Satin Initial',
+    image: '/images/products/monogram-poplin-shirt-2.jpg',
+  },
 ];
 
 export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
@@ -643,5 +753,6 @@ export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
 }
 
 export async function getCraftTechnique(slug: string): Promise<CraftTechniqueInfo | undefined> {
-  return CRAFT_TECHNIQUES.find((c) => c.slug === slug);
+  const normalized = slug === 'zardozi' ? 'hand-zardozi' : slug;
+  return CRAFT_TECHNIQUES.find((c) => c.slug === normalized);
 }

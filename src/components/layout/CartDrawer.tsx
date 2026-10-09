@@ -2,35 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
-import { getCartLine, formatPrice, type CartLine } from '../../lib/data';
+import { getCartLine, formatPrice, createOrder, getDefaultVariant, type CartLine, type PaymentMethod } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
 import { CartLineItem } from './CartLineItem';
 import { Button } from '../ui/Button';
 
-interface CartUpsellItem {
-  sku: string;
-  name: string;
-  priceCents: number;
-  image: string;
-  description: string;
-}
-
-const UPSELL_ITEMS: CartUpsellItem[] = [
-  {
-    sku: 'acc-care-kit',
-    name: 'Mulberry Silk Thread Conditioner & Wax',
-    priceCents: 2800,
-    image: '/images/products/embroidered-silk-scarf-2.jpg',
-    description: 'Natural beeswax formula to protect thread luster.',
-  },
-  {
-    sku: 'acc-hanger-bag',
-    name: 'Cedar Garment Hanger & Linen Bag',
-    priceCents: 4500,
-    image: '/images/products/needlework-canvas-tote-2.jpg',
-    description: 'Archival breathable linen preservation bag.',
-  },
-];
+const STANDARD_SHIPPING_CENTS = 199900;
 
 export const CartDrawer: React.FC = () => {
   const isOpen = useCartStore((state) => state.isOpen);
@@ -58,7 +35,13 @@ export const CartDrawer: React.FC = () => {
   const [checkoutStep, setCheckoutStep] = useState<'details' | 'success'>('details');
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerPincode, setCustomerPincode] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [shippingAddress, setShippingAddress] = useState('');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [placedOrderId, setPlacedOrderId] = useState('');
 
   const cartLines = useMemo(() => {
     return items
@@ -84,9 +67,9 @@ export const CartDrawer: React.FC = () => {
 
   const subtotalCents = Math.max(0, rawSubtotalCents - discountCents);
 
-  // Free shipping ($350) and Gift Tier ($600)
-  const freeShippingThresholdCents = 35000;
-  const giftTierThresholdCents = 60000;
+  // Free shipping (₹29,050) and Gift Tier (₹49,800) — India-first thresholds
+  const freeShippingThresholdCents = 2905000;
+  const giftTierThresholdCents = 4980000;
 
   const freeShippingQualified = subtotalCents >= freeShippingThresholdCents || appliedCoupon?.code === 'FREESHIP';
   const giftTierQualified = subtotalCents >= giftTierThresholdCents;
@@ -94,7 +77,7 @@ export const CartDrawer: React.FC = () => {
   const remainingForFreeShipping = Math.max(0, freeShippingThresholdCents - subtotalCents);
   const remainingForGiftTier = Math.max(0, giftTierThresholdCents - subtotalCents);
 
-  const shippingCostCents = freeShippingQualified ? 0 : 2500;
+  const shippingCostCents = freeShippingQualified ? 0 : STANDARD_SHIPPING_CENTS;
   const finalTotalCents = subtotalCents + shippingCostCents;
 
   // Progress meters
@@ -134,8 +117,8 @@ export const CartDrawer: React.FC = () => {
       setAppliedCoupon({ code, discountPercent: 10 });
       showToast({ title: 'Coupon Applied', description: '10% privilege savings deducted.', type: 'success' });
     } else if (code === 'NEEDLECRAFT') {
-      setAppliedCoupon({ code, discountCents: 4000 });
-      showToast({ title: 'Coupon Applied', description: '$40.00 needlecraft gift applied.', type: 'success' });
+      setAppliedCoupon({ code, discountCents: 332000 });
+      showToast({ title: 'Coupon Applied', description: '₹3,320 needlecraft gift applied.', type: 'success' });
     } else if (code === 'FREESHIP') {
       setAppliedCoupon({ code });
       showToast({ title: 'Coupon Applied', description: 'Complimentary shipping unlocked.', type: 'success' });
@@ -145,29 +128,101 @@ export const CartDrawer: React.FC = () => {
     setCouponCode('');
   };
 
-  const handleAddUpsell = (upsell: CartUpsellItem) => {
-    // If an accessories product exists, attach or add as line
-    const accProduct = products?.find((p) => p.categorySlug === 'accessories') || products?.[0];
-    if (accProduct) {
-      addItem(accProduct.slug, accProduct.variants[0].sku, 1);
+  const handleAddUpsell = (productSlug: string) => {
+    const product = products?.find((p) => p.slug === productSlug);
+    if (!product) return;
+    const variant = getDefaultVariant(product);
+    if (variant.status === 'out-of-stock') {
       showToast({
-        title: 'Archival Care Added',
-        description: upsell.name,
-        type: 'accent',
+        title: 'Sold out',
+        description: `${product.name} is currently sold out.`,
+        type: 'info',
       });
+      return;
     }
+    addItem(product.slug, variant.sku, 1, undefined, variant.quantity ?? 99);
+    showToast({
+      title: 'Archival Care Added',
+      description: `${product.name} (${variant.color} / ${variant.size})`,
+      type: 'accent',
+    });
   };
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
+  const upsellProducts = useMemo(() => {
+    if (!products) return [];
+    const inCart = new Set(items.map((i) => i.productSlug));
+    const accessories = products.filter(
+      (p) => p.categorySlug === 'accessories' && !inCart.has(p.slug)
+    );
+    const pool = accessories.length > 0 ? accessories : products.filter((p) => !inCart.has(p.slug));
+    return pool
+      .filter((p) => getDefaultVariant(p).status !== 'out-of-stock')
+      .slice(0, 2);
+  }, [products, items]);
+
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customerEmail || !customerName) return;
-    setCheckoutStep('success');
-    clearCart();
-    showToast({
-      title: 'Order Confirmed',
-      description: 'Your bespoke commission has been queued with the master needleworker.',
-      type: 'success',
-    });
+    setOrderError('');
+    if (!customerName.trim() || !customerEmail.trim() || !shippingAddress.trim()) {
+      setOrderError('Please fill in your name, email and delivery address.');
+      return;
+    }
+    if (!/^\d{6}$/.test(customerPincode)) {
+      setOrderError('Please enter a valid 6-digit delivery PIN code.');
+      return;
+    }
+    if (customerPhone && !/^[6-9]\d{9}$/.test(customerPhone.replace(/\s+/g, ''))) {
+      setOrderError('Please enter a valid 10-digit Indian mobile number, or leave phone empty.');
+      return;
+    }
+    if (cartLines.length === 0) {
+      setOrderError('Your bag is empty. Add a garment before checkout.');
+      return;
+    }
+    setIsPlacingOrder(true);
+    try {
+      const res = await createOrder({
+        customerName: customerName.trim(),
+        customerEmail: customerEmail.trim(),
+        customerPhone: customerPhone.trim() || undefined,
+        pincode: customerPincode.trim(),
+        paymentMethod,
+        subtotalCents: rawSubtotalCents,
+        discountCents,
+        shippingCents: shippingCostCents,
+        totalCents: finalTotalCents,
+        couponCode: appliedCoupon?.code || null,
+        giftNote: hasGiftNote ? giftNoteText : null,
+        shippingAddress: shippingAddress.trim(),
+        lines: cartLines.map((l) => ({
+          productSlug: l.product.slug,
+          variantSku: l.variant.sku,
+          productName: l.product.name,
+          color: l.variant.color,
+          size: l.variant.size,
+          quantity: l.quantity,
+          priceCents: l.variant.priceCents,
+          customization: l.customization,
+        })),
+      });
+      if (!res.success) {
+        setOrderError(res.message);
+        return;
+      }
+      setPlacedOrderId(res.orderId || '');
+      setCheckoutStep('success');
+      clearCart();
+      showToast({
+        title: paymentMethod === 'cod' ? 'COD Order Confirmed' : 'Order Confirmed',
+        description:
+          paymentMethod === 'upi'
+            ? 'Complete your UPI payment on the next step — invoice sent to your email.'
+            : 'Your bespoke commission has been queued with the master needleworker.',
+        type: 'success',
+      });
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -269,28 +324,34 @@ export const CartDrawer: React.FC = () => {
               </div>
 
               {/* In-Drawer Upsells: Frequently Stitched Together */}
+              {upsellProducts.length > 0 && (
               <div className="py-5">
                 <span className="text-[10px] uppercase tracking-widest text-accent font-medium block mb-2.5">
                   ✦ Frequently Stitched Together
                 </span>
                 <div className="space-y-3">
-                  {UPSELL_ITEMS.map((up) => (
-                    <div key={up.sku} className="flex items-center gap-3 p-2.5 bg-cream/70 border border-stone/70 rounded-sm">
-                      <img src={up.image} alt={up.name} className="w-12 h-12 object-cover border border-stone/60" />
+                  {upsellProducts.map((up) => {
+                    const uv = getDefaultVariant(up);
+                    return (
+                    <div key={up.slug} className="flex items-center gap-3 p-2.5 bg-cream/70 border border-stone/70 rounded-sm">
+                      <img src={up.images[0]?.src || '/images/placeholders/hero.jpg'} alt={up.images[0]?.alt || up.name} className="w-12 h-12 object-cover border border-stone/60" />
                       <div className="flex-1 min-w-0">
                         <h5 className="font-serif text-xs text-ink truncate">{up.name}</h5>
-                        <span className="text-[11px] font-sans text-ink-muted font-medium">{formatPrice(up.priceCents)}</span>
+                        <span className="text-[11px] font-sans text-ink-muted font-medium">{formatPrice(uv.priceCents)}</span>
                       </div>
                       <button
-                        onClick={() => handleAddUpsell(up)}
-                        className="px-2.5 py-1 text-[10px] uppercase tracking-wider bg-ink text-cream hover:bg-accent transition-colors font-medium whitespace-nowrap"
+                        onClick={() => handleAddUpsell(up.slug)}
+                        aria-label={`Add ${up.name} to bag`}
+                        className="px-2.5 py-1 min-h-[44px] text-[10px] uppercase tracking-wider bg-ink text-cream hover:bg-accent transition-colors font-medium whitespace-nowrap"
                       >
                         + Add
                       </button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
+              )}
 
               {/* Gift Note Section */}
               <div className="py-4">
@@ -368,7 +429,7 @@ export const CartDrawer: React.FC = () => {
               )}
               <div className="flex justify-between text-ink-muted">
                 <span>Shipping</span>
-                <span>{freeShippingQualified ? 'Complimentary' : '$25.00'}</span>
+                <span>{freeShippingQualified ? 'Complimentary' : formatPrice(STANDARD_SHIPPING_CENTS)}</span>
               </div>
               <div className="flex justify-between text-sm font-medium text-ink pt-2 border-t border-stone/40">
                 <span>Total</span>
@@ -404,7 +465,7 @@ export const CartDrawer: React.FC = () => {
               <div>
                 <div className="flex justify-between items-center pb-3 border-b border-stone/60">
                   <h3 className="font-serif text-2xl text-ink">Atelier Order Checkout</h3>
-                  <button onClick={() => setIsCheckoutOpen(false)} className="text-xs text-ink-muted">✕</button>
+                  <button onClick={() => setIsCheckoutOpen(false)} aria-label="Close checkout" className="min-w-[44px] min-h-[44px] px-2 text-xs text-ink-muted hover:text-ink">✕</button>
                 </div>
 
                 <div className="my-4 p-3 bg-cream border border-stone/60 text-xs">
@@ -417,60 +478,156 @@ export const CartDrawer: React.FC = () => {
                   )}
                 </div>
 
-                <form onSubmit={handleCheckoutSubmit} className="space-y-3.5">
-                  <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Lady Vivienne Montgomery"
-                      className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
-                    />
+                <form onSubmit={handleCheckoutSubmit} className="space-y-3.5 max-h-[60vh] overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="co-name" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                        Full Name
+                      </label>
+                      <input
+                        id="co-name"
+                        type="text"
+                        required
+                        autoComplete="name"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="e.g. Ananya Sharma"
+                        className="w-full bg-cream border border-stone px-3 py-2.5 min-h-[44px] text-xs text-ink focus:outline-accent"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="co-phone" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                        Mobile (10-digit)
+                      </label>
+                      <input
+                        id="co-phone"
+                        type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        placeholder="e.g. 9810012345"
+                        className="w-full bg-cream border border-stone px-3 py-2.5 min-h-[44px] text-xs text-ink focus:outline-accent"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                    <label htmlFor="co-email" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
                       Email Address
                     </label>
                     <input
+                      id="co-email"
                       type="email"
                       required
+                      autoComplete="email"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="e.g. vivienne@atelier.com"
-                      className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
+                      placeholder="e.g. ananya@example.in"
+                      className="w-full bg-cream border border-stone px-3 py-2.5 min-h-[44px] text-xs text-ink focus:outline-accent"
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="co-pincode" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                        PIN Code
+                      </label>
+                      <input
+                        id="co-pincode"
+                        type="text"
+                        required
+                        inputMode="numeric"
+                        autoComplete="postal-code"
+                        value={customerPincode}
+                        onChange={(e) => setCustomerPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="e.g. 110001"
+                        className="w-full bg-cream border border-stone px-3 py-2.5 min-h-[44px] text-xs text-ink focus:outline-accent"
+                      />
+                    </div>
+                    <div>
+                      <span className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                        Payment
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5" role="radiogroup" aria-label="Payment method">
+                        {(
+                          [
+                            { key: 'upi', label: 'UPI' },
+                            { key: 'cod', label: 'COD' },
+                            { key: 'card', label: 'Card' },
+                          ] as { key: PaymentMethod; label: string }[]
+                        ).map((m) => (
+                          <button
+                            key={m.key}
+                            type="button"
+                            role="radio"
+                            aria-checked={paymentMethod === m.key}
+                            onClick={() => setPaymentMethod(m.key)}
+                            className={`min-h-[44px] px-2 text-xs border transition-colors ${
+                              paymentMethod === m.key
+                                ? 'bg-ink text-cream border-ink font-medium'
+                                : 'bg-paper text-ink border-stone hover:border-ink/60'
+                            }`}
+                          >
+                            {m.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                    <label htmlFor="co-address" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
                       Delivery Address
                     </label>
                     <textarea
+                      id="co-address"
                       required
                       rows={2}
+                      autoComplete="street-address"
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
-                      placeholder="Street, City, State/Province, Postal Code, Country"
-                      className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
+                      placeholder="Flat, street, area, city, state"
+                      className="w-full bg-cream border border-stone px-3 py-2.5 text-xs text-ink focus:outline-accent"
                     />
                   </div>
 
-                  <div className="p-3 bg-paper border border-stone/70 text-[11px] text-ink-muted">
+                  {hasGiftNote && (
+                    <div>
+                      <label htmlFor="co-gift" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                        Gift Note
+                      </label>
+                      <input
+                        id="co-gift"
+                        type="text"
+                        value={giftNoteText}
+                        onChange={(e) => setGiftNoteText(e.target.value)}
+                        placeholder="Handwritten note for the recipient"
+                        className="w-full bg-cream border border-stone px-3 py-2.5 min-h-[44px] text-xs text-ink focus:outline-accent"
+                      />
+                    </div>
+                  )}
+
+                  <div className="p-3 bg-paper border border-stone/70 text-[11px] text-ink-muted leading-relaxed">
                     <span className="text-ink font-medium block">✦ White-Glove Courier Service</span>
-                    Estimated dispatch in 2 business days. Hand-packaged in archival Japanese mulberry boxes.
+                    {paymentMethod === 'upi' && 'You will receive a UPI collect request after placing the order. '}
+                    {paymentMethod === 'cod' && 'Pay in cash or via UPI on delivery. Please keep exact change ready. '}
+                    {paymentMethod === 'card' && 'Secure RuPay / Visa / Mastercard payment link will be emailed. '}
+                    Dispatch in 2 business days. Inclusive of all taxes.
                   </div>
+
+                  {orderError && (
+                    <p role="alert" className="text-xs text-red-700 bg-red-50 border border-red-200 px-3 py-2">
+                      {orderError}
+                    </p>
+                  )}
 
                   <div className="flex justify-end gap-2 pt-2">
                     <Button type="button" variant="ghost" size="sm" onClick={() => setIsCheckoutOpen(false)}>
                       Back to Bag
                     </Button>
-                    <Button type="submit" variant="primary" size="sm">
-                      Complete Order ({formatPrice(finalTotalCents)})
+                    <Button type="submit" variant="primary" size="sm" disabled={isPlacingOrder}>
+                      {isPlacingOrder ? 'Placing Order…' : `Pay ${paymentMethod.toUpperCase()} • ${formatPrice(finalTotalCents)}`}
                     </Button>
                   </div>
                 </form>
@@ -484,8 +641,11 @@ export const CartDrawer: React.FC = () => {
                 <p className="text-xs text-ink-muted mt-2 max-w-sm mx-auto leading-relaxed">
                   Thank you, <span className="text-ink font-medium">{customerName}</span>. Your bespoke order has been assigned to our master embroidery workshop. An archival invoice has been transmitted to <span className="text-ink font-medium">{customerEmail}</span>.
                 </p>
+                {placedOrderId && (
+                  <p className="text-[11px] font-mono text-ink-muted mt-2">Order ID: {placedOrderId}</p>
+                )}
                 <div className="mt-6">
-                  <Button variant="primary" size="sm" onClick={() => { setIsCheckoutOpen(false); closeCart(); }}>
+                  <Button variant="primary" size="sm" onClick={() => { setCheckoutStep('details'); setPlacedOrderId(''); setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); setCustomerPincode(''); setShippingAddress(''); setGiftNoteText(''); setHasGiftNote(false); setIsCheckoutOpen(false); closeCart(); }}>
                     Return to Atelier
                   </Button>
                 </div>

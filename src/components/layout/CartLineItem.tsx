@@ -5,7 +5,7 @@ import { Image } from '../ui/Image';
 
 interface CartLineItemProps {
   line: CartLine;
-  onUpdateQuantity: (id: string, qty: number) => void;
+  onUpdateQuantity: (id: string, qty: number, max?: number) => void;
   onRemove: (id: string) => void;
 }
 
@@ -65,19 +65,23 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
         <div className="flex items-center justify-between pt-2">
           <div className="inline-flex items-center border border-stone">
             <button
-              onClick={() => onUpdateQuantity(line.id, quantity - 1)}
+              onClick={() => onUpdateQuantity(line.id, quantity - 1, variant.quantity ?? 99)}
               aria-label="Decrease quantity"
-              className="w-7 h-7 flex items-center justify-center text-xs text-ink hover:bg-stone/30 transition-colors"
+              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center text-xs text-ink hover:bg-stone/30 transition-colors"
             >
               −
             </button>
-            <span className="w-8 text-center text-xs font-sans font-medium text-ink">
+            <span className="w-8 text-center text-xs font-sans font-medium text-ink" aria-live="polite">
               {quantity}
+              {variant.quantity != null && (
+                <span className="block text-[9px] text-ink-muted font-normal">of {variant.quantity}</span>
+              )}
             </span>
             <button
-              onClick={() => onUpdateQuantity(line.id, quantity + 1)}
+              onClick={() => onUpdateQuantity(line.id, quantity + 1, variant.quantity ?? 99)}
               aria-label="Increase quantity"
-              className="w-7 h-7 flex items-center justify-center text-xs text-ink hover:bg-stone/30 transition-colors"
+              disabled={variant.quantity != null && quantity >= variant.quantity}
+              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center text-xs text-ink hover:bg-stone/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               +
             </button>

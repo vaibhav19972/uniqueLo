@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
+import { subscribeNewsletter } from '../../lib/data';
+import { useToastStore } from '../../stores/toast';
 
 export const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const showToast = useToastStore((s) => s.showToast);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email || isLoading) return;
+    setIsLoading(true);
+    try {
+      const res = await subscribeNewsletter(email.trim());
       setSubscribed(true);
       setEmail('');
+      showToast({ title: 'Subscribed', description: res.message, type: 'success' });
+    } catch {
+      showToast({ title: 'Subscription failed', description: 'Please try again.', type: 'info' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,7 +114,7 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/atelier/zardozi" className="hover:text-cream transition-colors">
+                <Link to="/atelier/hand-zardozi" className="hover:text-cream transition-colors">
                   Jaipur Zardozi Guild
                 </Link>
               </li>
@@ -167,9 +179,10 @@ export const Footer: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-accent text-cream hover:bg-accent-hover transition-colors py-2 text-[10px] font-medium uppercase tracking-widest cursor-pointer"
+                  disabled={isLoading}
+                  className="w-full bg-accent text-cream hover:bg-accent-hover transition-colors py-2 text-[10px] font-medium uppercase tracking-widest cursor-pointer disabled:opacity-60"
                 >
-                  Join Dispatch
+                  {isLoading ? 'Joining…' : 'Join Dispatch'}
                 </button>
               </form>
             )}
