@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
+import { subscribeNewsletter } from '../../lib/data';
+import { useToastStore } from '../../stores/toast';
 
 export const Newsletter: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const showToast = useToastStore((s) => s.showToast);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email || isLoading) return;
+    setIsLoading(true);
+    try {
+      const res = await subscribeNewsletter(email.trim());
       setIsSubmitted(true);
       setEmail('');
+      showToast({ title: 'Subscribed', description: res.message, type: 'success' });
+    } catch {
+      showToast({ title: 'Subscription failed', description: 'Please try again.', type: 'info' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,9 +63,10 @@ export const Newsletter: React.FC = () => {
                 type="submit"
                 variant="primary"
                 size="md"
-                className="w-full sm:w-auto text-xs tracking-widest whitespace-nowrap"
+                disabled={isLoading}
+                className="w-full sm:w-auto text-xs tracking-widest whitespace-nowrap disabled:opacity-60"
               >
-                Request Dispatch
+                {isLoading ? 'Joining…' : 'Request Dispatch'}
               </Button>
             </form>
           )}

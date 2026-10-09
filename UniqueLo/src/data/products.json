@@ -19,7 +19,7 @@
           "color": "Indigo",
           "colorHex": "#1d2a44",
           "size": "S",
-          "priceCents": 58000,
+          "priceCents": 4814000,
           "status": "in-stock"
         },
         {
@@ -27,7 +27,7 @@
           "color": "Indigo",
           "colorHex": "#1d2a44",
           "size": "M",
-          "priceCents": 58000,
+          "priceCents": 4814000,
           "status": "in-stock"
         },
         {
@@ -35,7 +35,7 @@
           "color": "Indigo",
           "colorHex": "#1d2a44",
           "size": "L",
-          "priceCents": 58000,
+          "priceCents": 4814000,
           "status": "low-stock",
           "quantity": 2
         },
@@ -44,7 +44,7 @@
           "color": "Ecru",
           "colorHex": "#f4efe6",
           "size": "S",
-          "priceCents": 58000,
+          "priceCents": 4814000,
           "status": "in-stock"
         },
         {
@@ -52,19 +52,19 @@
           "color": "Ecru",
           "colorHex": "#f4efe6",
           "size": "M",
-          "priceCents": 58000,
+          "priceCents": 4814000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/botanical-silk-jacket-1.png",
-          "alt": "Botanical Silk Embroidered Jacket — front view",
+          "alt": "Botanical Silk Embroidered Jacket \u2014 front view",
           "color": "#1d2a44"
         },
         {
           "src": "/images/products/botanical-silk-jacket-2.png",
-          "alt": "Botanical Silk Embroidered Jacket — macro stitch detail",
+          "alt": "Botanical Silk Embroidered Jacket \u2014 macro stitch detail",
           "color": "#1d2a44"
         }
       ],
@@ -117,7 +117,7 @@
           "color": "Nocturne Black",
           "colorHex": "#121214",
           "size": "38",
-          "priceCents": 125000,
+          "priceCents": 10375000,
           "status": "in-stock"
         },
         {
@@ -125,7 +125,7 @@
           "color": "Nocturne Black",
           "colorHex": "#121214",
           "size": "40",
-          "priceCents": 125000,
+          "priceCents": 10375000,
           "status": "in-stock"
         },
         {
@@ -133,7 +133,7 @@
           "color": "Nocturne Black",
           "colorHex": "#121214",
           "size": "42",
-          "priceCents": 125000,
+          "priceCents": 10375000,
           "status": "low-stock",
           "quantity": 1
         }
@@ -141,12 +141,12 @@
       "images": [
         {
           "src": "/images/products/celestial-zardozi-coat-1.png",
-          "alt": "Celestial Zardozi Wool Overcoat — silhouette view",
+          "alt": "Celestial Zardozi Wool Overcoat \u2014 silhouette view",
           "color": "#121214"
         },
         {
           "src": "/images/products/celestial-zardozi-coat-2.png",
-          "alt": "Celestial Zardozi Wool Overcoat — metallic wire embroidery detail",
+          "alt": "Celestial Zardozi Wool Overcoat \u2014 metallic wire embroidery detail",
           "color": "#121214"
         }
       ],
@@ -197,7 +197,7 @@
           "color": "Vintage Indigo",
           "colorHex": "#23334d",
           "size": "S",
-          "priceCents": 64000,
+          "priceCents": 5312000,
           "status": "in-stock"
         },
         {
@@ -205,7 +205,7 @@
           "color": "Vintage Indigo",
           "colorHex": "#23334d",
           "size": "M",
-          "priceCents": 64000,
+          "priceCents": 5312000,
           "status": "in-stock"
         },
         {
@@ -213,19 +213,19 @@
           "color": "Vintage Indigo",
           "colorHex": "#23334d",
           "size": "L",
-          "priceCents": 64000,
+          "priceCents": 5312000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Heirloom Kantha Quilted Chore Jacket — full view",
+          "alt": "Heirloom Kantha Quilted Chore Jacket \u2014 full view",
           "color": "#23334d"
         },
         {
           "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Heirloom Kantha Quilted Chore Jacket — running stitch texture",
+          "alt": "Heirloom Kantha Quilted Chore Jacket \u2014 running stitch texture",
           "color": "#23334d"
         }
       ],
@@ -276,7 +276,7 @@
           "color": "Oatmeal",
           "colorHex": "#d9d2c5",
           "size": "S",
-          "priceCents": 69000,
+          "priceCents": 5727000,
           "status": "in-stock"
         },
         {
@@ -284,7 +284,7 @@
           "color": "Oatmeal",
           "colorHex": "#d9d2c5",
           "size": "M",
-          "priceCents": 69000,
+          "priceCents": 5727000,
           "status": "in-stock"
         },
         {
@@ -292,7 +292,7 @@
           "color": "Oatmeal",
           "colorHex": "#d9d2c5",
           "size": "L",
-          "priceCents": 69000,
+          "priceCents": 5727000,
           "status": "low-stock",
           "quantity": 3
         },
@@ -301,7 +301,7 @@
           "color": "Charcoal",
           "colorHex": "#2c2c2e",
           "size": "S",
-          "priceCents": 69000,
+          "priceCents": 5727000,
           "status": "in-stock"
         },
         {
@@ -309,19 +309,19 @@
           "color": "Charcoal",
           "colorHex": "#2c2c2e",
           "size": "M",
-          "priceCents": 69000,
+          "priceCents": 5727000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/crewel-cashmere-cardigan-1.png",
-          "alt": "Flora Crewel Cashmere Cardigan — model shot",
+          "alt": "Flora Crewel Cashmere Cardigan \u2014 model shot",
           "color": "#d9d2c5"
         },
         {
           "src": "/images/products/crewel-cashmere-cardigan-2.png",
-          "alt": "Flora Crewel Cashmere Cardigan — raised crewel wool relief",
+          "alt": "Flora Crewel Cashmere Cardigan \u2014 raised crewel wool relief",
           "color": "#d9d2c5"
         }
       ],
@@ -370,7 +370,7 @@
           "color": "Cream",
           "colorHex": "#f8f5ee",
           "size": "S",
-          "priceCents": 44000,
+          "priceCents": 3652000,
           "status": "in-stock"
         },
         {
@@ -378,7 +378,7 @@
           "color": "Cream",
           "colorHex": "#f8f5ee",
           "size": "M",
-          "priceCents": 44000,
+          "priceCents": 3652000,
           "status": "in-stock"
         },
         {
@@ -386,7 +386,7 @@
           "color": "Cream",
           "colorHex": "#f8f5ee",
           "size": "L",
-          "priceCents": 44000,
+          "priceCents": 3652000,
           "status": "in-stock"
         },
         {
@@ -394,19 +394,19 @@
           "color": "Terracotta",
           "colorHex": "#c06b52",
           "size": "M",
-          "priceCents": 44000,
+          "priceCents": 3652000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "French-Knot Merino Turtleneck — studio styling",
+          "alt": "French-Knot Merino Turtleneck \u2014 studio styling",
           "color": "#f8f5ee"
         },
         {
           "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "French-Knot Merino Turtleneck — macro cluster detail",
+          "alt": "French-Knot Merino Turtleneck \u2014 macro cluster detail",
           "color": "#f8f5ee"
         }
       ],
@@ -455,7 +455,7 @@
           "color": "Paper White",
           "colorHex": "#ffffff",
           "size": "38",
-          "priceCents": 32000,
+          "priceCents": 2656000,
           "status": "in-stock"
         },
         {
@@ -463,7 +463,7 @@
           "color": "Paper White",
           "colorHex": "#ffffff",
           "size": "40",
-          "priceCents": 32000,
+          "priceCents": 2656000,
           "status": "in-stock"
         },
         {
@@ -471,7 +471,7 @@
           "color": "Paper White",
           "colorHex": "#ffffff",
           "size": "42",
-          "priceCents": 32000,
+          "priceCents": 2656000,
           "status": "in-stock"
         },
         {
@@ -479,19 +479,19 @@
           "color": "Sky Blue",
           "colorHex": "#d4e2ed",
           "size": "40",
-          "priceCents": 32000,
+          "priceCents": 2656000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Atelier Monogram Poplin Shirt — clean look",
+          "alt": "Atelier Monogram Poplin Shirt \u2014 clean look",
           "color": "#ffffff"
         },
         {
           "src": "/images/products/monogram-poplin-shirt-2.jpg",
-          "alt": "Atelier Monogram Poplin Shirt — monogram embroidery detail",
+          "alt": "Atelier Monogram Poplin Shirt \u2014 monogram embroidery detail",
           "color": "#ffffff"
         }
       ],
@@ -519,9 +519,9 @@
       "fit": "Contemporary refined relaxed cut with split back yoke",
       "batchNumber": 5,
       "batchTotal": 40,
-      "craftRegion": "India",
-      "craftCluster": "Artisanal Needlework Guild",
-      "fabricGsm": "280 GSM Premium Natural Textile"
+      "craftRegion": "Jaipur, Rajasthan",
+      "craftCluster": "Pink City Monogram Atelier",
+      "fabricGsm": "140 GSM Supima Cotton Poplin"
     },
     {
       "slug": "vine-embroidered-heavyweight-tee",
@@ -542,7 +542,7 @@
           "color": "Sand Mineral",
           "colorHex": "#e6decb",
           "size": "S",
-          "priceCents": 18000,
+          "priceCents": 1494000,
           "status": "in-stock"
         },
         {
@@ -550,7 +550,7 @@
           "color": "Sand Mineral",
           "colorHex": "#e6decb",
           "size": "M",
-          "priceCents": 18000,
+          "priceCents": 1494000,
           "status": "in-stock"
         },
         {
@@ -558,7 +558,7 @@
           "color": "Sand Mineral",
           "colorHex": "#e6decb",
           "size": "L",
-          "priceCents": 18000,
+          "priceCents": 1494000,
           "status": "in-stock"
         },
         {
@@ -566,19 +566,19 @@
           "color": "Faded Black",
           "colorHex": "#2b2a2a",
           "size": "M",
-          "priceCents": 18000,
+          "priceCents": 1494000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Vine Embroidered Heavyweight Tee — studio front",
+          "alt": "Vine Embroidered Heavyweight Tee \u2014 studio front",
           "color": "#e6decb"
         },
         {
           "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Vine Embroidered Heavyweight Tee — collar embroidery zoom",
+          "alt": "Vine Embroidered Heavyweight Tee \u2014 collar embroidery zoom",
           "color": "#e6decb"
         }
       ],
@@ -628,7 +628,7 @@
           "color": "Raw Indigo",
           "colorHex": "#152238",
           "size": "30",
-          "priceCents": 52000,
+          "priceCents": 4316000,
           "status": "in-stock"
         },
         {
@@ -636,7 +636,7 @@
           "color": "Raw Indigo",
           "colorHex": "#152238",
           "size": "32",
-          "priceCents": 52000,
+          "priceCents": 4316000,
           "status": "in-stock"
         },
         {
@@ -644,7 +644,7 @@
           "color": "Raw Indigo",
           "colorHex": "#152238",
           "size": "34",
-          "priceCents": 52000,
+          "priceCents": 4316000,
           "status": "low-stock",
           "quantity": 1
         }
@@ -652,18 +652,18 @@
       "images": [
         {
           "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Selvedge Sashiko Embroidered Denim — front profile",
+          "alt": "Selvedge Sashiko Embroidered Denim \u2014 front profile",
           "color": "#152238"
         },
         {
           "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Selvedge Sashiko Embroidered Denim — macro white sashiko stitching",
+          "alt": "Selvedge Sashiko Embroidered Denim \u2014 macro white sashiko stitching",
           "color": "#152238"
         }
       ],
       "featured": true,
       "embroidery": {
-        "technique": "kantha-quilt",
+        "technique": "sashiko-selvedge",
         "techniqueLabel": "Japanese Traditional Sashiko Reinforcement",
         "artisanHours": 14,
         "placement": [
@@ -709,7 +709,7 @@
           "color": "Deep Olive",
           "colorHex": "#393e36",
           "size": "46",
-          "priceCents": 48000,
+          "priceCents": 3984000,
           "status": "in-stock"
         },
         {
@@ -717,7 +717,7 @@
           "color": "Deep Olive",
           "colorHex": "#393e36",
           "size": "48",
-          "priceCents": 48000,
+          "priceCents": 3984000,
           "status": "in-stock"
         },
         {
@@ -725,19 +725,19 @@
           "color": "Deep Olive",
           "colorHex": "#393e36",
           "size": "50",
-          "priceCents": 48000,
+          "priceCents": 3984000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/pleated-zari-trousers-1.jpg",
-          "alt": "Pleated Silk-Zari Wool Trousers — drape and cut",
+          "alt": "Pleated Silk-Zari Wool Trousers \u2014 drape and cut",
           "color": "#393e36"
         },
         {
           "src": "/images/products/pleated-zari-trousers-2.jpg",
-          "alt": "Pleated Silk-Zari Wool Trousers — metallic stripe needlecraft detail",
+          "alt": "Pleated Silk-Zari Wool Trousers \u2014 metallic stripe needlecraft detail",
           "color": "#393e36"
         }
       ],
@@ -764,9 +764,9 @@
       "fit": "High-rise relaxed taper with crisp front crease",
       "batchNumber": 5,
       "batchTotal": 40,
-      "craftRegion": "India",
-      "craftCluster": "Artisanal Needlework Guild",
-      "fabricGsm": "280 GSM Premium Natural Textile"
+      "craftRegion": "Varanasi, Uttar Pradesh",
+      "craftCluster": "Ghat Zari Weavers Collective",
+      "fabricGsm": "210 GSM Silk-Zari Wool Twill"
     },
     {
       "slug": "heritage-flora-embroidered-silk-scarf",
@@ -786,7 +786,7 @@
           "color": "Oat Beige",
           "colorHex": "#e5ded3",
           "size": "OS",
-          "priceCents": 26000,
+          "priceCents": 2158000,
           "status": "in-stock"
         },
         {
@@ -794,19 +794,19 @@
           "color": "Terracotta",
           "colorHex": "#c06b52",
           "size": "OS",
-          "priceCents": 26000,
+          "priceCents": 2158000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/embroidered-silk-scarf-1.png",
-          "alt": "Heritage Flora Embroidered Silk Scarf — folded styling",
+          "alt": "Heritage Flora Embroidered Silk Scarf \u2014 folded styling",
           "color": "#e5ded3"
         },
         {
           "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Heritage Flora Embroidered Silk Scarf — satin stitch corner embroidery",
+          "alt": "Heritage Flora Embroidered Silk Scarf \u2014 satin stitch corner embroidery",
           "color": "#e5ded3"
         }
       ],
@@ -833,9 +833,9 @@
       "fit": "90cm x 90cm square scarf",
       "batchNumber": 5,
       "batchTotal": 40,
-      "craftRegion": "India",
-      "craftCluster": "Artisanal Needlework Guild",
-      "fabricGsm": "280 GSM Premium Natural Textile"
+      "craftRegion": "Murshidabad, West Bengal",
+      "craftCluster": "Shantiniketan Silk Guild",
+      "fabricGsm": "18 Momme Mulberry Silk Twill"
     },
     {
       "slug": "artisanal-needlework-canvas-tote",
@@ -856,7 +856,7 @@
           "color": "Natural Canvas",
           "colorHex": "#eae5da",
           "size": "OS",
-          "priceCents": 21000,
+          "priceCents": 1743000,
           "status": "in-stock"
         },
         {
@@ -864,19 +864,19 @@
           "color": "Coal",
           "colorHex": "#1f1e1d",
           "size": "OS",
-          "priceCents": 21000,
+          "priceCents": 1743000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/needlework-canvas-tote-1.jpg",
-          "alt": "Artisanal Needlework Canvas Tote — side-profile",
+          "alt": "Artisanal Needlework Canvas Tote \u2014 side-profile",
           "color": "#eae5da"
         },
         {
           "src": "/images/products/needlework-canvas-tote-2.jpg",
-          "alt": "Artisanal Needlework Canvas Tote — handle needlepoint reinforcement",
+          "alt": "Artisanal Needlework Canvas Tote \u2014 handle needlepoint reinforcement",
           "color": "#eae5da"
         }
       ],
@@ -925,7 +925,7 @@
           "color": "Midnight Black",
           "colorHex": "#141416",
           "size": "S",
-          "priceCents": 46000,
+          "priceCents": 3818000,
           "status": "in-stock"
         },
         {
@@ -933,7 +933,7 @@
           "color": "Midnight Black",
           "colorHex": "#141416",
           "size": "M",
-          "priceCents": 46000,
+          "priceCents": 3818000,
           "status": "in-stock"
         },
         {
@@ -941,7 +941,7 @@
           "color": "Midnight Black",
           "colorHex": "#141416",
           "size": "L",
-          "priceCents": 46000,
+          "priceCents": 3818000,
           "status": "low-stock",
           "quantity": 2
         }
@@ -949,12 +949,12 @@
       "images": [
         {
           "src": "/images/products/nocturne-velvet-vest-1.jpg",
-          "alt": "Nocturne Velvet Crewel Waistcoat — front view",
+          "alt": "Nocturne Velvet Crewel Waistcoat \u2014 front view",
           "color": "#141416"
         },
         {
           "src": "/images/products/nocturne-velvet-vest-2.jpg",
-          "alt": "Nocturne Velvet Crewel Waistcoat — metallic thread detail on velvet",
+          "alt": "Nocturne Velvet Crewel Waistcoat \u2014 metallic thread detail on velvet",
           "color": "#141416"
         }
       ],
@@ -981,9 +981,9 @@
       "fit": "Tailored waistcoat cut with adjustable cinch back",
       "batchNumber": 5,
       "batchTotal": 40,
-      "craftRegion": "India",
-      "craftCluster": "Artisanal Needlework Guild",
-      "fabricGsm": "280 GSM Premium Natural Textile"
+      "craftRegion": "Srinagar, Kashmir",
+      "craftCluster": "Valley Aari Craftspersons",
+      "fabricGsm": "320 GSM Cotton Velvet"
     },
     {
       "slug": "royal-aari-organic-tee",
@@ -1005,7 +1005,7 @@
           "color": "Washed Black",
           "colorHex": "#18181b",
           "size": "S",
-          "priceCents": 38000,
+          "priceCents": 3154000,
           "status": "in-stock"
         },
         {
@@ -1013,7 +1013,7 @@
           "color": "Washed Black",
           "colorHex": "#18181b",
           "size": "M",
-          "priceCents": 38000,
+          "priceCents": 3154000,
           "status": "in-stock"
         },
         {
@@ -1021,7 +1021,7 @@
           "color": "Washed Black",
           "colorHex": "#18181b",
           "size": "L",
-          "priceCents": 38000,
+          "priceCents": 3154000,
           "status": "low-stock",
           "quantity": 3
         },
@@ -1030,19 +1030,19 @@
           "color": "Natural Ecru",
           "colorHex": "#f4efe6",
           "size": "M",
-          "priceCents": 38000,
+          "priceCents": 3154000,
           "status": "in-stock"
         }
       ],
       "images": [
         {
           "src": "/images/products/botanical-silk-jacket-1.png",
-          "alt": "Royal Aari Organic Cotton Tee — front silhouette",
+          "alt": "Royal Aari Organic Cotton Tee \u2014 front silhouette",
           "color": "#18181b"
         },
         {
           "src": "/images/products/botanical-silk-jacket-1.png",
-          "alt": "Royal Aari Organic Cotton Tee — macro Aari stitch detail",
+          "alt": "Royal Aari Organic Cotton Tee \u2014 macro Aari stitch detail",
           "color": "#18181b"
         }
       ],
@@ -1053,7 +1053,7 @@
         "Mercerized Cotton Embroidery Floss"
       ],
       "care": [
-        "Machine wash gentle cold (30°C) inside out",
+        "Machine wash gentle cold (30\u00b0C) inside out",
         "Line dry in shade",
         "Do not iron directly on embroidery"
       ],

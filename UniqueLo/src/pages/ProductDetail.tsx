@@ -59,22 +59,24 @@ export const ProductDetail: React.FC = () => {
   const [pincodeEta, setPincodeEta] = useState<string | null>(null);
 
   const checkPincode = () => {
-    if (pincode.length === 6) {
-      const cityMap: Record<string, string> = {
-        '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
-        '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
-        '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
-        '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
-        '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
-        '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
-        '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
-      };
-      const prefix = pincode.substring(0, 2);
-      const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
-      setPincodeEta(`Serviceable: ${cityInfo} • Cash on Delivery / UPI Available`);
-    } else {
+    if (!/^\d{6}$/.test(pincode)) {
       setPincodeEta('Please enter a valid 6-digit Indian PIN code.');
+      return;
     }
+    const cityMap: Record<string, string> = {
+      '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
+      '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
+      '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
+      '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
+      '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
+      '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
+      '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
+    };
+    const prefix = pincode.substring(0, 2);
+    const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
+    setPincodeEta(
+      `Estimated serviceability: ${cityInfo}. COD / UPI availability is confirmed at checkout — this is an estimate, not a guarantee.`
+    );
   };
 
   const currentVariant = useMemo(() => {
@@ -123,10 +125,20 @@ export const ProductDetail: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    addItem(product.slug, currentVariant.sku, quantity);
+    if (currentVariant.status === 'out-of-stock') {
+      showToast({
+        title: 'Sold out in this size',
+        description: 'Please choose another size or join the dispatch for restock.',
+        type: 'info',
+      });
+      return;
+    }
+    const max = currentVariant.quantity ?? 99;
+    const safeQty = Math.min(Math.max(1, quantity), max);
+    addItem(product.slug, currentVariant.sku, safeQty, undefined, max);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${quantity}× ${product.name} (${currentVariant.color} / ${currentVariant.size})`,
+      description: `${safeQty}× ${product.name} (${currentVariant.color} / ${currentVariant.size})`,
       type: 'success',
     });
   };
@@ -169,8 +181,51 @@ export const ProductDetail: React.FC = () => {
   const activeImage = product.images[selectedImageIndex] || product.images[0];
   const isWish = isWishlisted(product.slug);
 
+  const toAbsoluteUrl = (src: string): string => {
+    if (/^https?:\/\//.test(src)) return src;
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return new URL(src, window.location.origin).toString();
+    }
+    return src;
+  };
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.images.map((i) => toAbsoluteUrl(i.src)),
+    brand: { '@type': 'Brand', name: 'UniqueLo' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: (currentVariant.priceCents / 100).toFixed(0),
+      availability:
+        currentVariant.status === 'out-of-stock'
+          ? 'https://schema.org/OutOfStock'
+          : 'https://schema.org/InStock',
+    },
+    ...(reviews && reviews.length > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1),
+            reviewCount: reviews.length,
+          },
+          review: reviews.slice(0, 5).map((r) => ({
+            '@type': 'Review',
+            author: { '@type': 'Person', name: r.author },
+            reviewRating: { '@type': 'Rating', ratingValue: r.rating },
+            name: r.title,
+            reviewBody: r.comment,
+          })),
+        }
+      : {}),
+  };
+
   return (
     <div className="bg-cream min-h-screen">
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       {/* Breadcrumb Bar */}
       <div className="border-b border-stone/50 bg-paper py-3">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex items-center text-xs tracking-wider uppercase font-sans text-ink-muted">
@@ -196,7 +251,9 @@ export const ProductDetail: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all ${
+                  aria-label={`View image ${idx + 1} of ${product.images.length}`}
+                  aria-pressed={selectedImageIndex === idx}
+                  className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all min-h-[44px] ${
                     selectedImageIndex === idx
                       ? 'border-accent ring-2 ring-accent/40 shadow-sm'
                       : 'border-stone opacity-70 hover:opacity-100'
@@ -298,19 +355,29 @@ export const ProductDetail: React.FC = () => {
                     {product.craftRegion || 'Made in India'} // {product.categorySlug}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-ink">
-                    <span className="text-accent">★★★★★</span>
-                    <span className="font-medium">4.9</span>
-                    <span className="text-ink-muted text-[11px]">({reviews?.length || 24} collector reviews)</span>
+                    {reviews && reviews.length > 0 ? (
+                      <>
+                        <span className="text-accent">★★★★★</span>
+                        <span className="font-medium">
+                          {(reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)}
+                        </span>
+                        <span className="text-ink-muted text-[11px]">({reviews.length} collector reviews)</span>
+                      </>
+                    ) : (
+                      <span className="text-ink-muted text-[11px]">New atelier edition — be the first to review</span>
+                    )}
                   </div>
                 </div>
 
                 {/* Quiet Batch Scarcity Marker */}
                 <div className="inline-flex items-center gap-2 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
-                  <span className="text-ink font-medium">
-                    Edition {product.batchNumber || 12} of {product.batchTotal || 50}
-                  </span>
-                  <span>•</span>
-                  <span>{product.craftCluster || 'Atelier Guild'}</span>
+                  {product.batchNumber != null && product.batchTotal != null && (
+                    <span className="text-ink font-medium">
+                      Edition {product.batchNumber} of {product.batchTotal}
+                    </span>
+                  )}
+                  {product.batchNumber != null && product.craftCluster && <span>•</span>}
+                  {product.craftCluster && <span>{product.craftCluster}</span>}
                 </div>
               </div>
 
@@ -340,22 +407,30 @@ export const ProductDetail: React.FC = () => {
               {/* Non-Accordion Initial Garment Specifications (Mobile-Optimized) */}
               <div className="my-5 p-4 bg-paper border border-stone/70">
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
-                    <span className="text-ink font-medium">{product.fabricGsm || '280 GSM Organic Cotton'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Hand Needlework</span>
-                    <span className="text-ink font-medium">{product.embroidery?.artisanHours || 14} Hours by Guild</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
-                    <span className="text-ink font-medium">{product.embroidery?.techniqueLabel || 'Regional Needlecraft'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
-                    <span className="text-ink font-medium">{product.fit || 'Atelier Relaxed Fit'}</span>
-                  </div>
+                  {product.fabricGsm && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
+                      <span className="text-ink font-medium">{product.fabricGsm}</span>
+                    </div>
+                  )}
+                  {product.embroidery?.artisanHours != null && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Hand Needlework</span>
+                      <span className="text-ink font-medium">{product.embroidery.artisanHours} Hours by Guild</span>
+                    </div>
+                  )}
+                  {product.embroidery?.techniqueLabel && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
+                      <span className="text-ink font-medium">{product.embroidery.techniqueLabel}</span>
+                    </div>
+                  )}
+                  {product.fit && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
+                      <span className="text-ink font-medium">{product.fit}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -374,7 +449,9 @@ export const ProductDetail: React.FC = () => {
                       <button
                         key={color}
                         onClick={() => variantForColor && setSelectedVariant(variantForColor)}
-                        className={`group relative flex items-center gap-2 p-1 border transition-all ${
+                        aria-label={`Choose color ${color}`}
+                        aria-pressed={isSelected}
+                        className={`group relative flex items-center gap-2 p-1 border transition-all min-h-[44px] ${
                           isSelected ? 'border-ink bg-paper shadow-sm' : 'border-stone hover:border-ink/50'
                         }`}
                       >
@@ -407,6 +484,7 @@ export const ProductDetail: React.FC = () => {
                     .filter((v) => v.color === currentVariant.color)
                     .map((v) => {
                       const isSelected = currentVariant.sku === v.sku;
+                      const isOut = v.status === 'out-of-stock';
                       const sizeLabel =
                         v.size === 'S' ? '38 (S)' :
                         v.size === 'M' ? '40 (M)' :
@@ -415,14 +493,20 @@ export const ProductDetail: React.FC = () => {
                       return (
                         <button
                           key={v.sku}
-                          onClick={() => setSelectedVariant(v)}
-                          className={`min-w-[64px] h-10 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
-                            isSelected
-                              ? 'bg-ink text-cream border-ink font-medium shadow-sm'
-                              : 'bg-paper text-ink border-stone hover:border-ink/60'
+                          onClick={() => !isOut && setSelectedVariant(v)}
+                          disabled={isOut}
+                          aria-label={`Size ${sizeLabel}${isOut ? ' — sold out' : ''}`}
+                          aria-pressed={isSelected}
+                          className={`min-w-[64px] min-h-[44px] h-11 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
+                            isOut
+                              ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
+                              : isSelected
+                                ? 'bg-ink text-cream border-ink font-medium shadow-sm'
+                                : 'bg-paper text-ink border-stone hover:border-ink/60'
                           }`}
                         >
                           <span>{sizeLabel}</span>
+                          {isOut && <span className="text-[9px] no-underline">Sold out</span>}
                         </button>
                       );
                     })}
@@ -443,7 +527,8 @@ export const ProductDetail: React.FC = () => {
                 <div className="flex items-center border border-stone bg-paper">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
+                    aria-label="Decrease quantity"
+                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
                   >
                     –
                   </button>
@@ -451,8 +536,9 @@ export const ProductDetail: React.FC = () => {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
+                    onClick={() => setQuantity((q) => Math.min(currentVariant.quantity ?? 99, q + 1))}
+                    aria-label="Increase quantity"
+                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
                   >
                     +
                   </button>
@@ -470,8 +556,9 @@ export const ProductDetail: React.FC = () => {
                 {/* Wishlist Button */}
                 <button
                   onClick={handleWishlistToggle}
-                  aria-label="Save to Wishlist"
-                  className={`w-12 h-12 border flex items-center justify-center transition-colors ${
+                  aria-label={isWish ? 'Remove from wishlist' : 'Save to wishlist'}
+                  aria-pressed={isWish}
+                  className={`min-w-[44px] min-h-[44px] w-12 h-12 border flex items-center justify-center transition-colors ${
                     isWish
                       ? 'border-accent bg-accent/10 text-accent'
                       : 'border-stone bg-paper text-ink-muted hover:text-ink hover:border-ink'
@@ -554,7 +641,8 @@ export const ProductDetail: React.FC = () => {
                 <div>
                   <button
                     onClick={() => setActiveAccordion(activeAccordion === 'technique' ? null : 'technique')}
-                    className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                    aria-expanded={activeAccordion === 'technique'}
+                    className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                   >
                     <span>Artisanal Needlecraft & Technique</span>
                     <span className="text-sm">{activeAccordion === 'technique' ? '–' : '+'}</span>
@@ -588,7 +676,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'materials' ? null : 'materials')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'materials'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Textile Composition & Provenance</span>
                   <span className="text-sm">{activeAccordion === 'materials' ? '–' : '+'}</span>
@@ -611,7 +700,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'fit' ? null : 'fit')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'fit'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Fit & Tailoring Dimensions</span>
                   <span className="text-sm">{activeAccordion === 'fit' ? '–' : '+'}</span>
@@ -628,7 +718,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'care' ? null : 'care')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'care'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Heirloom Care & Storage</span>
                   <span className="text-sm">{activeAccordion === 'care' ? '–' : '+'}</span>
@@ -646,7 +737,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? null : 'delivery')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'delivery'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Atelier Dispatch & In-Home Guarantee</span>
                   <span className="text-sm">{activeAccordion === 'delivery' ? '–' : '+'}</span>
@@ -872,7 +964,10 @@ export const ProductDetail: React.FC = () => {
                   {product.name}
                 </span>
                 <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
-                  Edition {product.batchNumber || 12}/{product.batchTotal || 50} • {currentVariant.color} / {currentVariant.size}
+                  {product.batchNumber != null && product.batchTotal != null
+                    ? `Edition ${product.batchNumber}/${product.batchTotal} • `
+                    : ''}
+                  {currentVariant.color} / {currentVariant.size}
                 </span>
               </div>
             </div>

@@ -22,7 +22,15 @@ export const QuickViewModal: React.FC = () => {
   const currentVariant = selectedVariant || getDefaultVariant(product);
 
   const handleAdd = () => {
-    addItem(product.slug, currentVariant.sku, 1);
+    if (currentVariant.status === 'out-of-stock') {
+      showToast({
+        title: 'Sold out in this size',
+        description: 'Please choose another size.',
+        type: 'info',
+      });
+      return;
+    }
+    addItem(product.slug, currentVariant.sku, 1, undefined, currentVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
       description: `${product.name} (${currentVariant.color} / ${currentVariant.size})`,
@@ -76,7 +84,9 @@ export const QuickViewModal: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => setActiveImageIndex(idx)}
-                className={`w-14 h-16 border overflow-hidden transition-all ${
+                aria-label={`View image ${idx + 1} of ${product.images.length}`}
+                aria-pressed={activeImageIndex === idx}
+                className={`w-14 h-16 min-w-[44px] min-h-[44px] border overflow-hidden transition-all ${
                   activeImageIndex === idx ? 'border-accent ring-1 ring-accent' : 'border-stone opacity-70 hover:opacity-100'
                 }`}
               >
@@ -140,7 +150,9 @@ export const QuickViewModal: React.FC = () => {
                     <button
                       key={color}
                       onClick={() => variantForColor && setSelectedVariant(variantForColor)}
-                      className={`w-7 h-7 rounded-full border transition-all ${
+                      aria-label={`Choose color ${color}`}
+                      aria-pressed={isSelected}
+                      className={`min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border transition-all ${
                         isSelected ? 'ring-2 ring-accent ring-offset-2 scale-105 border-transparent' : 'border-stone hover:scale-105'
                       }`}
                       style={{ backgroundColor: variantForColor?.colorHex }}
@@ -161,14 +173,20 @@ export const QuickViewModal: React.FC = () => {
                   .filter((v) => v.color === currentVariant.color)
                   .map((v) => {
                     const isSelected = currentVariant.sku === v.sku;
+                    const isOut = v.status === 'out-of-stock';
                     return (
                       <button
                         key={v.sku}
-                        onClick={() => setSelectedVariant(v)}
-                        className={`px-3.5 py-1.5 text-xs font-sans border transition-colors ${
-                          isSelected
-                            ? 'bg-ink text-cream border-ink font-medium'
-                            : 'bg-paper text-ink border-stone hover:border-ink/60'
+                        onClick={() => !isOut && setSelectedVariant(v)}
+                        disabled={isOut}
+                        aria-label={`Size ${v.size}${isOut ? ' — sold out' : ''}`}
+                        aria-pressed={isSelected}
+                        className={`px-3.5 py-1.5 min-w-[44px] min-h-[44px] text-xs font-sans border transition-colors ${
+                          isOut
+                            ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
+                            : isSelected
+                              ? 'bg-ink text-cream border-ink font-medium'
+                              : 'bg-paper text-ink border-stone hover:border-ink/60'
                         }`}
                       >
                         {v.size}
