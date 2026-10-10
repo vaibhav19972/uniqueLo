@@ -5,7 +5,6 @@ import { Footer } from '../components/layout/Footer';
 import { CartDrawer } from '../components/layout/CartDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
-import { WelcomePopup } from '../components/ui/WelcomePopup';
 import { ToastContainer } from '../components/ui/Toast';
 
 export const Layout: React.FC = () => {
@@ -19,7 +18,6 @@ export const Layout: React.FC = () => {
       <CartDrawer />
       <CustomizerModal />
       <QuickViewModal />
-      <WelcomePopup />
       <ToastContainer />
     </div>
   );

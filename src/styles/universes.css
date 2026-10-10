@@ -1,0 +1,66 @@
+/* src/styles/universes.css — themed-universe token skins (docs/08 §04).
+   Layout components stay theme-agnostic; all universe expression flows
+   through these custom properties scoped by [data-universe] + [data-vibe].
+   Source of truth: src/data/universes.json theme_tokens (mirror by hand). */
+
+:root {
+  /* Render-era shell (chatgpt-v2 targets): gold CTAs, coal footer. */
+  --brand-gold: #ae7a24;
+  --brand-gold-hover: #93701f;
+  --brand-coal: #16130e;
+  --brand-coal-soft: #221c14;
+}
+
+/* ── Animeverse ─────────────────────────────────────────────── */
+[data-universe='animeverse'] {
+  --u-bg: #141824;
+  --u-surface: #1b2340;
+  --u-ink: #f4efe6;
+  --u-ink-muted: #b9b2a4;
+  --u-accent: #f4a7c3;
+  --u-accent-2: #59e3ff;
+  --u-product-zone: #f7f5f0;
+  --u-on-accent: #241019;
+}
+
+/* ── Heroverse ──────────────────────────────────────────────── */
+[data-universe='heroverse'] {
+  --u-bg: #171310;
+  --u-surface: #241a12;
+  --u-ink: #faf6ee;
+  --u-ink-muted: #c9bda9;
+  --u-accent: #d7263d;
+  --u-accent-2: #ffd23f;
+  --u-product-zone: #faf6ee;
+  --u-on-accent: #fff8f0;
+}
+
+/* ── Itihaas ────────────────────────────────────────────────── */
+[data-universe='itihaas'] {
+  --u-bg: #1d130d;
+  --u-surface: #2a1a12;
+  --u-ink: #f6efe3;
+  --u-ink-muted: #c4b198;
+  --u-accent: #b98a2f;
+  --u-accent-2: #0f6f6a;
+  --u-product-zone: #f7f5f0;
+  --u-on-accent: #241a08;
+}
+
+/* ── Vibe modifiers (token subsets only) ────────────────────── */
+[data-vibe='minimal'] {
+  --u-accent-2: var(--u-accent);
+  --u-texture-opacity: 0;
+}
+
+[data-vibe='clean'] {
+  --u-texture-opacity: 0;
+}
+
+[data-vibe='aesthetic'] {
+  --u-texture-opacity: 0.05;
+}
+
+[data-vibe='expressive'] {
+  --u-texture-opacity: 0.09;
+}

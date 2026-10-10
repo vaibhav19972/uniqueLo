@@ -1,9 +1,52 @@
-import rawProducts from '../data/products.json';
 import rawCategories from '../data/categories.json';
+import rawMockProducts from '../data/mock-products.json';
+import rawUniverses from '../data/universes.json';
+import rawMotifs from '../data/motifs.json';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 export type Currency = 'INR';
+
+/** Gender taxonomy: `unisex` matches BOTH Men and Women surfaces. */
+export type Gender = 'men' | 'women' | 'unisex';
+
+/** Vibe is presentation-only (token swap), never a product attribute. */
+export type Vibe = 'aesthetic' | 'clean' | 'minimal' | 'expressive';
+
+export interface UniverseThemeTokens {
+  bg: string;
+  surface: string;
+  ink: string;
+  accent: string;
+  accent2: string;
+  product_zone: string;
+  divider: string;
+  card_frame: string;
+  texture_opacity: number;
+  display_font: string;
+}
+
+export interface Universe {
+  slug: string;
+  name: string;
+  tagline: string;
+  lore: string;
+  emblem_src?: string;
+  drop_cadence?: string;
+  is_active: boolean;
+  order: number;
+  theme_tokens: UniverseThemeTokens;
+}
+
+export interface Motif {
+  id: string;
+  universe_slug: string;
+  name: string;
+  meaning: string;
+  symbol_notes?: string;
+  /** Motifs must be IP-cleared before any product references them. */
+  ip_cleared: boolean;
+}
 
 export interface ProductImage {
   src: string;
@@ -48,7 +91,28 @@ export interface Product {
   name: string;
   subtitle: string;
   description: string;
+  /** Decorative transliteration shown beside the universe tag (e.g. product-name script). */
+  foreignTagline?: string;
   categorySlug: string;
+  /** Universe this product belongs to (exactly one). Extensible — new universes need no code changes. */
+  universeSlug?: string;
+  /** Free-vocabulary garment type facet (hoodie, tee, jacket, cap, tote, lowers…). */
+  garmentType?: string;
+  /** Gender facet. `unisex` appears under both Men and Women. */
+  gender?: Gender;
+  /** Motif lore link (motifs.json id). */
+  motifId?: string;
+  /**
+   * Discovery hint for the "Explore by Mood" gateway (counts + entry filtering).
+   * Rendering stays token-driven; this only powers merchandising surfaces.
+   */
+  vibes?: Vibe[];
+  /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
+  isMock?: boolean;
+  /** Mock-phase social proof. Replaced by real review aggregates at launch. */
+  rating?: number;
+  reviewCount?: number;
+  soldCount?: string;
   tags: string[];
   variants: ProductVariant[];
   images: ProductImage[];
@@ -79,6 +143,10 @@ export type SortKey = 'newest' | 'price-asc' | 'price-desc';
 
 export interface FilterState {
   categorySlug: string | 'all';
+  universeSlug?: string | 'all';
+  gender?: Gender | 'all';
+  garmentTypes?: string[];
+  vibe?: Vibe | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
@@ -125,42 +193,37 @@ export interface Review {
 // Seed Fallback Data (bundled JSON)
 // ─────────────────────────────────────────────────────────────────────
 
-const seedProducts: Product[] = (rawProducts as { products: Product[] }).products;
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
+// NOTE: src/data/products.json (original 13) is deprecated-retained on disk and no
+// longer imported. The storefront runs on mock-products.json until real SKUs land.
+const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).products;
+const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
+const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
 
 const mockReviews: Record<string, Review[]> = {
-  'botanical-silk-embroidered-jacket': [
+  // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
+  'sakura-ronin-hoodie': [
     {
-      id: 'rev-1',
-      productSlug: 'botanical-silk-embroidered-jacket',
-      author: 'Eleanor Vance',
+      id: 'mock-rev-1',
+      productSlug: 'sakura-ronin-hoodie',
+      author: 'Arjun Mehta',
       rating: 5,
-      title: 'Museum-grade needlework and incredible drape',
-      comment: 'The botanical chain stitching along the collar is even more mesmerizing in person. The silk floss has a subtle luster in natural daylight that catches the eye immediately.',
+      title: 'Embroidery quality is next level',
+      comment: 'Feels premium and even better in person. Oversized fit is perfect.',
       verified: true,
-      createdAt: '2 days ago',
-    },
-    {
-      id: 'rev-2',
-      productSlug: 'botanical-silk-embroidered-jacket',
-      author: 'Marcus Sterling',
-      rating: 5,
-      title: 'Pure artisanal luxury',
-      comment: 'The heavyweight organic cotton canvas gives this jacket substantial structure. You can feel the weight of the 18 artisan hours poured into it.',
-      verified: true,
-      createdAt: '1 week ago',
+      createdAt: '2 weeks ago',
     },
   ],
-  'celestial-zardozi-wool-coat': [
+  'koi-no-yume-sweatshirt': [
     {
-      id: 'rev-3',
-      productSlug: 'celestial-zardozi-wool-coat',
-      author: 'Julian D.',
+      id: 'mock-rev-2',
+      productSlug: 'koi-no-yume-sweatshirt',
+      author: 'Ishita Rao',
       rating: 5,
-      title: 'The gold bullion thread is breathtaking',
-      comment: 'The French wire embroidery catches low evening light like nothing else in my wardrobe. True heirloom craftsmanship that will be passed down.',
+      title: 'Perfect for anime events',
+      comment: 'So many people asked me where I got this from.',
       verified: true,
-      createdAt: '3 days ago',
+      createdAt: '1 week ago',
     },
   ],
 };
@@ -189,6 +252,15 @@ export async function getProducts(): Promise<Product[]> {
       if (error) {
         console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
       } else if (data && data.length > 0) {
+        // Universe-schema feature detection: pre-migration rows lack universe_slug.
+        // Serve them and they would leak the deprecated catalog (no universe/gender/
+        // vibes) into the universe storefront — fall back to local mocks instead.
+        if (!('universe_slug' in (data[0] as object))) {
+          console.warn(
+            '[UniqueLo] Supabase catalog predates the universe schema; using local mock catalog.',
+          );
+          return [...mockProducts];
+        }
         return data.map((item: any) => {
           const emb = Array.isArray(item.embroidery_details)
             ? item.embroidery_details[0]
@@ -199,7 +271,13 @@ export async function getProducts(): Promise<Product[]> {
             name: item.name,
             subtitle: item.subtitle,
             description: item.description,
+            foreignTagline: item.foreign_tagline,
             categorySlug: item.category_slug,
+            universeSlug: item.universe_slug,
+            garmentType: item.garment_type,
+            gender: item.gender ?? 'unisex',
+            motifId: item.motif_id,
+            isMock: item.is_mock ?? false,
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,
@@ -252,8 +330,8 @@ export async function getProducts(): Promise<Product[]> {
     }
   }
 
-  // Instant local seed fallback
-  return [...seedProducts];
+  // Instant local seed fallback — mock render catalog (original 13 deprecated-retained)
+  return [...mockProducts];
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -305,6 +383,63 @@ export async function getProductsByCategory(categorySlug: string | 'all'): Promi
   const products = await getProducts();
   if (categorySlug === 'all') return products;
   return products.filter((p) => p.categorySlug === categorySlug);
+}
+
+/** All active universes, ordered. Renders the Universes dropdown — never hardcode. */
+export async function getUniverses(): Promise<Universe[]> {
+  return [...seedUniverses]
+    .filter((u) => u.is_active)
+    .sort((a, b) => a.order - b.order);
+}
+
+export async function getUniverse(slug: string): Promise<Universe | undefined> {
+  const universes = await getUniverses();
+  return universes.find((u) => u.slug === slug);
+}
+
+/** Only IP-cleared motifs are ever returned. */
+export async function getMotifsByUniverse(universeSlug: string): Promise<Motif[]> {
+  return seedMotifs.filter((m) => m.universe_slug === universeSlug && m.ip_cleared);
+}
+
+export async function getMotif(id: string | undefined): Promise<Motif | undefined> {
+  if (!id) return undefined;
+  return seedMotifs.find((m) => m.id === id && m.ip_cleared);
+}
+
+/** Sync seed lookup for render-path use (no effect needed). Supabase-backed later. */
+export function getMotifSync(id: string | undefined): Motif | undefined {
+  if (!id) return undefined;
+  return seedMotifs.find((m) => m.id === id && m.ip_cleared);
+}
+
+export async function getProductsByUniverse(universeSlug: string | 'all'): Promise<Product[]> {
+  const products = await getProducts();
+  if (universeSlug === 'all') return products;
+  return products.filter((p) => p.universeSlug === universeSlug);
+}
+
+export function matchesGender(p: Product, gender: Gender | 'all'): boolean {
+  if (gender === 'all') return true;
+  const g = p.gender ?? 'unisex';
+  return g === gender || g === 'unisex';
+}
+
+/** Men and Women surfaces both include `unisex` products. */
+export async function getProductsByGender(gender: Gender | 'all'): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => matchesGender(p, gender));
+}
+
+/** Live counts for vibe/universe cards. Always COUNT(*) — never hardcode render numbers. */
+export function countBy<T>(items: T[], key: (t: T) => string | undefined): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const item of items) {
+    const k = key(item);
+    if (!k) continue;
+    counts[k] = (counts[k] ?? 0) + 1;
+  }
+  return counts;
 }
 
 export async function getFeaturedProducts(limit?: number): Promise<Product[]> {
@@ -372,6 +507,30 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
     // Category check
     if (filters.categorySlug !== 'all' && product.categorySlug !== filters.categorySlug) {
       return false;
+    }
+
+    // Universe check
+    if (filters.universeSlug && filters.universeSlug !== 'all' && product.universeSlug !== filters.universeSlug) {
+      return false;
+    }
+
+    // Gender check (`unisex` matches both Men and Women)
+    if (filters.gender && filters.gender !== 'all' && !matchesGender(product, filters.gender)) {
+      return false;
+    }
+
+    // Garment-type check
+    if (filters.garmentTypes && filters.garmentTypes.length > 0) {
+      if (!product.garmentType || !filters.garmentTypes.includes(product.garmentType)) {
+        return false;
+      }
+    }
+
+    // Vibe discovery check
+    if (filters.vibe && filters.vibe !== 'all') {
+      if (!product.vibes || !product.vibes.includes(filters.vibe)) {
+        return false;
+      }
     }
 
     // Technique check

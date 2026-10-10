@@ -1,9 +1,13 @@
 import { create } from 'zustand';
-import type { FilterState, SortKey, EmbroideryTechnique } from '../lib/data';
+import type { FilterState, SortKey, EmbroideryTechnique, Gender, Vibe } from '../lib/data';
 
 interface FiltersStore {
   filters: FilterState;
   setCategory: (categorySlug: string) => void;
+  setUniverse: (universeSlug: string | 'all') => void;
+  setGender: (gender: Gender | 'all') => void;
+  setVibe: (vibe: Vibe | 'all') => void;
+  toggleGarmentType: (garmentType: string) => void;
   toggleColor: (color: string) => void;
   toggleSize: (size: string) => void;
   toggleTechnique: (technique: EmbroideryTechnique) => void;
@@ -15,6 +19,10 @@ interface FiltersStore {
 
 const initialFilters: FilterState = {
   categorySlug: 'all',
+  universeSlug: 'all',
+  gender: 'all',
+  garmentTypes: [],
+  vibe: 'all',
   colors: [],
   sizes: [],
   techniques: [],
@@ -30,6 +38,29 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
     set((state) => ({
       filters: { ...state.filters, categorySlug },
     })),
+
+  setUniverse: (universeSlug) =>
+    set((state) => ({
+      filters: { ...state.filters, universeSlug },
+    })),
+
+  setGender: (gender) =>
+    set((state) => ({
+      filters: { ...state.filters, gender },
+    })),
+
+  setVibe: (vibe) =>
+    set((state) => ({
+      filters: { ...state.filters, vibe },
+    })),
+
+  toggleGarmentType: (garmentType) =>
+    set((state) => {
+      const current = state.filters.garmentTypes ?? [];
+      const exists = current.includes(garmentType);
+      const next = exists ? current.filter((g) => g !== garmentType) : [...current, garmentType];
+      return { filters: { ...state.filters, garmentTypes: next } };
+    }),
 
   toggleColor: (color) =>
     set((state) => {
