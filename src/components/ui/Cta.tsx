@@ -44,7 +44,7 @@ export const CtaLink: React.FC<CtaProps & { to: string }> = ({
   </Link>
 );
 
-/** Small underlined text link used for "View all / See more" (render style). */
+/** Small functional-voice text link "View all / See more" (render style: sans, hairline underline). */
 export const TextLink: React.FC<{ to: string; children: React.ReactNode; className?: string }> = ({
   to,
   children,
@@ -52,7 +52,7 @@ export const TextLink: React.FC<{ to: string; children: React.ReactNode; classNa
 }) => (
   <Link
     to={to}
-    className={`hidden sm:inline-flex items-center gap-2 text-[15px] font-serif text-ink border-b border-ink/30 hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
+    className={`hidden sm:inline-flex items-center gap-2 text-[15px] font-sans font-medium text-ink border-b border-ink/30 hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
   >
     {children}
   </Link>
