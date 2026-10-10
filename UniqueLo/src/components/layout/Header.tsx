@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
+import { useFiltersStore } from '../../stores/filters';
 import { useToastStore } from '../../stores/toast';
 import { useUniverses } from '../../hooks/useCatalog';
 import { prefersReducedMotion } from '../../lib/motion';
@@ -11,15 +12,32 @@ export const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [universesOpen, setUniversesOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
   const lastScrollY = useRef(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const totalItems = useCartStore((state) => state.getTotalItems());
   const openCart = useCartStore((state) => state.openCart);
   const wishlistCount = useWishlistStore((state) => state.count());
+  const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
   const showToast = useToastStore((state) => state.showToast);
   const { data: universes } = useUniverses();
+
+  // Focus the overlay input whenever it opens.
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  const submitSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setSearchQuery(searchValue.trim());
+    setSearchOpen(false);
+    if (location.pathname !== '/shop') navigate('/shop');
+  };
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
@@ -49,12 +67,13 @@ export const Header: React.FC = () => {
 
   const isUniversesActive = location.pathname.startsWith('/universes');
 
-  // Close the Universes menu on Escape.
+  // Close the Universes menu / search overlay on Escape.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setUniversesOpen(false);
         setMobileOpen(false);
+        setSearchOpen(false);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -108,17 +127,16 @@ export const Header: React.FC = () => {
           </svg>
         </button>
 
-        {/* Left: Brand Wordmark */}
+        {/* Left: Brand Wordmark (render 01 — sparkle mark, no tagline) */}
         <div className="flex-1 min-w-0">
           <Link
             to="/"
-            className="group inline-flex flex-col tracking-tight focus-visible:outline-accent"
+            className="group inline-flex items-center gap-1.5 tracking-tight focus-visible:outline-accent"
+            aria-label="UniqueLo home"
           >
-            <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent flex items-center gap-1.5">
-              <span>UniqueLo</span>
-            </span>
-            <span className="hidden sm:block text-[9px] font-sans tracking-[0.2em] text-ink-muted uppercase -mt-0.5">
-              Hand-Embroidered Essentials • Made in India
+            <span aria-hidden="true" className="text-gold text-lg leading-none">✳</span>
+            <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent">
+              UniqueLo
             </span>
           </Link>
         </div>
@@ -193,19 +211,20 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Right: Search, Account, Wishlist & Cart */}
-        <div className="ml-auto flex items-center gap-1 sm:gap-3">
-          {/* Search — rounded pill per render 1 */}
-          <Link
-            to="/shop"
-            aria-label="Search the collection"
-            className="hidden lg:flex items-center gap-2 rounded-full border border-stone px-4 py-2 text-[13px] text-warm-gray hover:border-ink/40 hover:text-ink-muted transition-colors min-h-[36px]"
+        {/* Right: icon rail per renders 01/08/09 — search expands an overlay,
+            never a squeezed inline pill (that pill clipped at 1024–1280px) */}
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1.5">
+          {/* Search trigger */}
+          <button
+            onClick={() => setSearchOpen((v) => !v)}
+            aria-expanded={searchOpen}
+            aria-label={searchOpen ? 'Close search' : 'Search the collection'}
+            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
           >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
             </svg>
-            <span className="whitespace-nowrap">Search for anime, heroes, history…</span>
-          </Link>
+          </button>
 
           {/* Account (stub — honest toast until accounts launch) */}
           <button
@@ -217,7 +236,7 @@ export const Header: React.FC = () => {
               })
             }
             aria-label="Account"
-            className="hidden sm:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
+            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
@@ -228,7 +247,7 @@ export const Header: React.FC = () => {
           <button
             onClick={handleWishlistClick}
             aria-label={`Wishlist with ${wishlistCount} items`}
-            className="hidden sm:flex group relative items-center space-x-1.5 p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent"
+            className="hidden md:flex group relative items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[44px] min-h-[44px] justify-center"
           >
             <svg
               className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
@@ -244,17 +263,17 @@ export const Header: React.FC = () => {
               />
             </svg>
             {wishlistCount > 0 && (
-              <span className="inline-flex items-center justify-center min-w-[18px] h-4.5 px-1 text-[10px] font-medium rounded-full bg-accent/90 text-paper">
+              <span className="absolute top-1 right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-medium rounded-full bg-accent text-paper">
                 {wishlistCount}
               </span>
             )}
           </button>
 
-          {/* Cart Trigger */}
+          {/* Cart Trigger — icon + count badge (render 01) */}
           <button
             onClick={openCart}
-            aria-label={`Cart with ${totalItems} items`}
-            className="group relative hidden sm:flex items-center space-x-2.5 p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent"
+            aria-label={`Shopping bag with ${totalItems} items`}
+            className="group relative hidden md:flex items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[44px] min-h-[44px] justify-center"
           >
             <svg
               className="w-5 h-5 transition-transform duration-300 group-hover:scale-105"
@@ -269,11 +288,8 @@ export const Header: React.FC = () => {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <span className="text-[15px] font-serif hidden sm:inline-block">
-              Bag
-            </span>
             <span
-              className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-medium rounded-full transition-all duration-300 ${
+              className={`absolute top-1 right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-medium rounded-full transition-all duration-300 ${
                 totalItems > 0
                   ? 'bg-accent text-paper scale-100'
                   : 'bg-stone/80 text-ink-muted scale-95'
@@ -287,12 +303,51 @@ export const Header: React.FC = () => {
           <button
             onClick={openCart}
             aria-label={`Cart with ${totalItems} items`}
-            className="inline-flex sm:hidden items-center gap-2 px-3 py-2 text-xs uppercase tracking-widest text-ink border border-stone min-h-[44px]"
+            className="inline-flex md:hidden items-center gap-2 px-3 py-2 text-xs uppercase tracking-widest text-ink border border-stone min-h-[44px]"
           >
             Bag · {totalItems}
           </button>
         </div>
       </div>
+
+      {/* Expanding search overlay (render 01 has no inline pill — the old
+          squeezed pill clipped its placeholder at 1024–1280px) */}
+      {searchOpen && (
+        <div className="hidden md:block border-t border-stone/60 bg-cream">
+          <form
+            onSubmit={submitSearch}
+            role="search"
+            className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-3 flex items-center gap-3"
+          >
+            <svg className="w-5 h-5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            </svg>
+            <input
+              ref={searchInputRef}
+              type="search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search for anime, heroes, history…"
+              aria-label="Search the collection"
+              className="flex-1 bg-transparent font-serif text-lg text-ink placeholder:text-ink-muted/70 focus:outline-none min-h-[44px]"
+            />
+            <button
+              type="submit"
+              className="px-5 py-2.5 bg-ink text-cream text-xs uppercase tracking-[0.18em] hover:bg-gold transition-colors min-h-[44px]"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={() => setSearchOpen(false)}
+              aria-label="Close search"
+              className="p-2 text-ink-muted hover:text-ink min-w-[44px] min-h-[44px]"
+            >
+              ✕
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Mobile nav panel */}
       {mobileOpen && (
@@ -305,7 +360,7 @@ export const Header: React.FC = () => {
               onClick={() => setMobileOpen(false)}
               className="block px-2 py-3 font-serif text-2xl text-ink border-b border-stone/40"
             >
-              {u.slug === 'itihaas' ? 'Itihas' : u.name}
+              {u.name}
             </Link>
           ))}
           {[

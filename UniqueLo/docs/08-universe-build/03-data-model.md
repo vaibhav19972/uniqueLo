@@ -32,6 +32,7 @@
 3. Stock: `quantity` is source of truth; `status` derived (`0 → out-of-stock`, `≤3 → low-stock`). UI clamps qty selectors to `quantity`.
 4. Snapshots: order_items freeze name/price at purchase; later catalog edits must not rewrite history.
 5. Seed parity: any catalog change lands in **both** the active seed file and `seed.sql` until migration. The deprecated `products.json` (original 13) is frozen — no edits, no parity duty.
+6. Copy honesty: generic surfaces say "embroidery / threadwork", never "hand-". The `handcrafted` boolean (product-level, default false; Supabase: add column at the backend pass) gates the per-product "Handcrafted" tag on cards + PDP. Mock rule (≥30 embroidery-hours) is a placeholder — re-verify per SKU at cutover.
 
 ## Decisions locked
 

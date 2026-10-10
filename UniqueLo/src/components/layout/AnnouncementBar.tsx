@@ -4,7 +4,9 @@ import { Link } from 'react-router';
 /**
  * Render target 01: gold announcement bar (chatgpt-v2).
  * Serif, sentence case, three zones separated by hairline dividers.
- * Left: shipping promise · Center: craft line · Right: first-order offer.
+ * Left: shipping promise · Center: origin line · Right: first-order offer.
+ * Copy rule: "embroidery", never "hand-embroidery" — handcraft claims are
+ * per-product only (Product.handcrafted flag).
  */
 export const AnnouncementBar: React.FC = () => {
   const [isDismissed, setIsDismissed] = useState(false);
@@ -28,7 +30,7 @@ export const AnnouncementBar: React.FC = () => {
         {/* Center zone: craft line (hidden < lg) */}
         <p className="hidden lg:flex items-center gap-3 opacity-95">
           <span aria-hidden="true" className="h-4 w-px bg-cream/40" />
-          <span>Hand-embroidered&ensp;|&ensp;Made in India&ensp;|&ensp;Worldwide Shipping</span>
+          <span>Embroidered in India&ensp;|&ensp;Worldwide Shipping</span>
           <span aria-hidden="true" className="h-4 w-px bg-cream/40" />
         </p>
 

@@ -21,8 +21,8 @@ export const GenderPage: React.FC = () => {
   const title = gender === 'women' ? 'Women' : 'Men';
   const copy =
     gender === 'women'
-      ? 'Hand-embroidered universes, cut for her — plus every unisex piece in the atelier.'
-      : 'Hand-embroidered universes, cut for him — plus every unisex piece in the atelier.';
+      ? 'Embroidered universes, cut for her — plus every unisex piece in the atelier.'
+      : 'Embroidered universes, cut for him — plus every unisex piece in the atelier.';
 
   return (
     <div className="w-full bg-cream min-h-screen">

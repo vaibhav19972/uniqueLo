@@ -4,7 +4,7 @@
       "slug": "sakura-ronin-hoodie",
       "name": "Sakura Ronin Hoodie",
       "subtitle": "A lone journey, a blossoming hope.",
-      "description": "Oversized hoodie carrying the Sakura Ronin \u2014 a wandering swordsman beneath falling cherry blossoms. Hand-embroidered zardozi and layered threadwork across the back panel.",
+      "description": "Oversized hoodie carrying the Sakura Ronin \u2014 a wandering swordsman beneath falling cherry blossoms. Embroidered zardozi and layered threadwork across the back panel.",
       "categorySlug": "tops",
       "universeSlug": "animeverse",
       "garmentType": "hoodie",
@@ -111,7 +111,7 @@
       "featured": true,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Hand-Zardozi",
+        "techniqueLabel": "Zardozi",
         "artisanHours": 40,
         "placement": [
           "back panel",
@@ -137,12 +137,13 @@
         "expressive",
         "aesthetic"
       ],
-      "foreignTagline": "\u685c\u306e\u6d6a\u4eba"
+      "foreignTagline": "\u685c\u306e\u6d6a\u4eba",
+      "handcrafted": true
     },
     {
       "slug": "roaring-spirit-tee",
       "name": "Roaring Spirit Tee",
-      "description": "Oversized tee with a roaring tiger spirit wrapped in peony threadwork. Bold anime energy, hand-embroidered chest and back.",
+      "description": "Oversized tee with a roaring tiger spirit wrapped in peony threadwork. Bold anime energy, embroidered chest and back.",
       "categorySlug": "tops",
       "universeSlug": "animeverse",
       "garmentType": "tee",
@@ -237,7 +238,7 @@
       "featured": true,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Hand-Zardozi",
+        "techniqueLabel": "Zardozi",
         "artisanHours": 22,
         "placement": [
           "chest",
@@ -350,7 +351,7 @@
       "featured": true,
       "embroidery": {
         "technique": "metallic-zari",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 52,
         "placement": [
           "back panel",
@@ -373,7 +374,8 @@
       "craftCluster": "Jaipur zardozi houses",
       "vibes": [
         "aesthetic"
-      ]
+      ],
+      "handcrafted": true
     },
     {
       "slug": "koi-no-yume-sweatshirt",
@@ -473,7 +475,7 @@
       "featured": false,
       "embroidery": {
         "technique": "satin-stitch",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 28,
         "placement": [
           "chest",
@@ -586,7 +588,7 @@
       "featured": false,
       "embroidery": {
         "technique": "french-knot",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 46,
         "placement": [
           "back panel"
@@ -606,7 +608,8 @@
       "craftCluster": "Lucknow zardozi cluster",
       "vibes": [
         "expressive"
-      ]
+      ],
+      "handcrafted": true
     },
     {
       "slug": "tsuki-crane-sweatshirt",
@@ -696,7 +699,7 @@
       "featured": false,
       "embroidery": {
         "technique": "botanical-chain",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 26,
         "placement": [
           "chest",
@@ -809,7 +812,7 @@
       "featured": false,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Hand-Zardozi",
+        "techniqueLabel": "Zardozi",
         "artisanHours": 16,
         "placement": [
           "chest"
@@ -1065,7 +1068,7 @@
       "featured": false,
       "embroidery": {
         "technique": "satin-stitch",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 6,
         "placement": [
           "front panel"
@@ -1187,7 +1190,7 @@
       "featured": true,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Hand-Zardozi",
+        "techniqueLabel": "Zardozi",
         "artisanHours": 38,
         "placement": [
           "chest",
@@ -1210,7 +1213,8 @@
       "vibes": [
         "expressive",
         "aesthetic"
-      ]
+      ],
+      "handcrafted": true
     },
     {
       "slug": "guardian-stripe-tee",
@@ -1310,7 +1314,7 @@
       "featured": false,
       "embroidery": {
         "technique": "satin-stitch",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 14,
         "placement": [
           "chest",
@@ -1423,7 +1427,7 @@
       "featured": true,
       "embroidery": {
         "technique": "metallic-zari",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 48,
         "placement": [
           "shoulders",
@@ -1445,7 +1449,8 @@
       "craftCluster": "Jaipur zardozi houses",
       "vibes": [
         "expressive"
-      ]
+      ],
+      "handcrafted": true
     },
     {
       "slug": "arch-jaal-kurta",
@@ -1545,7 +1550,7 @@
       "featured": false,
       "embroidery": {
         "technique": "kantha-quilt",
-        "techniqueLabel": "Hand-Embroidery",
+        "techniqueLabel": "Embroidery",
         "artisanHours": 34,
         "placement": [
           "front panel",
@@ -1568,7 +1573,8 @@
       "vibes": [
         "aesthetic",
         "clean"
-      ]
+      ],
+      "handcrafted": true
     }
   ]
 }

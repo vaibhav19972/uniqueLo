@@ -42,19 +42,19 @@ export const Bestsellers: React.FC = () => {
           linkLabel="View all bestsellers"
         />
 
-        {/* Universe tabs + arrows — tabs slash-free, hairline-divided (render 05) */}
+        {/* Universe tabs + arrows — pipe-separated, selected = gold + underline (render 05) */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div role="tablist" aria-label="Filter bestsellers by universe" className="flex items-center">
             {[{ slug: 'all', name: 'All' }, ...(universes ?? []).map((u) => ({ slug: u.slug, name: u.name }))].map(
               (t, i) => (
                 <React.Fragment key={t.slug}>
-                  {i > 0 && <span aria-hidden="true" className="h-5 w-px bg-stone mx-4" />}
+                  {i > 0 && <span aria-hidden="true" className="text-stone mx-3 font-light select-none">|</span>}
                   <button
                     role="tab"
                     aria-selected={tab === t.slug}
                     onClick={() => setTab(t.slug)}
                     className={`relative pb-2 text-[16px] font-serif min-h-[44px] transition-colors ${
-                      tab === t.slug ? 'text-gold' : 'text-ink hover:text-gold'
+                      tab === t.slug ? 'text-gold font-medium' : 'text-ink-muted hover:text-gold'
                     }`}
                   >
                     {t.name}
@@ -76,8 +76,9 @@ export const Bestsellers: React.FC = () => {
           </div>
         </div>
 
-        {/* Cards */}
-        <div ref={rowRef} className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth">
+        {/* Cards — native hardware-accelerated momentum scroll; py breathing
+            room keeps hover lift + shadow unclipped; overscroll contains the axis */}
+        <div ref={rowRef} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-px-4 py-4 -my-2">
           {visible.map((p) => (
             <BestsellerCard key={p.slug} product={p} universeName={universeName(p.universeSlug)} />
           ))}

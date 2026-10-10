@@ -23,10 +23,10 @@ export const UniverseHero: React.FC = () => {
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-10 lg:pt-16 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         {/* Copy */}
         <div>
-          {/* Tracked caps eyebrow + hairline rule (render style) */}
+          {/* Tracked caps eyebrow + hairline rule (render 01) */}
           <div className="flex items-center gap-4 max-w-md">
-            <span className="text-[12px] font-sans uppercase tracking-eyebrow font-medium whitespace-nowrap" style={{ color: 'var(--brand-gold)' }}>
-              Threads Across Worlds
+            <span className="text-[12px] font-sans uppercase tracking-eyebrow font-medium leading-relaxed" style={{ color: 'var(--brand-gold)' }}>
+              Embroidered apparel for dreamers, believers and builders
             </span>
             <span aria-hidden="true" className="h-px flex-1 bg-stone" />
           </div>
@@ -35,22 +35,22 @@ export const UniverseHero: React.FC = () => {
             style={{ fontSize: 'var(--text-display)' }}
           >
             Wear the Universe,{' '}
-            <span className="text-gold">Stitched by Hand.</span>
+            <span className="text-gold italic">Embroidered for You.</span>
           </h1>
           <p className="font-serif text-lg text-ink-muted mt-6 max-w-md leading-relaxed">
-            Iconic worlds, reimagined through Indian hand-embroidery. For dreamers,
-            collectors and everyone in between.
+            Explore embroidered apparel inspired by Anime, Heroes and Indian
+            History. For dreamers, collectors and everyone in between.
           </p>
 
-          {/* Universe tabs — slash-separated per render 1, active = gold + underline */}
+          {/* Universe tabs — pipe-separated per render 01, selected = gold + underline */}
           <div role="tablist" aria-label="Choose a universe" className="flex items-center gap-3 mt-7 max-w-md">
             {list.map((u, i) => {
               const selected = u.slug === (active?.slug ?? '');
               return (
                 <React.Fragment key={u.slug}>
                   {i > 0 && (
-                    <span aria-hidden="true" className="text-stone select-none text-lg">
-                      /
+                    <span aria-hidden="true" className="text-stone select-none text-lg font-light">
+                      |
                     </span>
                   )}
                   <button
@@ -59,7 +59,7 @@ export const UniverseHero: React.FC = () => {
                     onClick={() => setActiveSlug(u.slug)}
                     className="relative pb-0.5 text-xl font-serif transition-colors min-h-[44px] flex items-center"
                   >
-                    <span className={selected ? 'text-ink' : 'text-warm-gray hover:text-ink'}>
+                    <span className={selected ? 'text-gold font-medium' : 'text-warm-gray hover:text-ink'}>
                       {TAB_LABELS[u.slug] ?? u.name}
                     </span>
                     {selected && (

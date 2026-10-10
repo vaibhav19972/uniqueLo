@@ -64,8 +64,8 @@ export const FeaturedProducts: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-ink-muted max-w-sm mt-3 sm:mt-0 font-light">
-            Each silhouette features hand-guided stitchwork, unbleached organic backings, 
-            and authenticated artisan hours.
+            Each silhouette features detailed stitchwork, unbleached organic backings,
+            and documented embroidery hours.
           </p>
         </div>
 
@@ -160,9 +160,9 @@ export const FeaturedProducts: React.FC = () => {
 
                   {product.embroidery?.artisanHours && (
                     <div className="mt-4 pt-3 border-t border-stone/50 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
-                      <span>Artisan Labor</span>
+                      <span>Embroidery</span>
                       <span className="font-medium text-ink">
-                        {product.embroidery.artisanHours} Hours Hand-Needle
+                        {product.embroidery.artisanHours} Hours Threadwork
                       </span>
                     </div>
                   )}

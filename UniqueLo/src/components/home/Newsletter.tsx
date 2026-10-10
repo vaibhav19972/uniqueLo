@@ -16,7 +16,7 @@ const BENEFITS = [
     ),
   },
   {
-    title: 'Stories from our artisans',
+    title: 'Stories from the atelier',
     icon: (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.8 2.8m7.2 7.2l2.8 2.8m0-12.8l-2.8 2.8m-7.2 7.2l-2.8 2.8" />
     ),

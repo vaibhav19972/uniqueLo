@@ -250,7 +250,7 @@ export const Universe: React.FC = () => {
                 onClick={() => setVibe(v === vibe ? 'all' : v)}
                 aria-pressed={vibe === v}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors capitalize ${
-                  vibe === v ? 'text-ink border-ink bg-paper' : 'text-ink-muted border border-stone hover:border-ink'
+                  vibe === v ? 'text-cream bg-gold border border-transparent' : 'text-ink-muted border border-stone hover:border-ink'
                 }`}
               >
                 {v}

@@ -9,7 +9,7 @@ import { useUniverses } from '../../hooks/useCatalog';
  */
 const CRAFT_LINKS = [
   { label: 'Our Story', to: '/atelier' },
-  { label: 'Meet the Artisans', to: '/atelier' },
+  { label: 'Our Techniques', to: '/atelier' },
   { label: 'Embroidery Techniques', to: '/atelier' },
   { label: 'Materials & Dyes', to: '/atelier' },
   { label: 'Behind the Scenes', to: '/atelier' },
@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
             </Link>
             <p className="text-[10px] tracking-[0.3em] uppercase text-gold mt-1">Wear the universe</p>
             <p className="text-sm text-cream/70 leading-relaxed mt-4 max-w-xs font-light">
-              Indian stories, global universes — hand-embroidered for your everyday.
+              Indian stories, global universes — embroidered for your everyday.
             </p>
             <div className="flex items-center gap-2 mt-5">
               {/* Letter-mark circles: no brand-glyph asset source in repo; stub
@@ -79,7 +79,7 @@ export const Footer: React.FC = () => {
               {(universes ?? []).map((u) => (
                 <li key={u.slug}>
                   <Link to={`/universes/${u.slug}`} className="hover:text-cream transition-colors">
-                    {u.slug === 'itihaas' ? 'Itihas' : u.name}
+                    {u.name}
                   </Link>
                 </li>
               ))}
@@ -148,12 +148,12 @@ export const Footer: React.FC = () => {
           {[
             {
               title: 'Proudly rooted in India',
-              detail: 'We work with skilled artisans and traditional craft clusters to keep hand-embroidery alive.',
+              detail: 'Designed at home in small batches — embroidery, natural dyes, honest fabric.',
               icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.5-2.5 4-5.5 4-9s-1.5-6.5-4-9m0 18c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9M3.5 9h17M3.5 15h17" />,
             },
             {
-              title: 'Hand-embroidered',
-              detail: 'By skilled Indian artisans.',
+              title: 'Signature embroidery',
+              detail: 'Detailed threadwork on every piece.',
               icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />,
             },
             {
