@@ -3,9 +3,10 @@ import { Link } from 'react-router';
 import { MarketingHeader } from '../ui/MarketingHeader';
 
 /**
- * Render target 04: Slow Fashion. Deeper Stories.
+ * Render target 04: Slow Fashion. Deeper Stories. (chatgpt-v2)
  * Artisan identity below is flagged SAMPLE data (user-approved) — replace with
  * verified artisan records at P5. Imagery is tonal placeholders until the shoot.
+ * The SAMPLE disclosure lives here + in img alt text, not as a visible UI chip.
  */
 const SAMPLE_ARTISAN = {
   quote:
@@ -48,14 +49,32 @@ const STEPS = [
 ];
 
 const BADGES = [
-  { title: 'Hand-Embroidered', detail: 'Real craftsmanship, not mass prints.' },
-  { title: 'Natural Dyes & Fabrics', detail: 'Gentle on you, kinder to the planet.' },
-  { title: '14-Day Home Inspection', detail: 'Try it at home. Easy returns, no questions.' },
+  {
+    title: 'Hand-Embroidered',
+    detail: 'Real craftsmanship, not mass prints.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
+    ),
+  },
+  {
+    title: 'Natural Dyes & Fabrics',
+    detail: 'Gentle on you, kinder to the planet.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21c-5 0-8-3-8-8 0-6 5-10 13-10 0 8-2 18-5 18zm0 0V9" />
+    ),
+  },
+  {
+    title: '14-Day Home Inspection',
+    detail: 'Try it at home. Easy returns, no questions.',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
+    ),
+  },
 ];
 
 export const CraftStory: React.FC = () => {
   return (
-    <section aria-labelledby="craft-heading" className="bg-cream py-16 lg:py-24 border-t border-stone/60">
+    <section aria-labelledby="craft-heading" className="bg-cream py-16 lg:py-24">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Our Craft"
@@ -66,60 +85,64 @@ export const CraftStory: React.FC = () => {
           linkLabel="The people behind your clothes"
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Macro visual */}
-          <div className="lg:col-span-5">
-            <div className="relative aspect-[4/5] overflow-hidden bg-stone/30 border border-stone/60">
-              <img
-                src="/images/campaigns/atelier-craft.jpg"
-                alt="Macro of gold and red hand-embroidery with needle in hand (placeholder)"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            </div>
+        {/* Macro visual bleeds to the left viewport edge on lg (render 04) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start mt-2">
+          <div className="relative aspect-[4/5] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:aspect-auto lg:h-full">
+            <img
+              src="/images/campaigns/atelier-craft.jpg"
+              alt="Macro of gold and red hand-embroidery with needle in hand (placeholder)"
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Steps + artisan */}
-          <div className="lg:col-span-7">
-            <ol className="grid grid-cols-2 xl:grid-cols-4 gap-5">
-              {STEPS.map((s) => (
-                <li key={s.n}>
+          <div>
+            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+              {STEPS.map((s, i) => (
+                <li key={s.n} className="flex flex-col">
                   <p className="font-serif text-3xl text-gold">
-                    {s.n} <span aria-hidden="true" className="text-stone text-2xl">→</span>
+                    {s.n}
+                    {i < STEPS.length - 1 && (
+                      <span aria-hidden="true" className="text-stone text-2xl ml-1.5 hidden lg:inline">
+                        →
+                      </span>
+                    )}
                   </p>
                   <p className="font-serif text-lg text-ink mt-1">{s.title}</p>
-                  <p className="text-[13px] text-ink-muted mt-1 leading-relaxed">{s.detail}</p>
-                  <div className="aspect-square overflow-hidden bg-stone/30 border border-stone/60 mt-3">
+                  <p className="font-serif text-[13px] text-ink-muted mt-1 leading-relaxed">{s.detail}</p>
+                  <div className="aspect-square overflow-hidden bg-stone/30 mt-3">
                     <img src={s.image} alt={s.alt} loading="lazy" className="w-full h-full object-cover" />
                   </div>
                 </li>
               ))}
             </ol>
 
-            {/* Artisan quote (SAMPLE) */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-paper border border-stone/60 p-5 sm:p-6">
+            {/* Artisan quote (SAMPLE) — barely-lighter cream strip, no card chrome */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-parchment/60 p-5 sm:p-6">
               <div className="sm:col-span-3">
                 <div className="aspect-[3/4] overflow-hidden bg-stone/30">
                   <img src={SAMPLE_ARTISAN.photo} alt={SAMPLE_ARTISAN.photoAlt} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="sm:col-span-6">
-                <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-ink-muted border border-stone px-2 py-1">
-                  Sample profile — verify at P5
-                </span>
-                <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed mt-3">
+                <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed">
                   “{SAMPLE_ARTISAN.quote}”
                 </blockquote>
-                <p className="font-serif text-base text-ink mt-3 italic">{SAMPLE_ARTISAN.name}</p>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+                {/* Script signature face not self-hosted — italic serif stands in (logged) */}
+                <p className="font-serif italic text-lg text-ink mt-3">{SAMPLE_ARTISAN.name}</p>
+                <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted mt-0.5">
                   {SAMPLE_ARTISAN.role}
                 </p>
               </div>
               <div className="sm:col-span-3 sm:border-l sm:border-stone/60 sm:pl-5 flex flex-col justify-center">
-                <p className="text-sm text-ink leading-relaxed">
+                <p className="font-serif text-[15px] text-ink leading-relaxed">
                   Over 30+ artisans across India bring UniqueLo to life.
                 </p>
-                <Link to="/atelier" className="text-sm font-serif text-ink border-b border-ink/30 hover:border-ink self-start mt-2 pb-0.5">
+                <Link
+                  to="/atelier"
+                  className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold border-b border-gold/40 hover:border-gold transition-colors"
+                >
                   Meet our artisans <span aria-hidden="true">→</span>
                 </Link>
               </div>
@@ -131,12 +154,14 @@ export const CraftStory: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10 pt-8 border-t border-stone/60">
           {BADGES.map((b) => (
             <div key={b.title} className="flex items-center gap-4">
-              <span className="w-12 h-12 rounded-full bg-stone/40 flex items-center justify-center shrink-0 text-gold font-serif text-xl" aria-hidden="true">
-                ✦
+              <span className="w-12 h-12 rounded-full bg-stone/40 flex items-center justify-center shrink-0 text-ink" aria-hidden="true">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {b.icon}
+                </svg>
               </span>
               <div>
                 <p className="font-serif text-lg text-ink">{b.title}</p>
-                <p className="text-[13px] text-ink-muted">{b.detail}</p>
+                <p className="font-serif text-[13px] text-ink-muted">{b.detail}</p>
               </div>
             </div>
           ))}

@@ -37,7 +37,7 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
         {title}
       </h2>
       {sub && (
-        <p className="font-serif italic text-lg text-ink-muted mt-3">{sub}</p>
+        <p className="font-serif italic text-lg text-ink-muted mt-3 max-w-2xl">{sub}</p>
       )}
     </div>
     {linkTo && linkLabel && (
