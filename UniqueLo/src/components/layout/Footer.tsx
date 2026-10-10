@@ -56,6 +56,8 @@ export const Footer: React.FC = () => {
               Indian stories, global universes — hand-embroidered for your everyday.
             </p>
             <div className="flex items-center gap-2 mt-5">
+              {/* Letter-mark circles: no brand-glyph asset source in repo; stub
+                  links until real handles — revisit at P5 (logged deviation) */}
               {SOCIALS.map((s) => (
                 <a
                   key={s}
@@ -141,19 +143,39 @@ export const Footer: React.FC = () => {
           </nav>
         </div>
 
-        {/* India craft strip */}
+        {/* India craft strip — circled gold line-icons (render 07) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-8 border-b border-cream/15">
           {[
-            { title: 'Proudly rooted in India', detail: 'We work with skilled artisans and traditional craft clusters to keep hand-embroidery alive.' },
-            { title: 'Hand-embroidered', detail: 'By skilled Indian artisans.' },
-            { title: 'Natural dyes & fabrics', detail: 'Kinder to you, kinder to the planet.' },
-            { title: '14-day home inspection', detail: 'Try it at home. Easy returns.' },
+            {
+              title: 'Proudly rooted in India',
+              detail: 'We work with skilled artisans and traditional craft clusters to keep hand-embroidery alive.',
+              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.5-2.5 4-5.5 4-9s-1.5-6.5-4-9m0 18c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9M3.5 9h17M3.5 15h17" />,
+            },
+            {
+              title: 'Hand-embroidered',
+              detail: 'By skilled Indian artisans.',
+              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />,
+            },
+            {
+              title: 'Natural dyes & fabrics',
+              detail: 'Kinder to you, kinder to the planet.',
+              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21c-5 0-8-3-8-8 0-6 5-10 13-10 0 8-2 18-5 18zm0 0V9" />,
+            },
+            {
+              title: '14-day home inspection',
+              detail: 'Try it at home. Easy returns.',
+              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />,
+            },
           ].map((b) => (
             <div key={b.title} className="flex items-start gap-3">
-              <span aria-hidden="true" className="text-gold font-serif text-xl leading-none">✦</span>
+              <span className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center shrink-0 text-gold" aria-hidden="true">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {b.icon}
+                </svg>
+              </span>
               <div>
                 <p className="font-serif text-base text-cream">{b.title}</p>
-                <p className="text-xs text-cream/60 mt-1 font-light">{b.detail}</p>
+                <p className="font-serif text-xs text-cream/60 mt-1">{b.detail}</p>
               </div>
             </div>
           ))}
@@ -170,9 +192,14 @@ export const Footer: React.FC = () => {
             ))}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Accepted payments">
-            <span className="mr-1">🔒 Secure Payments</span>
+            <span className="mr-1 inline-flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11V7a5 5 0 0110 0v4M5 11h14v10H5V11zm7 4a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" />
+              </svg>
+              Secure Payments
+            </span>
             {PAYMENTS.map((p) => (
-              <span key={p} className="px-2 py-1 bg-cream/10 border border-cream/20 text-[10px] text-cream/85">
+              <span key={p} className="px-2 py-1 bg-paper/90 text-ink/75 text-[10px] rounded-sm">
                 {p}
               </span>
             ))}

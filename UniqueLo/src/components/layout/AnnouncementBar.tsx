@@ -33,10 +33,7 @@ export const AnnouncementBar: React.FC = () => {
         </p>
 
         {/* Right zone: first-order offer */}
-        <Link
-          to="/#newsletter"
-          className="hidden sm:flex items-center gap-2.5 opacity-95 hover:opacity-100 group shrink-0"
-        >
+        <Link to="/#atelier-list" className="hidden sm:flex items-center gap-2.5 opacity-95 hover:opacity-100 group shrink-0">
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7m0 0c-1.5-2.5-4-3.5-5-2.5S7 7.5 12 7zm0 0c1.5-2.5 4-3.5 5-2.5S17 7.5 12 7z" />
           </svg>
