@@ -50,7 +50,7 @@ export const Shop: React.FC = () => {
               <p className="text-xs sm:text-sm text-ink-muted max-w-2xl mt-3 font-light leading-relaxed">
                 {currentCategory
                   ? currentCategory.description
-                  : 'Every piece is constructed from heirloom natural textiles and enriched with three-dimensional hand needlecraft. Inspect individual stitch reliefs or customize with bespoke monograms.'}
+                  :                 'Every piece is constructed from heirloom natural textiles and enriched with three-dimensional embroidery. Inspect individual stitch reliefs or customize with bespoke monograms.'}
               </p>
             </div>
 
@@ -62,8 +62,8 @@ export const Shop: React.FC = () => {
               </div>
               <div className="h-8 w-px bg-stone/80" />
               <div>
-                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Needlecraft</span>
-                <span className="font-serif text-lg font-medium text-accent">100% Hand-Finished</span>
+                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Craft</span>
+                <span className="font-serif text-lg font-medium text-accent">Detailed Embroidery</span>
               </div>
             </div>
           </div>

@@ -175,7 +175,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
         </div>
 
-        {/* Footer Meta: Color Dots & Artisan Hours */}
+        {/* Footer Meta: Color Dots & Embroidery Hours */}
         <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
           {/* Color Dots */}
           <div className="flex items-center gap-1.5">
@@ -191,7 +191,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {product.embroidery?.artisanHours && (
             <span className="font-medium text-ink">
-              {product.embroidery.artisanHours}h Needlework
+              {product.embroidery.artisanHours}h embroidery
+              {product.handcrafted && <span className="text-gold"> · Handcrafted</span>}
             </span>
           )}
         </div>

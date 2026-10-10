@@ -33,7 +33,7 @@ export const UniversePortals: React.FC = () => {
           eyebrow="Universes"
           title="Worlds to Wear"
           titleId="universes-heading"
-          sub="Stories, characters and legacies — hand-embroidered for your everyday."
+          sub="Stories, characters and legacies — embroidered for your everyday."
           linkTo="/shop"
           linkLabel="Explore all universes"
         />
@@ -93,7 +93,7 @@ export const UniversePortals: React.FC = () => {
                       className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-8 py-3 font-serif text-[17px] text-cream bg-gold hover:bg-gold-hover min-h-[44px] transition-colors"
                       aria-label={`Enter ${u.name}`}
                     >
-                      Enter {u.slug === 'itihaas' ? 'Itihas' : u.name} <span aria-hidden="true">→</span>
+                      Enter {u.name} <span aria-hidden="true">→</span>
                     </Link>
                   </div>
                 </div>

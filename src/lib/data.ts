@@ -123,6 +123,12 @@ export interface Product {
   vibes?: Vibe[];
   /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
   isMock?: boolean;
+  /**
+   * True only for pieces that are genuinely handcrafted. Generic embroidery
+   * copy must never claim handcraft — this flag gates the per-product
+   * "Handcrafted" tag on cards + PDP.
+   */
+  handcrafted?: boolean;
   /** Mock-phase social proof. Replaced by real review aggregates at launch. */
   rating?: number;
   reviewCount?: number;
@@ -292,6 +298,7 @@ export async function getProducts(): Promise<Product[]> {
             gender: item.gender ?? 'unisex',
             motifId: item.motif_id,
             isMock: item.is_mock ?? false,
+            handcrafted: item.handcrafted ?? false,
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,

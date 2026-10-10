@@ -91,7 +91,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
         </Link>
 
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-ink text-cream text-[11px] font-sans tracking-wide px-3 py-1.5">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gold text-cream text-[11px] font-sans tracking-wide px-3 py-1.5">
             <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
           </span>
         )}
@@ -101,8 +101,8 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           aria-label={isWish ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
           aria-pressed={isWish}
           className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-paper/90 flex items-center justify-center transition-colors ${
-            isWish ? 'text-accent' : 'text-ink'
-          } hover:text-accent`}
+            isWish ? 'text-red-700' : 'text-ink'
+          } hover:text-red-700`}
         >
           <svg className="w-5 h-5" fill={isWish ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -153,11 +153,19 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
 
       {/* Info */}
       <div className="p-4">
-        {product.embroidery && (
-          <span className="inline-block text-[10px] uppercase tracking-[0.18em] text-ink-muted bg-cream border border-stone/70 px-2.5 py-1">
-            {product.embroidery.techniqueLabel}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {product.embroidery && (
+            <span className="inline-block rounded-full text-[11px] font-serif text-ink bg-cream border border-stone/70 px-3 py-1">
+              {product.embroidery.techniqueLabel}
+            </span>
+          )}
+          {product.handcrafted && (
+            <span className="inline-flex items-center gap-1.5 rounded-full text-[11px] font-serif text-gold border border-gold/50 px-3 py-1">
+              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold" />
+              Handcrafted
+            </span>
+          )}
+        </div>
         <Link to={`/product/${product.slug}`}>
           <h3 className="font-serif text-xl text-ink mt-2 hover:text-gold transition-colors">{product.name}</h3>
         </Link>

@@ -4,17 +4,19 @@ import { MarketingHeader } from '../ui/MarketingHeader';
 
 /**
  * Render target 04: Slow Fashion. Deeper Stories. (chatgpt-v2)
- * Artisan identity below is flagged SAMPLE data (user-approved) — replace with
- * verified artisan records at P5. Imagery is tonal placeholders until the shoot.
- * The SAMPLE disclosure lives here + in img alt text, not as a visible UI chip.
+ * Copy rule: "embroidery", never "hand-embroidery" — handcraft claims are
+ * per-product only (Product.handcrafted flag). The atelier note below names
+ * no individual: artisan identities stay sample data until P5 verification,
+ * so the section speaks for the studio, not a person.
+ * Imagery is tonal placeholders until the shoot.
  */
-const SAMPLE_ARTISAN = {
+const ATELIER_NOTE = {
   quote:
-    'For me, embroidery is a way of keeping our stories alive — in every stitch, there is a piece of home.',
-  name: 'Savitri Devi',
-  role: 'Artisan, Uttar Pradesh',
+    'Every motif starts as a sketch in our studio, then becomes embroidery you will want to live in — rich thread, honest fabric, nothing shouty.',
+  name: 'The UniqueLo Atelier',
+  role: 'Design note',
   photo: '/images/campaigns/lookbook-01.jpg',
-  photoAlt: 'Artisan hand-embroidering at a wooden frame (sample photo, replace at P5)',
+  photoAlt: 'Embroidered motif close-up (sample photo, replace at P5)',
 };
 
 const STEPS = [
@@ -34,10 +36,10 @@ const STEPS = [
   },
   {
     n: '03',
-    title: '40-hr handwork',
-    detail: 'Skilled hands bring every detail to life.',
+    title: 'Threadwork',
+    detail: 'Motifs stitched in rich, lasting thread.',
     image: '/images/campaigns/lookbook-03.jpg',
-    alt: 'Step 3 — artisan stitching floral motif (placeholder)',
+    alt: 'Step 3 — embroidered floral motif close-up (placeholder)',
   },
   {
     n: '04',
@@ -50,8 +52,8 @@ const STEPS = [
 
 const BADGES = [
   {
-    title: 'Hand-Embroidered',
-    detail: 'Real craftsmanship, not mass prints.',
+    title: 'Signature Embroidery',
+    detail: 'Detailed threadwork, not mass prints.',
     icon: (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
     ),
@@ -80,9 +82,9 @@ export const CraftStory: React.FC = () => {
           eyebrow="Our Craft"
           title="Slow Fashion. Deeper Stories."
           titleId="craft-heading"
-          sub="Every piece is thoughtfully designed and hand-embroidered by skilled Indian artisans, blending tradition with contemporary expression."
+          sub="Every piece is thoughtfully designed in India — detailed embroidery, natural fabrics, contemporary expression."
           linkTo="/atelier"
-          linkLabel="The people behind your clothes"
+          linkLabel="How your clothes are made"
         />
 
         {/* Macro visual bleeds to the left viewport edge on lg (render 04) */}
@@ -90,7 +92,7 @@ export const CraftStory: React.FC = () => {
           <div className="relative aspect-[4/5] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:aspect-auto lg:h-full">
             <img
               src="/images/campaigns/atelier-craft.jpg"
-              alt="Macro of gold and red hand-embroidery with needle in hand (placeholder)"
+              alt="Macro of gold and red embroidery (placeholder)"
               loading="lazy"
               className="w-full h-full object-cover"
             />
@@ -118,32 +120,32 @@ export const CraftStory: React.FC = () => {
               ))}
             </ol>
 
-            {/* Artisan quote (SAMPLE) — barely-lighter cream strip, no card chrome */}
+            {/* Atelier note — barely-lighter cream strip, no card chrome */}
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-parchment/60 p-5 sm:p-6">
               <div className="sm:col-span-3">
                 <div className="aspect-[3/4] overflow-hidden bg-stone/30">
-                  <img src={SAMPLE_ARTISAN.photo} alt={SAMPLE_ARTISAN.photoAlt} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={ATELIER_NOTE.photo} alt={ATELIER_NOTE.photoAlt} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="sm:col-span-6">
                 <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed">
-                  “{SAMPLE_ARTISAN.quote}”
+                  “{ATELIER_NOTE.quote}”
                 </blockquote>
                 {/* Script signature face not self-hosted — italic serif stands in (logged) */}
-                <p className="font-serif italic text-lg text-ink mt-3">{SAMPLE_ARTISAN.name}</p>
+                <p className="font-serif italic text-lg text-ink mt-3">{ATELIER_NOTE.name}</p>
                 <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted mt-0.5">
-                  {SAMPLE_ARTISAN.role}
+                  {ATELIER_NOTE.role}
                 </p>
               </div>
               <div className="sm:col-span-3 sm:border-l sm:border-stone/60 sm:pl-5 flex flex-col justify-center">
                 <p className="font-serif text-[15px] text-ink leading-relaxed">
-                  Over 30+ artisans across India bring UniqueLo to life.
+                  Every piece passes a 4-step finish check before it ships.
                 </p>
                 <Link
                   to="/atelier"
                   className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold border-b border-gold/40 hover:border-gold transition-colors"
                 >
-                  Meet our artisans <span aria-hidden="true">→</span>
+                  Explore our techniques <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>

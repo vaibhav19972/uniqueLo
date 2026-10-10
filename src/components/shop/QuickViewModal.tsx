@@ -117,7 +117,7 @@ export const QuickViewModal: React.FC = () => {
               </span>
               {product.embroidery && (
                 <span className="text-[10px] tracking-widest text-ink-muted uppercase border-l border-stone pl-2">
-                  {product.embroidery.artisanHours}h Needlework
+                  {product.embroidery.artisanHours}h embroidery
                 </span>
               )}
             </div>

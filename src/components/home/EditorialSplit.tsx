@@ -16,7 +16,7 @@ export const EditorialSplit: React.FC = () => {
             <div className="relative z-10 w-4/5 ml-auto border border-stone/80">
               <Image
                 src="/images/campaigns/editorial-split.jpg"
-                alt="Artisan needleworker crafting botanical chain stitches"
+                alt="Close-up of botanical chain embroidery"
                 aspectRatio="4/5"
                 className="w-full object-cover"
               />
@@ -45,13 +45,13 @@ export const EditorialSplit: React.FC = () => {
             </div>
 
             <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.08] tracking-tight">
-              The Tension of the Hand-Drawn Needle.
+              Thread, Drawn Through Cloth.
             </h2>
 
             <p className="text-base text-ink-muted leading-relaxed font-light">
-              In a world dominated by synthetic fast-fashion and flat digital screen prints, UniqueLo 
-              brings hand needlecraft to the garments you wear every day. Heavyweight organic cotton tees, 
-              washed chore coats, and relaxed shirting crafted with hereditary artisans across Jaipur, Lucknow, and Bengal.
+              In a world dominated by synthetic fast-fashion and flat digital screen prints, UniqueLo
+              brings detailed embroidery to the garments you wear every day. Heavyweight organic cotton tees,
+              washed chore coats, and relaxed shirting — designed in India, made in small batches.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-stone/60">

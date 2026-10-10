@@ -86,7 +86,7 @@ export const UGCWall: React.FC = () => {
           eyebrow="Real people. Real stories."
           title="Worn Across Universes."
           titleId="ugc-heading"
-          sub="Different worlds. Same love for handcrafted details."
+          sub="Different worlds. Same love for embroidered details."
           linkTo="/shop"
           linkLabel="See more stories"
         />

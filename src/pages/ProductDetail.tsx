@@ -359,7 +359,7 @@ export const ProductDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Artisan Hours Pill */}
+              {/* Embroidery Hours Pill (+ Handcrafted badge only when flagged) */}
               {product.embroidery?.artisanHours && (
                 <div className="mt-4 p-3 bg-paper border border-stone flex items-center justify-between text-xs text-ink-muted">
                   <div className="flex items-center gap-2">
@@ -367,11 +367,11 @@ export const ProductDetail: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
                     </svg>
                     <span className="font-serif text-ink text-sm">
-                      {product.embroidery.artisanHours} Hours of Continuous Hand Needlework
+                      {product.embroidery.artisanHours} hours of embroidery threadwork
                     </span>
                   </div>
-                  <span className="text-[10px] uppercase tracking-widest text-ink font-medium">
-                    Atelier Certified
+                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold' : 'text-ink'}`}>
+                    {product.handcrafted ? 'Handcrafted piece' : 'Atelier finish'}
                   </span>
                 </div>
               )}
@@ -490,8 +490,8 @@ export const ProductDetail: React.FC = () => {
                   )}
                   {product.embroidery?.artisanHours != null && (
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Hand Needlework</span>
-                      <span className="text-ink font-medium">{product.embroidery.artisanHours} Hours by Guild</span>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Embroidery Time</span>
+                      <span className="text-ink font-medium">{product.embroidery.artisanHours} hours of threadwork</span>
                     </div>
                   )}
                   {product.embroidery?.techniqueLabel && (
@@ -576,7 +576,7 @@ export const ProductDetail: React.FC = () => {
                             isOut
                               ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
                               : isSelected
-                                ? 'bg-ink text-cream border-ink font-medium shadow-sm'
+                                ? 'border-gold bg-gold/10 text-ink font-medium shadow-sm'
                                 : 'bg-paper text-ink border-stone hover:border-ink/60'
                           }`}
                         >
@@ -709,7 +709,7 @@ export const ProductDetail: React.FC = () => {
                         ✦ Bespoke Studio Available
                       </span>
                       <p className="text-xs text-ink font-serif mt-0.5">
-                        Personalize with hand-embroidered monogram or botanical motif
+                        Personalize with embroidered monogram or botanical motif
                       </p>
                     </div>
                     <Button
@@ -736,7 +736,7 @@ export const ProductDetail: React.FC = () => {
                     aria-expanded={activeAccordion === 'technique'}
                     className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                   >
-                    <span>Artisanal Needlecraft & Technique</span>
+                    <span>Needlecraft & Technique</span>
                     <span className="text-sm">{activeAccordion === 'technique' ? '–' : '+'}</span>
                   </button>
                   {activeAccordion === 'technique' && (
@@ -850,10 +850,10 @@ export const ProductDetail: React.FC = () => {
         {/* DETAIL STRIP: captioned macro / fabric / placement / fit (render 09) */}
         <section aria-label="Product details close-up" className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { img: product.images[3], title: 'Hand-embroidered details', detail: product.embroidery ? `Over ${product.embroidery.artisanHours ?? '—'} hours of skilled handwork.` : 'Finished by hand.' },
-            { img: product.images[2], title: 'Premium fabric', detail: product.fabricGsm ? `${product.fabricGsm} · ${product.material?.[0] ?? 'natural textile'}.` : 'Natural textile.' },
-            { img: product.images[4] ?? product.images[1], title: 'Motif placement', detail: product.embroidery ? product.embroidery.placement.join(', ') || 'All-over artwork.' : 'Full artwork view.' },
-            { img: product.images[5] ?? product.images[0], title: 'Scale & fit', detail: product.fit ? `${product.fit}. Comfort meets statement.` : 'Comfort meets statement.' },
+            { img: product.images[3], title: 'Embroidered details', detail: product.embroidery ? `Over ${product.embroidery.artisanHours ?? '—'} hours of threadwork.` : 'Finished in the atelier.', badge: product.handcrafted ? 'Handcrafted' : undefined },
+            { img: product.images[2], title: 'Premium fabric', detail: product.fabricGsm ? `${product.fabricGsm} · ${product.material?.[0] ?? 'natural textile'}.` : 'Natural textile.', badge: undefined },
+            { img: product.images[4] ?? product.images[1], title: 'Motif placement', detail: product.embroidery ? product.embroidery.placement.join(', ') || 'All-over artwork.' : 'Full artwork view.', badge: undefined },
+            { img: product.images[5] ?? product.images[0], title: 'Scale & fit', detail: product.fit ? `${product.fit}. Comfort meets statement.` : 'Comfort meets statement.', badge: undefined },
           ].map((d, i) => (
             <figure key={i} className="bg-paper border border-stone/60 overflow-hidden">
               <div className="aspect-square overflow-hidden bg-stone/20">
@@ -862,7 +862,14 @@ export const ProductDetail: React.FC = () => {
                 )}
               </div>
               <figcaption className="p-3">
-                <p className="font-serif text-[15px] text-ink">{d.title}</p>
+                <p className="font-serif text-[15px] text-ink flex items-center gap-2 flex-wrap">
+                  {d.title}
+                  {d.badge && (
+                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold border border-gold/50 rounded-full px-2 py-0.5">
+                      {d.badge}
+                    </span>
+                  )}
+                </p>
                 <p className="text-[11px] text-ink-muted mt-0.5">{d.detail}</p>
               </figcaption>
             </figure>
@@ -892,7 +899,7 @@ export const ProductDetail: React.FC = () => {
                   to={`/universes/${universe.slug}`}
                   className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-ink/30 hover:border-ink transition-colors min-h-[48px]"
                 >
-                  Explore the {universe.slug === 'itihaas' ? 'Itihas' : universe.name} <span aria-hidden="true">→</span>
+                  Explore {universe.name} <span aria-hidden="true">→</span>
                 </Link>
               )}
             </div>
