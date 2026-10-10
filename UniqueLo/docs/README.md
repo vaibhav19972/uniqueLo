@@ -25,6 +25,7 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | **[05 — Build Phases](./05-phases/README.md)** | Phase-Gated Execution | Atomic task cards (P0 through P9), acceptance criteria, build-verification checkpoints. Updated brand experience plan at `.hermes/plans/2026-10-07_133000-design-plan-v2.md`. |
 | **[06 — Assets & Placeholders](./06-assets-and-placeholders/README.md)** | Visual Asset Pipeline | Tonal color block placeholders, aspect ratio rules, asset registry, and photography transition strategy. |
 | **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts` (Product/Variant/Category/Article/CraftTechnique), Editor role (articles + prices), product upload with craft/region fields, inventory per variant, and the `data.ts` async migration seam. |
+| **[08 — Universe Build](./08-universe-build/README.md)** | Themed-Universe Pre-Build Bible | Universes × vibes vision, navigation/IA, data-model deltas, theming tokens, page specs, commerce flow, image pipeline, SEO/a11y/perf gates, phase cards. Nothing builds until this section agrees. |
 
 ---
 

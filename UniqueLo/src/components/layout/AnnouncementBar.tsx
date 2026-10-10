@@ -1,36 +1,33 @@
 import React, { useState } from 'react';
 
+/**
+ * Render target 01: gold announcement bar.
+ * Left: shipping + craft promise · Right (desktop): studio tagline.
+ */
 export const AnnouncementBar: React.FC = () => {
   const [isDismissed, setIsDismissed] = useState(false);
 
   if (isDismissed) return null;
 
-  const announcements = [
-    '✦ COMPLIMENTARY PAN-INDIA WHITE-GLOVE SHIPPING ON ORDERS OVER ₹29,050',
-    '✦ 100% ARTISANAL NEEDLECRAFT — 14 TO 32 HOURS EMBROIDERED PER PIECE',
-    '✦ BESPOKE MONOGRAMMING STUDIO NOW OPEN — 24K GOLD ZARI & SPUN SILK YARNS',
-    '✦ ENJOY 10% OFF YOUR FIRST HEIRLOOM COMMISSION WITH CODE "ATELIER10"',
-  ];
-
   return (
-    <div className="bg-ink text-cream border-b border-stone/20 text-[10px] tracking-[0.22em] uppercase font-sans overflow-hidden relative z-[210] py-2">
-      <div className="flex items-center">
-        {/* Continuous Marquee Rail */}
-        <div className="animate-marquee whitespace-nowrap flex items-center space-x-12 cursor-default">
-          {announcements.concat(announcements).map((text, idx) => (
-            <span key={idx} className="flex items-center space-x-4">
-              <span className="text-accent font-bold">✦</span>
-              <span className="text-cream/90 hover:text-cream transition-colors">{text}</span>
-            </span>
-          ))}
-        </div>
+    <div
+      className="relative z-[210] text-cream text-[10px] sm:text-[11px] tracking-[0.18em] uppercase font-sans"
+      style={{ backgroundColor: 'var(--brand-gold)' }}
+    >
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-2 flex items-center justify-center sm:justify-between gap-3">
+        <p className="flex items-center gap-2 truncate">
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+          </svg>
+          <span className="truncate">Free shipping on all orders above ₹29,050&ensp;|&ensp;Hand-embroidered. Made in India.</span>
+        </p>
+        <p className="hidden sm:block shrink-0 opacity-90">A small studio. A bigger universe.</p>
       </div>
 
-      {/* Dismiss Button */}
       <button
         onClick={() => setIsDismissed(true)}
-        aria-label="Dismiss banner"
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone/60 hover:text-cream px-1.5 py-0.5 text-xs transition-colors bg-ink/80 backdrop-blur-xs"
+        aria-label="Dismiss announcement"
+        className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-cream/70 hover:text-cream transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
       >
         ✕
       </button>

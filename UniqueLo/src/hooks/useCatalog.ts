@@ -3,6 +3,9 @@ import {
   getProducts,
   getProduct,
   getCategories,
+  getUniverses,
+  getUniverse,
+  getMotifsByUniverse,
   getFeaturedProducts,
   getAllColors,
   getAllSizes,
@@ -11,6 +14,8 @@ import {
   getReviews,
   type Product,
   type Category,
+  type Universe,
+  type Motif,
   type Review,
   type EmbroideryTechnique,
 } from '../lib/data';
@@ -19,6 +24,9 @@ export const catalogKeys = {
   products: ['catalog', 'products'] as const,
   product: (slug: string) => ['catalog', 'product', slug] as const,
   categories: ['catalog', 'categories'] as const,
+  universes: ['catalog', 'universes'] as const,
+  universe: (slug: string) => ['catalog', 'universe', slug] as const,
+  motifs: (universeSlug: string) => ['catalog', 'motifs', universeSlug] as const,
   featured: (limit?: number) => ['catalog', 'featured', limit ?? 'all'] as const,
   colors: ['catalog', 'colors'] as const,
   sizes: ['catalog', 'sizes'] as const,
@@ -44,6 +52,29 @@ export function useProduct(slug: string | undefined): UseQueryResult<Product | u
 /** All categories, ordered */
 export function useCategories(): UseQueryResult<Category[]> {
   return useQuery({ queryKey: catalogKeys.categories, queryFn: getCategories });
+}
+
+/** All active universes, ordered — drives nav + portals, never hardcoded */
+export function useUniverses(): UseQueryResult<Universe[]> {
+  return useQuery({ queryKey: catalogKeys.universes, queryFn: getUniverses });
+}
+
+/** Single universe by slug */
+export function useUniverse(slug: string | undefined): UseQueryResult<Universe | undefined> {
+  return useQuery({
+    queryKey: catalogKeys.universe(slug || ''),
+    queryFn: () => (slug ? getUniverse(slug) : Promise.resolve(undefined)),
+    enabled: Boolean(slug),
+  });
+}
+
+/** IP-cleared motifs for a universe (lore strip) */
+export function useMotifsByUniverse(universeSlug: string | undefined): UseQueryResult<Motif[]> {
+  return useQuery({
+    queryKey: catalogKeys.motifs(universeSlug || ''),
+    queryFn: () => (universeSlug ? getMotifsByUniverse(universeSlug) : Promise.resolve([])),
+    enabled: Boolean(universeSlug),
+  });
 }
 
 /** Featured products for the home reel */
