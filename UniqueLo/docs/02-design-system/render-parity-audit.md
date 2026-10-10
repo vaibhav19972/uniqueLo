@@ -10,7 +10,7 @@
 | Render | Actual filename | Component(s) | Type pass | Layout pass | Status |
 |---|---|---|---|---|---|
 | 1 | `1. UniqueLo_ Wear the Universe.png` | `UniverseHero`, `Header`, `AnnouncementBar`, `TrustStrip` | serif everywhere, bold two-tone headline, tracked gold eyebrow, serif nav/CTAs | split hero, slash tabs, search pill, 3-up trust | **type+layout done** (hero emblem asset blank until P5 shoots) |
-| 2 | `2. Explore by Mood_ Fashion Collections.png` | `VibeGateway` | serif panels + italic taglines, sans CTAs | hover-expanded card w/ gold ring + filled CTA | pending |
+| 2 | `2. Explore by Mood_ Fashion Collections.png` | `VibeGateway`, `MarketingHeader` (shared), `Cta` (TextLink) | display serif title (--text-display-lg), italic serif subtitle, serif caps card titles, serif counts + sans STYLES label, sans CTAs | borderless full-bleed cards, 16px radius, dual scrim, gold ring + lift + filled gold CTA on hover | **type+layout done** (mood photos blank until P5 shoots; counts live-computed) |
 | 3 | `3. Worlds to Wear_ Three Embroidered Universes.png` | `UniversePortals` | — | 3 themed portal cards | pending |
 | 4 | `4. Stories Stitched by Hand.png` | `CraftStory` | — | 4 steps, trust badges | pending |
 | 5 | `5. Embroidered Community Favourites.png` | `Bestsellers` | — | quick-view hover, ₹ + compare-at, ribbons | pending |

@@ -3,7 +3,8 @@ import { TextLink } from './Cta';
 
 /**
  * Render-style marketing section header (chatgpt-v2 targets):
- * gold eyebrow · large tight serif title · muted sub · right-aligned link.
+ * gold tracked-caps sans eyebrow · display serif title (--text-display-lg)
+ * · italic serif poetic sub · right-aligned functional link.
  * Distinct from ui/SectionHeader (atelier archetypes) — marketing surfaces only.
  */
 interface MarketingHeaderProps {
@@ -25,14 +26,19 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
 }) => (
   <div className="flex items-end justify-between gap-6 mb-10 lg:mb-12">
     <div>
-      <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold">{eyebrow}</p>
+      <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold">
+        {eyebrow}
+      </p>
       <h2
         id={titleId}
-        className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-3 tracking-tight leading-[1.05]"
+        className="font-serif font-medium text-ink mt-3 leading-display tracking-tight"
+        style={{ fontSize: 'var(--text-display-lg)' }}
       >
         {title}
       </h2>
-      {sub && <p className="text-[15px] sm:text-base text-ink-muted mt-3 font-light">{sub}</p>}
+      {sub && (
+        <p className="font-serif italic text-lg text-ink-muted mt-3">{sub}</p>
+      )}
     </div>
     {linkTo && linkLabel && (
       <TextLink to={linkTo}>
