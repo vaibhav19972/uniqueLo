@@ -33,6 +33,18 @@ export interface Universe {
   lore: string;
   /** Display color for the portal-card title (chatgpt-v2 render 3). */
   portal_title_color?: string;
+  /** Landing-page copy accents (chatgpt-v2 renders 8.1–8.3). */
+  lore_heading?: string;
+  hero_headline?: string;
+  hero_headline_accent?: string;
+  /** Explicit two-tone colors (8.2 gold accent / 8.3 brown lead). */
+  hero_lead_color?: string;
+  hero_accent_color?: string;
+  hero_headline_case?: 'caps' | 'sentence';
+  hero_kicker?: string;
+  hero_ornament?: 'lotus' | 'compass';
+  hero_note?: string;
+  hero_vertical_text?: string;
   emblem_src?: string;
   drop_cadence?: string;
   is_active: boolean;

@@ -21,7 +21,11 @@
         "texture_opacity": 0.06,
         "display_font": "condensed-bold"
       },
-      "portal_title_color": "#7a1f23"
+      "portal_title_color": "#7a1f23",
+      "lore_heading": "More Than Characters.",
+      "hero_kicker": "動 漫",
+      "hero_headline_case": "caps",
+      "hero_vertical_text": "物語は、永遠に着られる。"
     },
     {
       "slug": "heroverse",
@@ -44,7 +48,14 @@
         "texture_opacity": 0.06,
         "display_font": "extra-bold-italic"
       },
-      "portal_title_color": "#b8860b"
+      "portal_title_color": "#b8860b",
+      "lore_heading": "Icons Are Ideas.",
+      "hero_ornament": "compass",
+      "hero_headline": "Extraordinary Lives Ahead.",
+      "hero_headline_accent": "Extraordinary",
+      "hero_headline_case": "sentence",
+      "hero_note": "Same people. Brighter versions.",
+      "hero_accent_color": "#d9a441"
     },
     {
       "slug": "itihaas",
@@ -67,7 +78,15 @@
         "texture_opacity": 0.05,
         "display_font": "elegant-serif"
       },
-      "portal_title_color": "#5d3a1a"
+      "portal_title_color": "#5d3a1a",
+      "lore_heading": "Symbols That Shaped Us.",
+      "hero_ornament": "lotus",
+      "hero_headline": "Threads of a Brighter Bharat.",
+      "hero_headline_accent": "Bharat.",
+      "hero_headline_case": "sentence",
+      "hero_vertical_text": "अतीत से प्रेरणा वर्तमान के लिए।",
+      "hero_lead_color": "#b98a5e",
+      "hero_accent_color": "#f6efe3"
     }
   ]
 }

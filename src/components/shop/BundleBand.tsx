@@ -78,9 +78,14 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
         <div className="flex flex-col lg:flex-row items-stretch gap-4 mt-7">
           <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
             {bundle.map((p, i) => (
-              <React.Fragment key={p.slug}>
+              <div key={p.slug} className="relative">
                 {i > 0 && (
-                  <span aria-hidden="true" className="hidden">+</span>
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1/2 -translate-y-1/2 -left-3 z-10 font-serif text-2xl text-gold"
+                  >
+                    +
+                  </span>
                 )}
                 <Link to={`/product/${p.slug}`} className="group bg-black/10 border border-white/10 p-2">
                   <div className="aspect-square overflow-hidden">
@@ -94,14 +99,14 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
                   <p className="font-serif text-[15px] mt-2 leading-tight">{p.name}</p>
                   <p className="text-[13px] opacity-75">{formatPrice(getDefaultVariant(p).priceCents)}</p>
                 </Link>
-              </React.Fragment>
+              </div>
             ))}
           </div>
 
           <div className="lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-white/15 pt-5 lg:pt-0 lg:pl-6 flex lg:flex-col justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-widest opacity-70">Set Total</p>
-              <p className="font-serif text-3xl mt-1" style={{ color: 'var(--u-accent-2)' }}>
+              <p className="font-serif text-3xl mt-1 text-gold">
                 {formatPrice(setTotal)}
               </p>
               <p className="text-[11px] mt-1 opacity-80">Unit prices · bundle discount engine lands next</p>
