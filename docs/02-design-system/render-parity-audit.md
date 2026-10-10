@@ -19,7 +19,7 @@
 | 8.1 | `8.1 Animeverse_ Stitched Stories Collection.png` | `Universe.tsx` (shared skeleton), `BundleBand` | caps white headline + kanji kicker (--u-accent-2), italic tagline, vertical Japanese column, gold/outline CTA pair | dark `--u-bg` hero, clip-path torn-paper edge, parchment lore cards w/ art slots, rounded pill chips, honest set-total bundle | **type+layout done** (hero artwork + motif/product art blank until P5; counts live: 9) |
 | 8.2 | `8.2 heroverse_ Stitched Stories Collection.png` | same skeleton | two-tone sentence headline ("Extraordinary" amber `#d9a441` / lead cream), compass ornament, tracked-caps annotation | same skeleton, warm near-black ground | **type+layout done** (counts live: 3) |
 | 8.3 | `8.3 Itihaasverse_ Stitched Stories Collection.png` | same skeleton | two-tone headline (bronze lead / cream "Bharat."), lotus ornament, vertical Devanagari column | same skeleton, deep brown ground; lore-row placeholder slot for 2-motif universes | **type+layout done** (counts live: 2) |
-| 9 | `9. Sakura Ronin Hoodie Product Page.png` | `ProductDetail.tsx` | serif buy box, serif CTA | gallery + zoom, motif story, trust row, accordions | pending |
+| 9 | `9. Sakura Ronin Hoodie Product Page.png` | `ProductDetail.tsx` | serif buy box (title/price/EMI), India-sized buttons, gold-ringed thumbs/dots, SVG trust row | gallery + macro loupe, spec grid, pincode checker, motif story band, UGC strip, reviews, Frequently Stitched Together | **type+layout done** (P5 imagery; EMI brand claim deferred; footer verified present in DOM — headless void is a capture artifact) |
 
 ## Deviation log
 
