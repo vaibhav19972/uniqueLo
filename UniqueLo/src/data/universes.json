@@ -1,1 +1,73 @@
-{"universes":[{"slug":"animeverse","name":"Animeverse","tagline":"Icons. Emotions. Forever.","lore":"Beloved worlds, reimagined in threads. Hand-embroidered apparel inspired by the stories that shaped a generation — from timeless classics to modern legends.","emblem_src":"/images/categories/tops.jpg","drop_cadence":"Seasonal arcs + monthly mini-drops","is_active":true,"order":1,"theme_tokens":{"bg":"#141824","surface":"#1b2340","ink":"#f4efe6","accent":"#f4a7c3","accent2":"#59e3ff","product_zone":"#f7f5f0","divider":"sakura-petal","card_frame":"torii","texture_opacity":0.06,"display_font":"condensed-bold"}},{"slug":"heroverse","name":"Heroverse","tagline":"Courage lives differently here.","lore":"Legends, icons and everyday heroes stitched to inspire. Cosmic-scale embroidery for those who carry their own weight — and then some.","emblem_src":"/images/categories/outerwear.jpg","drop_cadence":"Monthly New-Issue drops","is_active":true,"order":2,"theme_tokens":{"bg":"#171310","surface":"#241a12","ink":"#faf6ee","accent":"#d7263d","accent2":"#ffd23f","product_zone":"#faf6ee","divider":"action-lines","card_frame":"badge","texture_opacity":0.06,"display_font":"extra-bold-italic"}},{"slug":"itihaas","name":"Itihaas","tagline":"Our history. Always relevant.","lore":"Moments, empires and folk stories in contemporary forms. Royal Indian craft lineages — processions, arches, jaals — embroidered for the everyday wardrobe.","emblem_src":"/images/categories/knitwear.jpg","drop_cadence":"Festive darbar collections","is_active":true,"order":3,"theme_tokens":{"bg":"#1d130d","surface":"#2a1a12","ink":"#f6efe3","accent":"#b98a2f","accent2":"#0f6f6a","product_zone":"#f7f5f0","divider":"mughal-arch","card_frame":"arch","texture_opacity":0.05,"display_font":"elegant-serif"}}]}
+{
+  "universes": [
+    {
+      "slug": "animeverse",
+      "name": "Animeverse",
+      "tagline": "Icons. Emotions. Forever.",
+      "lore": "Beloved worlds, reimagined in threads. Hand-embroidered apparel inspired by the stories that shaped a generation — from timeless classics to modern legends.",
+      "emblem_src": "/images/categories/tops.jpg",
+      "drop_cadence": "Seasonal arcs + monthly mini-drops",
+      "is_active": true,
+      "order": 1,
+      "theme_tokens": {
+        "bg": "#141824",
+        "surface": "#1b2340",
+        "ink": "#f4efe6",
+        "accent": "#f4a7c3",
+        "accent2": "#59e3ff",
+        "product_zone": "#f7f5f0",
+        "divider": "sakura-petal",
+        "card_frame": "torii",
+        "texture_opacity": 0.06,
+        "display_font": "condensed-bold"
+      },
+      "portal_title_color": "#7a1f23"
+    },
+    {
+      "slug": "heroverse",
+      "name": "Heroverse",
+      "tagline": "Courage lives differently here.",
+      "lore": "Legends, icons and everyday heroes stitched to inspire. Cosmic-scale embroidery for those who carry their own weight — and then some.",
+      "emblem_src": "/images/categories/outerwear.jpg",
+      "drop_cadence": "Monthly New-Issue drops",
+      "is_active": true,
+      "order": 2,
+      "theme_tokens": {
+        "bg": "#171310",
+        "surface": "#241a12",
+        "ink": "#faf6ee",
+        "accent": "#d7263d",
+        "accent2": "#ffd23f",
+        "product_zone": "#faf6ee",
+        "divider": "action-lines",
+        "card_frame": "badge",
+        "texture_opacity": 0.06,
+        "display_font": "extra-bold-italic"
+      },
+      "portal_title_color": "#b8860b"
+    },
+    {
+      "slug": "itihaas",
+      "name": "Itihaas",
+      "tagline": "Our history. Always relevant.",
+      "lore": "Moments, empires and folk stories in contemporary forms. Royal Indian craft lineages — processions, arches, jaals — embroidered for the everyday wardrobe.",
+      "emblem_src": "/images/categories/knitwear.jpg",
+      "drop_cadence": "Festive darbar collections",
+      "is_active": true,
+      "order": 3,
+      "theme_tokens": {
+        "bg": "#1d130d",
+        "surface": "#2a1a12",
+        "ink": "#f6efe3",
+        "accent": "#b98a2f",
+        "accent2": "#0f6f6a",
+        "product_zone": "#f7f5f0",
+        "divider": "mughal-arch",
+        "card_frame": "arch",
+        "texture_opacity": 0.05,
+        "display_font": "elegant-serif"
+      },
+      "portal_title_color": "#5d3a1a"
+    }
+  ]
+}

@@ -31,6 +31,8 @@ export interface Universe {
   name: string;
   tagline: string;
   lore: string;
+  /** Display color for the portal-card title (chatgpt-v2 render 3). */
+  portal_title_color?: string;
   emblem_src?: string;
   drop_cadence?: string;
   is_active: boolean;

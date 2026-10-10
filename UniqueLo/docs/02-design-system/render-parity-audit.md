@@ -11,7 +11,7 @@
 |---|---|---|---|---|---|
 | 1 | `1. UniqueLo_ Wear the Universe.png` | `UniverseHero`, `Header`, `AnnouncementBar`, `TrustStrip` | serif everywhere, bold two-tone headline, tracked gold eyebrow, serif nav/CTAs | split hero, slash tabs, search pill, 3-up trust | **type+layout done** (hero emblem asset blank until P5 shoots) |
 | 2 | `2. Explore by Mood_ Fashion Collections.png` | `VibeGateway`, `MarketingHeader` (shared), `Cta` (TextLink) | display serif title (--text-display-lg), italic serif subtitle, serif caps card titles, serif counts + sans STYLES label, sans CTAs | borderless full-bleed cards, 16px radius, dual scrim, gold ring + lift + filled gold CTA on hover | **type+layout done** (mood photos blank until P5 shoots; counts live-computed) |
-| 3 | `3. Worlds to Wear_ Three Embroidered Universes.png` | `UniversePortals` | — | 3 themed portal cards | pending |
+| 3 | `3. Worlds to Wear_ Three Embroidered Universes.png` | `UniversePortals` | serif title-case names in per-universe `portal_title_color` (crimson/gold/brown), caps sans taglines, serif lore body | editorial stack at top, count + gold `Enter →` CTA bottom-left, featured Heroverse (slug-keyed: ring, scale, tilt, lift), borderless side cards, cream section | **type+layout done** (artwork blank until P5 shoots; text polarity deferred with it) |
 | 4 | `4. Stories Stitched by Hand.png` | `CraftStory` | — | 4 steps, trust badges | pending |
 | 5 | `5. Embroidered Community Favourites.png` | `Bestsellers` | — | quick-view hover, ₹ + compare-at, ribbons | pending |
 | 6 | `6. Worn Across Universes_ Stories in Stitching.png` | `UGCWall` | — | masonry, quotes, verified badges | pending |
