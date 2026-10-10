@@ -76,7 +76,9 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   };
 
   return (
-    <div className="group relative flex flex-col bg-paper border border-stone/70 transition-shadow duration-500 hover:shadow-xl w-[270px] sm:w-[300px] shrink-0 snap-start">
+    <div
+      className={`group relative flex flex-col overflow-hidden rounded-2xl bg-paper ring-1 ring-stone/50 transition-all duration-300 hover:ring-2 hover:ring-gold hover:shadow-[0_28px_70px_rgba(160,114,45,0.22)] hover:-translate-y-1 w-[270px] sm:w-[300px] shrink-0 snap-start`}
+    >
       {/* Visual */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
         <Link to={`/product/${product.slug}`} aria-label={product.name}>
@@ -89,7 +91,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
         </Link>
 
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gold text-cream text-[11px] font-sans tracking-wide px-3 py-1.5">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-ink text-cream text-[11px] font-sans tracking-wide px-3 py-1.5">
             <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
           </span>
         )}
@@ -98,46 +100,54 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           onClick={() => toggleWishlist(product.slug)}
           aria-label={isWish ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
           aria-pressed={isWish}
-          className="absolute top-3 right-3 w-11 h-11 rounded-full bg-paper/90 flex items-center justify-center text-ink hover:text-gold transition-colors"
+          className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-paper/90 flex items-center justify-center transition-colors ${
+            isWish ? 'text-accent' : 'text-ink'
+          } hover:text-accent`}
         >
           <svg className="w-5 h-5" fill={isWish ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
 
-        {/* Hover / focus Quick-View overlay */}
-        <div className="absolute inset-x-3 bottom-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300 bg-paper/95 backdrop-blur border border-stone/60 p-3">
+        {/* Hover / focus Quick-View overlay — dark bar + floating purchase panel */}
+        <div className="absolute inset-x-3 bottom-3 flex flex-col gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300">
           <button
             onClick={() => openQuickView(product)}
-            className="w-full text-center font-serif text-[16px] text-ink py-1.5 min-h-[44px]"
+            className="flex items-center justify-center gap-2 rounded-lg bg-ink/85 backdrop-blur text-cream py-2.5 min-h-[44px] font-serif text-[16px]"
           >
-            👁 Quick View
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+              <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
+            </svg>
+            Quick View
           </button>
-          <div className="flex items-center justify-center gap-1.5 mt-1" role="group" aria-label="Choose size">
-            {sizes.map((s) => {
-              const available = inStockSizes.has(s);
-              return (
-                <button
-                  key={s}
-                  disabled={!available}
-                  onClick={() => setSize(s)}
-                  aria-pressed={size === s}
-                  aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                  className={`min-w-[36px] min-h-[36px] px-1.5 text-xs border transition-colors ${
-                    size === s ? 'bg-gold text-cream border-transparent' : 'border-stone text-ink hover:border-ink'
-                  } ${available ? '' : 'opacity-30 line-through'}`}
-                >
-                  {s}
-                </button>
-              );
-            })}
+          <div className="bg-paper/95 backdrop-blur border border-stone/60 rounded-lg p-3">
+            <div className="flex items-center justify-center gap-1.5" role="group" aria-label="Choose size">
+              {sizes.map((s) => {
+                const available = inStockSizes.has(s);
+                return (
+                  <button
+                    key={s}
+                    disabled={!available}
+                    onClick={() => setSize(s)}
+                    aria-pressed={size === s}
+                    aria-label={`Size ${s}${available ? '' : ', sold out'}`}
+                    className={`min-w-[36px] min-h-[36px] px-1.5 text-xs border rounded-md transition-colors ${
+                      size === s ? 'bg-gold text-cream border-transparent' : 'border-stone text-ink hover:border-ink'
+                    } ${available ? '' : 'opacity-30 line-through'}`}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={handleAdd}
+              className="w-full mt-2 bg-gold text-cream rounded-lg font-serif text-[16px] py-2.5 min-h-[44px] hover:bg-gold-hover transition-colors"
+            >
+              Add to Cart — {formatPrice(defaultVariant.priceCents)}
+            </button>
           </div>
-          <button
-            onClick={handleAdd}
-            className="w-full mt-2 bg-gold text-cream font-serif text-[16px] py-2.5 min-h-[44px] hover:bg-gold-hover transition-colors"
-          >
-            Add to Cart — {formatPrice(defaultVariant.priceCents)}
-          </button>
         </div>
       </div>
 
