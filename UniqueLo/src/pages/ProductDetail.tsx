@@ -286,8 +286,8 @@ export const ProductDetail: React.FC = () => {
                   aria-pressed={selectedImageIndex === idx}
                   className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all min-h-[44px] ${
                     selectedImageIndex === idx
-                      ? 'border-accent ring-2 ring-accent/40 shadow-sm'
-                      : 'border-stone opacity-70 hover:opacity-100'
+                      ? 'border-gold ring-2 ring-gold/30 shadow-sm'
+                      : 'border-transparent opacity-70 hover:opacity-100'
                   }`}
                 >
                   <img
@@ -342,7 +342,7 @@ export const ProductDetail: React.FC = () => {
                     }}
                   >
                     <div className="absolute top-4 left-4 bg-ink/90 text-cream px-3 py-1 text-[10px] tracking-widest uppercase font-sans backdrop-blur-md border border-stone/30">
-                      ✦ 3x Macro Thread Inspection
+                      3x Macro Thread Inspection
                     </div>
                   </div>
                 )}
@@ -363,7 +363,9 @@ export const ProductDetail: React.FC = () => {
               {product.embroidery?.artisanHours && (
                 <div className="mt-4 p-3 bg-paper border border-stone flex items-center justify-between text-xs text-ink-muted">
                   <div className="flex items-center gap-2">
-                    <span className="text-accent text-sm">✦</span>
+                    <svg className="w-4 h-4 shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
+                    </svg>
                     <span className="font-serif text-ink text-sm">
                       {product.embroidery.artisanHours} Hours of Continuous Hand Needlework
                     </span>
@@ -467,6 +469,13 @@ export const ProductDetail: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-ink-muted mt-1 font-light">
                   Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
+                </p>
+                {/* EMI line (render 09) — figure computed from variant price; the
+                    render's "with simpl" brand claim deferred: no EPI integration
+                    exists yet, so it stays a neutral promise (logged deviation) */}
+                <p className="font-serif text-xs text-ink-muted mt-1.5">
+                  or {formatPrice(Math.round(currentVariant.priceCents / 6)).replace('-', '')}/month for 6 months ·
+                  EMI options confirmed at checkout
                 </p>
               </div>
 
@@ -631,16 +640,25 @@ export const ProductDetail: React.FC = () => {
                 </button>
               </div>
 
-              {/* Trust row (render 09) */}
+              {/* Trust row (render 09) — line-icon SVGs, no emoji */}
               <div className="mt-4 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
                 <span className="flex items-center gap-1.5">
-                  <span aria-hidden="true" className="text-gold">🚚</span> Free shipping on orders above ₹29,050
+                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                  Free shipping on orders above ₹29,050
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span aria-hidden="true" className="text-gold">📦</span> 14-day home inspection
+                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7H4v13h16V7zM4 7l2-3h12l2 3M9 11h6" />
+                  </svg>
+                  14-day home inspection
                 </span>
                 <span className="hidden sm:flex items-center gap-1.5">
-                  <span aria-hidden="true" className="text-gold">🛡</span> Secure payments · UPI, Cards, COD
+                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
+                  </svg>
+                  Secure payments · UPI, Cards, COD
                 </span>
               </div>
 
