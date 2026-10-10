@@ -9,7 +9,7 @@ import { ToastContainer } from '../components/ui/Toast';
 
 export const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-cream text-ink font-sans selection:bg-accent/20 selection:text-ink">
+    <div className="min-h-screen flex flex-col bg-cream text-ink selection:bg-accent/20 selection:text-ink">
       <Header />
       <main className="flex-1 pt-[calc(var(--header-height)+2.2rem)]">
         <Outlet />

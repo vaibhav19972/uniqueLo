@@ -130,20 +130,32 @@ Copy the block below into `src/styles/tokens.css`. It is the only place where de
 
 ## 3. Font Strategy
 
-### Primary: Satoshi (sans)
-- Use for: UI, body, buttons, nav, product names, prices.
-- Weights loaded: 400, 500, 700.
+> **Render-era update (anti-gravity-design-rework):** the chatgpt-v2 renders
+> are typographically *serif-forward* — one high-contrast display serif carries
+> display, nav, body and CTAs; sans survives only as tracked-out caps
+> eyebrows/micro-labels. The families below were swapped to match.
+> Deviations remain logged in `sketches/design-renders/chatgpt-v2/README.md`.
+
+### Primary: Playfair Display (serif)
+- Use for: ALL editorial + functional text — hero/section display, nav links,
+  body copy, buttons, prices, product names.
+- File: `Playfair-Display-Variable.woff2` (wght 400–900) +
+  `Playfair-Display-VariableItalic.woff2` (true italic — poetic taglines,
+  e.g. render 2 mood taglines). Self-hosted in `public/fonts/`.
+- Fallback: Melodrama (display-only, no italic cut) → Georgia.
+
+### Functional accent: Satoshi (sans)
+- Use ONLY for: tracked-out caps eyebrows/micro-labels (`--tracking-eyebrow`,
+  `--tracking-label`), e.g. "THREADS ACROSS WORLDS", "ANIMEVERSE".
+- File: `Satoshi-Variable.woff2` (300–900). Self-hosted.
 - Fallback: Inter → system-ui.
 
-### Editorial: Melodrama (serif)
-- Use for: hero headlines, editorial captions, lookbook callouts, section labels.
-- Weights loaded: 400, 500.
-- Fallback: Playfair Display (Google) → Georgia.
-
 ### Loading Rule
-- **Target:** self-host font files in `public/fonts/` with `font-display: swap`.
-- **Placeholder while assets are pending:** use the documented fallback stack. Do not block rendering on web fonts.
-- Update `src/styles/globals.css` with `@font-face` rules once files are available.
+- Self-hosted in `public/fonts/`, declared in `src/styles/fonts.css`
+  (imported via `globals.css`), `font-display: swap`. Plain `format('woff2')`
+  syntax; variable axes engaged via the `font-weight: <min> <max>` descriptor.
+- If the computed font on a page is a fallback, that's a bug — usually fonts
+  not loaded, never "Inter/Georgia as an intentional choice".
 
 ---
 
@@ -311,11 +323,13 @@ These rules exist to keep the site looking *designed*, not generated. They are
 checkable in code review, and every new component must pass them.
 
 ### 12.1 Typography discipline
-- **The brand fonts are Satoshi and Melodrama — self-hosted in `public/fonts/`.**
-  Inter/Playfair are fallback stacks only, never intentional choices. If the
+- **The brand fonts are Playfair Display (serif) and Satoshi (sans) — self-hosted in `public/fonts/`.**
+  Melodrama/Inter/Georgia are fallback stacks only, never intentional choices. If the
   computed font on a page is a fallback, that's a bug (usually: fonts not loaded).
-- Editorial display text (heroes, section titles, pull quotes) is **Melodrama**;
-  everything functional is **Satoshi**. Mixing them anywhere else dilutes both.
+- **Playfair Display (serif) carries display AND functional text** (nav, body,
+  CTAs — chatgpt-v2 render language). Satoshi (sans) is reserved for
+  tracked-out caps eyebrows/micro-labels. Sans appearing on body/nav/buttons
+  is a render-era regression.
 - Never center long-form paragraphs. Editorial text is left-aligned with a max
   measure of ~65 characters.
 - Avoid `font-weight` jumps between adjacent elements (e.g., 400 → 700 mid-UI);

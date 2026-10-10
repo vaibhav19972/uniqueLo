@@ -23,42 +23,50 @@ export const UniverseHero: React.FC = () => {
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-10 lg:pt-16 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         {/* Copy */}
         <div>
-          <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-ink-muted">
-            Embroidered apparel for dreamers, believers and builders
-          </p>
-          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-ink leading-[1.02] mt-4 tracking-tight">
-            Wear the
-            <br />
-            Universe,
-            <br />
-            <em className="font-light text-gold">
-              Stitched by Hand
-            </em>
+          {/* Tracked caps eyebrow + hairline rule (render style) */}
+          <div className="flex items-center gap-4 max-w-md">
+            <span className="text-[12px] font-sans uppercase tracking-eyebrow font-medium whitespace-nowrap" style={{ color: 'var(--brand-gold)' }}>
+              Threads Across Worlds
+            </span>
+            <span aria-hidden="true" className="h-px flex-1 bg-stone" />
+          </div>
+          <h1
+            className="font-serif font-bold text-ink leading-display tracking-tight mt-5 max-w-xl"
+            style={{ fontSize: 'var(--text-display)' }}
+          >
+            Wear the Universe,{' '}
+            <span className="text-gold">Stitched by Hand.</span>
           </h1>
-          <p className="text-sm sm:text-base text-ink-muted mt-5 max-w-md font-light leading-relaxed">
-            Explore hand-embroidered apparel inspired by Anime, Heroes and Indian History.
+          <p className="font-serif text-lg text-ink-muted mt-6 max-w-md leading-relaxed">
+            Iconic worlds, reimagined through Indian hand-embroidery. For dreamers,
+            collectors and everyone in between.
           </p>
 
-          {/* Universe tabs */}
-          <div role="tablist" aria-label="Choose a universe" className="flex items-center gap-6 mt-7 border-b border-stone/70 max-w-md">
-            {list.map((u) => {
+          {/* Universe tabs — slash-separated per render 1, active = gold + underline */}
+          <div role="tablist" aria-label="Choose a universe" className="flex items-center gap-3 mt-7 max-w-md">
+            {list.map((u, i) => {
               const selected = u.slug === (active?.slug ?? '');
               return (
-                <button
-                  key={u.slug}
-                  role="tab"
-                  aria-selected={selected}
-                  onClick={() => setActiveSlug(u.slug)}
-                  className={`relative pb-2.5 text-sm font-serif tracking-wide transition-colors min-h-[44px] ${
-                    selected ? 'text-ink font-semibold' : 'text-ink-muted hover:text-ink'
-                  }`}
-                  style={selected ? { color: 'var(--color-gold)' } : undefined}
-                >
-                  {TAB_LABELS[u.slug] ?? u.name}
-                  {selected && (
-                    <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-gold" />
+                <React.Fragment key={u.slug}>
+                  {i > 0 && (
+                    <span aria-hidden="true" className="text-stone select-none text-lg">
+                      /
+                    </span>
                   )}
-                </button>
+                  <button
+                    role="tab"
+                    aria-selected={selected}
+                    onClick={() => setActiveSlug(u.slug)}
+                    className="relative pb-0.5 text-xl font-serif transition-colors min-h-[44px] flex items-center"
+                  >
+                    <span className={selected ? 'text-ink' : 'text-warm-gray hover:text-ink'}>
+                      {TAB_LABELS[u.slug] ?? u.name}
+                    </span>
+                    {selected && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: 'var(--brand-gold)' }} />
+                    )}
+                  </button>
+                </React.Fragment>
               );
             })}
           </div>
@@ -68,6 +76,10 @@ export const UniverseHero: React.FC = () => {
               Shop the Universes <span aria-hidden="true">→</span>
             </CtaLink>
             <CtaLink to="/atelier" variant="outline">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" strokeWidth="1.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 9l5 3-5 3V9z" />
+              </svg>
               Our Craft
             </CtaLink>
           </div>
