@@ -114,7 +114,7 @@ export const Header: React.FC = () => {
             to="/"
             className="group inline-flex flex-col tracking-tight focus-visible:outline-accent"
           >
-            <span className="font-serif text-2xl sm:text-3xl text-ink font-normal transition-colors group-hover:text-accent flex items-center gap-1.5">
+            <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent flex items-center gap-1.5">
               <span>UniqueLo</span>
             </span>
             <span className="hidden sm:block text-[9px] font-sans tracking-[0.2em] text-ink-muted uppercase -mt-0.5">
@@ -122,7 +122,6 @@ export const Header: React.FC = () => {
             </span>
           </Link>
         </div>
-
         {/* Center: Navigation Links */}
         <nav aria-label="Primary" className="hidden md:flex items-center space-x-8 lg:space-x-10">
           {/* Universes dropdown — options rendered from data, never hardcoded */}
@@ -136,7 +135,7 @@ export const Header: React.FC = () => {
               onClick={() => setUniversesOpen((v) => !v)}
               aria-expanded={universesOpen}
               aria-haspopup="true"
-              className={`relative py-1 text-xs lg:text-sm uppercase tracking-[0.18em] font-medium transition-colors hover:text-ink inline-flex items-center gap-1.5 ${
+              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1.5 ${
                 isUniversesActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
@@ -166,7 +165,7 @@ export const Header: React.FC = () => {
                   <Link
                     to="/shop"
                     onClick={closeUniverses}
-                    className="block px-5 py-3 border-t border-stone/60 text-xs uppercase tracking-widest text-ink-muted hover:text-ink hover:bg-cream transition-colors"
+                    className="block px-5 py-3 border-t border-stone/60 text-sm font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
                   >
                     All universes →
                   </Link>
@@ -181,7 +180,7 @@ export const Header: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`relative py-1 text-xs lg:text-sm uppercase tracking-[0.18em] font-medium transition-colors hover:text-ink ${
+                className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink ${
                   isActive ? 'text-ink font-semibold' : 'text-ink-muted'
                 }`}
               >
@@ -196,15 +195,16 @@ export const Header: React.FC = () => {
 
         {/* Right: Search, Account, Wishlist & Cart */}
         <div className="ml-auto flex items-center gap-1 sm:gap-3">
-          {/* Search */}
+          {/* Search — rounded pill per render 1 */}
           <Link
             to="/shop"
             aria-label="Search the collection"
-            className="hidden sm:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
+            className="hidden lg:flex items-center gap-2 rounded-full border border-stone px-4 py-2 text-[13px] text-warm-gray hover:border-ink/40 hover:text-ink-muted transition-colors min-h-[36px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
             </svg>
+            <span className="whitespace-nowrap">Search for anime, heroes, history…</span>
           </Link>
 
           {/* Account (stub — honest toast until accounts launch) */}
@@ -269,7 +269,7 @@ export const Header: React.FC = () => {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <span className="text-xs uppercase font-sans tracking-widest hidden sm:inline-block">
+            <span className="text-[15px] font-serif hidden sm:inline-block">
               Bag
             </span>
             <span

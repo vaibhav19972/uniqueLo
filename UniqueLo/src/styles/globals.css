@@ -37,6 +37,13 @@
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
 
+  /* render-era type treatments (chatgpt-v2 targets) */
+  --tracking-eyebrow: var(--tracking-eyebrow);
+  --tracking-label: var(--tracking-label);
+  --leading-display: var(--leading-display);
+  --text-display: var(--text-display);
+  --text-display-lg: var(--text-display-lg);
+
   /* type scale */
   --text-hero: var(--text-hero);
 
@@ -58,7 +65,7 @@
     min-height: 100dvh;
     background-color: var(--color-cream);
     color: var(--color-ink);
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
     overflow-x: clip;
