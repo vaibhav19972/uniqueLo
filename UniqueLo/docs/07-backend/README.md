@@ -1,11 +1,17 @@
 # 07 — Backend & Cloud Architecture (Supabase + Vercel)
 
 > **Source of truth for the UniqueLo backend and database architecture.**
-> Aligned with the TMS project deployment pattern: immediate deployment on **Vercel** 
-> (SPA edge CDN) paired with **Supabase** (managed PostgreSQL with Row Level Security, 
-> auth, and realtime storage), backed by multi-stage Docker containers for real production servers.
-> All data querying lives behind `src/lib/supabase.ts` and `src/lib/data.ts` with zero-config 
-> bundled fallback.
+> Immediate deployment on **Vercel** (SPA edge CDN) paired with **Supabase**
+> (managed PostgreSQL with Row Level Security, auth, realtime, and storage),
+> backed by multi-stage Docker containers for real production servers.
+> All data querying lives behind `src/lib/supabase.ts` and `src/lib/data.ts`
+> with zero-config bundled fallback.
+
+> **Historical note (2026-10-11):** Phases 8–9 were originally planned around
+> Strapi v5 (Article CMS, Editor role, `/journal` routes). That plan was
+> **superseded** by the Supabase-first stack below. No Strapi instance, Article
+> collection, or Journal CMS exists in the codebase; the Footer currently links
+> "Journal" → `/shop` as a placeholder until a Journal phase is scheduled.
 
 ---
 
@@ -18,8 +24,8 @@
 | Immediate cloud deployment | Vercel provides instant zero-config preview & production deployments with SPA routing (`vercel.json`) |
 | Relational data model | Full PostgreSQL schema (`supabase/schema.sql`) for products, variants, craft taxonomy, reviews, and orders |
 | Role-Based Security & Permissions | PostgreSQL Row Level Security (RLS) policies enforce public read access and secured admin/order writes |
-| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`products.json`) if keys are unset |
-| Inventory & Variant Tracking | `product_variants` table tracks SKU, size, colorway, cents price, quantity, and stock status |
+| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`src/data/mock-products.json`) if keys are unset or rows predate the universe schema |
+| Inventory & Variant Tracking | `variants` table (keyed by `sku`, linked via `product_slug`) tracks size, colorway, cents price, quantity, and stock status |
 | Craft Provenance & Macro Media | `embroidery_details` table stores artisan hours, guild clusters, regions, stitch types, and thread compositions |
 | Production Server Containerization | Multi-stage `Dockerfile` with optimized Alpine Nginx reverse proxy + `docker-compose.prod.yml` |
 
@@ -30,66 +36,85 @@
 ```
 ┌─────────────────────────────────┐           ┌──────────────────────────────────────┐
 │  Storefront (Vercel Edge CDN)   │           │  Supabase Cloud (PostgreSQL 16)      │
-│  React 19 + TypeScript + Vite   │   HTTPS   │  Tables: products, categories,       │
-│  TanStack Query caching layer   │◄─────────►│  product_variants, embroidery,       │
-│  Zustand (Cart, Customizer, UI) │  REST/SQL │  reviews, newsletter, orders         │
-│  Failsafe: bundled JSON fallback│           │  Security: Row Level Security (RLS)  │
-└─────────────────────────────────┘           └──────────────────────────────────────┘
-                 │                                                │
-                 ▼                                                ▼
+│  React 19 + TypeScript + Vite   │   HTTPS   │  Tables: categories, products,       │
+│  TanStack Query caching layer   │◄─────────►│  variants, product_images,           │
+│  Zustand (Cart, Customizer, UI) │  REST/SQL │  embroidery_details, reviews,        │
+│  Failsafe: bundled JSON fallback│           │  newsletter_subscribers, orders      │
+└─────────────────────────────────┘           │  Security: Row Level Security (RLS)  │
+                 │                            └──────────────────────────────────────┘
+                 ▼                                        ▼
 ┌─────────────────────────────────┐           ┌──────────────────────────────────────┐
 │  Self-Hosted Linux / Docker     │           │  Storage & Edge                      │
-│  Multi-stage Dockerfile         │           │  Supabase Storage Bucket: product-media│
-│  Nginx 1.25 Alpine reverse proxy│           │  CDN Caching & HTTP/2 Headers        │
+│  Multi-stage Dockerfile         │           │  Supabase Storage Bucket:            │
+│  Nginx 1.25 Alpine reverse proxy│          │  `product-images` (public reads)      │
 └─────────────────────────────────┘           └──────────────────────────────────────┘
 ```
 
 - **Environment Configuration:**
   - `VITE_SUPABASE_URL`: Supabase project URL (`https://your-project.supabase.co`)
   - `VITE_SUPABASE_ANON_KEY`: Safe public anon JWT key
-  - Fallback mode: If environment variables are empty or Supabase is unreachable, the store operates without error using local static JSON.
+  - Fallback mode: If environment variables are empty, Supabase is unreachable, or the seeded rows predate the universe schema (feature detection on `universe_slug`), the store operates without error using local static JSON (`mock-products.json`).
 
 ---
 
 ## 3. Database Schema (`supabase/schema.sql`)
 
-Field names match `src/lib/data.ts` TypeScript types 1:1.
+Catalog tables are **slug/sku-keyed** (no surrogate uuid ids on catalog rows);
+uuid primary keys are used only for append-only rows (reviews, orders, images).
+Snake_case columns map 1:1 to the camelCase TypeScript types via the adapter in
+`src/lib/data.ts` (`getProducts()`).
 
 ### `categories`
-`id` (uuid, PK), `slug` (text, unique), `name` (text), `label` (text), `description` (text), `image` (text), `display_order` (int).
+`slug` (text, PK), `name`, `label`, `description`, `image`, `order_num` (int), `created_at`.
 
 ### `products`
-`id` (uuid, PK), `slug` (text, unique), `name` (text), `subtitle` (text), `description` (text), `category_id` (FK → categories), `tags` (text[]), `featured` (bool), `customizable` (bool), `fit` (text), `batch_number` (int), `batch_total` (int), `craft_region` (text), `craft_cluster` (text), `fabric_gsm` (text), `created_at` (timestamptz).
+`slug` (text, PK), `name`, `subtitle`, `description`, `category_slug` (FK → categories.slug), `tags` (text[]), `featured` (bool), `customizable` (bool), `material` (text[]), `care` (text[]), `fit`, `batch_number` (int), `batch_total` (int), `craft_region`, `craft_cluster`, `fabric_gsm`, `created_at`.
 
-### `product_variants`
-`id` (uuid, PK), `product_id` (FK → products), `sku` (text, unique), `color` (text), `color_hex` (text), `size` (text), `price_cents` (int), `compare_at_price_cents` (int), `quantity` (int), `status` (text: in-stock, low-stock, out-of-stock).
+### `variants`
+`sku` (text, PK), `product_slug` (FK → products.slug, cascade), `color`, `color_hex`, `size`, `price_cents` (int), `compare_at_price_cents` (int), `status` (check: `in-stock` | `low-stock` | `out-of-stock`), `quantity` (int), `created_at`.
+
+### `product_images`
+`id` (uuid, PK), `product_slug` (FK → products.slug), `src`, `alt`, `color`, `sort_order` (int).
 
 ### `embroidery_details`
-`id` (uuid, PK), `product_id` (FK → products, unique), `technique` (text), `technique_label` (text), `artisan_hours` (int), `placement` (text[]), `thread_composition` (text), `motif_story` (text), `macro_image` (text).
+`id` (uuid, PK), `product_slug` (FK → products.slug, unique), `technique`, `technique_label`, `artisan_hours` (int), `placement` (text[]), `thread_composition`, `motif_story`, `macro_image_src`, `macro_image_alt`.
 
 ### `reviews`
-`id` (uuid, PK), `product_slug` (text), `author` (text), `rating` (int), `title` (text), `comment` (text), `verified` (bool), `created_at` (timestamptz).
+`id` (uuid, PK), `product_slug` (FK → products.slug), `author`, `rating` (int, check 1–5), `title`, `comment`, `verified` (bool), `created_at`.
 
-### `newsletter_subscribers` & `orders`
-Direct capture tables for marketing dispatches and customer checkouts.order` integer (sort categories in nav).
+### `newsletter_subscribers`
+`id` (uuid, PK), `email` (text, unique), `subscribed_at`.
 
-### Article (collection) — for the Editor dashboard / Atelier Journal
-`slug` uid, `title` text (required), `excerpt` text, `body` richtext,
-`coverImage` media, `relatedProducts` relation → Product (many-to-many),
-`publishedAt` (built-in DRAFT/PUBLISHED workflow).
+### `orders`
+`id` (uuid, PK), `customer_name`, `customer_email`, `status` (default `confirmed`), `subtotal_cents`, `discount_cents`, `shipping_cents`, `total_cents`, `coupon_code`, `gift_note`, `shipping_address` (jsonb), `created_at`.
+
+### `order_items`
+`id` (uuid, PK), `order_id` (FK → orders.id, cascade), `product_slug`, `variant_sku`, `product_name`, `color`, `size`, `quantity`, `price_cents`, `customization` (jsonb).
+
+> **Migration debt (tracked in `audit.md`):** the live SQL pre-dates the
+> universe build — `universes` / `motifs` tables and the
+> `products.universe_slug / gender / vibes / moods / motif_id / is_mock /
+> handcrafted / foreign_tagline …` columns are still pending. `seed.sql`
+> currently seeds the 13-product legacy atelier line only; the storefront
+> detects pre-migration rows and serves the bundled 14-SKU mock catalog
+> (`src/data/mock-products.json`) until the migration lands.
 
 ---
 
-## 4. Roles & permissions (the Editor dashboard)
+## 4. Admin — Supabase Product Catalog Studio (`/admin`)
 
-Strapi ships an admin panel; configure roles once in **Settings → Roles**:
+`src/pages/Admin.tsx` is a single-page catalog studio (no Strapi, no external CMS):
 
-| Role | Can do |
-|---|---|
-| **Admin** (built-in Super Admin) | Everything incl. roles, plugins, settings |
+- Variant matrix editor (sizes × colorways with price, quantity, status).
+- SQL + JSON generators that emit `INSERT` statements / seed JSON for the schema above.
+- Image upload to the Supabase Storage bucket **`product-images`** (public reads); the admin's SQL tab includes the `storage.buckets` creation + public-read policy statements.
+- Craft/region/cluster/GSM provenance fields per product.
+
+Auth gating of `/admin` is planned for Phase 9 (Supabase Auth + role policies); today the route is open in dev.
+
 ---
 
-## 4. Security & Permissions (PostgreSQL RLS)
+## 5. Security & Permissions (PostgreSQL RLS)
 
 Supabase applies fine-grained Row Level Security (RLS) on each table:
 
@@ -97,31 +122,30 @@ Supabase applies fine-grained Row Level Security (RLS) on each table:
 |---|---|---|
 | `categories` | Public SELECT | All visitors can browse active categories |
 | `products` | Public SELECT | All visitors can browse active catalog garments |
-| `product_variants` | Public SELECT | Public inventory and size/color availability |
+| `variants` | Public SELECT | Public inventory and size/color availability |
+| `product_images` | Public SELECT | Public imagery |
 | `embroidery_details` | Public SELECT | Public craft provenance and stitch details |
-| `reviews` | Public SELECT + Authenticated/Anon INSERT | Visitors can read verified reviews and submit new feedback |
-| `newsletter_subscribers`| Public INSERT | Newsletter and dispatch lead capture |
-| `orders` & `order_items`| Authenticated/Anon INSERT | Secured customer order placement |
+| `reviews` | Public SELECT + public INSERT | Visitors can read reviews and submit feedback |
+| `newsletter_subscribers` | Public INSERT | Newsletter and dispatch lead capture |
+| `orders` & `order_items` | Public INSERT | Customer order placement (checkout drawer) |
 
 ---
 
-## 5. `data.ts` Migration Seam & Client Architecture
+## 6. `data.ts` Migration Seam & Client Architecture
 
 All database queries pass through `src/lib/supabase.ts` into `src/lib/data.ts`.
-Components use TanStack Query hooks (`useProducts()`, `useProduct(slug)`, `useCraftTechniques()`).
+Components use TanStack Query hooks (`useProducts()`, `useProduct(slug)`, `useCategories()` in `src/hooks/useCatalog.ts`).
 
-- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, `src/lib/data.ts` smoothly falls back to bundled `src/data/products.json`.
-- **Image URL Resolution:** `resolveImageUrl()` supports both relative local assets (`/images/products/...`) and Supabase Storage URLs.
-- **Stock Status Derivation:** Real-time quantity thresholds (`0 → out-of-stock`, `1–3 → low-stock`, `>3 → in-stock`).
+- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, unreachable, or the catalog rows predate the universe schema, `src/lib/data.ts` falls back to bundled `src/data/mock-products.json` (14 render-mock SKUs; `products.json` is deprecated-retained and no longer imported).
+- **Image URL Resolution:** `resolveImageUrl()` supports both relative local assets (`/images/products/...`) and Supabase Storage URLs (`product-images` bucket).
+- **Stock Status:** `variants.status` is stored explicitly in JSON/Supabase and is the badge source (`in-stock` / `low-stock` / `out-of-stock`) — there is no quantity→status derivation. `getDefaultVariant()` prefers `in-stock` → `low-stock` → non-`out-of-stock` (`src/lib/data.ts`). Cart operations additionally clamp to the live `quantity` value — cart clamping wins over the badge.
 
 ---
 
-## 6. Phasing Alignment (extends docs/05-phases)
+## 7. Phasing Alignment (extends docs/05-phases)
 
 | Phase | Delivers | Status |
 |---|---|---|
 | **Phase 7** | Async data layer, TanStack Query hooks (`useCatalog.ts`), React 19 compatibility | Completed |
-| **Phase 8** | Supabase DDL schema (`schema.sql`), Seed dataset (`seed.sql`), Vercel SPA deploy config (`vercel.json`), Docker prod setup | Completed |
-| **Phase 9** | Supabase Auth, Admin/Editor product management dashboard, Stripe/Razorpay live webhook integration | Next |
-
-| **9** | Editor role configured, product upload + price edit + category management via admin, Article CMS flow live |
+| **Phase 8** | Supabase DDL schema (`schema.sql`), legacy seed dataset (`seed.sql`), Vercel SPA deploy config (`vercel.json`), Docker prod setup | Completed |
+| **Phase 9** | Supabase Auth gating for `/admin`, Editor role policies, Stripe/Razorpay live webhooks, universe-schema migration (universes/motifs tables + product columns), Journal CMS (planned) | Next |

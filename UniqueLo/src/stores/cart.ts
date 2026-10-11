@@ -12,10 +12,11 @@ interface CartState {
     productSlug: string,
     variantSku: string,
     quantity?: number,
-    customization?: CartCustomization
+    customization?: CartCustomization,
+    maxQuantity?: number
   ) => void;
   removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (id: string, quantity: number, maxQuantity?: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
 }
@@ -42,15 +43,18 @@ export const useCartStore = create<CartState>()(
       closeCart: () => set({ isOpen: false }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
-      addItem: (productSlug, variantSku, quantity = 1, customization) => {
+      addItem: (productSlug, variantSku, quantity = 1, customization, maxQuantity) => {
         const id = generateCartItemId(productSlug, variantSku, customization);
+        const safeQty = maxQuantity != null ? Math.min(Math.max(1, quantity), maxQuantity) : Math.max(1, quantity);
         set((state) => {
           const existingIndex = state.items.findIndex((item) => item.id === id);
           if (existingIndex > -1) {
             const newItems = [...state.items];
+            const prev = newItems[existingIndex].quantity;
+            const next = maxQuantity != null ? Math.min(prev + safeQty, maxQuantity) : prev + safeQty;
             newItems[existingIndex] = {
               ...newItems[existingIndex],
-              quantity: newItems[existingIndex].quantity + quantity,
+              quantity: next,
             };
             return { items: newItems, isOpen: true };
           }
@@ -61,7 +65,7 @@ export const useCartStore = create<CartState>()(
                 id,
                 productSlug,
                 variantSku,
-                quantity,
+                quantity: safeQty,
                 customization,
               },
             ],
@@ -76,14 +80,15 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      updateQuantity: (id, quantity) => {
+      updateQuantity: (id, quantity, maxQuantity) => {
         if (quantity <= 0) {
           get().removeItem(id);
           return;
         }
+        const safeQty = maxQuantity != null ? Math.min(quantity, maxQuantity) : quantity;
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id ? { ...item, quantity } : item
+            item.id === id ? { ...item, quantity: safeQty } : item
           ),
         }));
       },

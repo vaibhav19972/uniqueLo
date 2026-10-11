@@ -19,12 +19,14 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | Section | Focus | Purpose |
 | :--- | :--- | :--- |
 | **[01 — Stack & Architecture](./01-stack-and-architecture/README.md)** | Technical Stack & Structure | Pinned dependencies (Vite 6, React 19, TS, Tailwind v4), folder hierarchy, decoupling rules, and headless upgrade paths. |
-| **[02 — Design System](./02-design-system/README.md)** | "Refined Editorial Minimal" | Color tokens, typography scale (Satoshi × Melodrama), surface hierarchy, 8pt spacing grid, and accessibility standards. |
+| **[02 — Design System](./02-design-system/README.md)** | "Refined Editorial Minimal" | Color tokens, typography scale (Playfair Display primary; Satoshi eyebrows-only; Melodrama fallback), surface hierarchy, 8pt spacing grid, and accessibility standards. |
 | **[03 — Data Contracts](./03-data-contracts/README.md)** | Schemas & Data Layer | Pure data-access contracts (`src/lib/data.ts`), embroidery craft metadata, pricing in cents, and cart types. |
 | **[04 — Motion System](./04-motion-system/README.md)** | Cinema-Grade Choreography | Lenis inertia scroll, GSAP ScrollTrigger pinning, Framer Motion UI transitions, and strict reduced-motion rules. |
 | **[05 — Build Phases](./05-phases/README.md)** | Phase-Gated Execution | Atomic task cards (P0 through P9), acceptance criteria, build-verification checkpoints. Updated brand experience plan at `.hermes/plans/2026-10-07_133000-design-plan-v2.md`. |
 | **[06 — Assets & Placeholders](./06-assets-and-placeholders/README.md)** | Visual Asset Pipeline | Tonal color block placeholders, aspect ratio rules, asset registry, and photography transition strategy. |
-| **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts` (Product/Variant/Category/Article/CraftTechnique), Editor role (articles + prices), product upload with craft/region fields, inventory per variant, and the `data.ts` async migration seam. |
+| **[07 — Backend & Admin](./07-backend/README.md)** | Supabase + Admin Studio | Slug-keyed Postgres schema + RLS (`schema.sql`), Vercel SPA deploy, the `/admin` Supabase Product Catalog Studio (variant matrix, SQL/JSON generators, `product-images` storage uploads), and the `data.ts` async migration seam. (Strapi plan superseded — see doc.) |
+| **[08 — Universe Build](./08-universe-build/README.md)** | Themed-Universe Pre-Build Bible | Universes × vibes vision, navigation/IA, data-model deltas, theming tokens, page specs, commerce flow, image pipeline, SEO/a11y/perf gates, phase cards. Nothing builds until this section agrees. |
+| **[09 — Reference Redesign](./09-reference-redesign-from-competitors/README.md)** | Competitor-Inspired Redesign Dock | The Souled Store teardown, article-presentation analysis, pick-and-place decisions, phased implementation roadmap. |
 
 ---
 

@@ -29,7 +29,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product.slug, defaultVariant.sku, 1);
+    if (defaultVariant.status === 'out-of-stock') {
+      showToast({
+        title: 'Sold out',
+        description: `${product.name} is currently sold out in ${defaultVariant.color}.`,
+        type: 'info',
+      });
+      return;
+    }
+    addItem(product.slug, defaultVariant.sku, 1, undefined, defaultVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
       description: `${product.name} (${defaultVariant.color} / ${defaultVariant.size})`,
@@ -147,7 +155,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div>
           <div className="flex items-center justify-between text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-1">
             <span>{product.craftRegion || 'Made in India'}</span>
-            <span>Ed. {product.batchNumber || 8}/{product.batchTotal || 50}</span>
+            {product.batchNumber != null && product.batchTotal != null && (
+              <span>Ed. {product.batchNumber}/{product.batchTotal}</span>
+            )}
           </div>
 
           <div className="flex justify-between items-start gap-2">
@@ -165,7 +175,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
         </div>
 
-        {/* Footer Meta: Color Dots & Artisan Hours */}
+        {/* Footer Meta: Color Dots & Embroidery Hours */}
         <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
           {/* Color Dots */}
           <div className="flex items-center gap-1.5">
@@ -181,7 +191,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {product.embroidery?.artisanHours && (
             <span className="font-medium text-ink">
-              {product.embroidery.artisanHours}h Needlework
+              {product.embroidery.artisanHours}h embroidery
+              {product.handcrafted && <span className="text-gold-deep"> · Handcrafted</span>}
             </span>
           )}
         </div>

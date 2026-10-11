@@ -53,14 +53,19 @@ Example:
 - Placeholder: `public/images/placeholders/product-cashmere-robe-coat-1.jpg`
 - Real asset: `public/images/products/cashmere-robe-coat-1.jpg`
 
-Update `products.json` image `src` to the real path once it exists. Until then, point `src` to the placeholder.
+Update the image `src` in `src/data/mock-products.json` (the canonical catalog;
+`products.json` is frozen — do not point it at new assets) to the real path once it exists. Until then, point `src` to the placeholder.
 
-**Current state (Phase 6 audit):** the catalog's image paths point directly to real
-files in `public/images/products/`, `public/images/categories/`, and
-`public/images/campaigns/` — but those files are tonal placeholder blocks generated
-per the spec in §4. The placeholder twins in `public/images/placeholders/` exist only
-as broken-link fallbacks for the shared `Image` component. The naming-rule example
-above pre-dates the actual catalog slugs.
+**Current state (2026-10-11):** the storefront catalog is
+`src/data/mock-products.json` (14 render-mock SKUs; `isMock: true`). Its image
+`src` paths point at real files in `public/images/products/`,
+`public/images/categories/`, and `public/images/placeholders/` — tonal
+placeholder blocks generated per §4 (all 26 referenced paths verified on
+disk, 2026-10-11). Mock SKUs **reuse** imagery from the legacy atelier line
+(e.g. `sakura-ronin-hoodie` renders with `vine-heavyweight-tee-*` files) —
+every mock product will need dedicated `product-<slug>-{1,2}.jpg` pairs at
+the P5 campaign shoot. The deprecated `src/data/products.json` (13 atelier
+SKUs) keeps its dedicated pairs below.
 
 ---
 
@@ -81,12 +86,12 @@ Placeholders are generated images (via a script, image tool, or manual creation)
 
 Use only these colors for placeholders:
 
-- `--color-cream` #f6f4ef
+- `--color-cream` #f7f5f0
 - `--color-paper` #ffffff
-- `--color-ink` #1a1a1a
-- `--color-stone` #e5e2dc
-- `--color-warm-gray` #9f9c96
-- `--color-accent` #c06b52 (use sparingly, e.g., hero campaign blocks)
+- `--color-ink` #141414
+- `--color-stone` #e5e1d8
+- `--color-warm-gray` #9e9b94
+- `--color-accent` #d95d39 (use sparingly, e.g., hero campaign blocks)
 
 ### Example Placeholder Spec
 
@@ -101,32 +106,68 @@ A hero placeholder is a 1920×1080 image:
 
 Use this table to track real assets as they arrive. Update it when a file is swapped.
 
-| Type | Slug / Name | Current Path | Status | Real Asset Owner | Notes |
-|------|-------------|--------------|--------|------------------|-------|
-| Hero | home-hero | `/images/campaigns/hero.jpg` | placeholder | TBD | Needs campaign video or image |
-| Category | outerwear | `/images/categories/outerwear.jpg` | placeholder | TBD | |
-| Category | knitwear | `/images/categories/knitwear.jpg` | placeholder | TBD | |
-| Category | tops | `/images/categories/tops.jpg` | placeholder | TBD | |
-| Category | bottoms | `/images/categories/bottoms.jpg` | placeholder | TBD | |
-| Category | accessories | `/images/categories/accessories.jpg` | placeholder | TBD | |
-| Product | botanical-silk-embroidered-jacket | `/images/products/botanical-silk-jacket-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | celestial-zardozi-wool-coat | `/images/products/celestial-zardozi-coat-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | kantha-quilted-chore-jacket | `/images/products/kantha-chore-jacket-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | flora-crewel-cashmere-cardigan | `/images/products/crewel-cashmere-cardigan-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | french-knot-merino-turtleneck | `/images/products/french-knot-turtleneck-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | atelier-monogram-poplin-shirt | `/images/products/monogram-poplin-shirt-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | vine-embroidered-heavyweight-tee | `/images/products/vine-heavyweight-tee-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | selvedge-sashiko-embroidered-denim | `/images/products/sashiko-selvedge-denim-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | pleated-silk-zari-wool-trousers | `/images/products/pleated-zari-trousers-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | heritage-flora-embroidered-silk-scarf | `/images/products/embroidered-silk-scarf-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | artisanal-needlework-canvas-tote | `/images/products/needlework-canvas-tote-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Product | nocturne-velvet-crewel-vest | `/images/products/nocturne-velvet-vest-{1,2}.jpg` | placeholder | TBD | Front + macro detail |
-| Editorial | atelier-craft | `/images/campaigns/atelier-craft.jpg` | placeholder | TBD | EditorialSplit secondary frame |
-| Editorial | editorial-split | `/images/campaigns/editorial-split.jpg` | placeholder | TBD | EditorialSplit primary frame |
-| Lookbook | lookbook 01–03 | `/images/campaigns/lookbook-0{1,2,3}.jpg` | placeholder | TBD | Lookbook carousel |
+> **Two catalogs, two registries (2026-10-11).** The **storefront** registry is
+> derived from `src/data/mock-products.json` (14 render-mock SKUs) — those SKUs
+> currently *reuse* files from the legacy atelier set below, so they are listed
+> with their effective file pairs, pending dedicated shoots. The **legacy**
+> registry covers the deprecated `products.json` 13-SKU atelier line (dedicated
+> pairs on disk, non-serving). The JSON files are the source of truth for
+> which images each catalog references — never regenerate this table from
+> folder listings.
 
-> All paths verified to exist on disk (Phase 6 audit). Every product slug in
-> `products.json` maps to real files for both silhouette + macro views.
+### Storefront (mock-products.json — 14 SKUs, image pairs borrowed from atelier assets)
+
+| Universe | Product (slug) | Effective image pair | Dedicated assets? |
+|---|---|---|---|
+| Animeverse | sakura-ronin-hoodie | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | roaring-spirit-tee | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | koi-no-yume-sweatshirt | `crewel-cashmere-cardigan-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | oni-spirit-jacket | `nocturne-velvet-vest-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | tsuki-crane-sweatshirt | `embroidered-silk-scarf-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | koi-no-yume-tee | `pleated-zari-trousers-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | tech-cargo-pants | `pleated-zari-trousers-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | samurai-cap | `monogram-poplin-shirt-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | red-sun-tote | `needlework-canvas-tote-{1,2}.jpg` | ❌ pending shoot |
+| Heroverse | ascendant-hoodie | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
+| Heroverse | guardian-stripe-tee | `sashiko-selvedge-denim-{1,2}.jpg` | ❌ pending shoot |
+| Heroverse | herald-cape-jacket | `botanical-silk-jacket-{1,2}.jpg` | ❌ pending shoot |
+| Itihaas | royal-procession-jacket | `kantha-chore-jacket-{1,2}.jpg` | ❌ pending shoot |
+| Itihaas | arch-jaal-kurta | `french-knot-turtleneck-{1,2}.jpg` | ❌ pending shoot |
+
+*(Effective pairs above were derived from `mock-products.json` on 2026-10-11;
+several SKUs cycle through more than two borrowed images. Verify against the
+JSON before relying on this snapshot.)*
+
+### Legacy atelier line (products.json — deprecated, non-serving)
+
+| Type | Slug / Name | Current Path | Status |
+|------|-------------|--------------|--------|
+| Hero | home-hero | `/images/campaigns/hero.jpg` | placeholder |
+| Category | outerwear / knitwear / tops / bottoms / accessories | `/images/categories/<slug>.jpg` | placeholder |
+| Product | botanical-silk-embroidered-jacket | `/images/products/botanical-silk-jacket-{1,2}.jpg` | placeholder |
+| Product | celestial-zardozi-wool-coat | `/images/products/celestial-zardozi-coat-{1,2}.jpg` | placeholder |
+| Product | kantha-quilted-chore-jacket | `/images/products/kantha-chore-jacket-{1,2}.jpg` | placeholder |
+| Product | flora-crewel-cashmere-cardigan | `/images/products/crewel-cashmere-cardigan-{1,2}.jpg` | placeholder |
+| Product | french-knot-merino-turtleneck | `/images/products/french-knot-turtleneck-{1,2}.jpg` | placeholder |
+| Product | atelier-monogram-poplin-shirt | `/images/products/monogram-poplin-shirt-{1,2}.jpg` | placeholder |
+| Product | vine-embroidered-heavyweight-tee | `/images/products/vine-heavyweight-tee-{1,2}.jpg` | placeholder |
+| Product | selvedge-sashiko-embroidered-denim | `/images/products/sashiko-selvedge-denim-{1,2}.jpg` | placeholder |
+| Product | pleated-silk-zari-wool-trousers | `/images/products/pleated-zari-trousers-{1,2}.jpg` | placeholder |
+| Product | heritage-flora-embroidered-silk-scarf | `/images/products/embroidered-silk-scarf-{1,2}.jpg` | placeholder |
+| Product | artisanal-needlework-canvas-tote | `/images/products/needlework-canvas-tote-{1,2}.jpg` | placeholder |
+| Product | nocturne-velvet-crewel-vest | `/images/products/nocturne-velvet-vest-{1,2}.jpg` | placeholder |
+| Editorial | atelier-craft | `/images/campaigns/atelier-craft.jpg` | placeholder |
+| Editorial | editorial-split | `/images/campaigns/editorial-split.jpg` | placeholder |
+| Lookbook | lookbook 01–03 | `/images/campaigns/lookbook-0{1,2,3}.jpg` | placeholder |
+
+> All storefront-referenced paths verified to exist on disk (2026-10-11 check:
+> 26 unique paths across `mock-products.json`, 0 missing).
+
+> **Cleanup candidates (do not delete without a grep):** unused oversized
+> `.png` twins in `public/images/products/` (~0.2–2.7MB each) and junk-named
+> files (`112.jpg`, `1322.jpg`, `14.jpg`, `2123.jpg`, `54254.jpg`,
+> `Cream-01/02.png`, `botanical1/2.jpg`). Grep `src/` and `docs/` for each
+> filename before removal.
 
 ---
 

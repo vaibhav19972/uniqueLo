@@ -12,7 +12,8 @@ Place these in `src/lib/data.ts`. They are the contract between the JSON dataset
 // src/lib/data.ts
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 
-export type Currency = 'USD';
+/** Storefront currency is INR; prices are held in paise (cents) for safe math. */
+export type Currency = 'INR';
 
 export interface ProductImage {
   /** Public URL relative to /public, e.g. "/images/products/cashmere-coat-1.jpg" */
@@ -47,6 +48,7 @@ export type EmbroideryTechnique =
   | 'kantha-quilt'
   | 'metallic-zari'
   | 'botanical-chain'
+  | 'sashiko-selvedge'
   | 'monogram-bespoke';
 
 export interface EmbroideryDetail {
@@ -60,15 +62,37 @@ export interface EmbroideryDetail {
 }
 
 export interface Product {
-  /** Stable URL slug, e.g. "botanical-silk-embroidered-jacket" */
+  /** Stable URL slug, e.g. "sakura-ronin-hoodie" */
   slug: string;
   name: string;
   /** Short tagline shown under name */
   subtitle: string;
+  /** Decorative transliteration shown beside the universe tag */
+  foreignTagline?: string;
   /** Long description for PDP */
   description: string;
   /** Category slug that matches categories.json */
   categorySlug: string;
+  /** Universe this product belongs to (exactly one). Extensible — new universes need no code changes. */
+  universeSlug?: string;
+  /** Free-vocabulary garment type facet (hoodie, tee, jacket, cap, tote, lowers…). */
+  garmentType?: string;
+  /** Gender facet. `unisex` appears under both Men and Women. */
+  gender?: 'men' | 'women' | 'unisex';
+  /** Motif lore link (motifs.json id). */
+  motifId?: string;
+  /** Style-vibe tokens (registry: vibes.json). Presentation hints, never merchandising. */
+  vibes?: string[];
+  /** Buyer-intent mood tags (1–3 per product, registry: moods.json). */
+  moods?: string[];
+  /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
+  isMock?: boolean;
+  /** True only for genuinely handcrafted pieces; gates the "Handcrafted" tag on cards + PDP. */
+  handcrafted?: boolean;
+  /** Mock-phase social proof. Replaced by real review aggregates at launch. */
+  rating?: number;
+  reviewCount?: number;
+  soldCount?: string;
   /** Tags for filtering / search */
   tags: string[];
   variants: ProductVariant[];
@@ -85,6 +109,12 @@ export interface Product {
   material?: string[];
   care?: string[];
   fit?: string;
+  /** Batch scarcity — rendered strictly only when both batchNumber and batchTotal are present. */
+  batchNumber?: number;
+  batchTotal?: number;
+  craftRegion?: string;
+  craftCluster?: string;
+  fabricGsm?: string;
 }
 
 export interface Category {
@@ -104,10 +134,16 @@ export type SortKey = 'newest' | 'price-asc' | 'price-desc';
 
 export interface FilterState {
   categorySlug: string | 'all';
+  universeSlug?: string | 'all';
+  gender?: 'men' | 'women' | 'unisex' | 'all';
+  garmentTypes?: string[];
+  vibe?: string | 'all';
+  mood?: string | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
   priceMax?: number;
+  searchQuery?: string;
   sort: SortKey;
 }
 
@@ -129,6 +165,17 @@ export interface CartItem {
 ---
 
 ## 2. Canonical Dataset
+
+**Source of truth: `src/data/mock-products.json` (14 render-mock SKUs as of 2026-10-11), plus the registries `universes.json`, `motifs.json`, `vibes.json`, `moods.json`.**
+
+> `src/data/products.json` (the original 13-product atelier line) is
+> **deprecated-retained**: kept on disk, no longer imported anywhere in `src/`.
+> Do not add products there — the storefront will never render them.
+> `supabase/seed.sql` still seeds that legacy 13-product line and predates the
+> universe schema; `data.ts` feature-detects pre-migration rows and serves the
+> bundled mock catalog instead (see docs/07 §3 "Migration debt"). Precedence:
+> **`mock-products.json` (runtime) → Supabase (once universe schema is
+> migrated) → `products.json`/`seed.sql` (legacy, non-serving)**.
 
 ### `src/data/categories.json`
 
@@ -186,94 +233,102 @@ export interface CartItem {
 }
 ```
 
-### `src/data/products.json`
+### `src/data/mock-products.json`
 
-Populate with **12–20 products minimum** so the grid feels real. Each product must have:
+The storefront catalog. As of 2026-10-11 it holds 14 render-mock products
+(`isMock: true`, built from the chatgpt-v2 universe renders) — 9 Animeverse,
+3 Heroverse, 2 Itihaas — each with:
 
-- 1 slug
-- 1 name + subtitle + description
-- 1 categorySlug matching `categories.json`
-- 2–4 tags
-- 2+ variants with at least one color and one size
-- 2+ images (first is default, second is hover)
-- `featured: true` on 4–6 products
+- 1 slug + name + subtitle + description
+- 1 categorySlug matching `categories.json`, 1 universeSlug matching `universes.json`
+- 1–3 mood tags + vibe tokens (registry-driven facets)
+- 1+ variants with at least one color and one size (73 variants total; most have
+  5–7, `samurai-cap` and `red-sun-tote` are single one-size variants)
+- 6 images each (mock SKUs currently reuse atelier/product imagery — see docs/06)
+- rating / reviewCount / soldCount mock social proof (`isMock` gates honesty rules)
 
-Example product entry:
+### Supporting registries
 
-```json
-{
-  "slug": "botanical-silk-embroidered-jacket",
-  "name": "Botanical Silk Embroidered Jacket",
-  "subtitle": "Hand-stitched flora on heavy washed organic cotton",
-  "description": "An unstructured atelier workwear jacket featuring hand-embroidered botanical floral vine motifs along the collar, lapel, and back yoke using pure mulberry silk floss.",
-  "categorySlug": "outerwear",
-  "tags": ["jacket", "embroidery", "hand-stitched", "silk", "outerwear"],
-  "variants": [
-    { "sku": "bse-ind-s", "color": "Indigo", "colorHex": "#1d2a44", "size": "S", "priceCents": 58000, "status": "in-stock" },
-    { "sku": "bse-ind-m", "color": "Indigo", "colorHex": "#1d2a44", "size": "M", "priceCents": 58000, "status": "in-stock" },
-    { "sku": "bse-ind-l", "color": "Indigo", "colorHex": "#1d2a44", "size": "L", "priceCents": 58000, "status": "low-stock", "quantity": 2 },
-    { "sku": "bse-ecr-s", "color": "Ecru", "colorHex": "#f4efe6", "size": "S", "priceCents": 58000, "status": "in-stock" },
-    { "sku": "bse-ecr-m", "color": "Ecru", "colorHex": "#f4efe6", "size": "M", "priceCents": 58000, "status": "in-stock" }
-  ],
-  "images": [
-    { "src": "/images/products/botanical-silk-jacket-1.jpg", "alt": "Botanical Silk Embroidered Jacket — front view", "color": "#1d2a44" },
-    { "src": "/images/products/botanical-silk-jacket-2.jpg", "alt": "Botanical Silk Embroidered Jacket — macro stitch detail", "color": "#1d2a44" }
-  ],
-  "featured": true,
-  "embroidery": {
-    "technique": "botanical-chain",
-    "techniqueLabel": "Hand-stitched Chain & Satin Needlework",
-    "artisanHours": 18,
-    "placement": ["Collar", "Back Yoke", "Left Cuff"],
-    "threadComposition": "100% Spun Mulberry Silk Floss",
-    "motifStory": "Inspired by 18th-century botanical illustrations of wild flora, hand-stitched by master artisans."
-  },
-  "customizable": true,
-  "material": ["100% GOTS Organic Cotton Canvas", "Silk Floss Thread"],
-  "care": ["Delicate dry clean only"],
-  "fit": "Boxy atelier fit, true to size"
-}
-```
+- `src/data/universes.json` — universe roster (slug, name, tagline, lore, landing copy, `theme_tokens`, order). Extensible: new universe = new JSON row + CSS block, no code changes.
+- `src/data/motifs.json` — motif lore per universe (`id`, `universe_slug`, `meaning`, `ip_cleared`). Products reference motifs by `motifId`; motifs must be IP-cleared before use.
+- `src/data/vibes.json` / `moods.json` — presentation-vibe and buyer-intent-mood registries driving the two home gateways and shop facets.
+
+### Deprecated: `src/data/products.json`
+
+The original 13-product / 45-variant atelier line. Retained for reference and
+for the eventual real-SKU relaunch; **not imported by any file in `src/`** —
+grep-verified. (`scripts/generate_assets.py` is a standalone PIL generator
+that reads neither catalog file.) Do not update or extend it — it is frozen.
 
 ---
 
 ## 3. Data-Access Layer (`src/lib/data.ts`)
 
-This is the **only file** allowed to read `products.json` and `categories.json`. It exposes typed helpers.
+This is the **only file** allowed to read `mock-products.json`, `categories.json`, and the registries. It exposes typed helpers (async since Phase 7; consumed via TanStack Query hooks in `src/hooks/useCatalog.ts`).
 
 ### Required Exports
 
 ```typescript
-// src/lib/data.ts
+// src/lib/data.ts — async since Phase 7 (Supabase queries when configured,
+// bundled JSON fallback otherwise; consumed via TanStack Query in useCatalog.ts)
 
 export { type Product, type ProductImage, type ProductVariant, type ProductStatus } from './types'; // if split
 
 /** All products */
-export function getProducts(): Product[];
+export async function getProducts(): Promise<Product[]>;
 
 /** All categories, ordered */
-export function getCategories(): Category[];
+export async function getCategories(): Promise<Category[]>;
 
 /** One category by slug */
-export function getCategory(slug: string): Category | undefined;
+export async function getCategory(slug: string): Promise<Category | undefined>;
 
 /** One product by slug */
-export function getProduct(slug: string): Product | undefined;
+export async function getProduct(slug: string): Promise<Product | undefined>;
 
 /** Products for a category, or all if 'all' */
-export function getProductsByCategory(categorySlug: string | 'all'): Product[];
+export async function getProductsByCategory(categorySlug: string | 'all'): Promise<Product[]>;
+
+/** All universes (extensible registry) */
+export async function getUniverses(): Promise<Universe[]>;
+
+/** One universe by slug */
+export async function getUniverse(slug: string): Promise<Universe | undefined>;
+
+/** Motif lore for a universe / single motif (plus sync lookup) */
+export async function getMotifsByUniverse(universeSlug: string): Promise<Motif[]>;
+export async function getMotif(id: string | undefined): Promise<Motif | undefined>;
+export function getMotifSync(id: string | undefined): Motif | undefined;
+
+/** Products for a universe, or all if 'all' */
+export async function getProductsByUniverse(universeSlug: string | 'all'): Promise<Product[]>;
+
+/** Gender match (`unisex` matches both Men and Women) + gender-filtered products */
+export function matchesGender(p: Product, gender: Gender | 'all'): boolean;
+export async function getProductsByGender(gender: Gender | 'all'): Promise<Product[]>;
+
+/** Count helper for gateway rails */
+export function countBy<T>(items: T[], key: (t: T) => string | undefined): Record<string, number>;
 
 /** Featured products for home page, sorted by order in JSON */
-export function getFeaturedProducts(limit?: number): Product[];
+export async function getFeaturedProducts(limit?: number): Promise<Product[]>;
 
 /** Unique colors across all products */
-export function getAllColors(): { name: string; hex: string }[];
+export async function getAllColors(): Promise<{ name: string; hex: string }[]>;
 
 /** Unique sizes across all products, sorted naturally */
-export function getAllSizes(): string[];
+export async function getAllSizes(): Promise<string[]>;
+
+/** Craft-technique taxonomy (labels for faceted filter) */
+export async function getAllTechniques(): Promise<{ technique: EmbroideryTechnique; label: string }[]>;
+export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]>;
+export async function getCraftTechnique(slug: string): Promise<CraftTechniqueInfo | undefined>;
 
 /** Maximum price among all variants */
-export function getMaxPriceCents(): number;
+export async function getMaxPriceCents(): Promise<number>;
+
+/** Image URL resolution (local assets + Supabase Storage) */
+export function resolveImageUrl(src: string): string;
 
 /** Filter + sort products. Reused by shop page. */
 export function filterProducts(
@@ -281,19 +336,25 @@ export function filterProducts(
   filters: FilterState
 ): Product[];
 
-/** Format cents to USD string, e.g. "$420.00" */
+/** Format paise to INR string, e.g. "₹420" (en-IN, no decimals) */
 export function formatPrice(cents: number): string;
 
-/** Pick the default variant for a product (first in-stock, else first) */
+/** Pick the default variant (first in-stock → low-stock → non-out-of-stock → first) */
 export function getDefaultVariant(product: Product): ProductVariant;
 
 /** Get available sizes for a given color */
 export function getSizesForColor(product: Product, color: string): ProductVariant[];
+
+/** Reviews + newsletter + orders (Supabase writes, local fallback) */
+export async function getReviews(productSlug: string): Promise<Review[]>;
+export async function submitReview(review: Omit<Review, 'id' | 'createdAt' | 'verified'>): Promise<boolean>;
+export async function subscribeNewsletter(email: string): Promise<{ success: boolean; message: string }>;
+export async function createOrder(input: CreateOrderInput): Promise<{ success: boolean; orderId?: string; message: string }>;
 ```
 
 ### Implementation Rules
 
-1. Import JSON via `import products from '../data/products.json'` with `resolveJsonModule`.
+1. Import JSON via `import products from '../data/mock-products.json'` with `resolveJsonModule` (async helpers since Phase 7; Supabase queries when configured, JSON fallback otherwise).
 2. Keep helpers pure (no side effects).
 3. Do not mutate the imported arrays; return new arrays/objects.
 4. Throw **only** on programmer errors (e.g., missing required slug). Return `undefined` for missing lookups.
@@ -306,11 +367,18 @@ export function getSizesForColor(product: Product, color: string): ProductVarian
 `filterProducts` must apply all active filters as an **AND** match:
 
 1. If `categorySlug !== 'all'`, include only matching `categorySlug`.
-2. If `colors` is non-empty, include products that have **at least one variant** whose color is in `colors`.
-3. If `sizes` is non-empty, include products that have **at least one variant** whose size is in `sizes`.
-4. If `priceMax` is set, include products with **at least one variant** whose `priceCents <= priceMax`.
-5. Sort by:
-   - `newest` → order in JSON (products.json is authored newest-first).
+2. If `universeSlug` is set and !== `'all'`, include only that universe.
+3. If `gender` is set and !== `'all'`, include via `matchesGender()` (`unisex` matches both Men and Women).
+4. If `garmentTypes` is non-empty, include products whose `garmentType` is listed.
+5. If `vibe` is set and !== `'all'`, include products whose `vibes[]` includes it.
+6. If `mood` is set and !== `'all'`, include products whose `moods[]` includes it.
+7. If `techniques` is non-empty, include products whose `embroidery.technique` is listed.
+8. If `colors` is non-empty, include products that have **at least one variant** whose color is in `colors`.
+9. If `sizes` is non-empty, include products that have **at least one variant** whose size is in `sizes`.
+10. If `priceMax` is set and > 0, include products with **at least one variant** whose `priceCents <= priceMax`.
+11. If `searchQuery` is non-blank, match (case-insensitive) against name, subtitle, description, tags, and `embroidery.techniqueLabel`.
+12. Sort by:
+   - `newest` → order in JSON (mock-products.json is authored newest-first).
    - `price-asc` → min variant price ascending.
    - `price-desc` → max variant price descending.
 
@@ -333,6 +401,7 @@ export interface CartLine {
   variant: ProductVariant;
   quantity: number;
   lineTotalCents: number;
+  customization?: CartCustomization;
 }
 ```
 
@@ -342,8 +411,9 @@ export interface CartLine {
 
 Before any build, verify:
 
-- [ ] Every `categorySlug` in `products.json` exists in `categories.json`.
-- [ ] Every product has at least 2 images.
+- [ ] Every `categorySlug` in `mock-products.json` exists in `categories.json`.
+- [ ] Every `universeSlug` in `mock-products.json` exists in `universes.json`; every `motifId` in `motifs.json` (and is `ip_cleared`).
+- [ ] Every product has at least 2 images (storefront SKUs carry 6 each).
 - [ ] Every product has at least 1 in-stock variant.
 - [ ] `colorHex` values are valid 3- or 6-digit hex strings.
 - [ ] `priceCents` is a positive integer.

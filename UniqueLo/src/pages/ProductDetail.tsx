@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
-import { useProduct, useProducts, useReviews } from '../hooks/useCatalog';
+import { useProduct, useProducts, useReviews, useUniverse } from '../hooks/useCatalog';
 import { useCartStore } from '../stores/cart';
 import { useCustomizerStore } from '../stores/customizer';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
-import { formatPrice, getDefaultVariant, type ProductVariant, submitReview } from '../lib/data';
+import { formatPrice, getDefaultVariant, getMotifSync, type ProductVariant, submitReview } from '../lib/data';
 import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
+import { CtaButton } from '../components/ui/Cta';
 
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -59,28 +60,56 @@ export const ProductDetail: React.FC = () => {
   const [pincodeEta, setPincodeEta] = useState<string | null>(null);
 
   const checkPincode = () => {
-    if (pincode.length === 6) {
-      const cityMap: Record<string, string> = {
-        '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
-        '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
-        '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
-        '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
-        '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
-        '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
-        '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
-      };
-      const prefix = pincode.substring(0, 2);
-      const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
-      setPincodeEta(`Serviceable: ${cityInfo} • Cash on Delivery / UPI Available`);
-    } else {
+    if (!/^\d{6}$/.test(pincode)) {
       setPincodeEta('Please enter a valid 6-digit Indian PIN code.');
+      return;
     }
+    const cityMap: Record<string, string> = {
+      '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
+      '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
+      '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
+      '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
+      '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
+      '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
+      '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
+    };
+    const prefix = pincode.substring(0, 2);
+    const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
+    setPincodeEta(
+      `Estimated serviceability: ${cityInfo}. COD / UPI availability is confirmed at checkout — this is an estimate, not a guarantee.`
+    );
   };
 
   const currentVariant = useMemo(() => {
     if (!product) return null;
     return selectedVariant || getDefaultVariant(product);
   }, [product, selectedVariant]);
+
+  const { data: universe } = useUniverse(product?.universeSlug);
+
+  const motif = product?.motifId ? getMotifSync(product.motifId) ?? null : null;
+
+  // Display rating prefers mock-phase product fields, falls back to review aggregate.
+  const productRating = product?.rating;
+  const productReviewCount = product?.reviewCount;
+  const displayRating = useMemo(() => {
+    if (productRating !== undefined) {
+      return { value: productRating, count: productReviewCount ?? (reviews?.length ?? 0) };
+    }
+    if (reviews && reviews.length > 0) {
+      return {
+        value: reviews.reduce((a, r) => a + r.rating, 0) / reviews.length,
+        count: reviews.length,
+      };
+    }
+    return null;
+  }, [productRating, productReviewCount, reviews]);
+
+  const discountPct = useMemo(() => {
+    const compare = currentVariant?.compareAtPriceCents;
+    if (!currentVariant || !compare || compare <= currentVariant.priceCents) return 0;
+    return Math.round((1 - currentVariant.priceCents / compare) * 100);
+  }, [currentVariant]);
 
   const relatedProducts = useMemo(() => {
     if (!product || !allProducts) return [];
@@ -123,10 +152,20 @@ export const ProductDetail: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    addItem(product.slug, currentVariant.sku, quantity);
+    if (currentVariant.status === 'out-of-stock') {
+      showToast({
+        title: 'Sold out in this size',
+        description: 'Please choose another size or join the dispatch for restock.',
+        type: 'info',
+      });
+      return;
+    }
+    const max = currentVariant.quantity ?? 99;
+    const safeQty = Math.min(Math.max(1, quantity), max);
+    addItem(product.slug, currentVariant.sku, safeQty, undefined, max);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${quantity}× ${product.name} (${currentVariant.color} / ${currentVariant.size})`,
+      description: `${safeQty}× ${product.name} (${currentVariant.color} / ${currentVariant.size})`,
       type: 'success',
     });
   };
@@ -169,16 +208,63 @@ export const ProductDetail: React.FC = () => {
   const activeImage = product.images[selectedImageIndex] || product.images[0];
   const isWish = isWishlisted(product.slug);
 
+  const toAbsoluteUrl = (src: string): string => {
+    if (/^https?:\/\//.test(src)) return src;
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return new URL(src, window.location.origin).toString();
+    }
+    return src;
+  };
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.images.map((i) => toAbsoluteUrl(i.src)),
+    brand: { '@type': 'Brand', name: 'UniqueLo' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: (currentVariant.priceCents / 100).toFixed(0),
+      availability:
+        currentVariant.status === 'out-of-stock'
+          ? 'https://schema.org/OutOfStock'
+          : 'https://schema.org/InStock',
+    },
+    ...(reviews && reviews.length > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1),
+            reviewCount: reviews.length,
+          },
+          review: reviews.slice(0, 5).map((r) => ({
+            '@type': 'Review',
+            author: { '@type': 'Person', name: r.author },
+            reviewRating: { '@type': 'Rating', ratingValue: r.rating },
+            name: r.title,
+            reviewBody: r.comment,
+          })),
+        }
+      : {}),
+  };
+
   return (
     <div className="bg-cream min-h-screen">
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       {/* Breadcrumb Bar */}
       <div className="border-b border-stone/50 bg-paper py-3">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex items-center text-xs tracking-wider uppercase font-sans text-ink-muted">
-          <Link to="/" className="hover:text-ink transition-colors">Atelier</Link>
+          <Link to="/" className="hover:text-ink transition-colors">Home</Link>
           <span className="mx-2 text-stone">/</span>
-          <Link to="/shop" className="hover:text-ink transition-colors">Collections</Link>
-          <span className="mx-2 text-stone">/</span>
-          <span className="text-accent font-medium">{product.categorySlug}</span>
+          {universe ? (
+            <>
+              <Link to={`/universes/${universe.slug}`} className="hover:text-ink transition-colors">{universe.name}</Link>
+              <span className="mx-2 text-stone">/</span>
+            </>
+          ) : null}
+          <span className="text-accent font-medium capitalize">{product.garmentType ? `${product.garmentType}s` : product.categorySlug}</span>
           <span className="mx-2 text-stone">/</span>
           <span className="text-ink truncate max-w-[200px]">{product.name}</span>
         </div>
@@ -196,10 +282,12 @@ export const ProductDetail: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all ${
+                  aria-label={`View image ${idx + 1} of ${product.images.length}`}
+                  aria-pressed={selectedImageIndex === idx}
+                  className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all min-h-[44px] ${
                     selectedImageIndex === idx
-                      ? 'border-accent ring-2 ring-accent/40 shadow-sm'
-                      : 'border-stone opacity-70 hover:opacity-100'
+                      ? 'border-gold ring-2 ring-gold/30 shadow-sm'
+                      : 'border-transparent opacity-70 hover:opacity-100'
                   }`}
                 >
                   <img
@@ -254,7 +342,7 @@ export const ProductDetail: React.FC = () => {
                     }}
                   >
                     <div className="absolute top-4 left-4 bg-ink/90 text-cream px-3 py-1 text-[10px] tracking-widest uppercase font-sans backdrop-blur-md border border-stone/30">
-                      ✦ 3x Macro Thread Inspection
+                      3x Macro Thread Inspection
                     </div>
                   </div>
                 )}
@@ -271,17 +359,19 @@ export const ProductDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Artisan Hours Pill */}
+              {/* Embroidery Hours Pill (+ Handcrafted badge only when flagged) */}
               {product.embroidery?.artisanHours && (
                 <div className="mt-4 p-3 bg-paper border border-stone flex items-center justify-between text-xs text-ink-muted">
                   <div className="flex items-center gap-2">
-                    <span className="text-accent text-sm">✦</span>
+                    <svg className="w-4 h-4 shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
+                    </svg>
                     <span className="font-serif text-ink text-sm">
-                      {product.embroidery.artisanHours} Hours of Continuous Hand Needlework
+                      {product.embroidery.artisanHours} hours of embroidery threadwork
                     </span>
                   </div>
-                  <span className="text-[10px] uppercase tracking-widest text-ink font-medium">
-                    Atelier Certified
+                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold-deep' : 'text-ink'}`}>
+                    {product.handcrafted ? 'Handcrafted piece' : 'Atelier finish'}
                   </span>
                 </div>
               )}
@@ -291,79 +381,139 @@ export const ProductDetail: React.FC = () => {
           {/* RIGHT: Product Buy Box & Tailoring Specs */}
           <div ref={buyBoxRef} className="lg:col-span-5 flex flex-col justify-between">
             <div>
+              {/* Universe tag + transliteration + Bestseller (render 09) */}
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2 text-xs">
+                  {universe && (
+                    <Link
+                      to={`/universes/${universe.slug}`}
+                      className="inline-flex items-center gap-1.5 bg-gold-deep/10 text-gold-deep font-sans tracking-[0.18em] uppercase px-2.5 py-1"
+                    >
+                      <span aria-hidden="true">◉</span> {universe.name}
+                    </Link>
+                  )}
+                  {product.foreignTagline && (
+                    <span className="text-ink-muted font-serif" lang="ja">
+                      {product.foreignTagline}
+                    </span>
+                  )}
+                </div>
+                {product.featured && (
+                  <span className="text-xs text-ink font-medium inline-flex items-center gap-1">
+                    Bestseller <span aria-hidden="true" className="text-gold-deep">🔥</span>
+                  </span>
+                )}
+              </div>
+
               {/* Category, Craft Region & Batch Scarcity Marker */}
               <div className="flex flex-col gap-1.5 mb-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
-                    {product.craftRegion || 'Made in India'} // {product.categorySlug}
+                    {product.craftRegion || 'Made in India'} // {product.garmentType ?? product.categorySlug}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-ink">
-                    <span className="text-accent">★★★★★</span>
-                    <span className="font-medium">4.9</span>
-                    <span className="text-ink-muted text-[11px]">({reviews?.length || 24} collector reviews)</span>
+                    {displayRating ? (
+                      <>
+                        <span className="text-gold-deep" aria-hidden="true">
+                          {'★'.repeat(Math.round(displayRating.value))}
+                        </span>
+                        <span className="font-medium">{displayRating.value.toFixed(1)}</span>
+                        <span className="text-ink-muted text-[11px]">({displayRating.count} reviews)</span>
+                        {product.soldCount && (
+                          <span className="text-ink-muted text-[11px]">| {product.soldCount} sold</span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-ink-muted text-[11px]">New atelier edition — be the first to review</span>
+                    )}
                   </div>
                 </div>
 
                 {/* Quiet Batch Scarcity Marker */}
                 <div className="inline-flex items-center gap-2 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
-                  <span className="text-ink font-medium">
-                    Edition {product.batchNumber || 12} of {product.batchTotal || 50}
-                  </span>
-                  <span>•</span>
-                  <span>{product.craftCluster || 'Atelier Guild'}</span>
+                  {product.batchNumber != null && product.batchTotal != null && (
+                    <span className="text-ink font-medium">
+                      Edition {product.batchNumber} of {product.batchTotal}
+                    </span>
+                  )}
+                  {product.batchNumber != null && product.craftCluster && <span>•</span>}
+                  {product.craftCluster && <span>{product.craftCluster}</span>}
                 </div>
               </div>
 
               {/* Title & Subtitle */}
-              <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal leading-tight tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-5xl text-ink font-normal leading-[1.05] tracking-tight">
                 {product.name}
               </h1>
-              <p className="text-xs sm:text-sm text-ink-muted mt-2 font-light leading-relaxed">
+              <p className="font-serif italic text-lg text-ink-muted mt-2 leading-relaxed">
                 {product.subtitle}
               </p>
 
-              {/* Price & Shipping */}
+              {/* Price: serif + compare-at + computed %OFF (render 09) */}
               <div className="mt-5 pb-5 border-b border-stone/50">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-sans text-2xl sm:text-3xl font-medium text-ink">
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="font-serif text-3xl sm:text-4xl text-ink">
                     {formatPrice(currentVariant.priceCents)}
                   </span>
-                  <span className="text-xs text-accent font-medium tracking-wide">
-                    Complimentary Express Shipping
-                  </span>
+                  {currentVariant.compareAtPriceCents &&
+                    currentVariant.compareAtPriceCents > currentVariant.priceCents && (
+                      <>
+                        <span className="text-base text-ink-muted line-through">
+                          {formatPrice(currentVariant.compareAtPriceCents)}
+                        </span>
+                        <span className="text-[11px] font-sans bg-gold-deep/10 text-gold-deep px-2 py-0.5">
+                          {discountPct}% OFF
+                        </span>
+                      </>
+                    )}
                 </div>
                 <p className="text-[11px] text-ink-muted mt-1 font-light">
                   Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
+                </p>
+                {/* EMI line (render 09) — figure computed from variant price; the
+                    render's "with simpl" brand claim deferred: no EPI integration
+                    exists yet, so it stays a neutral promise (logged deviation) */}
+                <p className="font-serif text-xs text-ink-muted mt-1.5">
+                  or {formatPrice(Math.round(currentVariant.priceCents / 6)).replace('-', '')}/month for 6 months ·
+                  EMI options confirmed at checkout
                 </p>
               </div>
 
               {/* Non-Accordion Initial Garment Specifications (Mobile-Optimized) */}
               <div className="my-5 p-4 bg-paper border border-stone/70">
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
-                    <span className="text-ink font-medium">{product.fabricGsm || '280 GSM Organic Cotton'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Hand Needlework</span>
-                    <span className="text-ink font-medium">{product.embroidery?.artisanHours || 14} Hours by Guild</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
-                    <span className="text-ink font-medium">{product.embroidery?.techniqueLabel || 'Regional Needlecraft'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
-                    <span className="text-ink font-medium">{product.fit || 'Atelier Relaxed Fit'}</span>
-                  </div>
+                  {product.fabricGsm && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
+                      <span className="text-ink font-medium">{product.fabricGsm}</span>
+                    </div>
+                  )}
+                  {product.embroidery?.artisanHours != null && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Embroidery Time</span>
+                      <span className="text-ink font-medium">{product.embroidery.artisanHours} hours of threadwork</span>
+                    </div>
+                  )}
+                  {product.embroidery?.techniqueLabel && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
+                      <span className="text-ink font-medium">{product.embroidery.techniqueLabel}</span>
+                    </div>
+                  )}
+                  {product.fit && (
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
+                      <span className="text-ink font-medium">{product.fit}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Variant Picker: Colors */}
+              {/* Variant Picker: Colors (dots, render 09) */}
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-sans tracking-widest uppercase text-ink font-medium">
-                    Textile Colorway: <span className="text-ink-muted font-normal">{currentVariant.color}</span>
+                    Color: <span className="text-ink-muted font-normal">{currentVariant.color}</span>
                   </span>
                 </div>
                 <div className="flex gap-3">
@@ -374,15 +524,17 @@ export const ProductDetail: React.FC = () => {
                       <button
                         key={color}
                         onClick={() => variantForColor && setSelectedVariant(variantForColor)}
-                        className={`group relative flex items-center gap-2 p-1 border transition-all ${
-                          isSelected ? 'border-ink bg-paper shadow-sm' : 'border-stone hover:border-ink/50'
+                        title={color}
+                        aria-label={`Choose color ${color}`}
+                        aria-pressed={isSelected}
+                        className={`w-11 h-11 rounded-full border-2 transition-all flex items-center justify-center ${
+                          isSelected ? 'border-gold ring-2 ring-gold/30' : 'border-stone hover:border-ink/50'
                         }`}
                       >
                         <span
-                          className="w-6 h-6 rounded-full border border-stone/50 shadow-inner"
+                          className="w-7 h-7 rounded-full border border-ink/10"
                           style={{ backgroundColor: variantForColor?.colorHex }}
                         />
-                        <span className="text-xs text-ink pr-2 font-light">{color}</span>
                       </button>
                     );
                   })}
@@ -407,6 +559,7 @@ export const ProductDetail: React.FC = () => {
                     .filter((v) => v.color === currentVariant.color)
                     .map((v) => {
                       const isSelected = currentVariant.sku === v.sku;
+                      const isOut = v.status === 'out-of-stock';
                       const sizeLabel =
                         v.size === 'S' ? '38 (S)' :
                         v.size === 'M' ? '40 (M)' :
@@ -415,14 +568,20 @@ export const ProductDetail: React.FC = () => {
                       return (
                         <button
                           key={v.sku}
-                          onClick={() => setSelectedVariant(v)}
-                          className={`min-w-[64px] h-10 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
-                            isSelected
-                              ? 'bg-ink text-cream border-ink font-medium shadow-sm'
-                              : 'bg-paper text-ink border-stone hover:border-ink/60'
+                          onClick={() => !isOut && setSelectedVariant(v)}
+                          disabled={isOut}
+                          aria-label={`Size ${sizeLabel}${isOut ? ' — sold out' : ''}`}
+                          aria-pressed={isSelected}
+                          className={`min-w-[64px] min-h-[44px] h-11 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
+                            isOut
+                              ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
+                              : isSelected
+                                ? 'border-gold bg-gold/10 text-ink font-medium shadow-sm'
+                                : 'bg-paper text-ink border-stone hover:border-ink/60'
                           }`}
                         >
                           <span>{sizeLabel}</span>
+                          {isOut && <span className="text-[9px] no-underline">Sold out</span>}
                         </button>
                       );
                     })}
@@ -443,7 +602,8 @@ export const ProductDetail: React.FC = () => {
                 <div className="flex items-center border border-stone bg-paper">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
+                    aria-label="Decrease quantity"
+                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
                   >
                     –
                   </button>
@@ -451,27 +611,24 @@ export const ProductDetail: React.FC = () => {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
+                    onClick={() => setQuantity((q) => Math.min(currentVariant.quantity ?? 99, q + 1))}
+                    aria-label="Increase quantity"
+                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
                   >
                     +
                   </button>
                 </div>
 
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="flex-1 text-xs tracking-widest font-medium uppercase h-12"
-                  onClick={handleAddToCart}
-                >
-                  Add to Atelier Bag
-                </Button>
+                <CtaButton className="flex-1" onClick={handleAddToCart}>
+                  Add to Bag <span aria-hidden="true">→</span>
+                </CtaButton>
 
                 {/* Wishlist Button */}
                 <button
                   onClick={handleWishlistToggle}
-                  aria-label="Save to Wishlist"
-                  className={`w-12 h-12 border flex items-center justify-center transition-colors ${
+                  aria-label={isWish ? 'Remove from wishlist' : 'Save to wishlist'}
+                  aria-pressed={isWish}
+                  className={`min-w-[44px] min-h-[44px] w-12 h-12 border flex items-center justify-center transition-colors ${
                     isWish
                       ? 'border-accent bg-accent/10 text-accent'
                       : 'border-stone bg-paper text-ink-muted hover:text-ink hover:border-ink'
@@ -481,6 +638,28 @@ export const ProductDetail: React.FC = () => {
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </button>
+              </div>
+
+              {/* Trust row (render 09) — line-icon SVGs, no emoji */}
+              <div className="mt-4 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                  Free shipping on orders above ₹29,050
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7H4v13h16V7zM4 7l2-3h12l2 3M9 11h6" />
+                  </svg>
+                  14-day home inspection
+                </span>
+                <span className="hidden sm:flex items-center gap-1.5">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
+                  </svg>
+                  Secure payments · UPI, Cards, COD
+                </span>
               </div>
 
               {/* India Pincode Delivery ETA & Trust Block (Task S1.9) */}
@@ -530,7 +709,7 @@ export const ProductDetail: React.FC = () => {
                         ✦ Bespoke Studio Available
                       </span>
                       <p className="text-xs text-ink font-serif mt-0.5">
-                        Personalize with hand-embroidered monogram or botanical motif
+                        Personalize with embroidered monogram or botanical motif
                       </p>
                     </div>
                     <Button
@@ -554,9 +733,10 @@ export const ProductDetail: React.FC = () => {
                 <div>
                   <button
                     onClick={() => setActiveAccordion(activeAccordion === 'technique' ? null : 'technique')}
-                    className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                    aria-expanded={activeAccordion === 'technique'}
+                    className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                   >
-                    <span>Artisanal Needlecraft & Technique</span>
+                    <span>Needlecraft & Technique</span>
                     <span className="text-sm">{activeAccordion === 'technique' ? '–' : '+'}</span>
                   </button>
                   {activeAccordion === 'technique' && (
@@ -588,7 +768,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'materials' ? null : 'materials')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'materials'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Textile Composition & Provenance</span>
                   <span className="text-sm">{activeAccordion === 'materials' ? '–' : '+'}</span>
@@ -611,7 +792,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'fit' ? null : 'fit')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'fit'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Fit & Tailoring Dimensions</span>
                   <span className="text-sm">{activeAccordion === 'fit' ? '–' : '+'}</span>
@@ -628,7 +810,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'care' ? null : 'care')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'care'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Heirloom Care & Storage</span>
                   <span className="text-sm">{activeAccordion === 'care' ? '–' : '+'}</span>
@@ -646,7 +829,8 @@ export const ProductDetail: React.FC = () => {
               <div>
                 <button
                   onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? null : 'delivery')}
-                  className="w-full py-4 flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  aria-expanded={activeAccordion === 'delivery'}
+                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
                 >
                   <span>Atelier Dispatch & In-Home Guarantee</span>
                   <span className="text-sm">{activeAccordion === 'delivery' ? '–' : '+'}</span>
@@ -663,22 +847,115 @@ export const ProductDetail: React.FC = () => {
           </div>
         </div>
 
+        {/* DETAIL STRIP: captioned macro / fabric / placement / fit (render 09) */}
+        <section aria-label="Product details close-up" className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { img: product.images[3], title: 'Embroidered details', detail: product.embroidery ? `Over ${product.embroidery.artisanHours ?? '—'} hours of threadwork.` : 'Finished in the atelier.', badge: product.handcrafted ? 'Handcrafted' : undefined },
+            { img: product.images[2], title: 'Premium fabric', detail: product.fabricGsm ? `${product.fabricGsm} · ${product.material?.[0] ?? 'natural textile'}.` : 'Natural textile.', badge: undefined },
+            { img: product.images[4] ?? product.images[1], title: 'Motif placement', detail: product.embroidery ? product.embroidery.placement.join(', ') || 'All-over artwork.' : 'Full artwork view.', badge: undefined },
+            { img: product.images[5] ?? product.images[0], title: 'Scale & fit', detail: product.fit ? `${product.fit}. Comfort meets statement.` : 'Comfort meets statement.', badge: undefined },
+          ].map((d, i) => (
+            <figure key={i} className="bg-paper border border-stone/60 overflow-hidden">
+              <div className="aspect-square overflow-hidden bg-stone/20">
+                {d.img && (
+                  <img src={d.img.src} alt={d.img.alt} loading="lazy" className="w-full h-full object-cover" />
+                )}
+              </div>
+              <figcaption className="p-3">
+                <p className="font-serif text-[15px] text-ink flex items-center gap-2 flex-wrap">
+                  {d.title}
+                  {d.badge && (
+                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold-deep border border-gold-deep/50 rounded-full px-2 py-0.5">
+                      {d.badge}
+                    </span>
+                  )}
+                </p>
+                <p className="text-[11px] text-ink-muted mt-0.5">{d.detail}</p>
+              </figcaption>
+            </figure>
+          ))}
+        </section>
+
+        {/* MOTIF STORY BAND (render 09) */}
+        {(motif || product.embroidery?.motifStory) && (
+          <section aria-label="The story behind this motif" className="mt-14 bg-paper border border-stone/60 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+            <div>
+              <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold-deep">
+                {universe?.name ?? 'UniqueLo'} lore
+              </p>
+              <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 tracking-tight">
+                The Story Behind {motif?.name ?? product.name}
+              </h2>
+              <p className="text-sm text-ink-muted mt-4 font-light leading-relaxed">
+                {motif?.meaning ?? product.embroidery?.motifStory}
+              </p>
+              {product.embroidery?.motifStory && motif?.meaning && (
+                <p className="text-sm text-ink-muted mt-3 font-light leading-relaxed">
+                  {product.embroidery.motifStory}
+                </p>
+              )}
+              {universe && (
+                <Link
+                  to={`/universes/${universe.slug}`}
+                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-ink/30 hover:border-ink transition-colors min-h-[48px]"
+                >
+                  Explore {universe.name} <span aria-hidden="true">→</span>
+                </Link>
+              )}
+            </div>
+            <div className="aspect-[16/10] overflow-hidden bg-stone/20">
+              {product.images[3] && (
+                <img
+                  src={product.images[3].src}
+                  alt={product.images[3].alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* COMMUNITY STRIP (render 09) */}
+        <section aria-label="Worn by the community" className="mt-14">
+          <h2 className="font-serif text-3xl sm:text-4xl text-ink tracking-tight">Real People. Real Fits.</h2>
+          <p className="text-sm text-ink-muted mt-2 font-light">Worn across cities, campuses and conventions.</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+            {[product.images[1], product.images[4], product.images[5], product.images[0]]
+              .filter(Boolean)
+              .map((img, i) => (
+                <div key={i} className="aspect-[3/4] overflow-hidden bg-stone/20 border border-stone/60">
+                  <img src={img!.src} alt={img!.alt} loading="lazy" className="w-full h-full object-cover" />
+                </div>
+              ))}
+          </div>
+          <p className="text-xs text-ink-muted mt-3">Community fits — share yours with #UniqueLo.</p>
+        </section>
+
         {/* CUSTOMER REVIEWS & CONNOISSEUR TESTIMONIALS */}
         <section className="mt-20 pt-16 border-t border-stone/60">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-stone/40">
             <div>
-              <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                Client Testimonials
+              <span className="text-[10px] font-sans tracking-[0.25em] text-gold-deep uppercase font-medium">
+                Worn & reviewed
               </span>
-              <h2 className="font-serif text-3xl text-ink mt-1">
-                Connoisseur Reviews
+              <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-1 tracking-tight">
+                Customer Reviews
               </h2>
+              {displayRating && (
+                <p className="text-sm text-ink-muted mt-2">
+                  <span className="text-gold-deep" aria-hidden="true">
+                    {'★'.repeat(Math.round(displayRating.value))}
+                  </span>{' '}
+                  {displayRating.value.toFixed(1)} out of 5 · Based on {displayRating.count} reviews
+                </p>
+              )}
             </div>
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="mt-4 sm:mt-0 px-4 py-2 bg-ink text-cream text-xs uppercase tracking-widest font-sans hover:bg-accent transition-colors"
+              className="mt-4 sm:mt-0 px-5 py-2.5 bg-transparent text-ink border border-ink/30 text-xs uppercase tracking-widest font-sans hover:border-ink transition-colors min-h-[44px]"
             >
-              Write Atelier Review ✦
+              Write a review
             </button>
           </div>
 
@@ -872,7 +1149,10 @@ export const ProductDetail: React.FC = () => {
                   {product.name}
                 </span>
                 <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
-                  Edition {product.batchNumber || 12}/{product.batchTotal || 50} • {currentVariant.color} / {currentVariant.size}
+                  {product.batchNumber != null && product.batchTotal != null
+                    ? `Edition ${product.batchNumber}/${product.batchTotal} • `
+                    : ''}
+                  {currentVariant.color} / {currentVariant.size}
                 </span>
               </div>
             </div>

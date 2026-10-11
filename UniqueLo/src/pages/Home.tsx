@@ -1,19 +1,26 @@
 import React from 'react';
-import { Hero } from '../components/home/Hero';
-import { CategoryStrip } from '../components/home/CategoryStrip';
-import { FeaturedProducts } from '../components/home/FeaturedProducts';
-import { EditorialSplit } from '../components/home/EditorialSplit';
-import { Lookbook } from '../components/home/Lookbook';
+import { UniverseHero } from '../components/home/UniverseHero';
+import { TrustStrip } from '../components/home/TrustStrip';
+import { VibeGateway } from '../components/home/VibeGateway';
+import { MoodGateway } from '../components/home/MoodGateway';
+import { UniversePortals } from '../components/home/UniversePortals';
+import { CraftStory } from '../components/home/CraftStory';
+import { Bestsellers } from '../components/home/Bestsellers';
+import { UGCWall } from '../components/home/UGCWall';
 import { Newsletter } from '../components/home/Newsletter';
 
 export const Home: React.FC = () => {
   return (
     <div className="w-full">
-      <Hero />
-      <CategoryStrip />
-      <FeaturedProducts />
-      <EditorialSplit />
-      <Lookbook />
+      {/* Render targets 01–07 (new universe system) */}
+      <UniverseHero />
+      <TrustStrip />
+      <VibeGateway />
+      <MoodGateway />
+      <UniversePortals />
+      <CraftStory />
+      <Bestsellers />
+      <UGCWall />
       <Newsletter />
     </div>
   );

@@ -1,12 +1,25 @@
+/* oxlint-disable react/only-export-components */
+import React, { Suspense, lazy } from 'react';
 import { type RouteObject } from 'react-router';
 import { App } from './App';
 import { Home } from '../pages/Home';
-import { Shop } from '../pages/Shop';
-import { ProductDetail } from '../pages/ProductDetail';
-import { Atelier } from '../pages/Atelier';
-import { AtelierTechnique } from '../pages/AtelierTechnique';
-import { Admin } from '../pages/Admin';
 import { NotFound } from '../pages/NotFound';
+
+const Shop = lazy(() => import('../pages/Shop').then((m) => ({ default: m.Shop })));
+const Universe = lazy(() => import('../pages/Universe').then((m) => ({ default: m.Universe })));
+const GenderPage = lazy(() => import('../pages/Gender').then((m) => ({ default: m.GenderPage })));
+const ProductDetail = lazy(() => import('../pages/ProductDetail').then((m) => ({ default: m.ProductDetail })));
+const Atelier = lazy(() => import('../pages/Atelier').then((m) => ({ default: m.Atelier })));
+const AtelierTechnique = lazy(() => import('../pages/AtelierTechnique').then((m) => ({ default: m.AtelierTechnique })));
+const Admin = lazy(() => import('../pages/Admin').then((m) => ({ default: m.Admin })));
+
+const PageFallback: React.FC = () => (
+  <div className="min-h-[50vh] flex items-center justify-center bg-cream">
+    <p className="font-serif text-xl text-ink animate-pulse">Unfolding Atelier Piece...</p>
+  </div>
+);
+
+const withSuspense = (el: React.ReactNode) => <Suspense fallback={<PageFallback />}>{el}</Suspense>;
 
 export const routes: RouteObject[] = [
   {
@@ -19,23 +32,35 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'shop',
-        element: <Shop />,
+        element: withSuspense(<Shop />),
+      },
+      {
+        path: 'universes/:universeSlug',
+        element: withSuspense(<Universe />),
+      },
+      {
+        path: 'men',
+        element: withSuspense(<GenderPage />),
+      },
+      {
+        path: 'women',
+        element: withSuspense(<GenderPage />),
       },
       {
         path: 'product/:slug',
-        element: <ProductDetail />,
+        element: withSuspense(<ProductDetail />),
       },
       {
         path: 'atelier',
-        element: <Atelier />,
+        element: withSuspense(<Atelier />),
       },
       {
         path: 'atelier/:techniqueSlug',
-        element: <AtelierTechnique />,
+        element: withSuspense(<AtelierTechnique />),
       },
       {
         path: 'admin',
-        element: <Admin />,
+        element: withSuspense(<Admin />),
       },
       {
         path: '*',

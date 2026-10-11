@@ -1,9 +1,97 @@
-import rawProducts from '../data/products.json';
 import rawCategories from '../data/categories.json';
+import rawMockProducts from '../data/mock-products.json';
+import rawUniverses from '../data/universes.json';
+import rawMotifs from '../data/motifs.json';
+import rawVibes from '../data/vibes.json';
+import rawMoods from '../data/moods.json';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
-export type Currency = 'USD';
+export type Currency = 'INR';
+
+/** Gender taxonomy: `unisex` matches BOTH Men and Women surfaces. */
+export type Gender = 'men' | 'women' | 'unisex';
+
+/**
+ * Vibe = presentation-only token modifier (how loud a surface renders).
+ * Registry: src/data/vibes.json — one JSON row + one [data-vibe] CSS block
+ * per vibe; components never hardcode the list.
+ */
+export type Vibe = 'aesthetic' | 'clean' | 'minimal' | 'expressive' | 'noir' | 'pearl' | 'gilded';
+
+/**
+ * Mood = buyer-intent shopping family (why the customer is here).
+ * Registry: src/data/moods.json. Products carry 1–3 mood tags; moods are
+ * merchandising facets, never render modifiers.
+ */
+export type MoodSlug = 'everyday' | 'statement' | 'heritage' | 'festive-gifting' | 'comfort' | 'collector';
+
+export interface VibeInfo {
+  slug: Vibe;
+  title: string;
+  tagline: string;
+  /** Featured vibes render as homepage gateway cards; the rest sit behind "More". */
+  featured: boolean;
+  order: number;
+}
+
+export interface MoodInfo {
+  slug: MoodSlug;
+  title: string;
+  tagline: string;
+  featured: boolean;
+  order: number;
+}
+
+export interface UniverseThemeTokens {
+  bg: string;
+  surface: string;
+  ink: string;
+  accent: string;
+  accent2: string;
+  product_zone: string;
+  divider: string;
+  card_frame: string;
+  texture_opacity: number;
+  display_font: string;
+}
+
+export interface Universe {
+  slug: string;
+  name: string;
+  tagline: string;
+  lore: string;
+  /** Display color for the portal-card title (chatgpt-v2 render 3). */
+  portal_title_color?: string;
+  /** Landing-page copy accents (chatgpt-v2 renders 8.1–8.3). */
+  lore_heading?: string;
+  hero_headline?: string;
+  hero_headline_accent?: string;
+  /** Explicit two-tone colors (8.2 gold accent / 8.3 brown lead). */
+  hero_lead_color?: string;
+  hero_accent_color?: string;
+  hero_headline_case?: 'caps' | 'sentence';
+  hero_kicker?: string;
+  hero_ornament?: 'lotus' | 'compass';
+  hero_note?: string;
+  hero_vertical_text?: string;
+  hero_image?: string;
+  emblem_src?: string;
+  drop_cadence?: string;
+  is_active: boolean;
+  order: number;
+  theme_tokens: UniverseThemeTokens;
+}
+
+export interface Motif {
+  id: string;
+  universe_slug: string;
+  name: string;
+  meaning: string;
+  symbol_notes?: string;
+  /** Motifs must be IP-cleared before any product references them. */
+  ip_cleared: boolean;
+}
 
 export interface ProductImage {
   src: string;
@@ -30,6 +118,7 @@ export type EmbroideryTechnique =
   | 'kantha-quilt'
   | 'metallic-zari'
   | 'botanical-chain'
+  | 'sashiko-selvedge'
   | 'monogram-bespoke';
 
 export interface EmbroideryDetail {
@@ -47,7 +136,39 @@ export interface Product {
   name: string;
   subtitle: string;
   description: string;
+  /** Decorative transliteration shown beside the universe tag (e.g. product-name script). */
+  foreignTagline?: string;
   categorySlug: string;
+  /** Universe this product belongs to (exactly one). Extensible — new universes need no code changes. */
+  universeSlug?: string;
+  /** Free-vocabulary garment type facet (hoodie, tee, jacket, cap, tote, lowers…). */
+  garmentType?: string;
+  /** Gender facet. `unisex` appears under both Men and Women. */
+  gender?: Gender;
+  /** Motif lore link (motifs.json id). */
+  motifId?: string;
+  /**
+   * Discovery hint for the "Explore by Mood" gateway (counts + entry filtering).
+   * Rendering stays token-driven; this only powers merchandising surfaces.
+   */
+  vibes?: Vibe[];
+  /**
+   * Buyer-intent mood tags (1–3 per product, from src/data/moods.json).
+   * Powers the "Explore by Mood" gateway + mood facet — never rendering.
+   */
+  moods?: MoodSlug[];
+  /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
+  isMock?: boolean;
+  /**
+   * True only for pieces that are genuinely handcrafted. Generic embroidery
+   * copy must never claim handcraft — this flag gates the per-product
+   * "Handcrafted" tag on cards + PDP.
+   */
+  handcrafted?: boolean;
+  /** Mock-phase social proof. Replaced by real review aggregates at launch. */
+  rating?: number;
+  reviewCount?: number;
+  soldCount?: string;
   tags: string[];
   variants: ProductVariant[];
   images: ProductImage[];
@@ -78,6 +199,11 @@ export type SortKey = 'newest' | 'price-asc' | 'price-desc';
 
 export interface FilterState {
   categorySlug: string | 'all';
+  universeSlug?: string | 'all';
+  gender?: Gender | 'all';
+  garmentTypes?: string[];
+  vibe?: Vibe | 'all';
+  mood?: MoodSlug | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
@@ -124,42 +250,47 @@ export interface Review {
 // Seed Fallback Data (bundled JSON)
 // ─────────────────────────────────────────────────────────────────────
 
-const seedProducts: Product[] = (rawProducts as { products: Product[] }).products;
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
+// NOTE: src/data/products.json (original 13) is deprecated-retained on disk and no
+// longer imported. The storefront runs on mock-products.json until real SKUs land.
+const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).products;
+const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
+const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
+
+/** Style-vibe registry (sorted by order). Homepage shows featured; rest behind "More". */
+export const VIBES: VibeInfo[] = ((rawVibes as { vibes: VibeInfo[] }).vibes)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
+/** Mood registry (sorted by order). Extensible — one JSON row, no code changes. */
+export const MOODS: MoodInfo[] = ((rawMoods as { moods: MoodInfo[] }).moods)
+  .slice()
+  .sort((a, b) => a.order - b.order);
 
 const mockReviews: Record<string, Review[]> = {
-  'botanical-silk-embroidered-jacket': [
+  // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
+  'sakura-ronin-hoodie': [
     {
-      id: 'rev-1',
-      productSlug: 'botanical-silk-embroidered-jacket',
-      author: 'Eleanor Vance',
+      id: 'mock-rev-1',
+      productSlug: 'sakura-ronin-hoodie',
+      author: 'Arjun Mehta',
       rating: 5,
-      title: 'Museum-grade needlework and incredible drape',
-      comment: 'The botanical chain stitching along the collar is even more mesmerizing in person. The silk floss has a subtle luster in natural daylight that catches the eye immediately.',
+      title: 'Embroidery quality is next level',
+      comment: 'Feels premium and even better in person. Oversized fit is perfect.',
       verified: true,
-      createdAt: '2 days ago',
-    },
-    {
-      id: 'rev-2',
-      productSlug: 'botanical-silk-embroidered-jacket',
-      author: 'Marcus Sterling',
-      rating: 5,
-      title: 'Pure artisanal luxury',
-      comment: 'The heavyweight organic cotton canvas gives this jacket substantial structure. You can feel the weight of the 18 artisan hours poured into it.',
-      verified: true,
-      createdAt: '1 week ago',
+      createdAt: '2 weeks ago',
     },
   ],
-  'celestial-zardozi-wool-coat': [
+  'koi-no-yume-sweatshirt': [
     {
-      id: 'rev-3',
-      productSlug: 'celestial-zardozi-wool-coat',
-      author: 'Julian D.',
+      id: 'mock-rev-2',
+      productSlug: 'koi-no-yume-sweatshirt',
+      author: 'Ishita Rao',
       rating: 5,
-      title: 'The gold bullion thread is breathtaking',
-      comment: 'The French wire embroidery catches low evening light like nothing else in my wardrobe. True heirloom craftsmanship that will be passed down.',
+      title: 'Perfect for anime events',
+      comment: 'So many people asked me where I got this from.',
       verified: true,
-      createdAt: '3 days ago',
+      createdAt: '1 week ago',
     },
   ],
 };
@@ -179,7 +310,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, category_slug, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -188,6 +319,15 @@ export async function getProducts(): Promise<Product[]> {
       if (error) {
         console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
       } else if (data && data.length > 0) {
+        // Universe-schema feature detection: pre-migration rows lack universe_slug.
+        // Serve them and they would leak the deprecated catalog (no universe/gender/
+        // vibes) into the universe storefront — fall back to local mocks instead.
+        if (!('universe_slug' in (data[0] as object))) {
+          console.warn(
+            '[UniqueLo] Supabase catalog predates the universe schema; using local mock catalog.',
+          );
+          return [...mockProducts];
+        }
         return data.map((item: any) => {
           const emb = Array.isArray(item.embroidery_details)
             ? item.embroidery_details[0]
@@ -198,7 +338,16 @@ export async function getProducts(): Promise<Product[]> {
             name: item.name,
             subtitle: item.subtitle,
             description: item.description,
+            foreignTagline: item.foreign_tagline,
             categorySlug: item.category_slug,
+            universeSlug: item.universe_slug,
+            garmentType: item.garment_type,
+            gender: item.gender ?? 'unisex',
+            motifId: item.motif_id,
+            isMock: item.is_mock ?? false,
+            handcrafted: item.handcrafted ?? false,
+            vibes: item.vibes ?? [],
+            moods: item.moods ?? [],
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,
@@ -251,8 +400,8 @@ export async function getProducts(): Promise<Product[]> {
     }
   }
 
-  // Instant local seed fallback
-  return [...seedProducts];
+  // Instant local seed fallback — mock render catalog (original 13 deprecated-retained)
+  return [...mockProducts];
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -304,6 +453,63 @@ export async function getProductsByCategory(categorySlug: string | 'all'): Promi
   const products = await getProducts();
   if (categorySlug === 'all') return products;
   return products.filter((p) => p.categorySlug === categorySlug);
+}
+
+/** All active universes, ordered. Renders the Universes dropdown — never hardcode. */
+export async function getUniverses(): Promise<Universe[]> {
+  return [...seedUniverses]
+    .filter((u) => u.is_active)
+    .sort((a, b) => a.order - b.order);
+}
+
+export async function getUniverse(slug: string): Promise<Universe | undefined> {
+  const universes = await getUniverses();
+  return universes.find((u) => u.slug === slug);
+}
+
+/** Only IP-cleared motifs are ever returned. */
+export async function getMotifsByUniverse(universeSlug: string): Promise<Motif[]> {
+  return seedMotifs.filter((m) => m.universe_slug === universeSlug && m.ip_cleared);
+}
+
+export async function getMotif(id: string | undefined): Promise<Motif | undefined> {
+  if (!id) return undefined;
+  return seedMotifs.find((m) => m.id === id && m.ip_cleared);
+}
+
+/** Sync seed lookup for render-path use (no effect needed). Supabase-backed later. */
+export function getMotifSync(id: string | undefined): Motif | undefined {
+  if (!id) return undefined;
+  return seedMotifs.find((m) => m.id === id && m.ip_cleared);
+}
+
+export async function getProductsByUniverse(universeSlug: string | 'all'): Promise<Product[]> {
+  const products = await getProducts();
+  if (universeSlug === 'all') return products;
+  return products.filter((p) => p.universeSlug === universeSlug);
+}
+
+export function matchesGender(p: Product, gender: Gender | 'all'): boolean {
+  if (gender === 'all') return true;
+  const g = p.gender ?? 'unisex';
+  return g === gender || g === 'unisex';
+}
+
+/** Men and Women surfaces both include `unisex` products. */
+export async function getProductsByGender(gender: Gender | 'all'): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => matchesGender(p, gender));
+}
+
+/** Live counts for vibe/universe cards. Always COUNT(*) — never hardcode render numbers. */
+export function countBy<T>(items: T[], key: (t: T) => string | undefined): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const item of items) {
+    const k = key(item);
+    if (!k) continue;
+    counts[k] = (counts[k] ?? 0) + 1;
+  }
+  return counts;
 }
 
 export async function getFeaturedProducts(limit?: number): Promise<Product[]> {
@@ -373,6 +579,37 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       return false;
     }
 
+    // Universe check
+    if (filters.universeSlug && filters.universeSlug !== 'all' && product.universeSlug !== filters.universeSlug) {
+      return false;
+    }
+
+    // Gender check (`unisex` matches both Men and Women)
+    if (filters.gender && filters.gender !== 'all' && !matchesGender(product, filters.gender)) {
+      return false;
+    }
+
+    // Garment-type check
+    if (filters.garmentTypes && filters.garmentTypes.length > 0) {
+      if (!product.garmentType || !filters.garmentTypes.includes(product.garmentType)) {
+        return false;
+      }
+    }
+
+    // Vibe discovery check
+    if (filters.vibe && filters.vibe !== 'all') {
+      if (!product.vibes || !product.vibes.includes(filters.vibe)) {
+        return false;
+      }
+    }
+
+    // Mood (buyer-intent) check
+    if (filters.mood && filters.mood !== 'all') {
+      if (!product.moods || !product.moods.includes(filters.mood)) {
+        return false;
+      }
+    }
+
     // Technique check
     if (filters.techniques && filters.techniques.length > 0) {
       if (!product.embroidery || !filters.techniques.includes(product.embroidery.technique)) {
@@ -433,15 +670,20 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
 }
 
 export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
-  }).format(cents / 100);
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(Math.round(cents / 100));
 }
 
 export function getDefaultVariant(product: Product): ProductVariant {
   const inStock = product.variants?.find((v) => v.status === 'in-stock');
   if (inStock) return inStock;
+  const lowStock = product.variants?.find((v) => v.status === 'low-stock');
+  if (lowStock) return lowStock;
+  const available = product.variants?.find((v) => v.status !== 'out-of-stock');
+  if (available) return available;
   if (product.variants && product.variants.length > 0) return product.variants[0];
   return {
     sku: `${product.slug}-default`,
@@ -553,6 +795,77 @@ export async function subscribeNewsletter(email: string): Promise<{ success: boo
   return { success: true, message: 'Welcome to the UniqueLo Atelier circle. Your complimentary code is ATELIER10.' };
 }
 
+export type PaymentMethod = 'upi' | 'cod' | 'card';
+
+export interface CreateOrderInput {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  pincode?: string;
+  paymentMethod: PaymentMethod;
+  subtotalCents: number;
+  discountCents: number;
+  shippingCents: number;
+  totalCents: number;
+  couponCode?: string | null;
+  giftNote?: string | null;
+  shippingAddress: string;
+  lines: { productSlug: string; variantSku: string; productName: string; color: string; size: string; quantity: number; priceCents: number; customization?: CartCustomization }[];
+}
+
+export async function createOrder(input: CreateOrderInput): Promise<{ success: boolean; orderId?: string; message: string }> {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_name: input.customerName,
+          customer_email: input.customerEmail,
+          status: input.paymentMethod === 'cod' ? 'confirmed-cod' : 'confirmed',
+          subtotal_cents: input.subtotalCents,
+          discount_cents: input.discountCents,
+          shipping_cents: input.shippingCents,
+          total_cents: input.totalCents,
+          coupon_code: input.couponCode || null,
+          gift_note: input.giftNote || null,
+          shipping_address: {
+            address: input.shippingAddress,
+            phone: input.customerPhone || null,
+            pincode: input.pincode || null,
+            payment_method: input.paymentMethod,
+          },
+        })
+        .select('id')
+        .single();
+      if (orderError) throw orderError;
+      const orderId = (order as { id: string }).id;
+      if (input.lines.length > 0) {
+        const { error: itemsError } = await supabase.from('order_items').insert(
+          input.lines.map((l) => ({
+            order_id: orderId,
+            product_slug: l.productSlug,
+            variant_sku: l.variantSku,
+            product_name: l.productName,
+            color: l.color,
+            size: l.size,
+            quantity: l.quantity,
+            price_cents: l.priceCents,
+            customization: l.customization || null,
+          }))
+        );
+        if (itemsError) throw itemsError;
+      }
+      return { success: true, orderId, message: 'Order placed successfully.' };
+    } catch (err) {
+      console.warn('[UniqueLo] createOrder failed:', err);
+      return { success: false, message: 'Could not save order. Please try again or choose COD.' };
+    }
+  }
+  // Dev fallback — no Supabase configured
+  await new Promise((r) => setTimeout(r, 600));
+  return { success: true, orderId: `local-${Date.now()}`, message: 'Order confirmed (local mode).' };
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Indian Craft Provenance Taxonomy (Stream 3)
 // ─────────────────────────────────────────────────────────────────────
@@ -570,17 +883,6 @@ export interface CraftTechniqueInfo {
 }
 
 export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
-  {
-    slug: 'zardozi',
-    name: 'Zardozi Wirework',
-    region: 'Jaipur & Agra',
-    cluster: 'Pink City Bullion Guild',
-    artisanPace: '28–34 hours per garment',
-    historicalContext: 'Dating back to the Rigveda and Mughal imperial courts, Zardozi translates literally to gold sewing. Artisans hand-anchor coiled metallic bullion wires and French spirals onto heavy wool.',
-    description: 'Raised three-dimensional metallic relief worked with gilded zari thread. Built to catch low ambient light without losing structural tension.',
-    stitchType: 'Anchor Bullion & Metallic Wire',
-    image: '/images/products/celestial-zardozi-coat-2.png',
-  },
   {
     slug: 'botanical-chain',
     name: 'Chikankari & Botanical Chain',
@@ -636,6 +938,50 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     stitchType: 'Structural Geometric Grid',
     image: '/images/products/sashiko-selvedge-denim-2.jpg',
   },
+  {
+    slug: 'hand-zardozi',
+    name: 'Hand Zardozi Wirework',
+    region: 'Jaipur, Rajasthan',
+    cluster: 'Pink City Bullion Guild',
+    artisanPace: '28–34 hours per garment',
+    historicalContext: 'Mughal-court gold sewing: coiled bullion wires and French spirals hand-anchored onto wool and silk. The atelier standard for bridal-grade relief.',
+    description: 'Raised metallic relief with gilded wire, built to catch low light without losing tension.',
+    stitchType: 'Anchor Bullion & Metallic Wire',
+    image: '/images/products/celestial-zardozi-coat-2.png',
+  },
+  {
+    slug: 'metallic-zari',
+    name: 'Metallic Zari & Tilla',
+    region: 'Varanasi & Surat',
+    cluster: 'Ghat Zari Weavers Collective',
+    artisanPace: '20–28 hours per garment',
+    historicalContext: 'Silver-gilt zari cords couched with silk core along pleats and borders — temple and court textile lineage adapted to modern tailoring.',
+    description: 'Continuous metallic inlay that holds pleat structure while adding heirloom sheen.',
+    stitchType: 'Couched Metallic Cord',
+    image: '/images/products/pleated-zari-trousers-2.jpg',
+  },
+  {
+    slug: 'french-knot',
+    name: 'French Knot Needlecraft',
+    region: 'Kashmir & Kutch',
+    cluster: 'Highland Knot Artisans',
+    artisanPace: '14–18 hours per garment',
+    historicalContext: 'Hand-wound spiral knots in merino and silk floss — pebble-grain texture that reads as sculpture up close and solid colour at distance.',
+    description: 'Micro-sculpted knots delivering tactile dimension on knitwear and heavyweight jersey.',
+    stitchType: 'Hand-Wound Spiral Knot',
+    image: '/images/products/french-knot-turtleneck-2.jpg',
+  },
+  {
+    slug: 'monogram-bespoke',
+    name: 'Bespoke Monogram & Crest',
+    region: 'Jaipur Atelier',
+    cluster: 'Pink City Monogram Atelier',
+    artisanPace: '6–10 hours per commission',
+    historicalContext: 'Patron-initial satin work and crest embroidery — the atelier personalisation studio for shirts, scarves and heirloom linens.',
+    description: 'Precision satin initials tailored to the patron, with archival thread and placement choice.',
+    stitchType: 'Precision Satin Initial',
+    image: '/images/products/monogram-poplin-shirt-2.jpg',
+  },
 ];
 
 export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
@@ -643,5 +989,6 @@ export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
 }
 
 export async function getCraftTechnique(slug: string): Promise<CraftTechniqueInfo | undefined> {
-  return CRAFT_TECHNIQUES.find((c) => c.slug === slug);
+  const normalized = slug === 'zardozi' ? 'hand-zardozi' : slug;
+  return CRAFT_TECHNIQUES.find((c) => c.slug === normalized);
 }

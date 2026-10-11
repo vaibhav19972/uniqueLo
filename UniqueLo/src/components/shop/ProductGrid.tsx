@@ -63,10 +63,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                         <span>Lucknow, Uttar Pradesh</span>
                       </div>
                       <h3 className="font-serif text-2xl sm:text-3xl text-ink leading-tight">
-                        32 Stitches. Zero Machines. Unbleached Natural Muslin.
+                        32 Stitches. Unbleached Natural Muslin.
                       </h3>
                       <p className="text-xs sm:text-sm text-ink-muted font-light leading-relaxed">
-                        Chikankari is India's most delicate shadow-work tradition. Every stitch is calibrated by hand 
+                        Chikankari is India's most delicate shadow-work tradition. Every stitch is placed with care
                         over organic cotton, creating subtle three-dimensional relief that printed fast-fashion can never replicate.
                       </p>
                       <div className="pt-1">
@@ -82,11 +82,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
                     <div className="grid grid-cols-2 gap-4 text-xs border-l border-stone/60 pl-6 w-full md:w-auto">
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Artisan Guild</span>
+                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Craft Collective</span>
                         <span className="font-medium text-ink">Old City Collective</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Needle Pace</span>
+                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Embroidery Time</span>
                         <span className="font-medium text-ink">14–20 Hours / Piece</span>
                       </div>
                       <div>
@@ -116,12 +116,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                         24K Bullion Metallic Wirework on Heavyweight Outerwear.
                       </h3>
                       <p className="text-xs sm:text-sm text-stone/80 font-light leading-relaxed">
-                        Hand-anchored gold and metallic French coils engineered for daily chore jackets and overshirts. 
+                        Anchored gold and metallic French coils engineered for daily chore jackets and overshirts. 
                         Designed to catch ambient light and develop authentic character over decades of wear.
                       </p>
                       <div className="pt-1">
                         <a
-                          href="/atelier/zardozi"
+                          href="/atelier/hand-zardozi"
                           className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-cream hover:text-accent transition-colors"
                         >
                           <span>Inspect Zardozi Process</span>
@@ -132,11 +132,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
                     <div className="grid grid-cols-2 gap-4 text-xs border-l border-stone/30 pl-6 w-full md:w-auto text-cream">
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Artisan Guild</span>
+                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Craft Collective</span>
                         <span className="font-medium text-cream">Pink City Bullion Guild</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Needle Pace</span>
+                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Embroidery Time</span>
                         <span className="font-medium text-cream">28–34 Hours / Piece</span>
                       </div>
                       <div>

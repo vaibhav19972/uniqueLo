@@ -28,7 +28,7 @@
       Typography
       ───────────────────────────────────── */
    --font-sans:  'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-   --font-serif: 'Melodrama', 'Playfair Display', Georgia, 'Times New Roman', serif;
+   --font-serif: 'Playfair Display', 'Melodrama', Georgia, 'Times New Roman', serif;
 
    --text-xs:    0.75rem;  /* 12px */
    --text-sm:    0.875rem; /* 14px */
@@ -51,6 +51,13 @@
    --tracking-normal: 0;
    --tracking-wide:   0.05em;
    --tracking-loose:  0.12em;
+
+   /* Render-era treatments (chatgpt-v2 targets) */
+   --tracking-eyebrow: 0.22em;  /* tracked-out caps micro-labels */
+   --tracking-label:   0.15em;  /* caps card titles (ANIMEVERSE…) */
+   --leading-display:  1.02;    /* tight hero/section display leading */
+   --text-display:     clamp(3.5rem, 7.5vw, 8.75rem);  /* ~110–120px hero @1536w */
+   --text-display-lg:  clamp(2.75rem, 5vw, 4.5rem);    /* ~64–70px section titles */
 
    /* ─────────────────────────────────────
       Spacing

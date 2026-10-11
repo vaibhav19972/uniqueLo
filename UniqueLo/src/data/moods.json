@@ -1,0 +1,10 @@
+{
+  "moods": [
+    { "slug": "everyday", "title": "Everyday", "tagline": "Quiet luxury for the daily rotation.", "featured": true, "order": 1 },
+    { "slug": "statement", "title": "Statement", "tagline": "Wear it before you say it.", "featured": true, "order": 2 },
+    { "slug": "heritage", "title": "Heritage", "tagline": "Craft lineage, made current.", "featured": true, "order": 3 },
+    { "slug": "festive-gifting", "title": "Festive & Gifting", "tagline": "For the darbar, and the giving.", "featured": true, "order": 4 },
+    { "slug": "comfort", "title": "Comfort", "tagline": "Soft worlds, slow evenings.", "featured": false, "order": 5 },
+    { "slug": "collector", "title": "Collector", "tagline": "One of few, forever.", "featured": false, "order": 6 }
+  ]
+}

@@ -1,70 +1,89 @@
 @import 'tailwindcss';
 @import './fonts.css';
 @import './tokens.css';
+@import './universes.css';
 
 /* Map design tokens into the Tailwind theme so utilities like `bg-cream`,
    `text-ink`, `font-serif`, `text-hero`, `bg-gold-zari` resolve from tokens.css. */
 @theme {
-    /* colors */
-    --color-cream:           var(--color-cream);
-    --color-paper:           var(--color-paper);
-    --color-ink:             var(--color-ink);
-    --color-ink-muted:       var(--color-ink-muted);
-    --color-stone:           var(--color-stone);
-    --color-warm-gray:       var(--color-warm-gray);
-    
-    --color-accent:          var(--color-accent);
-    --color-accent-hover:    var(--color-accent-hover);
-    --color-saffron:         var(--color-saffron);
-    --color-gold-zari:       var(--color-gold-zari);
-    --color-pistachio:       var(--color-pistachio);
-    --color-pistachio-light: var(--color-pistachio-light);
-    --color-riviera:         var(--color-riviera);
-    --color-blush:           var(--color-blush);
-    --color-parchment:       var(--color-parchment);
-    
-    --color-error:           var(--color-error);
-    --color-success:         var(--color-success);
+  /* colors */
+  --color-cream: var(--color-cream);
+  --color-paper: var(--color-paper);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-stone: var(--color-stone);
+  --color-warm-gray: var(--color-warm-gray);
 
-    /* fonts */
-    --font-sans:  var(--font-sans);
-    --font-serif: var(--font-serif);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-saffron: var(--color-saffron);
+  --color-gold-zari: var(--color-gold-zari);
+  --color-pistachio: var(--color-pistachio);
+  --color-pistachio-light: var(--color-pistachio-light);
+  --color-riviera: var(--color-riviera);
+  --color-blush: var(--color-blush);
+  --color-parchment: var(--color-parchment);
 
-    /* type scale */
-    --text-hero: var(--text-hero);
+  --color-error: var(--color-error);
+  --color-success: var(--color-success);
 
-    /* semantic spacing */
-    --spacing-section: var(--section-gap);
-    --spacing-header:  var(--header-height);
-    --spacing-drawer:  var(--drawer-width);
+  /* render-era marketing shell (chatgpt-v2 targets) — quiet-luxury graphite +
+     champagne (Oct 2026). --on-gold is the text color that passes contrast
+     on champagne; themed scopes remap it to --u-on-accent. */
+  --color-gold: var(--brand-gold);
+  --color-gold-hover: var(--brand-gold-hover);
+  --color-gold-deep: var(--brand-gold-deep);
+  --color-on-gold: var(--on-gold);
+  --color-coal: var(--brand-coal);
+  --color-coal-soft: var(--brand-coal-soft);
+
+  /* fonts */
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+
+  /* render-era type treatments (chatgpt-v2 targets) */
+  --tracking-eyebrow: var(--tracking-eyebrow);
+  --tracking-label: var(--tracking-label);
+  --leading-display: var(--leading-display);
+  --text-display: var(--text-display);
+  --text-display-lg: var(--text-display-lg);
+
+  /* type scale */
+  --text-hero: var(--text-hero);
+
+  /* semantic spacing */
+  --spacing-section: var(--section-gap);
+  --spacing-header: var(--header-height);
+  --spacing-drawer: var(--drawer-width);
 }
 
 @layer base {
-    html {
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      scroll-behavior: smooth;
-    }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100dvh;
-      background-color: var(--color-cream);
-      color: var(--color-ink);
-      font-family: var(--font-sans);
-      font-size: var(--text-base);
-      line-height: var(--leading-normal);
-    }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    overflow-x: clip;
+  }
 
-    * {
-      border-color: var(--color-stone);
-    }
+  * {
+    border-color: var(--color-stone);
+  }
 
-    /* Always-visible focus ring for keyboard users */
-    :focus-visible {
-      outline: 2px solid var(--color-accent);
-      outline-offset: 2px;
-    }
+  /* Always-visible focus ring for keyboard users */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }
 
 /* ─────────────────────────────────────
@@ -84,9 +103,12 @@
 
 /* Subtle Floating Animation for Badges */
 @keyframes needle-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-4px);
   }
@@ -98,8 +120,13 @@
 
 /* Marquee scrolling ticker */
 @keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
@@ -117,13 +144,16 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-cream);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-stone);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-warm-gray);
 }
@@ -132,12 +162,13 @@
    Reduced-motion reset
    ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
