@@ -22,6 +22,16 @@
       ],
       "variants": [
         {
+          "sku": "SRH-IV-XS",
+          "color": "Warm Ivory",
+          "colorHex": "#f3ede2",
+          "size": "XS",
+          "priceCents": 349900,
+          "compareAtPriceCents": 499900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "SRH-IV-S",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
@@ -159,6 +169,16 @@
       ],
       "variants": [
         {
+          "sku": "RST-BK-XS",
+          "color": "Ink Black",
+          "colorHex": "#1c1a18",
+          "size": "XS",
+          "priceCents": 279900,
+          "compareAtPriceCents": 349900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "RST-BK-S",
           "color": "Ink Black",
           "colorHex": "#1c1a18",
@@ -282,6 +302,16 @@
       ],
       "variants": [
         {
+          "sku": "RPJ-IV-XS",
+          "color": "Warm Ivory",
+          "colorHex": "#f3ede2",
+          "size": "XS",
+          "priceCents": 499900,
+          "compareAtPriceCents": 649900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "RPJ-IV-S",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
@@ -320,6 +350,16 @@
           "compareAtPriceCents": 649900,
           "status": "in-stock",
           "quantity": 5
+        },
+        {
+          "sku": "RPJ-IV-XL",
+          "color": "Warm Ivory",
+          "colorHex": "#f3ede2",
+          "size": "XL",
+          "priceCents": 499900,
+          "compareAtPriceCents": 649900,
+          "status": "in-stock",
+          "quantity": 10
         }
       ],
       "images": [
@@ -395,6 +435,16 @@
         "unisex"
       ],
       "variants": [
+        {
+          "sku": "KNY-MN-XS",
+          "color": "Midnight",
+          "colorHex": "#232a3a",
+          "size": "XS",
+          "priceCents": 329900,
+          "compareAtPriceCents": 449900,
+          "status": "in-stock",
+          "quantity": 10
+        },
         {
           "sku": "KNY-MN-S",
           "color": "Midnight",
@@ -519,6 +569,26 @@
       ],
       "variants": [
         {
+          "sku": "OSJ-BK-XS",
+          "color": "Ink Black",
+          "colorHex": "#1c1a18",
+          "size": "XS",
+          "priceCents": 499900,
+          "compareAtPriceCents": 649900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
+          "sku": "OSJ-BK-S",
+          "color": "Ink Black",
+          "colorHex": "#1c1a18",
+          "size": "S",
+          "priceCents": 499900,
+          "compareAtPriceCents": 649900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "OSJ-BK-M",
           "color": "Ink Black",
           "colorHex": "#1c1a18",
@@ -630,6 +700,16 @@
       ],
       "variants": [
         {
+          "sku": "TCS-EC-XS",
+          "color": "Ecru",
+          "colorHex": "#efe7d8",
+          "size": "XS",
+          "priceCents": 329900,
+          "compareAtPriceCents": 449900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "TCS-EC-S",
           "color": "Ecru",
           "colorHex": "#efe7d8",
@@ -668,6 +748,16 @@
           "compareAtPriceCents": 449900,
           "status": "in-stock",
           "quantity": 6
+        },
+        {
+          "sku": "TCS-EC-XL",
+          "color": "Ecru",
+          "colorHex": "#efe7d8",
+          "size": "XL",
+          "priceCents": 329900,
+          "compareAtPriceCents": 449900,
+          "status": "in-stock",
+          "quantity": 10
         }
       ],
       "images": [
@@ -742,6 +832,16 @@
         "unisex"
       ],
       "variants": [
+        {
+          "sku": "KNT-BK-XS",
+          "color": "Ink Black",
+          "colorHex": "#1c1a18",
+          "size": "XS",
+          "priceCents": 279900,
+          "compareAtPriceCents": 349900,
+          "status": "in-stock",
+          "quantity": 10
+        },
         {
           "sku": "KNT-BK-S",
           "color": "Ink Black",
@@ -852,6 +952,15 @@
         "men"
       ],
       "variants": [
+        {
+          "sku": "TCP-BK-XS",
+          "color": "Ink Black",
+          "colorHex": "#1c1a18",
+          "size": "XS",
+          "priceCents": 249900,
+          "status": "in-stock",
+          "quantity": 10
+        },
         {
           "sku": "TCP-BK-S",
           "color": "Ink Black",
@@ -1111,6 +1220,16 @@
       ],
       "variants": [
         {
+          "sku": "ASC-DR-XS",
+          "color": "Deep Red",
+          "colorHex": "#7a1f1f",
+          "size": "XS",
+          "priceCents": 399900,
+          "compareAtPriceCents": 549900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "ASC-DR-S",
           "color": "Deep Red",
           "colorHex": "#7a1f1f",
@@ -1235,6 +1354,16 @@
       ],
       "variants": [
         {
+          "sku": "GST-NV-XS",
+          "color": "Navy",
+          "colorHex": "#22355c",
+          "size": "XS",
+          "priceCents": 249900,
+          "compareAtPriceCents": 329900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "GST-NV-S",
           "color": "Navy",
           "colorHex": "#22355c",
@@ -1358,6 +1487,16 @@
       ],
       "variants": [
         {
+          "sku": "HCJ-RB-XS",
+          "color": "Royal Blue",
+          "colorHex": "#1d4ed8",
+          "size": "XS",
+          "priceCents": 549900,
+          "compareAtPriceCents": 699900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
           "sku": "HCJ-RB-S",
           "color": "Royal Blue",
           "colorHex": "#1d4ed8",
@@ -1396,6 +1535,16 @@
           "compareAtPriceCents": 699900,
           "status": "in-stock",
           "quantity": 5
+        },
+        {
+          "sku": "HCJ-RB-XL",
+          "color": "Royal Blue",
+          "colorHex": "#1d4ed8",
+          "size": "XL",
+          "priceCents": 549900,
+          "compareAtPriceCents": 699900,
+          "status": "in-stock",
+          "quantity": 10
         }
       ],
       "images": [
@@ -1470,6 +1619,16 @@
         "unisex"
       ],
       "variants": [
+        {
+          "sku": "AJK-EC-XS",
+          "color": "Ecru",
+          "colorHex": "#efe7d8",
+          "size": "XS",
+          "priceCents": 449900,
+          "compareAtPriceCents": 599900,
+          "status": "in-stock",
+          "quantity": 10
+        },
         {
           "sku": "AJK-EC-S",
           "color": "Ecru",
