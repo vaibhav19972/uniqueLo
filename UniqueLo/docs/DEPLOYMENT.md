@@ -20,11 +20,13 @@ UniqueLo is engineered with a **headless, decoupled architecture** identical to 
                     ▼                                     ▼
 ┌──────────────────────────────────────┐  ┌───────────────────────────────────┐
 │     SUPABASE MANAGED CLOUD TIER      │  │      BUNDLED SEED FALLBACK        │
-│  • PostgreSQL DB (12+ products,      │  │  • src/data/products.json         │
-│    categories, variants, reviews)    │  │  • src/data/categories.json       │
-│  • Auto-generated REST (PostgREST)   │  │  • Zero-config instant demo       │
-│  • Row-Level Security (RLS) enabled  │  │    when credentials omitted       │
-└──────────────────────────────────────┘  └───────────────────────────────────┘
+│  • PostgreSQL DB (schema + RLS;      │  │  • src/data/mock-products.json   │
+│    categories, products, variants,  │  │  • src/data/categories.json     │
+│    reviews, orders)                  │  │  • Zero-config instant demo     │
+│  • Auto-generated REST (PostgREST)   │  │    when credentials omitted     │
+│  • Row-Level Security (RLS) enabled  │  │    or rows predate universe      │
+└──────────────────────────────────────┘  │    schema (feature-detected)    │
+                                          └─────────────────────────────────┘
 ```
 
 ---
@@ -63,7 +65,7 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 
 ### Step 3.2 — Execute Database Schema
 1. In the Supabase Dashboard, open **SQL Editor**.
-2. Click **New Query**, paste the contents of [`supabase/schema.sql`](file:///Users/apple/MySpace/UniqueLo/supabase/schema.sql), and click **Run**.
+2. Click **New Query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and click **Run**.
 3. This creates:
    - `categories`, `products`, `variants`, `product_images`, `embroidery_details`
    - `newsletter_subscribers`, `reviews`, `orders`, `order_items`
@@ -71,8 +73,8 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 
 ### Step 3.3 — Seed Initial Needlecraft Catalog
 1. In the Supabase SQL Editor, open a **New Query**.
-2. Paste the contents of [`supabase/seed.sql`](file:///Users/apple/MySpace/UniqueLo/supabase/seed.sql) and click **Run**.
-3. All 12 artisanal products, 6 categories, and variant inventories are immediately populated into your Supabase database!
+2. Paste the contents of [`supabase/seed.sql`](../supabase/seed.sql) and click **Run**.
+3. This seeds the **legacy 13-product atelier line** (45 variants, 6 categories) into your Supabase database. Note: the storefront currently serves the 14-SKU mock catalog from `src/data/mock-products.json` and *feature-detects* pre-migration Supabase rows (missing `universe_slug`) — seeded legacy rows will be ignored until the universe-schema migration lands (docs/07 §3 "Migration debt").
 
 ### Step 3.4 — Copy API Keys
 In Supabase, navigate to **Project Settings** > **API**:

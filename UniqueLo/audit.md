@@ -1,7 +1,7 @@
 # UniqueLo — Project Audit & Quality Assurance Report
 
 **Last Updated:** 2026-10-11 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready  
-**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, ~2.25s) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 · 100% Data & Image Parity
+**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, ~2.25s) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 · 100% Data & Image Parity *(verification snapshot from 2026-10-09/10 audits — re-run before relying on route/file counts)*
 
 ---
 
@@ -27,6 +27,26 @@
 
 ---
 
+## 📝 2026-10-11 — Docs ↔ Code Reconciliation (audit remediation applied)
+
+The cross-verifier audit ("docs do NOT fully reflect project state") was verified
+true against code, then remediated the same day. All edits were docs-only — no
+source files touched.
+
+| Audit finding | Remediation | Status |
+|---|---|---|
+| A. Catalog identity (13 vs 14 mocks) | docs/03 §2 rewritten around `mock-products.json` (14 SKUs / 73 variants, dated snapshot); docs/06 registry split into storefront (mock) + legacy (atelier) tables; audit.md / PRODUCT.md / DEPLOYMENT.md counts corrected with "as of 2026-10-11" anchors | ✅ Fixed |
+| B. Backend naming (Strapi / wrong schema) | docs/07 rewritten to actual slug-keyed tables + RLS; Strapi block removed with explicit "superseded" tombstone; docs/05 Phase 8/9 rows realigned to Supabase Admin Studio; Journal marked planned (Footer placeholder hack noted) | ✅ Fixed |
+| C. Token drift (#c06b52 / #f6f4ef / old fonts) | docs/02 token block synced to live tokens.css (new accents, glows, display tokens); docs/06 placeholder hexes updated; STAR_GOAL palette/fonts/focus-ring corrected | ✅ Fixed |
+| D. IA / component inventory drift | docs/01 rewritten: 10 routes, real folder tree, Supabase deps, no `tailwind.config.ts`/MegaMenu/Cursor; upgrade path flipped to Supabase-first | ✅ Fixed |
+| E. Currency USD → INR + Product-type gaps | docs/03 `Currency = 'INR'`, `formatPrice` en-IN, full `Product`/`FilterState` types incl. universeSlug/gender/motifId/vibes/moods/isMock/handcrafted; technique union +`sashiko-selvedge` | ✅ Fixed |
+| F. Index/link drift | 07/08/09 added to root README + docs/README (07 row corrected); Phase-6 font verification line fixed to Playfair; DEPLOYMENT.md `file:///` links → relative; seed.sql precedence + universe-schema feature-detection documented in docs/03, docs/07, DEPLOYMENT.md | ✅ Fixed |
+
+**Known open (tracked, not doc drift):** Supabase universe-schema migration (P9.4),
+contrast-gate re-run, dedicated mock-SKU imagery (docs/06 registry), admin auth gating.
+
+---
+
 ## 📊 Executive Summary
 
 | Category | Initial Audit (2026-10-07) | Current State (2026-10-09) | Status |
@@ -34,7 +54,7 @@
 | **TypeScript Compilation** | Pass (0 errors) | Pass (`tsc -b` 0 errors) | ✅ Healthy |
 | **Production Build** | Pass | Pass (`vite build` completed in ~2.1s) | ✅ Healthy |
 | **Linting (`oxlint`)** | 0 warnings, 0 errors | 0 warnings, 0 errors (48 files, 116 rules) | ✅ Healthy |
-| **Catalog Parity** | 12 products | 13 products, 45 variants synchronized between `products.json` & `seed.sql` | ✅ Healthy |
+| **Catalog Parity** | 12 products | Legacy line: 13 products / 45 variants synchronized between `products.json` & `seed.sql` (deprecated-retained). Storefront catalog: `mock-products.json`, 14 SKUs / 73 variants as of 2026-10-11 | ✅ Healthy |
 | **Image Assets** | 100% resolved on disk | 100% resolved on disk (0 broken paths) | ✅ Healthy |
 | **Cart Stock Clamping** | Ignored variant stock | Clamped in PDP, QuickView, Cart Drawer, and Zustand store | ✅ Resolved |
 | **Newsletter Persistence** | Forms discarded emails | Forms call `subscribeNewsletter()` with toast & loading state | ✅ Resolved |
@@ -151,7 +171,7 @@
 - [x] `npm run lint` passes with 0 errors and 0 warnings.
 - [x] All 10 application routes return 200 OK.
 - [x] All product images on disk resolve to valid files.
-- [x] All 13 products and 45 variants have matching SKUs, colors, prices, and stock statuses across JSON and SQL.
+- [x] Legacy atelier line: all 13 products / 45 variants have matching SKUs, colors, prices, and stock statuses across `products.json` and `seed.sql` (deprecated-retained catalog). Storefront catalog parity (`mock-products.json`, 14 SKUs / 73 variants, 26 image paths all resolving) verified 2026-10-11.
 - [x] Out-of-stock items cannot be added to cart from any entry point.
 - [x] Newsletter subscriptions successfully call persistence handler with feedback.
 - [x] Schema.org structured data correctly embedded on PDP.

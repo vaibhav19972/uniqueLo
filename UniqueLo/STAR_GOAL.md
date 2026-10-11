@@ -22,8 +22,8 @@ In high-end fashion e-commerce, flat photography treats embroidered apparel like
        │   • Bespoke Personalization  │    • Sub-50ms Micro-Interactions
        ├──────────────────────────────┴──────────────────────────────┤
        │                 REFINED EDITORIAL AESTHETIC                 │
-       │   • Warm Mineral & Cream Palette (`#f6f4ef` / `#1a1a1a`)    │
-       │   • Satoshi (Modern Grotesk) × Melodrama (Haute Serif)      │
+       │   • Warm Mineral & Cream Palette (`#f7f5f0` / `#141414`)    │
+       │   • Playfair Display (Haute Serif) × Satoshi (Eyebrows)   │
        │   • Generous Negative Space & Quiet Luxury Restraint        │
        └─────────────────────────────────────────────────────────────┘
 ```
@@ -151,7 +151,7 @@ How UniqueLo outperforms industry leaders:
 
 ### Pillar 5: Radical Accessibility & Universal Performance
 * **Inclusive Luxury:** High design should never exclude users.
-* **WCAG 2.1 AA Compliance:** Minimum 4.5:1 text contrast ratios, 44px touch targets, visible focus indicators in terracotta accent (`#c06b52`).
+* **WCAG 2.1 AA Compliance:** Minimum 4.5:1 text contrast ratios, 44px touch targets, visible focus indicators in terracotta accent (`--color-accent`, currently `#d95d39`).
 * **Motion Sensitivity:** Flawless fallback for users with `prefers-reduced-motion`—all parallax, pinned scrolling, and zooms gracefully convert into clean, static, non-vestibular layouts.
 
 ---
@@ -162,33 +162,32 @@ To support this Star Goal, the data contracts in `src/lib/data.ts` are enriched 
 
 ```typescript
 // Core domain extension for UniqueLo Embroidery Fashion
-export type EmbroideryTechnique = 
-  | 'hand-zardozi' 
-  | 'french-knot' 
-  | 'satin-stitch' 
-  | 'crewel-needlework' 
-  | 'kantha-quilt' 
-  | 'metallic-zari' 
+// (synced to src/lib/data.ts — docs/03 is the full contract)
+export type EmbroideryTechnique =
+  | 'hand-zardozi'
+  | 'french-knot'
+  | 'satin-stitch'
+  | 'crewel-needlework'
+  | 'kantha-quilt'
+  | 'metallic-zari'
+  | 'botanical-chain'
+  | 'sashiko-selvedge'
   | 'monogram-bespoke';
 
 export interface EmbroideryDetail {
   technique: EmbroideryTechnique;
-  artisanHours: number;
-  placement: string[];        // e.g. ["Left Chest", "Back Yoke", "Cuffs"]
-  threadComposition: string;  // e.g. "100% Spun Silk Floss & Metallic Thread"
-  motifDescription: string;
-  macroImages: {
-    src: string;
-    alt: string;
-    magnification: string;    // e.g. "3x Macro Detail"
-  }[];
+  techniqueLabel: string;
+  artisanHours?: number;       // rendered only when present (no fabricated scarcity)
+  placement: string[];         // e.g. ["Left Chest", "Back Yoke", "Cuffs"]
+  threadComposition: string;   // e.g. "100% Spun Silk Floss & Metallic Thread"
+  motifStory: string;
+  macroImage?: ProductImage;
 }
 
-export interface CustomizationConfig {
-  allowedPlacements: ('chest' | 'cuff' | 'yoke')[];
-  maxCharacters: number;
-  availableThreadColors: { name: string; hex: string }[];
-  priceCents: number;
+export interface CartCustomization {
+  monogramText?: string;
+  threadColor?: string;
+  placement?: string;
 }
 ```
 
@@ -214,7 +213,7 @@ To achieve this ambitious standard, every build phase in `docs/05-phases` must p
 
 ### The Non-Negotiable "Atelier Standard" Checklist
 1. **Never use generic placeholders.** If product photography is pending, use warm, noise-textured editorial color blocks that harmonize with the cream/stone/terracotta palette.
-2. **Never break typography rhythm.** Satoshi and Melodrama must be loaded with `font-display: swap` and zero Flash of Unstyled Text (FOUT).
+2. **Never break typography rhythm.** Playfair Display (primary — display, nav, body, CTAs), Satoshi (eyebrows/micro-labels only), and Melodrama (fallback) must be loaded with `font-display: swap` and zero Flash of Unstyled Text (FOUT).
 3. **No janky layout jumps.** All image containers must maintain strict aspect ratios (`3:4` for products, `4:5` for editorial, `16:9` for lookbook).
 4. **All price calculations in cents.** Zero floating-point rounding errors on discounts or taxes.
 5. **Production verification on every commit.** `npm run build` must run clean without any lint or type warnings.

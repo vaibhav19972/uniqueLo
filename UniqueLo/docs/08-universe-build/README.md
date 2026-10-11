@@ -16,7 +16,7 @@
 | [01 — Vision & Scope](./01-vision-and-scope.md) | What are we building, for whom, and what is explicitly out of scope? |
 | [02 — Navigation & IA](./02-navigation-and-IA.md) | Every route, nav element, and how the universe switcher behaves. |
 | [03 — Data Model](./03-data-model.md) | Tables, fields, relations, universe/vibe/lore additions. Mirrors `supabase/schema.sql`. |
-| [04 — Universe Theming](./04-universe-theming-system.md) | The 3 universe bibles, 4 vibe modifiers, CSS token architecture. |
+| [04 — Universe Theming](./04-universe-theming-system.md) | The 3 universe bibles, 7 vibe modifiers (extensible registry), CSS token architecture. |
 | [05 — Page Specs](./05-page-specs.md) | Section-by-section build spec for every page template. |
 | [06 — Commerce Flow](./06-commerce-flow.md) | Cart, pricing, coupons, UPI/COD checkout, order states. |
 | [07 — Image Pipeline](./07-image-pipeline.md) | 6-slot catalog shoots via `tools/catalog-image-harness` + Gem/GPT workflow. |
@@ -34,7 +34,7 @@ ChatGPT image-2 target renders live in `sketches/design-renders/chatgpt-v2/` (**
 - Currency: INR, prices stored as integer paise (`price_cents`).
 - **Outlets, not data:** components render whatever the catalog holds. Render images, names, prices, and counts are mock variables — never hardcoded. New universes, categories, genders, and products must work with zero component changes.
 - Active catalog: **mock render SKUs** (`src/data/mock-products.json`, `isMock: true`) built from the chatgpt-v2 renders. The original 13 products (`products.json`) are **deprecated-retained**: kept in repo, excluded from the storefront (DB: `is_mock = false` rows hidden until real catalog lands).
-- Taxonomy: universe (extensible, 3 at launch) · vibe (fixed 4, presentation-only) · gender (`men | women | unisex`; unisex appears under both Men and Women).
+- Taxonomy: universe (extensible, 3 at launch) · vibe (extensible registry, 7 at launch: 4 featured + noir/pearl/gilded — presentation-only; relaxed from fixed-4 Oct 2026, see `01-vision-and-scope.md`) · gender (`men | women | unisex`; unisex appears under both Men and Women).
 - Commerce constants: free shipping ≥ ₹29,050 · gift ≥ ₹49,800 · standard shipping ₹1,999 · NEEDLECRAFT coupon ₹3,320.
 - All UI data flows through `src/lib/data.ts`. No direct JSON imports in components.
 - IP rule: original-inspired motifs only. No trademarked characters, names, or artwork on garments or site.

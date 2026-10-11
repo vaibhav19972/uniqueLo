@@ -7,7 +7,7 @@
 
 ## 1. Goal
 
-Build a state-of-the-art embroidered clothing e-commerce experience — from editorial storytelling to seamless checkout — in alignment with [STAR_GOAL.md](../../STAR_GOAL.md). The platform leverages patterns proven by the competition (Bode, Story mfg., Bottega Veneta, SSENSE): editorial heroes, premium Lenis scroll motion, clean product grids, macro-stitch inspection image-swap cards, animated filtering by embroidery technique, and a polished atelier cart drawer. This phase has no backend; products live in typed JSON behind a thin data-access layer that can be swapped for Shopify Storefront API or Supabase later without touching UI code.
+Build a state-of-the-art embroidered clothing e-commerce experience — from editorial storytelling to seamless checkout — in alignment with [STAR_GOAL.md](../../STAR_GOAL.md). The platform leverages patterns proven by the competition (Bode, Story mfg., Bottega Veneta, SSENSE): editorial heroes, premium Lenis scroll motion, clean product grids, macro-stitch inspection image-swap cards, animated filtering by embroidery technique, and a polished atelier cart drawer. Since Phase 8 the product catalog and checkout run on **Supabase** behind the `src/lib/data.ts` seam, with bundled JSON fallback so the UI code never touches a backend directly.
 
 ---
 
@@ -16,13 +16,13 @@ Build a state-of-the-art embroidered clothing e-commerce experience — from edi
 | Concern | Pick | Reason |
 |--------|------|--------|
 | Build tool | **Vite + React 19 + TypeScript** | Fast dev server, simple config, fewer hallucinated configs than Next.js for local models. |
-| Routing | **React Router v7 (library mode)** | Two main routes now (`/`, `/shop`), room for `/product/:id` and `/cart` later. |
-| Styling | **Tailwind CSS v4 + CSS variables** | Utility speed + token-based palette/type/spacing keeps every agent consistent. |
+| Routing | **React Router v7 (library mode)** | 10 child routes live (`/`, `/shop`, `/universes/:slug`, `/men`, `/women`, `/product/:slug`, `/atelier`, `/atelier/:techniqueSlug`, `/admin`, `*`), code-split via `React.lazy`. |
+| Styling | **Tailwind CSS v4 + CSS variables** | Utility speed + token-based palette/type/spacing keeps every agent consistent. CSS-first via `@tailwindcss/vite` — no `tailwind.config.ts`. |
 | Scroll animation | **GSAP + ScrollTrigger** | Industry standard for pinned sections, parallax, and scrubbed reveals. |
 | Smooth scroll | **Lenis** | The "premium inertia" feel used by award-winning fashion sites. |
 | Page / UI motion | **Motion (Framer Motion)** | Route transitions, layout animations, hover states, cart drawer. |
-| State | **Zustand** | Tiny, un-opinionated; perfect for cart and filters. |
-| Data | **typed JSON files + `lib/data.ts`** | No DB until accounts, real inventory, checkout, or auth are needed. |
+| State | **Zustand** | Tiny, un-opinionated; powers cart, filters, customizer, quickView, wishlist, toast stores. |
+| Data | **Supabase (Postgres + RLS) + typed JSON fallback** | Live backend since Phase 8: `supabase.ts` + `schema.sql`/`seed.sql`, orders/newsletter checkout writes; bundled `mock-products.json` fallback when keys unset. |
 
 ---
 
@@ -36,45 +36,68 @@ UniqueLo/
 │   ├── 03-data-contracts/
 │   ├── 04-motion-system/
 │   ├── 05-phases/
-│   └── 06-assets-and-placeholders/
+│   ├── 06-assets-and-placeholders/
+│   ├── 07-backend/
+│   ├── 08-universe-build/
+│   └── 09-reference-redesign-from-competitors/
 ├── public/
 │   ├── images/
 │   │   ├── products/           ← product imagery keyed by product.slug
+│   │   ├── categories/         ← category tiles
 │   │   ├── campaigns/          ← hero / lookbook / editorial imagery
 │   │   └── placeholders/       ← generated tonal blocks while assets are pending
 │   └── fonts/                  ← self-hosted fonts only (no FOUT)
+├── scripts/                    ← asset-generation tooling (e.g. generate_assets.py)
+├── supabase/                   ← schema.sql + seed.sql (legacy atelier seed)
 ├── src/
 │   ├── app/                    ← router, layout shell, page transitions
-│   │   ├── App.tsx
-│   │   ├── routes.tsx
-│   │   └── Layout.tsx
+│   │   ├── App.tsx             ← QueryClientProvider mount
+│   │   ├── routes.tsx          ← 10 child routes, React.lazy code-split
+│   │   └── Layout.tsx          ← [data-universe] theming shell
 │   ├── styles/
 │   │   ├── tokens.css          ← CSS variables for colors, type, spacing, easing
-│   │   └── globals.css         ← base + Tailwind imports + reduced-motion
+│   │   ├── globals.css         ← base + Tailwind imports + reduced-motion
+│   │   ├── fonts.css           ← Playfair / Satoshi / Melodrama @font-face
+│   │   └── universes.css       ← [data-universe] token remaps per universe
 │   ├── lib/
-│   │   ├── data.ts             ← data-access layer (queries / filters / cart helpers)
+│   │   ├── data.ts             ← data-access layer (Supabase queries + JSON fallback)
+│   │   ├── supabase.ts         ← Supabase client + isSupabaseConfigured()
+│   │   ├── queryClient.ts      ← TanStack Query client
 │   │   ├── motion.ts           ← shared easings, variants, stagger helpers
 │   │   └── lenis.ts            ← Lenis init + React Router integration
 │   ├── data/
-│   │   ├── products.json       ← canonical product dataset
-│   │   └── categories.json     ← canonical category dataset
-│   ├── stores/
-│   │   ├── cart.ts             ← Zustand cart store
-│   │   └── filters.ts          ← Zustand shop filters store
+│   │   ├── mock-products.json  ← canonical storefront catalog (render-mock SKUs)
+│   │   ├── products.json       ← deprecated-retained legacy atelier line (not imported)
+│   │   ├── categories.json
+│   │   ├── universes.json      ← universe roster + theme tokens
+│   │   ├── motifs.json         ← IP-cleared motif lore registry
+│   │   ├── vibes.json          ← style-vibe registry
+│   │   └── moods.json          ← buyer-intent mood registry
+│   ├── hooks/
+│   │   ├── useCatalog.ts       ← TanStack Query hooks over data.ts
+│   │   └── useHorizontalRailGuard.ts ← horizontal-rail scroll guard (Bestsellers)
+│   ├── stores/                 ← Zustand stores
+│   │   ├── cart.ts / filters.ts / customizer.ts
+│   │   └── quickView.ts / wishlist.ts / toast.ts
 │   ├── components/
-│   │   ├── layout/             ← Header, Footer, MegaMenu, CartDrawer
-│   │   ├── ui/                 ← Button, Image (lazy + blur-up), Cursor, Marquee
-│   │   ├── home/               ← Hero, CategoryStrip, FeaturedProducts, EditorialSplit, Lookbook, Newsletter
-│   │   └── shop/               ← CategoryTabs, FilterBar, ProductGrid, ProductCard
+│   │   ├── layout/             ← Header, Footer, CartDrawer, CartLineItem, AnnouncementBar
+│   │   ├── ui/                 ← Button, Cta, Image (lazy + blur-up), Toast, MarketingHeader, SectionHeader
+│   │   ├── home/               ← Hero, UniverseHero, UniversePortals, VibeGateway, MoodGateway, Bestsellers,
+│   │   │                         BestsellerCard, FeaturedProducts, CategoryStrip, CraftStory, EditorialSplit,
+│   │   │                         Lookbook, UGCWall, Newsletter, TrustStrip
+│   │   ├── shop/               ← CategoryTabs, FilterBar, ProductGrid, ProductCard, BundleBand, QuickViewModal, SizeGuideModal
+│   │   └── customizer/         ← CustomizerModal
 │   ├── pages/
-│   │   ├── Home.tsx
-│   │   └── Shop.tsx
+│   │   ├── Home.tsx / Shop.tsx / ProductDetail.tsx
+│   │   ├── Universe.tsx / Gender.tsx
+│   │   ├── Atelier.tsx / AtelierTechnique.tsx
+│   │   ├── Admin.tsx           ← Supabase Product Catalog Studio
+│   │   └── NotFound.tsx
 │   └── main.tsx                ← Vite entry
 ├── index.html
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-├── tailwind.config.ts
 └── README.md
 ```
 
@@ -92,6 +115,8 @@ Do not bump these without updating this file and re-verifying the build.
     "react-router": "^7.5.0",
     "gsap": "^3.12.7",
     "@gsap/react": "^2.1.2",
+    "@supabase/supabase-js": "^2.117.2",
+    "@tanstack/react-query": "^5.104.1",
     "lenis": "^1.3.1",
     "motion": "^12.7.4",
     "zustand": "^5.0.3",
@@ -99,9 +124,11 @@ Do not bump these without updating this file and re-verifying the build.
     "tailwind-merge": "^3.2.0"
   },
   "devDependencies": {
+    "@types/node": "^24.13.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "oxlint": "^1.81.0",
     "typescript": "^5.7.3",
     "vite": "^6.3.1",
     "tailwindcss": "^4.1.4",
@@ -114,9 +141,9 @@ Do not bump these without updating this file and re-verifying the build.
 
 ## 5. Upgrade Path
 
-- **Backend later?** Only replace `src/lib/data.ts`. Shopify Storefront API is preferred for clothing because it handles inventory, variants, and checkout out of the box. Supabase is the fallback for custom auth + inventory.
+- **Backend evolution?** Only replace `src/lib/data.ts` internals. Supabase is the chosen backend (see docs/07); Shopify Storefront API remains a documented *alternative* if out-of-the-box inventory/checkout is ever preferred, but no work is planned against it.
 - **SEO / SSR later?** Components carry over cleanly to Next.js App Router once the routing/data layer is adapted. Do not optimize for SEO now.
-- **Database later?** Add only when real inventory, checkout persistence, or auth is required.
+- **Database later?** Supabase is live (Phase 8) — checkout/orders/newsletter writes go to Postgres; bundled `mock-products.json` serves the catalog until the universe-schema migration lands.
 
 ---
 

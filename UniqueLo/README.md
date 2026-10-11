@@ -23,6 +23,9 @@ Read the full step-by-step production deployment guide in **[DEPLOYMENT.md](./do
 - [04 — Motion System](./docs/04-motion-system/README.md)
 - [05 — Build Phases & Completion](./docs/05-phases/README.md)
 - [06 — Assets & Placeholders](./docs/06-assets-and-placeholders/README.md)
+- [07 — Backend & Admin](./docs/07-backend/README.md)
+- [08 — Universe Build](./docs/08-universe-build/README.md)
+- [09 — Reference Redesign](./docs/09-reference-redesign-from-competitors/README.md)
 - [Deployment Guide](./docs/DEPLOYMENT.md)
 
 ---
