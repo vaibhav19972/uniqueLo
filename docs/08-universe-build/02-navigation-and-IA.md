@@ -13,10 +13,10 @@
 | `/shop` | All-products grid (filterable) | Neutral; universe shown as facet + card tags |
 | `/product/:slug` | PDP (§05.3) | Themed accents (tags, lore block) on neutral base |
 | `/atelier` | Craft story | Neutral atelier |
-| `/journal` | Articles / drops log | Neutral; per-article universe tag |
+| `/journal` | Articles / drops log *(planned — P9.5, no route in code yet)* | Neutral; per-article universe tag |
 | `/bag` | Cart drawer (overlay, no route change) | Inherits current page theme |
-| `/checkout` | Checkout (modal or page) | **Always neutral** — trust over theme |
-| `/account/orders/:id` | Order confirmation | Neutral |
+| `/checkout` | Checkout (modal or page) *(planned — no route in code yet)* | **Always neutral** — trust over theme |
+| `/account/orders/:id` | Order confirmation *(planned — no route in code yet)* | Neutral |
 | `/admin` | Admin (local-only, lazy) | Unthemed |
 
 ## Global nav (desktop + mobile)

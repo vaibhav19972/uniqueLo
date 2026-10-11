@@ -4,7 +4,7 @@
 
 ## P0 — Foundations & schema deltas
 - [ ] Migrate/extend Supabase per §03-§B (universes, motifs, drops, garment_type, payment columns, indexes).
-- [ ] Backfill 13 products → universes; every product gets `motif_id` with `ip_cleared = true`.
+- [ ] Backfill catalog → universes: every storefront SKU (`mock-products.json`, 14 as of 2026-10-11) gets `motif_id` with `ip_cleared = true`.
 - [ ] Seed parity check: JSON ↔ SQL row counts, no hex/placeholder regressions.
 - Accept: schema applies clean; RLS policies cover new tables (public read catalog, insert-only storefront writes).
 

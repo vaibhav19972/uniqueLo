@@ -31,7 +31,7 @@
 
 1. Every product: exactly one universe, one gender, ≥1 in-stock variant, exactly 6 images (`sort_order` 0–5), one embroidery_details row (nullable only for non-embroidered SKUs like plain lowers), `motif_id` set with `ip_cleared = true` when embroidered.
 2. Prices: integer paise only; `compare_at_price_cents` required when showing a discount; never invent strikethroughs. **All render prices/names/counts are mock seed** (`is_mock`), swappable without UI changes.
-3. Stock: `quantity` is source of truth; `status` derived (`0 → out-of-stock`, `≤3 → low-stock`). UI clamps qty selectors to `quantity`.
+3. Stock: `quantity` is source of truth for clamping; `status` derivation (`0 → out-of-stock`, `≤3 → low-stock`) applies at migration seeding. **Note:** current code stores `status` explicitly (no derivation in `data.ts` — see docs/07 §6); the migration must either implement this derivation in seed/mapping code or revise this rule.
 4. Snapshots: order_items freeze name/price at purchase; later catalog edits must not rewrite history.
 5. Seed parity: any catalog change lands in **both** the active seed file and `seed.sql` until migration. The deprecated `products.json` (original 13) is frozen — no edits, no parity duty.
 6. Copy honesty: generic surfaces say "embroidery / threadwork", never "hand-". The `handcrafted` boolean (product-level, default false; Supabase: add column at the backend pass) gates the per-product "Handcrafted" tag on cards + PDP. Mock rule (≥30 embroidery-hours) is a placeholder — re-verify per SKU at cutover.
@@ -41,4 +41,4 @@
 1. Universes get their own table; garment type becomes a facet column.
 2. Motif lore is relational with an `ip_cleared` gate.
 3. Payment method + state are order columns, not JSON.
-4. Stock status is derived, never hand-set.
+4. Stock status derivation is the migration target (see §C.3 note — current code stores `status` explicitly); implement derivation at migration or revise.

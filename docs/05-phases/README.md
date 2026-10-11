@@ -16,8 +16,8 @@
 | **5** | Polish + QA + build optimization | Reduced motion pass, Lighthouse, responsive audit, prod build passes |
 | **6** | Identity & brand experience pass | Real Satoshi + Melodrama self-hosted fonts, anti-generic rules, PDP/Atelier/Journal design per `.hermes/plans/2026-10-07_133000-design-plan-v2.md` |
 | **7** | Async data layer | `data.ts` becomes async (TanStack Query), JSON dev seed, storefront UX unchanged, hooks for product/categories/techniques |
-| **8** | Backend (Strapi v5) | Content types modeled (Product/Variant/Category/Article/CraftTechnique), catalog seeded, `data.ts` swaps to REST |
-| **9** | Editor dashboard | Editor role (articles + prices), product upload with craft/region fields, category management, inventory per variant |
+| **8** | Backend (Supabase + Vercel) | PostgreSQL schema + RLS (`schema.sql`), legacy seed (`seed.sql`), `data.ts` queries Supabase with JSON fallback (see docs/07) |
+| **9** | Editor dashboard | Supabase Product Catalog Studio (`/admin`): variant matrix, SQL/JSON generators, image upload to `product-images` bucket, craft/region fields, inventory per variant |
 
 ---
 
@@ -61,7 +61,7 @@ A working Vite + React + TS project with Tailwind v4 configured and the empty ap
   - [ ] `npm run build` succeeds.
 
 #### P0.3 — Configure Tailwind v4
-- **Files:** `src/styles/tokens.css`, `src/styles/globals.css`, `vite.config.ts`, `tailwind.config.ts`
+- **Files:** `src/styles/tokens.css`, `src/styles/globals.css`, `vite.config.ts` (Tailwind v4 is CSS-first via `@tailwindcss/vite` — there is no `tailwind.config.ts`)
 - **Acceptance:**
   - [ ] `src/styles/tokens.css` contains the full token block from `docs/02-design-system/README.md`.
   - [ ] `src/styles/globals.css` imports Tailwind v4 and maps tokens via `@theme`.
@@ -106,11 +106,11 @@ This is the first real implementation phase. Complete everything below before mo
   - [ ] ScrollTrigger is wired to Lenis updates.
 
 #### P1.4 — Data contracts and JSON seed
-- **Files:** `src/lib/data.ts`, `src/data/products.json`, `src/data/categories.json`
+- **Files:** `src/lib/data.ts`, `src/data/mock-products.json` (canonical storefront catalog; `products.json` deprecated-retained), `src/data/categories.json`
 - **Acceptance:**
   - [ ] All types from `docs/03-data-contracts/README.md` defined and exported.
   - [ ] `getProducts`, `getCategories`, `getFeaturedProducts`, `getAllColors`, `getAllSizes`, `getMaxPriceCents`, `filterProducts`, `formatPrice`, `getDefaultVariant`, `getCartLine` all implemented.
-  - [ ] `products.json` has 12–20 valid products with all required fields.
+  - [ ] `mock-products.json` is the canonical catalog (14 SKUs as of 2026-10-11) with all required fields.
   - [ ] `categories.json` has 6 categories including `all`.
   - [ ] All JSON schema checks pass (see `docs/03-data-contracts/README.md`).
 
@@ -282,14 +282,14 @@ treated as the active design direction for Phases 6+.
 
 - [ ] `npm run build` passes.
 - [ ] DevTools network shows fonts served locally (no `fonts.googleapis.com` request).
-- [ ] Computed font-family on `body` is Satoshi; on editorial headings is Melodrama.
+- [ ] Computed font on `body` and editorial headings is Playfair Display (serif-forward system); Satoshi appears only on tracked-out caps eyebrows/micro-labels.
 
 ---
 
 ## 10. Phase 7 — Async Data Layer
 
 ### Goal
-Prepare the seam for Strapi: `src/lib/data.ts` exports become async, cached via
+Prepare the seam for a real backend: `src/lib/data.ts` exports become async, cached via
 TanStack Query, with JSON files demoted to dev seed data. Storefront UX unchanged.
 
 ### Task Cards
@@ -322,7 +322,7 @@ Align with the production stack demonstrated in TMS: Deploy the storefront to **
 | P8.2 | Async Data Layer with Supabase | `data.ts` queries Supabase when keys present, with seamless fallback to seed JSON. | ✅ Done |
 | P8.3 | Vercel Deployment Configuration | `vercel.json` configured with SPA rewrites and edge immutable caching. | ✅ Done |
 | P8.4 | Production Server Docker Stack | Multi-stage `Dockerfile`, `nginx.conf`, and `docker-compose.prod.yml` ready for VPS. | ✅ Done |
-| P8.5 | State-of-the-Art Luxury Brand Parity | Full PDP (`/product/:slug`), 3x Macro Stitch Loupe, Quick View modal, coupon discounts, cart upsells, wishlist, announcements marquee, and size guide modal. | ✅ Done |
+| P8.5 | State-of-the-Art Luxury Brand Parity | Full PDP (`/product/:slug`), 3x Macro Stitch Loupe, Quick View modal, coupon discounts, cart upsells, wishlist, announcement bar (static 3-zone; marquee keyframes in `globals.css` unused), and size guide modal. | ✅ Done |
 
 ### Phase 8 Verification
 
@@ -333,27 +333,33 @@ Align with the production stack demonstrated in TMS: Deploy the storefront to **
 
 ---
 
-## 12. Phase 9 — Editor Dashboard
+## 12. Phase 9 — Editor Dashboard (Supabase Admin Studio)
+
+> Originally drafted around Strapi v5 (Article CMS + Editor role). **Superseded:**
+> the live implementation is the Supabase Product Catalog Studio in
+> `src/pages/Admin.tsx`. Journal CMS remains a possible future phase — no
+> `/journal` routes exist; the Footer links Journal → `/shop` as a placeholder.
 
 ### Goal
-Non-developer workflow: an Editor logs into `/admin` and can manage articles,
-edit prices, upload products with variants, and manage categories + inventory.
+Non-developer workflow: an Editor opens `/admin` and can manage the catalog,
+edit prices, upload products with variants, and manage inventory.
 
 ### Task Cards
 
 | ID | Task | Acceptance |
 |----|------|------------|
-| P9.1 | Editor role | Custom Strapi role: full CRUD on Article; update-only on Product (price/featured fields); publish rights; no settings/delete access. |
-| P9.2 | Product upload flow | Editor creates a product in admin: images to media library, variants with price/quantity, category assignment, embroidery details. |
+| P9.1 | Admin route gating | Supabase Auth on `/admin`; editor-role policies (catalog CRUD, no settings/delete). Route is open in dev until this lands. |
+| P9.2 | Product upload flow | Editor creates a product in the Catalog Studio: images uploaded to the `product-images` Storage bucket, variants with price/quantity, category assignment, craft/region provenance fields. |
 | P9.3 | Inventory workflow | Editor adjusts variant `quantity`; storefront stock status (in/low/out) reflects it. |
-| P9.4 | Article workflow | Editor drafts, previews, publishes an Atelier Journal article; storefront Journal route renders it. |
-| P9.5 | Journal route | `/journal` + `/journal/:slug` frontend routes reading Article data via `data.ts`. |
+| P9.4 | Universe-schema migration | `universes`/`motifs` tables + `products.universe_slug/gender/vibes/moods/motif_id/is_mock/handcrafted/foreign_tagline` columns; re-seed from mock-products.json parity. |
+| P9.5 | Journal CMS (planned, not started) | Article authoring + publish workflow + `/journal` frontend routes ("publish an article" gates HERE when this phase is scheduled — not in the catalog-studio checklist); tracked here so the placeholder Footer link has a home. |
 
 ### Phase 9 Verification
 
 - [ ] `npm run build` passes.
-- [ ] Editor account can log in, publish an article, edit a price, and upload a product — without touching code.
+- [ ] Editor account can log in, edit a price, and upload a product — without touching code.
 - [ ] Admin (Super Admin) can delete products and manage roles; Editor cannot.
+- [ ] *(Gates with P9.5, not before:)* Editor can draft, preview, and publish a Journal article; storefront renders it at `/journal`.
 
 ---
 

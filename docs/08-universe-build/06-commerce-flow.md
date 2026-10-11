@@ -10,7 +10,7 @@
 
 - Lines keyed by (product_slug, variant_sku, customization?). Qty clamps to `variants.quantity`; OOS lines blocked with message, never silent.
 - Free-ship + gift progress bars derive from merch subtotal after discounts.
-- Coupons: code lookup, single active coupon, visible error states (expired/invalid/min-not-met).
+- Coupons: code lookup, single active coupon, visible error states (expired/invalid/min-not-met). Live codes (`CartDrawer.tsx`): `ATELIER10` → 10% off merch subtotal · `NEEDLECRAFT` → ₹3,320 off · `FREESHIP` → free shipping (also qualifies the free-ship progress bar).
 - Upsells: real in-stock products only, excluded if already in bag, add capped at stock.
 
 ## Checkout (always neutral surface)

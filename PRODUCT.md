@@ -52,8 +52,8 @@ web
 ## Evidence on Hand
 
 - Fully operational React 19 + TypeScript + Vite codebase running locally on dev server.
-- Existing catalog infrastructure with 13 mock products and 45 variants synchronized across `src/data/products.json` and Supabase `seed.sql` (placeholder atelier line; themed capsules to come).
-- High-definition macro photography and garment assets in `public/assets/`.
+- Catalog infrastructure: 14 render-mock SKUs (73 variants) in `src/data/mock-products.json` (canonical storefront catalog, `isMock: true`), with the original 13-product atelier line (`products.json`) deprecated-retained for the eventual real-SKU launch. Supabase backend live for orders/newsletter (see docs/07).
+- High-definition macro photography and garment assets in `public/images/` (products, categories, campaigns — placeholder tonal blocks pending the real shoot; see docs/06).
 - Validated build pipeline: `tsc -b`, `vite build`, and `oxlint` all passing with 0 errors.
 
 ## Product Principles
