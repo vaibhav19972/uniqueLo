@@ -29,14 +29,24 @@ Type: elegant serif with Devanagari-inspired flourishes. Texture: handmade-paper
 
 ## Vibe modifiers (× each universe)
 
-| Vibe | Rule |
-| :--- | :--- |
-| `minimal` | Universe reduced to monochrome line-art + one accent token. Max 2 colors on screen. |
-| `clean` | Ivory-dominant; universe motifs only in dividers and tags. Default for PDP buy panels. |
-| `aesthetic` | Full palette + texture + editorial grain. Default for universe heroes. |
-| `expressive` | Maximalist: motif-dense backgrounds, animated-feel dividers, bold type. Never on checkout-adjacent UI. |
+> Registry: `src/data/vibes.json` (extensible — Oct 2026 decision; was "fixed 4").
+> One JSON row + one `[data-vibe]` CSS block per vibe; featured vibes render
+> as gateway cards, the rest behind "More styles". Adding vibe #8 = no
+> component changes.
+
+| Vibe | Rule | Featured |
+| :--- | :--- | :--- |
+| `minimal` | Universe reduced to monochrome line-art + one accent token. Max 2 colors on screen. | ✅ |
+| `clean` | Ivory-dominant; universe motifs only in dividers and tags. Default for PDP buy panels. | ✅ |
+| `aesthetic` | Full palette + texture + editorial grain. Default for universe heroes. | ✅ |
+| `expressive` | Maximalist: motif-dense backgrounds, animated-feel dividers, bold type. Never on checkout-adjacent UI. | ✅ |
+| `noir` | Monochrome: accent-2 collapses to ink, texture 0, single-accent screen. | — |
+| `pearl` | Soft-luminous: accent-2 follows accent, texture ≤0.02, lifted surfaces. | — |
+| `gilded` | Champagne restraint: accent-2 → `--brand-gold`, texture 0.03, metallic linework only. | — |
 
 Vibe is a user-facing filter (`?vibe=`), persisted per session. Default vibe per surface: heroes → aesthetic; grids → clean; PDP → clean with aesthetic lore block.
+
+**Contrast rule (launch-blocking):** champagne-family hexes fail 4.5:1 as body text on light surfaces — gold-family text on light zones uses `--brand-gold-deep` / `text-gold-deep`; gold CTAs use `text-on-gold` (→ `--u-on-accent` inside themed scopes). Re-run the §08 contrast gate for every universe × vibe after any token change.
 
 ## Token contract (minimum set per universe)
 
@@ -46,4 +56,6 @@ Vibe is a user-facing filter (`?vibe=`), persisted per session. Default vibe per
 
 1. Theming = CSS custom properties from `theme_tokens`; no per-universe components.
 2. PDP buy panel and checkout are always clean/neutral regardless of vibe.
-3. Every universe ships all 4 vibe modifiers at launch (they're token subsets, not extra work).
+3. Every universe ships all 7 vibe modifiers at launch (registry-driven token subsets, not extra work). *(Relaxed from 4 → 7, Oct 2026.)*
+4. Whole-site theming (Oct 2026): `Layout.tsx` sets `[data-universe]` on `<html>` for `/universes/:slug` + product pages (derived from the product's universe); all other routes stay neutral. Header/footer follow via scoped semantic-token remaps in `universes.css`; themed zones opt in via `data-u-zone`. Components never hardcode universe colors — they keep using `bg-cream`/`text-ink`/`bg-gold` and the scopes remap them.
+5. Shell palette (Oct 2026): warm browns retired. Graphite `#111116` + champagne `#c2a878` (+ `--brand-gold-deep #7a6234` for gold text on light surfaces, `--on-gold` for text on gold fills). Itihaas goes Ivory Darbar; Heroverse goes cinematic charcoal/crimson/champagne.

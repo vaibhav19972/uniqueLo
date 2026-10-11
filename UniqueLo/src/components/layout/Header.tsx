@@ -134,7 +134,7 @@ export const Header: React.FC = () => {
             className="group inline-flex items-center gap-1.5 tracking-tight focus-visible:outline-accent"
             aria-label="UniqueLo home"
           >
-            <span aria-hidden="true" className="text-gold text-lg leading-none">✳</span>
+            <span aria-hidden="true" className="text-gold-deep text-lg leading-none">✳</span>
             <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent">
               UniqueLo
             </span>
@@ -333,7 +333,7 @@ export const Header: React.FC = () => {
             />
             <button
               type="submit"
-              className="px-5 py-2.5 bg-ink text-cream text-xs uppercase tracking-[0.18em] hover:bg-gold transition-colors min-h-[44px]"
+              className="px-5 py-2.5 bg-ink text-cream text-xs uppercase tracking-[0.18em] hover:bg-gold hover:text-on-gold transition-colors min-h-[44px]"
             >
               Search
             </button>

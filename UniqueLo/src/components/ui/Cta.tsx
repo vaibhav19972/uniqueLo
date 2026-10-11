@@ -8,7 +8,7 @@ import { Link } from 'react-router';
 type CtaVariant = 'gold' | 'outline' | 'light';
 
 const variantStyles: Record<CtaVariant, string> = {
-  gold: 'bg-gold text-cream hover:bg-gold-hover',
+  gold: 'bg-gold text-on-gold hover:bg-gold-hover',
   outline: 'bg-transparent text-ink border border-ink/30 hover:border-ink',
   light: 'bg-cream text-ink hover:bg-paper',
 };

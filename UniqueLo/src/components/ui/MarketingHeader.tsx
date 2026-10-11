@@ -26,7 +26,7 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
 }) => (
   <div className="flex items-end justify-between gap-6 mb-10 lg:mb-12">
     <div>
-      <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold">
+      <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
         {eyebrow}
       </p>
       <h2

@@ -56,7 +56,7 @@ export const Newsletter: React.FC = () => {
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 items-center py-16 lg:py-24">
         {/* Copy + form */}
         <div>
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold">
+          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
             Join the Atelier List
           </p>
           <h2
@@ -71,7 +71,7 @@ export const Newsletter: React.FC = () => {
 
           {isSubmitted ? (
             <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink">
-              <svg className="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-5 h-5 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
               </svg>
               You are on the List. Your 10% welcome code is on its way.
@@ -98,7 +98,7 @@ export const Newsletter: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold transition-colors min-h-[52px] rounded-sm"
+                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
                 />
               </div>
               <CtaButton type="submit" disabled={isLoading} className="disabled:opacity-60 px-6">
@@ -116,7 +116,7 @@ export const Newsletter: React.FC = () => {
                   i === 0 ? 'sm:pr-4' : ''
                 }`}
               >
-                <svg className="w-5 h-5 shrink-0 text-gold mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-5 h-5 shrink-0 text-gold-deep mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   {b.icon}
                 </svg>
                 <span className="font-serif text-[13px] leading-snug text-ink/85">{b.title}</span>

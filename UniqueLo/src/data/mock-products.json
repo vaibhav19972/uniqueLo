@@ -148,7 +148,11 @@
         "aesthetic"
       ],
       "foreignTagline": "\u685c\u306e\u6d6a\u4eba",
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "statement",
+        "everyday"
+      ]
     },
     {
       "slug": "roaring-spirit-tee",
@@ -280,6 +284,9 @@
       "craftCluster": "Nakshi collective",
       "vibes": [
         "expressive"
+      ],
+      "moods": [
+        "statement"
       ]
     },
     {
@@ -415,7 +422,11 @@
       "vibes": [
         "aesthetic"
       ],
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "heritage",
+        "festive-gifting"
+      ]
     },
     {
       "slug": "koi-no-yume-sweatshirt",
@@ -548,6 +559,10 @@
       "vibes": [
         "aesthetic",
         "expressive"
+      ],
+      "moods": [
+        "everyday",
+        "comfort"
       ]
     },
     {
@@ -679,7 +694,11 @@
       "vibes": [
         "expressive"
       ],
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "statement",
+        "collector"
+      ]
     },
     {
       "slug": "tsuki-crane-sweatshirt",
@@ -812,6 +831,10 @@
       "vibes": [
         "aesthetic",
         "clean"
+      ],
+      "moods": [
+        "everyday",
+        "comfort"
       ]
     },
     {
@@ -933,6 +956,9 @@
       "craftCluster": "Mahabalipuram stitch unit",
       "vibes": [
         "clean"
+      ],
+      "moods": [
+        "everyday"
       ]
     },
     {
@@ -1040,6 +1066,9 @@
       "vibes": [
         "clean",
         "minimal"
+      ],
+      "moods": [
+        "everyday"
       ]
     },
     {
@@ -1118,6 +1147,9 @@
       "craftCluster": "Bengaluru stitch unit",
       "vibes": [
         "minimal"
+      ],
+      "moods": [
+        "everyday"
       ]
     },
     {
@@ -1198,6 +1230,10 @@
       "vibes": [
         "clean",
         "minimal"
+      ],
+      "moods": [
+        "everyday",
+        "festive-gifting"
       ]
     },
     {
@@ -1333,7 +1369,11 @@
         "expressive",
         "aesthetic"
       ],
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "statement",
+        "everyday"
+      ]
     },
     {
       "slug": "guardian-stripe-tee",
@@ -1466,6 +1506,9 @@
       "vibes": [
         "clean",
         "minimal"
+      ],
+      "moods": [
+        "everyday"
       ]
     },
     {
@@ -1599,7 +1642,11 @@
       "vibes": [
         "expressive"
       ],
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "statement",
+        "collector"
+      ]
     },
     {
       "slug": "arch-jaal-kurta",
@@ -1733,7 +1780,11 @@
         "aesthetic",
         "clean"
       ],
-      "handcrafted": true
+      "handcrafted": true,
+      "moods": [
+        "heritage",
+        "festive-gifting"
+      ]
     }
   ]
 }

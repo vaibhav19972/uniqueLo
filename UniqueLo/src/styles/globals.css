@@ -27,9 +27,13 @@
   --color-error: var(--color-error);
   --color-success: var(--color-success);
 
-  /* render-era marketing shell (chatgpt-v2 targets) */
+  /* render-era marketing shell (chatgpt-v2 targets) — quiet-luxury graphite +
+     champagne (Oct 2026). --on-gold is the text color that passes contrast
+     on champagne; themed scopes remap it to --u-on-accent. */
   --color-gold: var(--brand-gold);
   --color-gold-hover: var(--brand-gold-hover);
+  --color-gold-deep: var(--brand-gold-deep);
+  --color-on-gold: var(--on-gold);
   --color-coal: var(--brand-coal);
   --color-coal-soft: var(--brand-coal-soft);
 

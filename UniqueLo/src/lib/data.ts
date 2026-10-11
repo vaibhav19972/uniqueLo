@@ -2,6 +2,8 @@ import rawCategories from '../data/categories.json';
 import rawMockProducts from '../data/mock-products.json';
 import rawUniverses from '../data/universes.json';
 import rawMotifs from '../data/motifs.json';
+import rawVibes from '../data/vibes.json';
+import rawMoods from '../data/moods.json';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
@@ -10,8 +12,36 @@ export type Currency = 'INR';
 /** Gender taxonomy: `unisex` matches BOTH Men and Women surfaces. */
 export type Gender = 'men' | 'women' | 'unisex';
 
-/** Vibe is presentation-only (token swap), never a product attribute. */
-export type Vibe = 'aesthetic' | 'clean' | 'minimal' | 'expressive';
+/**
+ * Vibe = presentation-only token modifier (how loud a surface renders).
+ * Registry: src/data/vibes.json — one JSON row + one [data-vibe] CSS block
+ * per vibe; components never hardcode the list.
+ */
+export type Vibe = 'aesthetic' | 'clean' | 'minimal' | 'expressive' | 'noir' | 'pearl' | 'gilded';
+
+/**
+ * Mood = buyer-intent shopping family (why the customer is here).
+ * Registry: src/data/moods.json. Products carry 1–3 mood tags; moods are
+ * merchandising facets, never render modifiers.
+ */
+export type MoodSlug = 'everyday' | 'statement' | 'heritage' | 'festive-gifting' | 'comfort' | 'collector';
+
+export interface VibeInfo {
+  slug: Vibe;
+  title: string;
+  tagline: string;
+  /** Featured vibes render as homepage gateway cards; the rest sit behind "More". */
+  featured: boolean;
+  order: number;
+}
+
+export interface MoodInfo {
+  slug: MoodSlug;
+  title: string;
+  tagline: string;
+  featured: boolean;
+  order: number;
+}
 
 export interface UniverseThemeTokens {
   bg: string;
@@ -121,6 +151,11 @@ export interface Product {
    * Rendering stays token-driven; this only powers merchandising surfaces.
    */
   vibes?: Vibe[];
+  /**
+   * Buyer-intent mood tags (1–3 per product, from src/data/moods.json).
+   * Powers the "Explore by Mood" gateway + mood facet — never rendering.
+   */
+  moods?: MoodSlug[];
   /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
   isMock?: boolean;
   /**
@@ -167,6 +202,7 @@ export interface FilterState {
   gender?: Gender | 'all';
   garmentTypes?: string[];
   vibe?: Vibe | 'all';
+  mood?: MoodSlug | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
@@ -220,6 +256,16 @@ const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).pro
 const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
 const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
 
+/** Style-vibe registry (sorted by order). Homepage shows featured; rest behind "More". */
+export const VIBES: VibeInfo[] = ((rawVibes as { vibes: VibeInfo[] }).vibes)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
+/** Mood registry (sorted by order). Extensible — one JSON row, no code changes. */
+export const MOODS: MoodInfo[] = ((rawMoods as { moods: MoodInfo[] }).moods)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
 const mockReviews: Record<string, Review[]> = {
   // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
   'sakura-ronin-hoodie': [
@@ -263,7 +309,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, category_slug, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -299,6 +345,8 @@ export async function getProducts(): Promise<Product[]> {
             motifId: item.motif_id,
             isMock: item.is_mock ?? false,
             handcrafted: item.handcrafted ?? false,
+            vibes: item.vibes ?? [],
+            moods: item.moods ?? [],
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,
@@ -550,6 +598,13 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
     // Vibe discovery check
     if (filters.vibe && filters.vibe !== 'all') {
       if (!product.vibes || !product.vibes.includes(filters.vibe)) {
+        return false;
+      }
+    }
+
+    // Mood (buyer-intent) check
+    if (filters.mood && filters.mood !== 'all') {
+      if (!product.moods || !product.moods.includes(filters.mood)) {
         return false;
       }
     }

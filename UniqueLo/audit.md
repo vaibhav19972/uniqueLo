@@ -1,7 +1,29 @@
 # UniqueLo — Project Audit & Quality Assurance Report
 
-**Last Updated:** 2026-10-09 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready  
-**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes) · `oxlint` (0 warnings, 0 errors, 48 files) · 10/10 Routes return 200 · 100% Data & Image Parity
+**Last Updated:** 2026-10-11 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready  
+**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, ~2.25s) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 · 100% Data & Image Parity
+
+---
+
+## 🎨 2026-10-11 — Mood/Vibe Taxonomy + Universe Theming Pass
+
+**Scope:** two-axis discovery redesign (styles vs moods), whole-site universe theming, brown-retired palette. Owner decisions recorded in `docs/08 §01/§03/§04`.
+
+| Change | Files | Status |
+|---|---|---|
+| Vibe registry (extensible, 7 at launch: `noir`, `pearl`, `gilded` added) | `src/data/vibes.json`, `universes.css`, `lib/data.ts` (`VIBES`, `Vibe` type) | ✅ Data-driven; featured 4 + "More styles" drawer |
+| Mood registry (6 buyer-intent families) + `products.moods[]` backfill (14/14 products, 1–3 tags each) | `src/data/moods.json`, `lib/data.ts`, `mock-products.json`, `stores/filters.ts`, `filterProducts()` | ✅ Gateway + facet wired |
+| Gateways split & relabeled: "Explore by Style" (VibeGateway) vs "Explore by Mood" (new MoodGateway) | `VibeGateway.tsx`, `MoodGateway.tsx`, `Home.tsx`, `Footer.tsx`, `Universe.tsx` | ✅ Registry-rendered, counts computed |
+| Whole-site universe theming: `[data-universe]` on `<html>` via `Layout.tsx`; header/footer/product-zone scoped token remaps; `data-u-zone` opt-in | `app/Layout.tsx`, `styles/universes.css`, `Universe.tsx`, `BundleBand.tsx` | ✅ Checkout/account neutral by construction |
+| Palette de-browning: shell → graphite `#111116` + champagne `#c2a878` (+ `--brand-gold-deep`/`--on-gold` contrast tokens); Itihaas → Ivory Darbar; Heroverse → cinematic charcoal/crimson | `styles/universes.css`, `styles/globals.css`, `universes.json` | ✅ Mirror parity json↔css maintained |
+| Contrast sweep: gold CTAs → `text-on-gold`; gold text/borders on light surfaces → `text-gold-deep`/`border-gold-deep` | 14 components incl. `Cta.tsx`, `AnnouncementBar`, `BestsellerCard`, `ProductDetail`, `Newsletter`, `CraftStory`, `UGCWall` | ✅ Champagne no longer used as body text on light zones |
+| Supabase select parity: `getProducts` now queries `universe_slug, gender, vibes, moods, motif_id, is_mock, handcrafted, foreign_tagline…` (previously stale — Supabase rows would have failed universe-schema detection) | `lib/data.ts` | ✅ Bug fixed (pre-existing, surfaced this pass) |
+| Docs: §01 fixed-4 overturned → extensible registries; §03 deltas 2d/2e (`products.vibes`, `products.moods`); §04 vibe table (7), theming scope, shell palette, contrast rule | `docs/08-universe-build/01/03/04` | ✅ |
+
+**Open (tracked, not blockers):**
+1. `supabase/schema.sql` + `seed.sql` still predate the universe schema entirely (no `universes`, `motifs`, `products.universe_slug/gender/vibes/moods` columns) — the §03 deltas remain un-migrated; storefront correctly falls back to local mocks via feature detection. Migration pass pending.
+2. Contrast gate (§08: ≥4.5:1 body text, every universe × vibe) needs a re-run against the new palettes — automated check pending.
+3. Vibe/mood gateway imagery reuses category placeholders until the P5 campaign shoot.
 
 ---
 
