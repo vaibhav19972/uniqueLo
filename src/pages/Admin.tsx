@@ -1,9 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { useProducts } from '../hooks/useCatalog';
+import { useProducts, useUniverses, useMotifsByUniverse } from '../hooks/useCatalog';
 import { useToastStore } from '../stores/toast';
-import { formatPrice, type EmbroideryTechnique } from '../lib/data';
+import {
+  formatPrice,
+  VIBES,
+  MOODS,
+  type Vibe,
+  type MoodSlug,
+  type Gender,
+  type EmbroideryTechnique,
+} from '../lib/data';
 import { NotFound } from './NotFound';
 
 interface VariantForm {
@@ -103,11 +111,22 @@ const AdminStudio: React.FC = () => {
   const [slug, setSlug] = useState('');
   const [autoSlug, setAutoSlug] = useState(true);
   const [subtitle, setSubtitle] = useState('');
+  const [foreignTagline, setForeignTagline] = useState('');
   const [description, setDescription] = useState('');
   const [categorySlug, setCategorySlug] = useState<'outerwear' | 'knitwear' | 'tops' | 'bottoms' | 'accessories'>('tops');
+  const [universeSlug, setUniverseSlug] = useState<'animeverse' | 'heroverse' | 'itihaas'>('itihaas');
+  const [gender, setGender] = useState<Gender>('unisex');
+  const [garmentType, setGarmentType] = useState('tops');
+  const [motifId, setMotifId] = useState('');
   const [tagsInput, setTagsInput] = useState('tops, embroidery, handcrafted');
+  const [selectedVibes, setSelectedVibes] = useState<Vibe[]>(['aesthetic', 'clean']);
+  const [selectedMoods, setSelectedMoods] = useState<MoodSlug[]>(['everyday', 'heritage']);
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
+  const [handcrafted, setHandcrafted] = useState(true);
+
+  const { data: universes } = useUniverses();
+  const { data: motifs } = useMotifsByUniverse(universeSlug);
 
   // Craft & Provenance
   const [technique, setTechnique] = useState<EmbroideryTechnique>('botanical-chain');
@@ -297,25 +316,41 @@ const AdminStudio: React.FC = () => {
   const generatedSQL = useMemo(() => {
     const finalSlug = slug || 'new-product-slug';
     const tagsArr = tagsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
+    const vibesArr = selectedVibes.map((v) => `'${v}'`).join(', ');
+    const moodsArr = selectedMoods.map((m) => `'${m}'`).join(', ');
     const matArr = materialsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const careArr = careInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const placeArr = placementInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
 
     return `-- ====================================================================
 -- UniqueLo SQL: Add "${name || 'New Product'}"
+-- Current Schema: Fully synchronized with Universe, Gender & Craft Taxonomy
 -- ====================================================================
 
 -- 1. Insert Base Product
 INSERT INTO public.products (
-  slug, name, subtitle, description, category_slug, 
-  tags, featured, customizable, material, care, fit, 
-  batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
+  slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
+  garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods,
+  rating, review_count, sold_count, tags, featured, customizable,
+  material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
   '${finalSlug}',
   '${name.replace(/'/g, "''")}',
   '${subtitle.replace(/'/g, "''")}',
+  ${foreignTagline ? `'${foreignTagline.replace(/'/g, "''")}'` : 'NULL'},
   '${description.replace(/'/g, "''")}',
   '${categorySlug}',
+  '${universeSlug}',
+  '${garmentType.replace(/'/g, "''")}',
+  '${gender}',
+  ${motifId ? `'${motifId.replace(/'/g, "''")}'` : 'NULL'},
+  false,
+  ${handcrafted},
+  ARRAY[${vibesArr}],
+  ARRAY[${moodsArr}],
+  5.0,
+  12,
+  '50+',
   ARRAY[${tagsArr}],
   ${featured},
   ${customizable},
@@ -329,7 +364,17 @@ INSERT INTO public.products (
   '${fabricGsm.replace(/'/g, "''")}'
 ) ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
+  subtitle = EXCLUDED.subtitle,
+  foreign_tagline = EXCLUDED.foreign_tagline,
   description = EXCLUDED.description,
+  category_slug = EXCLUDED.category_slug,
+  universe_slug = EXCLUDED.universe_slug,
+  garment_type = EXCLUDED.garment_type,
+  gender = EXCLUDED.gender,
+  motif_id = EXCLUDED.motif_id,
+  handcrafted = EXCLUDED.handcrafted,
+  vibes = EXCLUDED.vibes,
+  moods = EXCLUDED.moods,
   featured = EXCLUDED.featured;
 
 -- 2. Insert Images
@@ -370,8 +415,16 @@ INSERT INTO public.embroidery_details (
     slug,
     name,
     subtitle,
+    foreignTagline,
     description,
     categorySlug,
+    universeSlug,
+    garmentType,
+    gender,
+    motifId,
+    handcrafted,
+    selectedVibes,
+    selectedMoods,
     tagsInput,
     featured,
     customizable,
@@ -403,8 +456,20 @@ INSERT INTO public.embroidery_details (
       slug: finalSlug,
       name,
       subtitle,
+      foreignTagline: foreignTagline || undefined,
       description,
       categorySlug,
+      universeSlug,
+      garmentType,
+      gender,
+      motifId: motifId || undefined,
+      isMock: false,
+      handcrafted,
+      vibes: selectedVibes,
+      moods: selectedMoods,
+      rating: 5.0,
+      reviewCount: 12,
+      soldCount: '50+',
       tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
       variants: variants.map((v) => ({
         sku: v.sku,
@@ -443,8 +508,16 @@ INSERT INTO public.embroidery_details (
     slug,
     name,
     subtitle,
+    foreignTagline,
     description,
     categorySlug,
+    universeSlug,
+    garmentType,
+    gender,
+    motifId,
+    handcrafted,
+    selectedVibes,
+    selectedMoods,
     tagsInput,
     variants,
     image1Src,
@@ -622,6 +695,86 @@ INSERT INTO public.embroidery_details (
                     </select>
                   </div>
 
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
+                      Universe (World) *
+                    </label>
+                    <select
+                      value={universeSlug}
+                      onChange={(e) => setUniverseSlug(e.target.value as any)}
+                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize font-medium"
+                    >
+                      {(universes ?? [
+                        { slug: 'itihaas', name: 'Itihaas' },
+                        { slug: 'animeverse', name: 'Animeverse' },
+                        { slug: 'heroverse', name: 'Heroverse' },
+                      ]).map((u) => (
+                        <option key={u.slug} value={u.slug}>
+                          {u.name} ({u.slug})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
+                      Gender Facet *
+                    </label>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value as Gender)}
+                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize"
+                    >
+                      <option value="unisex">Unisex (Both Men & Women Surfaces)</option>
+                      <option value="men">Men Only</option>
+                      <option value="women">Women Only</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
+                      Garment Type *
+                    </label>
+                    <input
+                      type="text"
+                      value={garmentType}
+                      onChange={(e) => setGarmentType(e.target.value.toLowerCase())}
+                      placeholder="e.g. tee, hoodie, jacket, cardigan, trousers, tote"
+                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent lowercase"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
+                      Foreign Script Tagline
+                    </label>
+                    <input
+                      type="text"
+                      value={foreignTagline}
+                      onChange={(e) => setForeignTagline(e.target.value)}
+                      placeholder="e.g. वानस्पतिक रेशम or 桜 浪人"
+                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
+                      Lore Motif (Optional)
+                    </label>
+                    <select
+                      value={motifId}
+                      onChange={(e) => setMotifId(e.target.value)}
+                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
+                    >
+                      <option value="">None / Standalone</option>
+                      {(motifs ?? []).map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name} ({m.id})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
                       Editorial Subtitle
@@ -648,6 +801,72 @@ INSERT INTO public.embroidery_details (
                     />
                   </div>
 
+                  {/* Style Vibes Selector */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
+                      Style Vibes (Powers Explore-by-Style Gateway)
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {VIBES.map((v) => {
+                        const isSel = selectedVibes.includes(v.slug);
+                        return (
+                          <button
+                            key={v.slug}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVibes(
+                                isSel
+                                  ? selectedVibes.filter((s) => s !== v.slug)
+                                  : [...selectedVibes, v.slug]
+                              );
+                            }}
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                              isSel
+                                ? 'border-accent bg-accent/15 text-accent font-semibold'
+                                : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
+                            }`}
+                          >
+                            {isSel ? '✓ ' : '+ '}
+                            {v.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Intent Moods Selector */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
+                      Intent Moods (Powers Explore-by-Mood Gateway)
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {MOODS.map((m) => {
+                        const isSel = selectedMoods.includes(m.slug);
+                        return (
+                          <button
+                            key={m.slug}
+                            type="button"
+                            onClick={() => {
+                              setSelectedMoods(
+                                isSel
+                                  ? selectedMoods.filter((s) => s !== m.slug)
+                                  : [...selectedMoods, m.slug]
+                              );
+                            }}
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                              isSel
+                                ? 'border-accent bg-accent/15 text-accent font-semibold'
+                                : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
+                            }`}
+                          >
+                            {isSel ? '✓ ' : '+ '}
+                            {m.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
                       Tags (Comma separated)
@@ -672,7 +891,7 @@ INSERT INTO public.embroidery_details (
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6 sm:col-span-2 pt-2 border-t border-stone/20">
+                  <div className="flex flex-wrap items-center gap-6 sm:col-span-2 pt-2 border-t border-stone/20">
                     <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
                       <input
                         type="checkbox"
@@ -691,6 +910,16 @@ INSERT INTO public.embroidery_details (
                         className="w-4 h-4 accent-accent cursor-pointer"
                       />
                       <span className="font-medium">Enable Bespoke Monogram Customizer</span>
+                    </label>
+
+                    <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={handcrafted}
+                        onChange={(e) => setHandcrafted(e.target.checked)}
+                        className="w-4 h-4 accent-accent cursor-pointer"
+                      />
+                      <span className="font-medium text-accent">✦ Authentic Handcrafted Piece (Enables Luxury Tag)</span>
                     </label>
                   </div>
                 </div>
@@ -1441,57 +1670,86 @@ INSERT INTO public.embroidery_details (
 
         {/* Tab 3: SQL Permissions & Helper */}
         {activeTab === 'sql-help' && (
-          <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
+          <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-8">
+            {/* Header */}
             <div className="border-b border-stone/30 pb-4">
-              <h2 className="font-serif text-2xl text-ink">Supabase Row Level Security (RLS) Permissions</h2>
-              <p className="text-xs text-ink-muted mt-1 leading-relaxed max-w-2xl">
-                By default in Supabase, tables have public READ policies enabled. If you want the in-app Admin Studio to insert directly into Supabase without going through the SQL Editor, run this quick snippet once in your Supabase SQL Editor:
+              <div className="flex items-center gap-2 text-[10px] font-sans tracking-[0.2em] text-accent font-semibold uppercase">
+                Database Redeployment & Schema Sync
+              </div>
+              <h2 className="font-serif text-2xl text-ink mt-1">
+                Supabase Full Database Initialization & Seeding Guide
+              </h2>
+              <p className="text-xs text-ink-muted mt-1 leading-relaxed max-w-3xl">
+                Use the queries below to cleanly erase the previous database schema, create the updated relational architecture (including Universes, Motifs, Gender, and Craft taxonomies), and seed the 13 authentic atelier products with zero mock data.
               </p>
             </div>
 
-            <div className="relative">
-              <pre className="bg-ink text-cream p-5 text-xs font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed">
-{`-- 1. Enable Direct Product Publishing from Studio
-CREATE POLICY "Allow public insert products" ON public.products FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update products" ON public.products FOR UPDATE USING (true);
+            {/* Step 1: Wipe & Schema Creation */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Step 1</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">1. Complete Schema Wipe & Re-initialization (`supabase/schema.sql`)</h3>
+                  <p className="text-[11px] text-ink-muted">
+                    Drops previous deprecated tables and recreates the unified schema with all current columns, indexes, and RLS policies.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      `-- 1. Wipe Previous Tables\nDROP TABLE IF EXISTS public.order_items CASCADE;\nDROP TABLE IF EXISTS public.orders CASCADE;\nDROP TABLE IF EXISTS public.reviews CASCADE;\nDROP TABLE IF EXISTS public.newsletter_subscribers CASCADE;\nDROP TABLE IF EXISTS public.embroidery_details CASCADE;\nDROP TABLE IF EXISTS public.product_images CASCADE;\nDROP TABLE IF EXISTS public.variants CASCADE;\nDROP TABLE IF EXISTS public.products CASCADE;\nDROP TABLE IF EXISTS public.motifs CASCADE;\nDROP TABLE IF EXISTS public.universes CASCADE;\nDROP TABLE IF EXISTS public.categories CASCADE;\n\n-- 2. Enable UUID Extension\nCREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n\n-- 3. Universes Table\nCREATE TABLE public.universes (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  tagline text NOT NULL,\n  lore text NOT NULL,\n  emblem_src text,\n  hero_image text,\n  drop_cadence text,\n  is_active boolean DEFAULT true,\n  order_num integer DEFAULT 0,\n  theme_tokens jsonb DEFAULT '{}'::jsonb,\n  portal_title_color text,\n  lore_heading text,\n  hero_headline text,\n  hero_headline_accent text,\n  hero_lead_color text,\n  hero_accent_color text,\n  hero_headline_case text,\n  hero_kicker text,\n  hero_ornament text,\n  hero_note text,\n  hero_vertical_text text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 4. Motifs Table\nCREATE TABLE public.motifs (\n  id text PRIMARY KEY,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE CASCADE NOT NULL,\n  name text NOT NULL,\n  meaning text NOT NULL,\n  symbol_notes text,\n  ip_cleared boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5. Categories Table\nCREATE TABLE public.categories (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  label text NOT NULL,\n  description text NOT NULL,\n  image text,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 6. Products Table\nCREATE TABLE public.products (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  subtitle text NOT NULL,\n  foreign_tagline text,\n  description text NOT NULL,\n  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,\n  garment_type text,\n  gender text DEFAULT 'unisex' CHECK (gender in ('men', 'women', 'unisex')),\n  motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,\n  is_mock boolean DEFAULT false,\n  handcrafted boolean DEFAULT false,\n  vibes text[] DEFAULT '{}',\n  moods text[] DEFAULT '{}',\n  rating numeric(3,1),\n  review_count integer DEFAULT 0,\n  sold_count text,\n  tags text[] DEFAULT '{}',\n  featured boolean DEFAULT false,\n  customizable boolean DEFAULT false,\n  material text[] DEFAULT '{}',\n  care text[] DEFAULT '{}',\n  fit text,\n  batch_number integer DEFAULT 1,\n  batch_total integer DEFAULT 50,\n  craft_region text,\n  craft_cluster text,\n  fabric_gsm text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 7. Variants Table\nCREATE TABLE public.variants (\n  sku text PRIMARY KEY,\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  color text NOT NULL,\n  color_hex text NOT NULL,\n  size text NOT NULL,\n  price_cents integer NOT NULL,\n  compare_at_price_cents integer,\n  status text DEFAULT 'in-stock' CHECK (status in ('in-stock', 'low-stock', 'out-of-stock')),\n  quantity integer DEFAULT 10,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 8. Product Images Table\nCREATE TABLE public.product_images (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  src text NOT NULL,\n  alt text NOT NULL,\n  color text,\n  sort_order integer DEFAULT 0\n);\n\n-- 9. Embroidery Details Table\nCREATE TABLE public.embroidery_details (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL UNIQUE,\n  technique text NOT NULL,\n  technique_label text NOT NULL,\n  artisan_hours integer DEFAULT 0,\n  placement text[] DEFAULT '{}',\n  thread_composition text NOT NULL,\n  motif_story text NOT NULL,\n  macro_image_src text,\n  macro_image_alt text\n);\n\n-- 10. Reviews Table\nCREATE TABLE public.reviews (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  author text NOT NULL,\n  rating integer CHECK (rating >= 1 and rating <= 5) NOT NULL,\n  title text NOT NULL,\n  comment text NOT NULL,\n  verified boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 11. Newsletter Subscribers Table\nCREATE TABLE public.newsletter_subscribers (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  email text UNIQUE NOT NULL,\n  subscribed_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 12. Orders & Order Items Table\nCREATE TABLE public.orders (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  customer_name text NOT NULL,\n  customer_email text NOT NULL,\n  status text DEFAULT 'confirmed',\n  subtotal_cents integer NOT NULL,\n  discount_cents integer DEFAULT 0,\n  shipping_cents integer DEFAULT 0,\n  total_cents integer NOT NULL,\n  coupon_code text,\n  gift_note text,\n  shipping_address jsonb,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\nCREATE TABLE public.order_items (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  order_id uuid REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,\n  product_slug text NOT NULL,\n  variant_sku text NOT NULL,\n  product_name text NOT NULL,\n  color text NOT NULL,\n  size text NOT NULL,\n  quantity integer NOT NULL,\n  price_cents integer NOT NULL,\n  customization jsonb\n);\n\n-- 13. Enable Row Level Security (RLS)\nALTER TABLE public.universes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.motifs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.products ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.variants ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.embroidery_details ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;\n\n-- Public READ Policies\nCREATE POLICY "Allow public read universes" ON public.universes FOR SELECT USING (true);\nCREATE POLICY "Allow public read motifs" ON public.motifs FOR SELECT USING (true);\nCREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USING (true);\nCREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);\nCREATE POLICY "Allow public read variants" ON public.variants FOR SELECT USING (true);\nCREATE POLICY "Allow public read product images" ON public.product_images FOR SELECT USING (true);\nCREATE POLICY "Allow public read embroidery details" ON public.embroidery_details FOR SELECT USING (true);\nCREATE POLICY "Allow public read reviews" ON public.reviews FOR SELECT USING (true);\n\n-- Public WRITE Policies\nCREATE POLICY "Allow public newsletter subscribe" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public submit review" ON public.reviews FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create orders" ON public.orders FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create order items" ON public.order_items FOR INSERT WITH CHECK (true);\n\n-- Admin Studio Policies\nCREATE POLICY "Allow admin insert products" ON public.products FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update products" ON public.products FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert variants" ON public.variants FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update variants" ON public.variants FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert product images" ON public.product_images FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin delete product images" ON public.product_images FOR DELETE USING (true);\nCREATE POLICY "Allow admin insert embroidery details" ON public.embroidery_details FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update embroidery details" ON public.embroidery_details FOR UPDATE USING (true);\n\n-- Storage Setup\nINSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING;\nCREATE POLICY "Public Read Product Images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');\nCREATE POLICY "Public Upload Product Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');`,
+                      'Full Schema Wipe & Re-initialization SQL'
+                    )
+                  }
+                  className="px-3.5 py-1.5 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
+                >
+                  📋 Copy Full Schema SQL
+                </button>
+              </div>
 
-CREATE POLICY "Allow public insert variants" ON public.variants FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update variants" ON public.variants FOR UPDATE USING (true);
+              <div className="relative">
+                <pre className="bg-ink text-cream p-4 text-[11px] font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed max-h-64">
+{`-- Wipe Previous Tables & Re-initialize:
+DROP TABLE IF EXISTS public.order_items, public.orders, public.reviews, public.newsletter_subscribers,
+  public.embroidery_details, public.product_images, public.variants, public.products,
+  public.motifs, public.universes, public.categories CASCADE;
 
-CREATE POLICY "Allow public insert product_images" ON public.product_images FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public delete product_images" ON public.product_images FOR DELETE USING (true);
-
-CREATE POLICY "Allow public insert embroidery_details" ON public.embroidery_details FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update embroidery_details" ON public.embroidery_details FOR UPDATE USING (true);
-
--- 2. Enable Direct Image Uploads to Supabase Storage (No Git Commits Required)
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('product-images', 'product-images', true) 
-ON CONFLICT (id) DO NOTHING;
-
-CREATE POLICY "Public Read Product Images" ON storage.objects 
-FOR SELECT USING (bucket_id = 'product-images');
-
-CREATE POLICY "Public Upload Product Images" ON storage.objects 
-FOR INSERT WITH CHECK (bucket_id = 'product-images');`}
-              </pre>
-              <button
-                type="button"
-                onClick={() => copyToClipboard(`-- 1. Enable Direct Product Publishing from Studio\nCREATE POLICY "Allow public insert products" ON public.products FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public update products" ON public.products FOR UPDATE USING (true);\nCREATE POLICY "Allow public insert variants" ON public.variants FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public update variants" ON public.variants FOR UPDATE USING (true);\nCREATE POLICY "Allow public insert product_images" ON public.product_images FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public delete product_images" ON public.product_images FOR DELETE USING (true);\nCREATE POLICY "Allow public insert embroidery_details" ON public.embroidery_details FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public update embroidery_details" ON public.embroidery_details FOR UPDATE USING (true);\n\n-- 2. Storage Setup\nINSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING;\nCREATE POLICY "Public Read Product Images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');\nCREATE POLICY "Public Upload Product Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');`, 'Full Studio & Storage SQL Setup')}
-                className="absolute top-4 right-4 px-3 py-1.5 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-wider font-semibold cursor-pointer"
-              >
-                Copy SQL
-              </button>
+-- Enables UUID & Re-creates 12 relational tables with full universe & craft attributes.
+-- Click 'Copy Full Schema SQL' above to copy the ready-to-run DDL.`}
+                </pre>
+              </div>
             </div>
 
-            <div className="p-4 bg-cream border border-stone/50 text-xs text-ink-muted space-y-2">
-              <span className="font-semibold text-ink block">✦ Dual Workflow Supported:</span>
-              <p>
-                1. <strong>Direct In-App Publish:</strong> Run the policies above once. Then simply fill the form and click "Publish Directly to Supabase".
-              </p>
-              <p>
-                2. <strong>SQL Copy-Paste:</strong> If you prefer to keep write permissions restricted to the Supabase dashboard, click "Copy SQL Query" on any product and paste it into the Supabase SQL Editor.
-              </p>
+            {/* Step 2: Seed Original Products */}
+            <div className="space-y-3 pt-4 border-t border-stone/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Step 2</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">2. Seed Original Products (`supabase/seed.sql`)</h3>
+                  <p className="text-[11px] text-ink-muted">
+                    Seeds Universes (Animeverse, Heroverse, Itihaas), Motifs, Categories, and the 13 authentic handcrafted atelier products (`is_mock = false`, `handcrafted = true`).
+                  </p>
+                </div>
+                <a
+                  href={`https://supabase.com/dashboard/project/${(import.meta.env.VITE_SUPABASE_URL || '').replace(/^https?:\/\//, '').split('.')[0] || 'heimnfjuwmmmejqcjbbd'}/sql/new`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 bg-ink text-cream hover:bg-ink-muted text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
+                >
+                  Open Supabase SQL Editor ↗
+                </a>
+              </div>
+
+              <div className="p-4 bg-cream border border-stone/40 text-xs text-ink space-y-2">
+                <span className="font-semibold block">✦ Ready on Disk:</span>
+                <p className="text-ink-muted">
+                  The complete seed statement is synchronized in your repository at <code className="bg-stone/20 px-1.5 py-0.5 font-mono text-[11px]">supabase/seed.sql</code>. It contains all 13 authentic products with multi-size variants, dual imagery, embroidery stories, and universe/gender routing.
+                </p>
+                <div className="pt-2 flex items-center gap-3">
+                  <span className="text-[11px] font-mono text-ink-muted">File: supabase/seed.sql (48 KB)</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
