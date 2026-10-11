@@ -23,9 +23,9 @@ export const Bestsellers: React.FC = () => {
   const [canNext, setCanNext] = useState(false);
 
   // Gesture custody: trackpad swipes over the rail scroll only the rail
-  // (Lenis stands down via data-lenis-prevent; diagonal intent is resolved
+  // (Lenis stands down via data-lenis-prevent-horizontal; diagonal intent is resolved
   // by dominant axis in the guard, with snap + smooth-scroll suspended for
-  // the gesture's duration). Vertical-dominant swipes hand back untouched.
+  // the gesture's duration). Vertical-dominant swipes hand back untouched to Lenis.
   useHorizontalRailGuard(rowRef);
 
   const visible = useMemo(
