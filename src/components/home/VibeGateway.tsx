@@ -16,13 +16,20 @@ import { VIBES, type Vibe, type VibeInfo } from '../../lib/data';
  * placeholders until the P5 campaign shoots.
  */
 const VIBE_IMAGE: Record<Vibe, string> = {
-  aesthetic: '/images/categories/knitwear.jpg',
-  clean: '/images/categories/tops.jpg',
-  minimal: '/images/categories/accessories.jpg',
-  expressive: '/images/categories/outerwear.jpg',
+  aesthetic: '/images/vibes/aesthetic.png',
+  clean: '/images/vibes/clean.png',
+  minimal: '/images/vibes/minimal.png',
+  expressive: '/images/vibes/expressive.png',
   noir: '/images/categories/outerwear.jpg',
   pearl: '/images/categories/tops.jpg',
   gilded: '/images/categories/knitwear.jpg',
+};
+
+const VIBE_OBJECT_POSITION: Partial<Record<Vibe, string>> = {
+  aesthetic: '78% center',
+  clean: '68% center',
+  minimal: '75% center',
+  expressive: '68% center',
 };
 
 export const VibeGateway: React.FC = () => {
@@ -52,11 +59,12 @@ export const VibeGateway: React.FC = () => {
       key={v.slug}
       className="group relative rounded-2xl transition-all duration-300 hover:z-10 hover:scale-[1.04] hover:ring-2 hover:ring-gold hover:shadow-[0_28px_70px_rgba(160,114,45,0.28)]"
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-stone/30">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-[#ded7cb]">
         <img
           src={VIBE_IMAGE[v.slug]}
           alt={`${v.title} style — ${v.tagline}`}
           loading="lazy"
+          style={{ objectPosition: VIBE_OBJECT_POSITION[v.slug] ?? 'center' }}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         {/* Dual scrim: top for the title block, bottom for the CTA */}
