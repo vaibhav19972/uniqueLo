@@ -8,17 +8,20 @@ import { useEffect, type RefObject } from 'react';
  * rail therefore moves BOTH the rail (native deltaX) and the page (Lenis
  * reading the gesture's small deltaY) — the "both axes scroll at once" bug.
  *
- * Layered resolution (the caller must also spread `data-lenis-prevent` onto
+ * Layered resolution (the caller must also spread `data-lenis-prevent-horizontal` onto
  * the rail element — see RAIL_PREVENT_ATTR):
  *
- * 1. `data-lenis-prevent` makes Lenis stand down for events composed inside
- *    the rail, so it stops driving the page during rail gestures.
+ * 1. `data-lenis-prevent-horizontal` makes Lenis stand down specifically for horizontal
+ *    gestures inside the rail (gestureOrientation === 'horizontal'). Crucially,
+ *    vertical scroll gestures (gestureOrientation === 'vertical') are NOT prevented,
+ *    allowing Lenis to smoothly scroll the page vertically past the section without
+ *    fighting native scroll.
  * 2. This capture-phase wheel listener resolves diagonal intent by dominant
  *    axis: when horizontal intent dominates AND the rail can still move that
  *    way, the whole event is default-prevented (killing the vertical leak)
  *    and the horizontal delta is applied manually. At either rail edge — or
  *    when vertical intent dominates — the event passes through untouched so
- *    the page keeps scrolling normally.
+ *    the page keeps scrolling normally with Lenis.
  * 3. While a guarded gesture is active, `scroll-snap-type` AND
  *    `scroll-behavior` are temporarily suspended:
  *      - Chrome re-snaps snap-proximity containers after every programmatic
@@ -35,7 +38,7 @@ import { useEffect, type RefObject } from 'react';
  * natively, and pinning `touch-action: pan-x` here would turn the rail's
  * full card height into a vertical scroll dead zone.
  */
-export const RAIL_PREVENT_ATTR = { 'data-lenis-prevent': true } as const;
+export const RAIL_PREVENT_ATTR = { 'data-lenis-prevent-horizontal': true } as const;
 
 const SNAP_RESTORE_DELAY_MS = 180;
 
@@ -67,8 +70,9 @@ export function useHorizontalRailGuard(ref: RefObject<HTMLElement | null>): void
       const horizontalIntent = Math.abs(e.deltaX) > Math.abs(e.deltaY);
       if (!horizontalIntent) return;
 
-      const atStart = el.scrollLeft <= 0;
-      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+      const tolerance = 2;
+      const atStart = el.scrollLeft <= tolerance;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - tolerance;
       const canScroll = (e.deltaX < 0 && !atStart) || (e.deltaX > 0 && !atEnd);
       if (!canScroll) return;
 

@@ -24,6 +24,8 @@ function Stars({ rating }: { rating: number }) {
  * compare-at + computed %OFF, color dots, hover Quick-View overlay with
  * size chips + Add to Cart.
  */
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'OS'];
+
 export const BestsellerCard: React.FC<{ product: Product; universeName?: string }> = ({
   product,
   universeName,
@@ -34,7 +36,6 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((s) => s.showToast);
 
-  const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'OS'];
   const sizes = useMemo(() => {
     const unique = [...new Set(product.variants.map((v) => v.size))];
     return unique.sort((a, b) => {
