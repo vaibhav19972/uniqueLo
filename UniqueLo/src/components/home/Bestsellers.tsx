@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProducts, useUniverses } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { BestsellerCard } from './BestsellerCard';
@@ -18,6 +18,8 @@ export const Bestsellers: React.FC = () => {
   const { data: universes } = useUniverses();
   const [tab, setTab] = useState<string>('all');
   const rowRef = useRef<HTMLDivElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
 
   const visible = useMemo(
     () => (products ?? []).filter((p) => tab === 'all' || p.universeSlug === tab),
@@ -26,12 +28,48 @@ export const Bestsellers: React.FC = () => {
 
   const universeName = (slug?: string) => universes?.find((u) => u.slug === slug)?.name;
 
+  const updateEdges = useCallback(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const tolerance = 4;
+    setCanPrev(el.scrollLeft > tolerance);
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - tolerance);
+  }, []);
+
+  useEffect(() => {
+    updateEdges();
+    const el = rowRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateEdges, { passive: true });
+    window.addEventListener('resize', updateEdges);
+    return () => {
+      el.removeEventListener('scroll', updateEdges);
+      window.removeEventListener('resize', updateEdges);
+    };
+  }, [updateEdges, visible.length]);
+
+  // Reset scroll position when the universe tab changes so the new list
+  // always starts aligned — otherwise a mid-list offset looks broken.
+  useEffect(() => {
+    rowRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    // Re-evaluate arrows after the list re-renders.
+    requestAnimationFrame(updateEdges);
+  }, [tab, updateEdges]);
+
   const scrollBy = (dir: 1 | -1) => {
-    rowRef.current?.scrollBy({ left: dir * 640, behavior: 'smooth' });
+    const el = rowRef.current;
+    if (!el) return;
+    // Step by exactly one card + gap so arrows always land on a card edge
+    // instead of mid-card (fixed 640px ignored responsive card widths and
+    // fought with scroll-snap, causing the "janky" feel).
+    const firstCard = el.querySelector<HTMLElement>(':scope > *');
+    const gap = 20; // gap-5
+    const step = firstCard ? firstCard.offsetWidth + gap : Math.round(el.clientWidth * 0.8);
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
   return (
-    <section aria-labelledby="best-heading" className="bg-cream py-16 lg:py-24">
+    <section aria-labelledby="best-heading" className="bg-cream py-16 lg:py-24 overflow-x-clip">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Bestsellers"
@@ -43,7 +81,7 @@ export const Bestsellers: React.FC = () => {
         />
 
         {/* Universe tabs + arrows — pipe-separated, selected = gold + underline (render 05) */}
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-2">
           <div role="tablist" aria-label="Filter bestsellers by universe" className="flex items-center">
             {[{ slug: 'all', name: 'All' }, ...(universes ?? []).map((u) => ({ slug: u.slug, name: u.name }))].map(
               (t, i) => (
@@ -67,25 +105,31 @@ export const Bestsellers: React.FC = () => {
             )}
           </div>
           <div className="hidden sm:flex items-center gap-2">
-            <button onClick={() => scrollBy(-1)} aria-label="Scroll bestsellers back" className="w-11 h-11 rounded-full border border-stone flex items-center justify-center text-ink hover:border-ink transition-colors">
+            <button onClick={() => scrollBy(-1)} disabled={!canPrev} aria-label="Scroll bestsellers back" className="w-11 h-11 rounded-full border border-stone flex items-center justify-center text-ink hover:border-ink transition-all disabled:opacity-30 disabled:pointer-events-none">
               <span aria-hidden="true">←</span>
             </button>
-            <button onClick={() => scrollBy(1)} aria-label="Scroll bestsellers forward" className="w-11 h-11 rounded-full bg-gold text-cream flex items-center justify-center hover:bg-gold-hover transition-colors">
+            <button onClick={() => scrollBy(1)} disabled={!canNext} aria-label="Scroll bestsellers forward" className="w-11 h-11 rounded-full bg-gold text-cream flex items-center justify-center hover:bg-gold-hover transition-all disabled:opacity-30 disabled:pointer-events-none">
               <span aria-hidden="true">→</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Cards — native hardware-accelerated momentum scroll; py breathing
-            room keeps hover lift + shadow unclipped; overscroll contains the axis */}
-        <div ref={rowRef} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-px-4 py-4 -my-2">
+        {/* Rail is full-bleed with its own container-matching padding. Previously it
+            sat inside the padded container with no inner padding, so the first /
+            last card's hover ring + shadow were sliced at the scroller edge.
+            Extra vertical padding keeps the hover lift unclipped (overflow-x:auto
+            forces overflow-y to clip). snap-proximity + card-width stepping
+            replaces snap-mandatory + fixed 640px which landed mid-card. */}
+        <div ref={rowRef} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-proximity scroll-px-4 sm:scroll-px-6 lg:scroll-px-12 scroll-smooth w-full max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {visible.map((p) => (
             <BestsellerCard key={p.slug} product={p} universeName={universeName(p.universeSlug)} />
           ))}
         </div>
 
         {/* Trust strip — gold line-icon in beige circle, serif title (render 05) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 pt-8 border-t border-stone/60">
+        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-2 pt-8 border-t border-stone/60">
           {TRUST.map((t, i) => (
             <div
               key={t.title}

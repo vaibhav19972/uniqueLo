@@ -12,11 +12,11 @@ import { MarketingHeader } from '../ui/MarketingHeader';
  */
 const ATELIER_NOTE = {
   quote:
-    'Every motif starts as a sketch in our studio, then becomes embroidery you will want to live in — rich thread, honest fabric, nothing shouty.',
-  name: 'The UniqueLo Atelier',
-  role: 'Design note',
+    'For me, embroidery is a way of keeping our stories alive — in every stitch, there is a piece of home.',
+  name: 'Savitri Devi',
+  role: 'Artisan, Uttar Pradesh',
   photo: '/images/campaigns/lookbook-01.jpg',
-  photoAlt: 'Embroidered motif close-up (sample photo, replace at P5)',
+  photoAlt: 'Artisan hand-embroidering a motif (sample photo, replace at P5)',
 };
 
 const STEPS = [
@@ -36,10 +36,10 @@ const STEPS = [
   },
   {
     n: '03',
-    title: 'Threadwork',
-    detail: 'Motifs stitched in rich, lasting thread.',
+    title: '40-hr handwork',
+    detail: 'Skilled hands bring every detail to life.',
     image: '/images/campaigns/lookbook-03.jpg',
-    alt: 'Step 3 — embroidered floral motif close-up (placeholder)',
+    alt: 'Step 3 — hands stitching a floral motif (placeholder)',
   },
   {
     n: '04',
@@ -84,80 +84,98 @@ export const CraftStory: React.FC = () => {
           titleId="craft-heading"
           sub="Every piece is thoughtfully designed in India — detailed embroidery, natural fabrics, contemporary expression."
           linkTo="/atelier"
-          linkLabel="How your clothes are made"
+          linkLabel="The people behind your clothes"
         />
 
-        {/* Macro visual bleeds to the left viewport edge on lg (render 04) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start mt-2">
-          <div className="relative aspect-[4/5] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:aspect-auto lg:h-full">
+        {/* Macro visual bleeds to the left viewport edge on lg and stretches
+            to the full height of the right column (render 04) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch mt-2">
+          <div className="relative min-h-[380px] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:min-h-[560px]">
             <img
               src="/images/campaigns/atelier-craft.jpg"
               alt="Macro of gold and red embroidery (placeholder)"
               loading="lazy"
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
 
           {/* Steps + artisan */}
-          <div>
-            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="flex flex-col">
+            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
               {STEPS.map((s, i) => (
-                <li key={s.n} className="flex flex-col">
-                  <p className="font-serif text-3xl text-gold">
-                    {s.n}
+                <li key={s.n} className="flex min-w-0 flex-col">
+                  {/* Number row — the → separators live here so every arrow
+                      sits on one shared baseline (render 04) */}
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-[32px] leading-none text-gold">{s.n}</span>
                     {i < STEPS.length - 1 && (
-                      <span aria-hidden="true" className="text-stone text-2xl ml-1.5 hidden lg:inline">
+                      <span aria-hidden="true" className="text-gold/70 text-xl leading-none">
                         →
                       </span>
                     )}
+                  </div>
+                  <p className="font-serif text-lg text-ink mt-2 leading-snug">{s.title}</p>
+                  <p className="font-serif text-[13px] text-ink-muted mt-1 leading-relaxed">
+                    {s.detail}
                   </p>
-                  <p className="font-serif text-lg text-ink mt-1">{s.title}</p>
-                  <p className="font-serif text-[13px] text-ink-muted mt-1 leading-relaxed">{s.detail}</p>
-                  <div className="aspect-square overflow-hidden bg-stone/30 mt-3">
-                    <img src={s.image} alt={s.alt} loading="lazy" className="w-full h-full object-cover" />
+                  {/* mt-auto pins every thumbnail to the bottom of the tallest
+                      card, so images 02 + 03 align with 01 + 04 even though
+                      the text blocks above have different heights */}
+                  <div className="mt-auto">
+                    <div className="aspect-square overflow-hidden rounded-lg bg-stone/30 mt-3">
+                      <img
+                        src={s.image}
+                        alt={s.alt}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
                 </li>
               ))}
             </ol>
 
-            {/* Atelier note — barely-lighter cream strip, no card chrome */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-parchment/60 p-5 sm:p-6">
-              <div className="sm:col-span-3">
-                <div className="aspect-[3/4] overflow-hidden bg-stone/30">
+            {/* Artisan note — photo · quote + signature · atelier count (render 04) */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-parchment/60 p-5 sm:p-6 items-center">
+              <div className="sm:col-span-4">
+                <div className="aspect-[4/3] overflow-hidden rounded-md bg-stone/30">
                   <img src={ATELIER_NOTE.photo} alt={ATELIER_NOTE.photoAlt} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               </div>
-              <div className="sm:col-span-6">
+              <div className="sm:col-span-5">
                 <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed">
                   “{ATELIER_NOTE.quote}”
                 </blockquote>
                 {/* Script signature face not self-hosted — italic serif stands in (logged) */}
-                <p className="font-serif italic text-lg text-ink mt-3">{ATELIER_NOTE.name}</p>
-                <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted mt-0.5">
-                  {ATELIER_NOTE.role}
+                <p className="font-serif italic text-[28px] text-ink mt-3 leading-none">{ATELIER_NOTE.name}</p>
+                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mt-2">
+                  {ATELIER_NOTE.name} · {ATELIER_NOTE.role}
                 </p>
               </div>
               <div className="sm:col-span-3 sm:border-l sm:border-stone/60 sm:pl-5 flex flex-col justify-center">
-                <p className="font-serif text-[15px] text-ink leading-relaxed">
-                  Every piece passes a 4-step finish check before it ships.
+                <svg aria-hidden="true" className="w-8 h-8 text-gold/70" fill="none" stroke="currentColor" strokeWidth="1.25" viewBox="0 0 32 32">
+                  <path strokeLinecap="round" d="M16 28C16 20 16 12 16 4M16 12c-3 0-6-2-7-5 3 0 6 2 7 5zm0 6c3 0 6-2 7-5-3 0-6 2-7 5zm0 4c-3 0-6-2-7-5 3 0 6 2 7 5z" />
+                </svg>
+                <p className="font-serif text-[15px] text-ink leading-relaxed mt-2">
+                  Over 30+ artisans across India bring UniqueLo to life.
                 </p>
                 <Link
                   to="/atelier"
                   className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold border-b border-gold/40 hover:border-gold transition-colors"
                 >
-                  Explore our techniques <span aria-hidden="true">→</span>
+                  Meet our artisans <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Trust badges */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10 pt-8 border-t border-stone/60">
-          {BADGES.map((b) => (
-            <div key={b.title} className="flex items-center gap-4">
-              <span className="w-12 h-12 rounded-full bg-stone/40 flex items-center justify-center shrink-0 text-ink" aria-hidden="true">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Trust badges — hairline dividers between columns (render 04) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10 pt-8 border-t border-stone/60 sm:divide-x sm:divide-stone/60">
+          {BADGES.map((b, i) => (
+            <div key={b.title} className={`flex items-center gap-4 ${i > 0 ? 'sm:pl-6' : ''}`}>
+              <span className="w-14 h-14 rounded-full bg-parchment flex items-center justify-center shrink-0 text-ink" aria-hidden="true">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {b.icon}
                 </svg>
               </span>
