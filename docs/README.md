@@ -26,6 +26,7 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | **[06 — Assets & Placeholders](./06-assets-and-placeholders/README.md)** | Visual Asset Pipeline | Tonal color block placeholders, aspect ratio rules, asset registry, and photography transition strategy. |
 | **[07 — Backend & Admin](./07-backend/README.md)** | Strapi v5 & Admin Roles | Content types mirroring `data.ts` (Product/Variant/Category/Article/CraftTechnique), Editor role (articles + prices), product upload with craft/region fields, inventory per variant, and the `data.ts` async migration seam. |
 | **[08 — Universe Build](./08-universe-build/README.md)** | Themed-Universe Pre-Build Bible | Universes × vibes vision, navigation/IA, data-model deltas, theming tokens, page specs, commerce flow, image pipeline, SEO/a11y/perf gates, phase cards. Nothing builds until this section agrees. |
+| **[09 — Reference Redesign](./09-reference-redesign-from-competitors/README.md)** | Competitor-Inspired Redesign Dock | The Souled Store teardown, article-presentation analysis, pick-and-place decisions, phased implementation roadmap. |
 
 ---
 

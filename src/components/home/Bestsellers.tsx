@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProducts, useUniverses } from '../../hooks/useCatalog';
+import { useHorizontalRailGuard, RAIL_PREVENT_ATTR } from '../../hooks/useHorizontalRailGuard';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { BestsellerCard } from './BestsellerCard';
 
@@ -20,6 +21,12 @@ export const Bestsellers: React.FC = () => {
   const rowRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
+
+  // Gesture custody: trackpad swipes over the rail scroll only the rail
+  // (Lenis stands down via data-lenis-prevent; diagonal intent is resolved
+  // by dominant axis in the guard, with snap + smooth-scroll suspended for
+  // the gesture's duration). Vertical-dominant swipes hand back untouched.
+  useHorizontalRailGuard(rowRef);
 
   const visible = useMemo(
     () => (products ?? []).filter((p) => tab === 'all' || p.universeSlug === tab),
@@ -121,7 +128,7 @@ export const Bestsellers: React.FC = () => {
             Extra vertical padding keeps the hover lift unclipped (overflow-x:auto
             forces overflow-y to clip). snap-proximity + card-width stepping
             replaces snap-mandatory + fixed 640px which landed mid-card. */}
-        <div ref={rowRef} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-proximity scroll-px-4 sm:scroll-px-6 lg:scroll-px-12 scroll-smooth w-full max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div ref={rowRef} {...RAIL_PREVENT_ATTR} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-proximity scroll-px-4 sm:scroll-px-6 lg:scroll-px-12 scroll-smooth w-full max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {visible.map((p) => (
             <BestsellerCard key={p.slug} product={p} universeName={universeName(p.universeSlug)} />
           ))}

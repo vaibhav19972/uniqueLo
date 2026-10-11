@@ -34,7 +34,19 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((s) => s.showToast);
 
-  const sizes = useMemo(() => [...new Set(product.variants.map((v) => v.size))], [product]);
+  const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'OS'];
+  const sizes = useMemo(() => {
+    const unique = [...new Set(product.variants.map((v) => v.size))];
+    return unique.sort((a, b) => {
+      const ia = SIZE_ORDER.indexOf(a);
+      const ib = SIZE_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }, [product]);
+
   const colors = useMemo(() => {
     const seen = new Map<string, string>();
     for (const v of product.variants) {
@@ -52,25 +64,31 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   );
   const isWish = isWishlisted(product.slug);
 
-  const compareAt = defaultVariant.compareAtPriceCents;
+  const currentVariant = useMemo(() => {
+    return (
+      product.variants.find((v) => v.size === size && v.status !== 'out-of-stock') ??
+      product.variants.find((v) => v.size === size) ??
+      defaultVariant
+    );
+  }, [product, size, defaultVariant]);
+
+  const compareAt = currentVariant.compareAtPriceCents ?? defaultVariant.compareAtPriceCents;
   const offPct =
-    compareAt && compareAt > defaultVariant.priceCents
-      ? Math.round((1 - defaultVariant.priceCents / compareAt) * 100)
+    compareAt && compareAt > currentVariant.priceCents
+      ? Math.round((1 - currentVariant.priceCents / compareAt) * 100)
       : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const variant =
-      product.variants.find((v) => v.size === size && v.status !== 'out-of-stock') ?? defaultVariant;
-    if (variant.status === 'out-of-stock') {
-      showToast({ title: 'Sold out', description: `${product.name} is currently sold out.`, type: 'info' });
+    if (currentVariant.status === 'out-of-stock') {
+      showToast({ title: 'Sold out', description: `${product.name} is currently sold out in size ${size}.`, type: 'info' });
       return;
     }
-    addItem(product.slug, variant.sku, 1, undefined, variant.quantity ?? 99);
+    addItem(product.slug, currentVariant.sku, 1, undefined, currentVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${product.name} (${variant.color} / ${variant.size})`,
+      description: `${product.name} (${currentVariant.color} / ${currentVariant.size})`,
       type: 'success',
     });
   };
@@ -109,32 +127,48 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </svg>
         </button>
 
-        {/* Hover / focus Quick-View overlay — dark bar + floating purchase panel */}
-        <div className="absolute inset-x-3 bottom-3 flex flex-col gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300">
+        {/* Hover / focus Quick-View overlay — compact integrated capsule matching render 05 */}
+        <div className="absolute inset-x-2.5 sm:inset-x-3 bottom-2.5 sm:bottom-3 flex flex-col opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300 z-10 filter drop-shadow-[0_12px_28px_rgba(0,0,0,0.18)] pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
+          {/* Quick View top bar — dark smoky glass tab */}
           <button
-            onClick={() => openQuickView(product)}
-            className="flex items-center justify-center gap-2 rounded-lg bg-ink/85 backdrop-blur text-cream py-2.5 min-h-[44px] font-serif text-[16px]"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openQuickView(product);
+            }}
+            aria-label={`Quick view ${product.name}`}
+            className="w-full flex items-center justify-center gap-2 rounded-t-xl bg-[#201c18]/85 hover:bg-[#201c18]/95 backdrop-blur-md text-white py-2 min-h-[34px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
           >
-            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-4 h-4 shrink-0 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
               <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
             </svg>
-            Quick View
+            <span>Quick View</span>
           </button>
-          <div className="bg-paper/95 backdrop-blur border border-stone/60 rounded-lg p-3">
-            <div className="flex items-center justify-center gap-1.5" role="group" aria-label="Choose size">
+
+          {/* Size selection & Add to Cart — crisp white floating surface */}
+          <div className="bg-white rounded-b-xl p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
+            <div className="grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="Choose size">
               {sizes.map((s) => {
                 const available = inStockSizes.has(s);
                 return (
                   <button
                     key={s}
+                    type="button"
                     disabled={!available}
-                    onClick={() => setSize(s)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSize(s);
+                    }}
                     aria-pressed={size === s}
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                    className={`min-w-[36px] min-h-[36px] px-1.5 text-xs border rounded-md transition-colors ${
-                      size === s ? 'bg-gold text-cream border-transparent' : 'border-stone text-ink hover:border-ink'
-                    } ${available ? '' : 'opacity-30 line-through'}`}
+                    className={`h-8 px-1 text-[12px] sm:text-[13px] font-serif border rounded-[5px] transition-colors flex items-center justify-center ${
+                      size === s
+                        ? 'bg-gold text-cream border-transparent font-medium shadow-xs'
+                        : 'bg-white border-[#ded8cf] text-ink hover:border-gold'
+                    } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
                   >
                     {s}
                   </button>
@@ -142,10 +176,11 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
               })}
             </div>
             <button
+              type="button"
               onClick={handleAdd}
-              className="w-full mt-2 bg-gold text-cream rounded-lg font-serif text-[16px] py-2.5 min-h-[44px] hover:bg-gold-hover transition-colors"
+              className="w-full mt-2 h-[36px] sm:h-[38px] bg-gold text-cream rounded-[6px] font-serif text-[13px] sm:text-[14px] hover:bg-gold-hover transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99]"
             >
-              Add to Cart — {formatPrice(defaultVariant.priceCents)}
+              Add to Cart — {formatPrice(currentVariant.priceCents)}
             </button>
           </div>
         </div>
