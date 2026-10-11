@@ -75,6 +75,7 @@ export interface Universe {
   hero_ornament?: 'lotus' | 'compass';
   hero_note?: string;
   hero_vertical_text?: string;
+  hero_image?: string;
   emblem_src?: string;
   drop_cadence?: string;
   is_active: boolean;
