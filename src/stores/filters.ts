@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FilterState, SortKey, EmbroideryTechnique, Gender, Vibe } from '../lib/data';
+import type { FilterState, SortKey, EmbroideryTechnique, Gender, Vibe, MoodSlug } from '../lib/data';
 
 interface FiltersStore {
   filters: FilterState;
@@ -7,6 +7,7 @@ interface FiltersStore {
   setUniverse: (universeSlug: string | 'all') => void;
   setGender: (gender: Gender | 'all') => void;
   setVibe: (vibe: Vibe | 'all') => void;
+  setMood: (mood: MoodSlug | 'all') => void;
   toggleGarmentType: (garmentType: string) => void;
   toggleColor: (color: string) => void;
   toggleSize: (size: string) => void;
@@ -23,6 +24,7 @@ const initialFilters: FilterState = {
   gender: 'all',
   garmentTypes: [],
   vibe: 'all',
+  mood: 'all',
   colors: [],
   sizes: [],
   techniques: [],
@@ -52,6 +54,11 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
   setVibe: (vibe) =>
     set((state) => ({
       filters: { ...state.filters, vibe },
+    })),
+
+  setMood: (mood) =>
+    set((state) => ({
+      filters: { ...state.filters, mood },
     })),
 
   toggleGarmentType: (garmentType) =>

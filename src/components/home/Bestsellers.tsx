@@ -99,12 +99,12 @@ export const Bestsellers: React.FC = () => {
                     aria-selected={tab === t.slug}
                     onClick={() => setTab(t.slug)}
                     className={`relative pb-2 text-[16px] font-serif min-h-[44px] transition-colors ${
-                      tab === t.slug ? 'text-gold font-medium' : 'text-ink-muted hover:text-gold'
+                      tab === t.slug ? 'text-gold-deep font-medium' : 'text-ink-muted hover:text-gold-deep'
                     }`}
                   >
                     {t.name}
                     {tab === t.slug && (
-                      <span aria-hidden="true" className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold" />
+                      <span aria-hidden="true" className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold-deep" />
                     )}
                   </button>
                 </React.Fragment>
@@ -115,7 +115,7 @@ export const Bestsellers: React.FC = () => {
             <button onClick={() => scrollBy(-1)} disabled={!canPrev} aria-label="Scroll bestsellers back" className="w-11 h-11 rounded-full border border-stone flex items-center justify-center text-ink hover:border-ink transition-all disabled:opacity-30 disabled:pointer-events-none">
               <span aria-hidden="true">←</span>
             </button>
-            <button onClick={() => scrollBy(1)} disabled={!canNext} aria-label="Scroll bestsellers forward" className="w-11 h-11 rounded-full bg-gold text-cream flex items-center justify-center hover:bg-gold-hover transition-all disabled:opacity-30 disabled:pointer-events-none">
+            <button onClick={() => scrollBy(1)} disabled={!canNext} aria-label="Scroll bestsellers forward" className="w-11 h-11 rounded-full bg-gold text-on-gold flex items-center justify-center hover:bg-gold-hover transition-all disabled:opacity-30 disabled:pointer-events-none">
               <span aria-hidden="true">→</span>
             </button>
           </div>

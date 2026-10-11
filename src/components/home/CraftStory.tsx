@@ -107,9 +107,9 @@ export const CraftStory: React.FC = () => {
                   {/* Number row — the → separators live here so every arrow
                       sits on one shared baseline (render 04) */}
                   <div className="flex items-center justify-between">
-                    <span className="font-serif text-[32px] leading-none text-gold">{s.n}</span>
+                    <span className="font-serif text-[32px] leading-none text-gold-deep">{s.n}</span>
                     {i < STEPS.length - 1 && (
-                      <span aria-hidden="true" className="text-gold/70 text-xl leading-none">
+                      <span aria-hidden="true" className="text-gold-deep/70 text-xl leading-none">
                         →
                       </span>
                     )}
@@ -153,7 +153,7 @@ export const CraftStory: React.FC = () => {
                 </p>
               </div>
               <div className="sm:col-span-3 sm:border-l sm:border-stone/60 sm:pl-5 flex flex-col justify-center">
-                <svg aria-hidden="true" className="w-8 h-8 text-gold/70" fill="none" stroke="currentColor" strokeWidth="1.25" viewBox="0 0 32 32">
+                <svg aria-hidden="true" className="w-8 h-8 text-gold-deep/70" fill="none" stroke="currentColor" strokeWidth="1.25" viewBox="0 0 32 32">
                   <path strokeLinecap="round" d="M16 28C16 20 16 12 16 4M16 12c-3 0-6-2-7-5 3 0 6 2 7 5zm0 6c3 0 6-2 7-5-3 0-6 2-7 5zm0 4c-3 0-6-2-7-5 3 0 6 2 7 5z" />
                 </svg>
                 <p className="font-serif text-[15px] text-ink leading-relaxed mt-2">
@@ -161,7 +161,7 @@ export const CraftStory: React.FC = () => {
                 </p>
                 <Link
                   to="/atelier"
-                  className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold border-b border-gold/40 hover:border-gold transition-colors"
+                  className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold-deep border-b border-gold-deep/40 hover:border-gold-deep transition-colors"
                 >
                   Meet our artisans <span aria-hidden="true">→</span>
                 </Link>

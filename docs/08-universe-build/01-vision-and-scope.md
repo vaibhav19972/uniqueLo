@@ -14,8 +14,11 @@ UniqueLo becomes the flagship store for hand-embroidered apparel organized as **
 
 - **Axis 1 — Universe** (extensible set, exactly 3 at launch): `animeverse`, `heroverse`, `itihaas`.
   A product belongs to exactly one universe. Adding a 4th universe later = one `universes` row + tokens; no component changes.
-- **Axis 2 — Vibe** (fixed 4): `aesthetic`, `clean`, `minimal`, `expressive`.
-  Vibe is a presentation filter, not a product attribute. Any universe renders in any vibe via token swap (see `04-universe-theming-system.md`). Products carry an optional `vibes[]` **discovery hint** used only for gateway counts and mood entry filtering — rendering never reads it.
+- **Axis 2 — Vibe** (extensible registry, 7 at launch): `aesthetic`, `clean`, `minimal`, `expressive` (featured) + `noir`, `pearl`, `gilded` (behind "More styles").
+  Registry: `src/data/vibes.json` — one JSON row + one `[data-vibe]` CSS block per vibe, zero component changes. Featured vibes render as homepage gateway cards; the rest sit in the expandable "More styles" row. Vibe is a presentation filter, not a product attribute. Products carry an optional `vibes[]` **discovery hint** used only for gateway counts and entry filtering — rendering never reads it.
+  *(Decision overturned Oct 2026: was "fixed 4". Extensible per owner directive.)*
+- **Axis 2b — Mood** (buyer-intent families, 6 at launch, extensible): `everyday`, `statement`, `heritage`, `festive-gifting` (featured) + `comfort`, `collector`.
+  Registry: `src/data/moods.json`. Products carry 1–3 `moods[]` tags. Moods answer "why am I shopping"; vibes answer "how loud should the page render". The two axes are labeled distinctly on the homepage ("Explore by Style" vs "Explore by Mood") so buyers never see one taxonomy under two names. Mood tags are curated, never auto-derived from universe (Heritage≈Itihaas is a coincidence, not a rule).
 - **Axis 3 — Gender** (`men | women | unisex`): header links Men / Women are first-class routes (`/men`, `/women`) over the shared grid. `unisex` products appear under **both**. Gender is a product attribute (`products.gender`), filterable and URL-synced like any facet.
 - **Garment types** (hoodie, tee, jacket, cap, tote…) are facets, never routes — new types need no IA changes.
 
@@ -39,7 +42,7 @@ Original-inspired motifs only. No trademarked characters, logos, names, or disti
 
 ## Decisions locked
 
-1. 3 universes (extensible) × 4 vibes (fixed) × gender (men/women/unisex), one layout skeleton.
+1. 3 universes (extensible) × 7 vibes (extensible registry) × 6 moods (extensible registry) × gender (men/women/unisex), one layout skeleton. *(Vibe count relaxed from fixed-4 Oct 2026; registries live in `src/data/vibes.json` + `src/data/moods.json`.)*
 2. Garment types and future categories are facets, not nav.
 3. INR-only, India-only.
 4. IP-originality rule is launch-blocking.

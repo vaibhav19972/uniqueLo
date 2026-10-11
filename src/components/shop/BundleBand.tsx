@@ -61,6 +61,7 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
   return (
     <section
       aria-label="Complete the look"
+      data-u-zone
       className="mt-4"
       style={{ backgroundColor: 'var(--u-surface)', color: 'var(--u-ink)' }}
     >
@@ -113,7 +114,7 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
             </div>
             <button
               onClick={handleAddAll}
-              className="px-6 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-cream hover:bg-gold-hover transition-colors"
+              className="px-6 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-on-gold hover:bg-gold-hover transition-colors"
             >
               Add All to Cart <span aria-hidden="true">→</span>
             </button>

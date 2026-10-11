@@ -113,7 +113,7 @@ export const UGCWall: React.FC = () => {
                     aria-label="Verified customer"
                     className="inline-flex w-4 h-4 rounded-full bg-gold items-center justify-center"
                   >
-                    <svg className="w-2.5 h-2.5 text-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="w-2.5 h-2.5 text-on-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
@@ -132,7 +132,7 @@ export const UGCWall: React.FC = () => {
               key={s.label}
               className={`flex items-center justify-center gap-3 ${i > 0 ? 'sm:border-l sm:border-stone/60' : ''}`}
             >
-              <svg className="w-6 h-6 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-6 h-6 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 {STAT_ICONS[s.icon]}
               </svg>
               <p>

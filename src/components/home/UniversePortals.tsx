@@ -37,9 +37,9 @@ const FOCUS: Record<
   heroverse: {
     // heroic pop: bigger, bouncier, tips right like a waving banner
     active:
-      'z-10 -translate-y-3 scale-[1.06] rotate-[1.5deg] shadow-[0_34px_95px_rgba(217,164,65,0.50)] ring-2 ring-gold duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
+      'z-10 -translate-y-3 scale-[1.06] rotate-[1.5deg] shadow-[0_34px_95px_rgba(194,168,120,0.45)] ring-2 ring-gold duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
     img: 'scale-110 rotate-1',
-    sticker: 'rotate-3 bg-[#d7263d] text-[#ffd23f]',
+    sticker: 'rotate-3 bg-[#c0392b] text-[#d4af37]',
     stickerLabel: 'New issue ★ POW',
   },
   itihaas: {
@@ -136,7 +136,7 @@ export const UniversePortals: React.FC = () => {
                 <span
                   aria-hidden="true"
                   className={`absolute top-4 right-4 z-20 rounded-full px-3 py-1.5 font-sans text-[10px] uppercase tracking-[0.18em] shadow-float transition-all duration-300 ${
-                    style?.sticker ?? 'bg-gold text-cream'
+                  style?.sticker ?? 'bg-gold text-on-gold'
                   } ${
                     isActive
                       ? 'scale-100 opacity-100'
@@ -181,7 +181,7 @@ export const UniversePortals: React.FC = () => {
                     </p>
                     <Link
                       to={`/universes/${u.slug}`}
-                      className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-8 py-3 font-serif text-[17px] text-cream bg-gold hover:bg-gold-hover min-h-[44px] transition-all group-hover:gap-3"
+                      className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-8 py-3 font-serif text-[17px] text-on-gold bg-gold hover:bg-gold-hover min-h-[44px] transition-all group-hover:gap-3"
                       aria-label={`Enter ${u.name}`}
                     >
                       Enter {u.name} <span aria-hidden="true">→</span>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { useUniverses } from '../../hooks/useCatalog';
+import { VIBES } from '../../lib/data';
 
 /**
  * Render target 07 (bottom): dark coal footer.
@@ -83,10 +84,10 @@ export const Footer: React.FC = () => {
                   </Link>
                 </li>
               ))}
-              {['Aesthetic', 'Minimal', 'Expressive'].map((v) => (
-                <li key={v}>
+              {VIBES.filter((v) => v.featured).map((v) => (
+                <li key={v.slug}>
                   <Link to="/shop" className="hover:text-cream transition-colors">
-                    {v}
+                    {v.title}
                   </Link>
                 </li>
               ))}

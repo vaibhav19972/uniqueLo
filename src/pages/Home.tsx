@@ -2,6 +2,7 @@ import React from 'react';
 import { UniverseHero } from '../components/home/UniverseHero';
 import { TrustStrip } from '../components/home/TrustStrip';
 import { VibeGateway } from '../components/home/VibeGateway';
+import { MoodGateway } from '../components/home/MoodGateway';
 import { UniversePortals } from '../components/home/UniversePortals';
 import { CraftStory } from '../components/home/CraftStory';
 import { Bestsellers } from '../components/home/Bestsellers';
@@ -15,6 +16,7 @@ export const Home: React.FC = () => {
       <UniverseHero />
       <TrustStrip />
       <VibeGateway />
+      <MoodGateway />
       <UniversePortals />
       <CraftStory />
       <Bestsellers />

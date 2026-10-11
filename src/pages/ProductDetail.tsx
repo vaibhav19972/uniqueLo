@@ -370,7 +370,7 @@ export const ProductDetail: React.FC = () => {
                       {product.embroidery.artisanHours} hours of embroidery threadwork
                     </span>
                   </div>
-                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold' : 'text-ink'}`}>
+                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold-deep' : 'text-ink'}`}>
                     {product.handcrafted ? 'Handcrafted piece' : 'Atelier finish'}
                   </span>
                 </div>
@@ -387,7 +387,7 @@ export const ProductDetail: React.FC = () => {
                   {universe && (
                     <Link
                       to={`/universes/${universe.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-gold/15 text-gold font-sans tracking-[0.18em] uppercase px-2.5 py-1"
+                      className="inline-flex items-center gap-1.5 bg-gold-deep/10 text-gold-deep font-sans tracking-[0.18em] uppercase px-2.5 py-1"
                     >
                       <span aria-hidden="true">◉</span> {universe.name}
                     </Link>
@@ -400,7 +400,7 @@ export const ProductDetail: React.FC = () => {
                 </div>
                 {product.featured && (
                   <span className="text-xs text-ink font-medium inline-flex items-center gap-1">
-                    Bestseller <span aria-hidden="true" className="text-gold">🔥</span>
+                    Bestseller <span aria-hidden="true" className="text-gold-deep">🔥</span>
                   </span>
                 )}
               </div>
@@ -414,7 +414,7 @@ export const ProductDetail: React.FC = () => {
                   <div className="flex items-center gap-1.5 text-xs text-ink">
                     {displayRating ? (
                       <>
-                        <span className="text-gold" aria-hidden="true">
+                        <span className="text-gold-deep" aria-hidden="true">
                           {'★'.repeat(Math.round(displayRating.value))}
                         </span>
                         <span className="font-medium">{displayRating.value.toFixed(1)}</span>
@@ -461,7 +461,7 @@ export const ProductDetail: React.FC = () => {
                         <span className="text-base text-ink-muted line-through">
                           {formatPrice(currentVariant.compareAtPriceCents)}
                         </span>
-                        <span className="text-[11px] font-sans bg-gold/15 text-gold px-2 py-0.5">
+                        <span className="text-[11px] font-sans bg-gold-deep/10 text-gold-deep px-2 py-0.5">
                           {discountPct}% OFF
                         </span>
                       </>
@@ -643,19 +643,19 @@ export const ProductDetail: React.FC = () => {
               {/* Trust row (render 09) — line-icon SVGs, no emoji */}
               <div className="mt-4 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                   </svg>
                   Free shipping on orders above ₹29,050
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7H4v13h16V7zM4 7l2-3h12l2 3M9 11h6" />
                   </svg>
                   14-day home inspection
                 </span>
                 <span className="hidden sm:flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
                   </svg>
                   Secure payments · UPI, Cards, COD
@@ -865,7 +865,7 @@ export const ProductDetail: React.FC = () => {
                 <p className="font-serif text-[15px] text-ink flex items-center gap-2 flex-wrap">
                   {d.title}
                   {d.badge && (
-                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold border border-gold/50 rounded-full px-2 py-0.5">
+                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold-deep border border-gold-deep/50 rounded-full px-2 py-0.5">
                       {d.badge}
                     </span>
                   )}
@@ -880,7 +880,7 @@ export const ProductDetail: React.FC = () => {
         {(motif || product.embroidery?.motifStory) && (
           <section aria-label="The story behind this motif" className="mt-14 bg-paper border border-stone/60 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
             <div>
-              <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold">
+              <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold-deep">
                 {universe?.name ?? 'UniqueLo'} lore
               </p>
               <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 tracking-tight">
@@ -936,7 +936,7 @@ export const ProductDetail: React.FC = () => {
         <section className="mt-20 pt-16 border-t border-stone/60">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-stone/40">
             <div>
-              <span className="text-[10px] font-sans tracking-[0.25em] text-gold uppercase font-medium">
+              <span className="text-[10px] font-sans tracking-[0.25em] text-gold-deep uppercase font-medium">
                 Worn & reviewed
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-1 tracking-tight">
@@ -944,7 +944,7 @@ export const ProductDetail: React.FC = () => {
               </h2>
               {displayRating && (
                 <p className="text-sm text-ink-muted mt-2">
-                  <span className="text-gold" aria-hidden="true">
+                  <span className="text-gold-deep" aria-hidden="true">
                     {'★'.repeat(Math.round(displayRating.value))}
                   </span>{' '}
                   {displayRating.value.toFixed(1)} out of 5 · Based on {displayRating.count} reviews

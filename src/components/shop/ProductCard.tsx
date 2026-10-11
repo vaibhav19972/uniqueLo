@@ -192,7 +192,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.embroidery?.artisanHours && (
             <span className="font-medium text-ink">
               {product.embroidery.artisanHours}h embroidery
-              {product.handcrafted && <span className="text-gold"> · Handcrafted</span>}
+              {product.handcrafted && <span className="text-gold-deep"> · Handcrafted</span>}
             </span>
           )}
         </div>

@@ -1,53 +1,140 @@
 /* src/styles/universes.css — themed-universe token skins (docs/08 §04).
    Layout components stay theme-agnostic; all universe expression flows
-   through these custom properties scoped by [data-universe] + [data-vibe].
-   Source of truth: src/data/universes.json theme_tokens (mirror by hand). */
+   through custom properties scoped by [data-universe] + [data-vibe] on <html>.
+   Source of truth: src/data/universes.json theme_tokens (mirror by hand).
+   Motif art (divider / card_frame / texture url) stays JS-consumed from the
+   JSON until the P5 asset pass; CSS carries color, texture-opacity and
+   display-type tokens. Vibe registry: src/data/vibes.json (extensible —
+   one JSON row + one [data-vibe] block, no component changes). */
 
 :root {
-  /* Render-era shell (chatgpt-v2 targets): gold CTAs, coal footer. */
-  --brand-gold: #ae7a24;
-  --brand-gold-hover: #93701f;
-  --brand-coal: #16130e;
-  --brand-coal-soft: #221c14;
+  /* Quiet-luxury shell: graphite + antique champagne (user decision Oct 2026 —
+     warm browns retired). Champagne is too light for cream text, so gold CTAs
+     use --on-gold (dark ink) instead; themed scopes remap it to --u-on-accent. */
+  --brand-gold: #c2a878;
+  --brand-gold-hover: #ab935f;
+  --brand-gold-deep: #7a6234;
+  --brand-coal: #111116;
+  --brand-coal-soft: #1a1a21;
+  --on-gold: #141414;
 }
 
-/* ── Animeverse ─────────────────────────────────────────────── */
+/* ── Animeverse — indigo night, dusty sakura, muted cyan ─────────── */
 [data-universe='animeverse'] {
-  --u-bg: #141824;
-  --u-surface: #1b2340;
+  --u-bg: #10131f;
+  --u-surface: #191f36;
   --u-ink: #f4efe6;
   --u-ink-muted: #b9b2a4;
-  --u-accent: #f4a7c3;
-  --u-accent-2: #59e3ff;
+  --u-accent: #e9b9cd;
+  --u-accent-2: #86d3e6;
   --u-product-zone: #f7f5f0;
   --u-on-accent: #241019;
+  --u-texture-opacity: 0.06;
+  --u-display-font: var(--font-serif);
+  --u-display-weight: 800;
+  --u-display-style: normal;
 }
 
-/* ── Heroverse ──────────────────────────────────────────────── */
+/* ── Heroverse — cinematic charcoal, deep crimson, champagne ────── */
 [data-universe='heroverse'] {
-  --u-bg: #171310;
-  --u-surface: #241a12;
-  --u-ink: #faf6ee;
+  --u-bg: #131316;
+  --u-surface: #1d161a;
+  --u-ink: #f5f0e8;
   --u-ink-muted: #c9bda9;
-  --u-accent: #d7263d;
-  --u-accent-2: #ffd23f;
+  --u-accent: #c0392b;
+  --u-accent-2: #d4af37;
   --u-product-zone: #faf6ee;
   --u-on-accent: #fff8f0;
+  --u-texture-opacity: 0.06;
+  --u-display-font: var(--font-serif);
+  --u-display-weight: 800;
+  --u-display-style: italic;
 }
 
-/* ── Itihaas ────────────────────────────────────────────────── */
+/* ── Itihaas — Ivory Darbar: ivory fields, maroon, peacock, gold ─── */
 [data-universe='itihaas'] {
-  --u-bg: #1d130d;
-  --u-surface: #2a1a12;
-  --u-ink: #f6efe3;
-  --u-ink-muted: #c4b198;
-  --u-accent: #b98a2f;
-  --u-accent-2: #0f6f6a;
-  --u-product-zone: #f7f5f0;
-  --u-on-accent: #241a08;
+  --u-bg: #f7f3ea;
+  --u-surface: #eee7d9;
+  --u-ink: #2e241a;
+  --u-ink-muted: #6f6152;
+  --u-accent: #6d1f2c;
+  --u-accent-2: #0e6a63;
+  --u-product-zone: #faf8f5;
+  --u-on-accent: #f7f3ea;
+  --u-texture-opacity: 0.05;
+  --u-display-font: var(--font-serif);
+  --u-display-weight: 700;
+  --u-display-style: normal;
 }
 
-/* ── Vibe modifiers (token subsets only) ────────────────────── */
+/* ── Whole-site theming (docs/08 §04, user decision Oct 2026) ──────
+   Layout.tsx sets data-universe on <html> for /universes/:slug routes
+   and ProductDetail sets it from the product's universe — checkout/
+   account stay neutral by construction (no route sets the attribute).
+   Product content zones stay on --u-product-zone (light) so garments
+   pop; the chrome (announcement, header, footer) follows the universe
+   via scoped semantic-token remaps below. Components never hardcode
+   universe colors — they keep using bg-cream/text-ink/bg-gold and the
+   scopes remap them. */
+html[data-universe] body {
+  background-color: var(--u-product-zone);
+}
+
+html[data-universe] .bg-cream {
+  background-color: var(--u-product-zone);
+}
+
+/* Header scope: translucent bar + dropdown follow the universe. */
+html[data-universe] header {
+  --color-cream: var(--u-bg);
+  --color-ink: var(--u-ink);
+  --color-ink-muted: var(--u-ink-muted);
+  --color-paper: var(--u-surface);
+  --color-stone: color-mix(in oklab, var(--u-ink) 22%, transparent);
+  --color-accent: var(--u-accent);
+  --color-accent-hover: var(--u-accent-2);
+  --color-gold: var(--u-accent);
+  --color-gold-hover: var(--u-accent-2);
+  --color-gold-deep: var(--u-accent);
+  --brand-gold: var(--u-accent);
+  --on-gold: var(--u-on-accent);
+}
+
+/* Footer scope: coal becomes the universe surface; cream-as-text
+   resolves to themed ink (covers text-cream/xx opacity variants). */
+html[data-universe] footer {
+  --color-cream: var(--u-ink);
+  --color-ink: var(--u-ink);
+  --color-ink-muted: var(--u-ink-muted);
+  --color-paper: var(--u-product-zone);
+  --color-parchment: var(--u-surface);
+  --color-stone: color-mix(in oklab, var(--u-ink) 22%, transparent);
+  --color-accent: var(--u-accent);
+  --color-gold: var(--u-accent);
+  --color-gold-hover: var(--u-accent-2);
+  --color-gold-deep: var(--u-accent);
+  --brand-coal: var(--u-surface);
+  --brand-coal-soft: var(--u-surface);
+  --on-gold: var(--u-on-accent);
+}
+
+/* Themed content zone (opt-in via data-u-zone, e.g. universe hero):
+   gold CTAs resolve to the universe accent with --u-on-accent text. */
+html[data-universe] [data-u-zone] {
+  --color-cream: var(--u-on-accent);
+  --color-ink: var(--u-ink);
+  --color-ink-muted: var(--u-ink-muted);
+  --color-stone: color-mix(in oklab, var(--u-ink) 22%, transparent);
+  --color-accent: var(--u-accent);
+  --color-accent-hover: var(--u-accent-2);
+  --color-gold: var(--u-accent);
+  --color-gold-hover: var(--u-accent-2);
+  --color-gold-deep: var(--u-accent);
+  --on-gold: var(--u-on-accent);
+}
+
+/* ── Vibe modifiers (token subsets only) ──────────────────────────
+   Registry: src/data/vibes.json. New vibe = one JSON row + one block. */
 [data-vibe='minimal'] {
   --u-accent-2: var(--u-accent);
   --u-texture-opacity: 0;
@@ -63,4 +150,19 @@
 
 [data-vibe='expressive'] {
   --u-texture-opacity: 0.09;
+}
+
+[data-vibe='noir'] {
+  --u-accent-2: var(--u-ink);
+  --u-texture-opacity: 0;
+}
+
+[data-vibe='pearl'] {
+  --u-accent-2: var(--u-accent);
+  --u-texture-opacity: 0.02;
+}
+
+[data-vibe='gilded'] {
+  --u-accent-2: var(--brand-gold);
+  --u-texture-opacity: 0.03;
 }

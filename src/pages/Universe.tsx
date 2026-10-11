@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useProducts, useUniverse, useMotifsByUniverse } from '../hooks/useCatalog';
-import { filterProducts, type FilterState, type Vibe } from '../lib/data';
+import { filterProducts, type FilterState, type Vibe, VIBES } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
 import { BundleBand } from '../components/shop/BundleBand';
 
-const VIBE_OPTIONS: Vibe[] = ['aesthetic', 'clean', 'minimal', 'expressive'];
+/** Rendered from the vibe registry (src/data/vibes.json) — never hardcoded. */
+const VIBE_OPTIONS: Vibe[] = VIBES.map((v) => v.slug);
 
 /** Jagged torn-paper divider strip (renders 8.x) — fill = the NEXT section's bg. */
 const TORN_POINTS =
@@ -93,8 +94,10 @@ export const Universe: React.FC = () => {
 
   return (
     <div data-universe={universe.slug} className="w-full">
-      {/* Themed hero */}
+      {/* Themed hero — data-u-zone opts this subtree into the universe token
+          scope (gold CTAs resolve to --u-accent with --u-on-accent text) */}
       <section
+        data-u-zone
         className="relative overflow-hidden"
         style={{ backgroundColor: 'var(--u-bg)', color: 'var(--u-ink)' }}
       >
@@ -150,7 +153,7 @@ export const Universe: React.FC = () => {
           <div className="flex flex-wrap gap-3 mt-8">
             <a
               href="#collection"
-              className="inline-flex items-center gap-2 px-7 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-cream hover:bg-gold-hover transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-on-gold hover:bg-gold-hover transition-colors"
             >
               Explore Collection <span aria-hidden="true">→</span>
             </a>
@@ -192,7 +195,7 @@ export const Universe: React.FC = () => {
       {/* Lore strip — parchment panels per 8.3 (artwork slots activate at P5) */}
       <section id="lore" aria-label={`${universe.name} lore`} className="bg-cream border-b border-stone/60">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold">
+          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
             The {universe.name} lore
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 font-medium leading-display tracking-tight">
@@ -226,7 +229,7 @@ export const Universe: React.FC = () => {
               onClick={() => setGarment('all')}
               aria-pressed={garment === 'all'}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors ${
-                garment === 'all' ? 'text-cream bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
+                garment === 'all' ? 'text-on-gold bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
               }`}
             >
               All
@@ -237,7 +240,7 @@ export const Universe: React.FC = () => {
                 onClick={() => setGarment(g === garment ? 'all' : g)}
                 aria-pressed={garment === g}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors ${
-                  garment === g ? 'text-cream bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
+                  garment === g ? 'text-on-gold bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
                 }`}
               >
                 {garmentLabel(g)}
@@ -250,7 +253,7 @@ export const Universe: React.FC = () => {
                 onClick={() => setVibe(v === vibe ? 'all' : v)}
                 aria-pressed={vibe === v}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors capitalize ${
-                  vibe === v ? 'text-cream bg-gold border border-transparent' : 'text-ink-muted border border-stone hover:border-ink'
+                  vibe === v ? 'text-on-gold bg-gold border border-transparent' : 'text-ink-muted border border-stone hover:border-ink'
                 }`}
               >
                 {v}

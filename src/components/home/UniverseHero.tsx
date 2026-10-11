@@ -25,7 +25,7 @@ export const UniverseHero: React.FC = () => {
         <div>
           {/* Tracked caps eyebrow + hairline rule (render 01) */}
           <div className="flex items-center gap-4 max-w-md">
-            <span className="text-[12px] font-sans uppercase tracking-eyebrow font-medium leading-relaxed" style={{ color: 'var(--brand-gold)' }}>
+            <span className="text-[12px] font-sans uppercase tracking-eyebrow font-medium leading-relaxed" style={{ color: 'var(--brand-gold-deep)' }}>
               Embroidered apparel for dreamers, believers and builders
             </span>
             <span aria-hidden="true" className="h-px flex-1 bg-stone" />
@@ -35,7 +35,7 @@ export const UniverseHero: React.FC = () => {
             style={{ fontSize: 'var(--text-display)' }}
           >
             Wear the Universe,{' '}
-            <span className="text-gold italic">Embroidered for You.</span>
+            <span className="text-gold-deep italic">Embroidered for You.</span>
           </h1>
           <p className="font-serif text-lg text-ink-muted mt-6 max-w-md leading-relaxed">
             Explore embroidered apparel inspired by Anime, Heroes and Indian
@@ -59,7 +59,7 @@ export const UniverseHero: React.FC = () => {
                     onClick={() => setActiveSlug(u.slug)}
                     className="relative pb-0.5 text-xl font-serif transition-colors min-h-[44px] flex items-center"
                   >
-                    <span className={selected ? 'text-gold font-medium' : 'text-warm-gray hover:text-ink'}>
+                    <span className={selected ? 'text-gold-deep font-medium' : 'text-warm-gray hover:text-ink'}>
                       {TAB_LABELS[u.slug] ?? u.name}
                     </span>
                     {selected && (

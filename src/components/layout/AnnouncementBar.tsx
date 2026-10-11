@@ -15,7 +15,7 @@ export const AnnouncementBar: React.FC = () => {
 
   return (
     <div
-      className="relative z-[210] text-cream text-[12px] sm:text-[13px] font-serif"
+      className="relative z-[210] text-on-gold text-[12px] sm:text-[13px] font-serif"
       style={{ backgroundColor: 'var(--brand-gold)' }}
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-2.5 flex items-center justify-center gap-4 lg:gap-0 lg:justify-between">

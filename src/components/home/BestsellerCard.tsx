@@ -9,7 +9,7 @@ import { useToastStore } from '../../stores/toast';
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
   return (
-    <span className="inline-flex items-center gap-0.5 text-gold" role="img" aria-label={`Rated ${rating} out of 5`}>
+    <span className="inline-flex items-center gap-0.5 text-gold-deep" role="img" aria-label={`Rated ${rating} out of 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i} aria-hidden="true" className={i < full ? '' : 'opacity-30'}>
           ★
@@ -109,7 +109,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
         </Link>
 
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gold text-cream text-[11px] font-sans tracking-wide px-3 py-1.5">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gold text-on-gold text-[11px] font-sans tracking-wide px-3 py-1.5">
             <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
           </span>
         )}
@@ -166,8 +166,8 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
                     className={`h-8 px-1 text-[12px] sm:text-[13px] font-serif border rounded-[5px] transition-colors flex items-center justify-center ${
                       size === s
-                        ? 'bg-gold text-cream border-transparent font-medium shadow-xs'
-                        : 'bg-white border-[#ded8cf] text-ink hover:border-gold'
+                        ? 'bg-gold text-on-gold border-transparent font-medium shadow-xs'
+                        : 'bg-white border-[#ded8cf] text-ink hover:border-gold-deep'
                     } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
                   >
                     {s}
@@ -178,7 +178,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <button
               type="button"
               onClick={handleAdd}
-              className="w-full mt-2 h-[36px] sm:h-[38px] bg-gold text-cream rounded-[6px] font-serif text-[13px] sm:text-[14px] hover:bg-gold-hover transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99]"
+              className="w-full mt-2 h-[36px] sm:h-[38px] bg-gold text-on-gold rounded-[6px] font-serif text-[13px] sm:text-[14px] hover:bg-gold-hover transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99]"
             >
               Add to Cart — {formatPrice(currentVariant.priceCents)}
             </button>
@@ -195,14 +195,14 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             </span>
           )}
           {product.handcrafted && (
-            <span className="inline-flex items-center gap-1.5 rounded-full text-[11px] font-serif text-gold border border-gold/50 px-3 py-1">
-              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold" />
+            <span className="inline-flex items-center gap-1.5 rounded-full text-[11px] font-serif text-gold-deep border border-gold-deep/50 px-3 py-1">
+              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold-deep" />
               Handcrafted
             </span>
           )}
         </div>
         <Link to={`/product/${product.slug}`}>
-          <h3 className="font-serif text-xl text-ink mt-2 hover:text-gold transition-colors">{product.name}</h3>
+          <h3 className="font-serif text-xl text-ink mt-2 hover:text-gold-deep transition-colors">{product.name}</h3>
         </Link>
         <p className="text-xs text-ink-muted mt-0.5">
           {product.fit ? `${product.fit} | ` : ''}{product.fabricGsm ?? ''}
@@ -221,7 +221,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           {compareAt && compareAt > defaultVariant.priceCents && (
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
-              <span className="text-[11px] font-sans bg-gold/15 text-gold px-1.5 py-0.5">{offPct}% OFF</span>
+              <span className="text-[11px] font-sans bg-gold-deep/10 text-gold-deep px-1.5 py-0.5">{offPct}% OFF</span>
             </>
           )}
         </p>
