@@ -1,7 +1,38 @@
 # UniqueLo — Project Audit & Quality Assurance Report
 
-**Last Updated:** 2026-10-11 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready  
-**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, ~2.25s) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 · 100% Data & Image Parity *(verification snapshot from 2026-10-09/10 audits — re-run before relying on route/file counts)*
+**Last Updated:** 2026-10-12 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready (re-verified 2026-10-12)  
+**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, 2.38s, advisory: 694 kB main chunk) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 *(re-verified live 2026-10-12: tsc/build/lint/route-200/counts/seed/image parity all re-run)*
+
+---
+
+## 🔎 2026-10-12 — Full Verification Refresh + Test Plan + KB
+
+Full re-run of every health check; **no new code bugs found** — the one known code
+gap (`is_mock` guard) is confirmed still open.
+
+| Check | Result |
+|---|---|
+| `tsc -b` + `vite build` | ✅ 0 errors, 2.38s. Advisory: `index` chunk 694 kB > 600 kB limit (motion+react vendor heavy) — advisory only |
+| `oxlint` | ✅ 0 issues in `src/` (102 warnings, all in `.agents/` tool scripts — pre-existing, not product code) |
+| Routes (vite preview + HTTP check) | ✅ 10/10 return 200 incl. universe/PDP/atelier deep links and `*` fallback |
+| Storefront counts | ✅ 14 SKUs / 73 variants (`mock-products.json`); legacy 13/45 frozen (`products.json`); seed 13/13 slugs |
+| Mock image paths | ✅ 26/26 unique paths resolve in `public/` |
+| Schema | ✅ 11 tables incl. `universes`/`motifs`; `is_mock` seeded `false` on legacy rows |
+| `moods[]` backfill | ✅ 14/14 mock SKUs carry 1–3 moods |
+| Vibe registry | ✅ 7 slugs: aesthetic, clean, minimal, expressive, noir, pearl, gilded |
+| Universe theming | ✅ `data-universe` on `<html>` verified in `Layout.tsx`; champagne/coal tokens match audit record |
+| **BUG-2 wording (stale, docs-only)** | ⚠️ audit said "Newsletter **and Footer** forms persist emails" — Footer has **no newsletter form anymore** (links only, comment: "Newsletter lives in the panel above"); only `Newsletter.tsx` calls `subscribeNewsletter`. BUG-2 resolution wording needs this correction — code is fine |
+| **is_mock guard (still open)** | ❌ Code fix still pending — `.eq('is_mock', true)` missing in `getProducts()`; tracked in docs/03, docs/07, and `kb/is-mock-guard-gap` |
+
+**New this pass:**
+- **`docs/10-testing/README.md`** — full test-case plan: Layer 1 Vitest + RTL
+  (data integrity gate, stores, components; T1.4 written TDD-style for the
+  `is_mock` fix), Layer 2 [tester-army/e2e](https://github.com/tester-army/e2e)
+  agent-driven E2E with replay caching + CI wiring. Nothing implemented yet.
+- **`kb/`** — in-repo memory graph (Obsidian-style, 9 interlinked pages):
+  catalog spine, fallback gate, `is-mock-guard-gap`, universe theming,
+  mood/vibe taxonomy, legacy catalog decision, cart flow, audit trail, route map.
+  Navigation: `kb/index.md`.
 
 ---
 
@@ -21,7 +52,7 @@
 | Docs: §01 fixed-4 overturned → extensible registries; §03 deltas 2d/2e (`products.vibes`, `products.moods`); §04 vibe table (7), theming scope, shell palette, contrast rule | `docs/08-universe-build/01/03/04` | ✅ |
 
 **Open (tracked, not blockers):**
-1. `supabase/schema.sql` + `seed.sql` still predate the universe schema entirely (no `universes`, `motifs`, `products.universe_slug/gender/vibes/moods` columns) — the §03 deltas remain un-migrated; storefront correctly falls back to local mocks via feature detection. Migration pass pending.
+1. ~~`supabase/schema.sql` + `seed.sql` predate the universe schema~~ — **superseded 2026-10-11:** the migration landed in commit `95b1193` (universes/motifs tables, product columns, enriched seed). Remaining gap tracked in the reconciliation section below (`is_mock` filter missing in `getProducts()`).
 2. Contrast gate (§08: ≥4.5:1 body text, every universe × vibe) needs a re-run against the new palettes — automated check pending.
 3. Vibe/mood gateway imagery reuses category placeholders until the P5 campaign shoot.
 
@@ -42,8 +73,10 @@ source files touched.
 | E. Currency USD → INR + Product-type gaps | docs/03 `Currency = 'INR'`, `formatPrice` en-IN, full `Product`/`FilterState` types incl. universeSlug/gender/motifId/vibes/moods/isMock/handcrafted; technique union +`sashiko-selvedge` | ✅ Fixed |
 | F. Index/link drift | 07/08/09 added to root README + docs/README (07 row corrected); Phase-6 font verification line fixed to Playfair; DEPLOYMENT.md `file:///` links → relative; seed.sql precedence + universe-schema feature-detection documented in docs/03, docs/07, DEPLOYMENT.md | ✅ Fixed |
 
-**Known open (tracked, not doc drift):** Supabase universe-schema migration (P9.4),
-contrast-gate re-run, dedicated mock-SKU imagery (docs/06 registry), admin auth gating.
+**Known open (tracked, not doc drift):**
+1. ~~Supabase universe-schema migration~~ — **landed 2026-10-11** (`95b1193`: universes/motifs tables + product columns; seed.sql enriched). NEW GAP: `getProducts()` still lacks the `is_mock = true` filter required by docs/08 §03-2c — seeded legacy rows would now pass universe feature-detection and leak to the storefront. Code fix needed before mock-phase deploys against a seeded DB.
+2. Contrast gate (§08: ≥4.5:1 body text, every universe × vibe) needs a re-run against the new palettes — automated check pending.
+3. Vibe/mood gateway imagery reuses category placeholders until the P5 campaign shoot (partial: dedicated vibe cover images added in `a42ccd4`).
 
 ---
 
@@ -74,9 +107,9 @@ contrast-gate re-run, dedicated mock-SKU imagery (docs/06 registry), admin auth 
 
 ### ✅ BUG-2 · HIGH · Newsletter forms silently discard emails
 - **Status:** **RESOLVED**
-- **Root Cause:** `Newsletter.tsx` and `Footer.tsx` merely called `setSubscribed(true)` without invoking `subscribeNewsletter()`.
-- **Resolution:** Wired both forms to asynchronous `subscribeNewsletter(email.trim())` with loading state, error catching, and user feedback toasts.
-- **Verification:** Both components now persist to Supabase `newsletter_subscribers` table (or mock fallback in dev) and gracefully handle network states.
+- **Root Cause:** `Newsletter.tsx` merely called `setSubscribed(true)` without invoking `subscribeNewsletter()`.
+- **Resolution:** Wired the form to asynchronous `subscribeNewsletter(email.trim())` with loading state, error catching, and user feedback toasts. *(2026-10-12 note: the Footer no longer carries a newsletter form at all — footer links; the only newsletter form is in `Newsletter.tsx`'s panel.)*
+- **Verification:** 2026-10-12 re-check: `Newsletter.tsx` persists via `subscribeNewsletter()`, toast + loading state verified in source; Footer contains no form (by design — see resolution note).
 
 ### ✅ BUG-3 · HIGH · Fabricated scarcity/provenance fallbacks in UI
 - **Status:** **RESOLVED**
