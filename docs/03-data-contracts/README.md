@@ -248,7 +248,9 @@ The storefront catalog. As of 2026-10-11 it holds 14 render-mock products
 - 1–3 mood tags + vibe tokens (registry-driven facets)
 - 1+ variants with at least one color and one size (73 variants total; most have
   5–7, `samurai-cap` and `red-sun-tote` are single one-size variants)
-- 6 images each (mock SKUs currently reuse atelier/product imagery — see docs/06)
+- 6 images each (dedicated per-SKU shoots land via the All-in-One spec-board
+  intake — `sakura-ronin-hoodie` is fully dedicated as of 2026-10-12; remaining
+  SKUs still reuse atelier/product imagery, see docs/06)
 - rating / reviewCount / soldCount mock social proof (`isMock` gates honesty rules)
 
 ### Supporting registries

@@ -24,7 +24,7 @@
 | Immediate cloud deployment | Vercel provides instant zero-config preview & production deployments with SPA routing (`vercel.json`) |
 | Relational data model | Full PostgreSQL schema (`supabase/schema.sql`) for products, variants, craft taxonomy, reviews, and orders |
 | Role-Based Security & Permissions | PostgreSQL Row Level Security (RLS) policies enforce public read access and secured admin/order writes |
-| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back to bundled JSON (`src/data/mock-products.json`) if keys are unset, rows predate the universe schema, or legacy mock rows would leak (no `is_mock` filter yet — see §3) |
+| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`src/data/mock-products.json`) if keys are unset, rows predate the universe schema, or legacy mock rows would leak (no `is_mock` filter yet — see §3). Localhost can force the JSON path for READS via `VITE_DATA_SOURCE=local` (writes stay live) |
 | Inventory & Variant Tracking | `variants` table (keyed by `sku`, linked via `product_slug`) tracks size, colorway, cents price, quantity, and stock status |
 | Craft Provenance & Macro Media | `embroidery_details` table stores artisan hours, guild clusters, regions, stitch types, and thread compositions |
 | Production Server Containerization | Multi-stage `Dockerfile` with optimized Alpine Nginx reverse proxy + `docker-compose.prod.yml` |
@@ -53,6 +53,12 @@
 - **Environment Configuration:**
   - `VITE_SUPABASE_URL`: Supabase project URL (`https://your-project.supabase.co`)
   - `VITE_SUPABASE_ANON_KEY`: Safe public anon JWT key
+  - `VITE_DATA_SOURCE=local`: forces catalog READS (products, categories,
+    reviews) from bundled `src/data/*.json` even when keys are set.
+    Recommended for localhost (set in `.env.local`): the storefront tests
+    against local data while Admin keeps its live client for uploads. Writes
+    (review submit, newsletter, orders, storage) always use the live client
+    when configured — they are not gated by this flag.
   - Fallback mode: If environment variables are empty, Supabase is unreachable, or the seeded rows predate the universe schema (feature detection on `universe_slug`), the store operates without error using local static JSON (`mock-products.json`). Note: rows seeded with the migrated schema DO pass detection — `is_mock` filtering is still pending (§3), so the migrated legacy seed would be served until that guard lands.
 
 ---
@@ -141,7 +147,7 @@ Supabase applies fine-grained Row Level Security (RLS) on each table:
 All database queries pass through `src/lib/supabase.ts` into `src/lib/data.ts`.
 Components use TanStack Query hooks (`useProducts()`, `useProduct(slug)`, `useCategories()` in `src/hooks/useCatalog.ts`).
 
-- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, unreachable, or the catalog rows predate the universe schema, `src/lib/data.ts` falls back to bundled `src/data/mock-products.json` (14 render-mock SKUs; `products.json` is deprecated-retained and no longer imported). Migrated-seed legacy rows still pass feature detection until the `is_mock` filter lands — see §3.
+- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, unreachable, or the catalog rows predate the universe schema, `src/lib/data.ts` falls back to bundled `src/data/mock-products.json` (14 render-mock SKUs; `products.json` is deprecated-retained and no longer imported). Setting `VITE_DATA_SOURCE=local` forces this JSON path for READS unconditionally (localhost testing); writes are unaffected. Migrated-seed legacy rows still pass feature detection until the `is_mock` filter lands — see §3.
 - **Image URL Resolution:** `resolveImageUrl()` supports both relative local assets (`/images/products/...`) and Supabase Storage URLs (`product-images` bucket).
 - **Stock Status:** `variants.status` is stored explicitly in JSON/Supabase and is the badge source (`in-stock` / `low-stock` / `out-of-stock`) — there is no quantity→status derivation. `getDefaultVariant()` prefers `in-stock` → `low-stock` → non-`out-of-stock` (`src/lib/data.ts`). Cart operations additionally clamp to the live `quantity` value — cart clamping wins over the badge.
 

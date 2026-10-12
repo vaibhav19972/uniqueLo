@@ -4,7 +4,7 @@ import rawUniverses from '../data/universes.json';
 import rawMotifs from '../data/motifs.json';
 import rawVibes from '../data/vibes.json';
 import rawMoods from '../data/moods.json';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabase, isSupabaseConfigured, shouldUseSupabaseReads } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 export type Currency = 'INR';
@@ -305,7 +305,7 @@ export function resolveImageUrl(src: string): string {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('products')
@@ -405,7 +405,7 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('categories')
@@ -721,7 +721,7 @@ export function getCartLine(item: CartItem, products: Product[]): CartLine | nul
 // ─────────────────────────────────────────────────────────────────────
 
 export async function getReviews(productSlug: string): Promise<Review[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('reviews')

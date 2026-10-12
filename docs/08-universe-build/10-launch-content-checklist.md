@@ -5,6 +5,7 @@
 ## Catalog imagery (per SKU — see `07-image-pipeline.md` 6-slot contract)
 
 - [ ] 6 slots filled, `sort_order` 0–5, real alts (no tonal blocks on launch surfaces)
+  - [x] `sakura-ronin-hoodie` (2026-10-12, All-in-One v1 board crop — first dedicated set)
 - [ ] Slot 3 macro passes human gate (individual stitches + thread twist visible)
 - [ ] Cross-SKU variety check (rotation sets A/B/C actually differ)
 - [ ] Manifest → seed flow recorded (parity rule, §03)
@@ -13,7 +14,7 @@
 
 - [ ] Every product: 1 universe, 1 gender, garment type, `motif_id` with `ip_cleared = true`
 - [ ] Prices + compare-at verified against real MRP (mock render prices replaced)
-- [ ] Stock quantities real; `status` derived correctly
+- [ ] Stock quantities real; `status` values correct per SKU (stored explicitly — see docs/07 §6; if the migration implements derivation, verify the mapping instead)
 - [ ] `is_mock` → false flip planned with the real-seed cutover (old-13 deprecation closes here)
 
 ## People & proof (all currently SAMPLE-flagged)
