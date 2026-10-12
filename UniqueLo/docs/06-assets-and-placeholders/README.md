@@ -117,9 +117,9 @@ Use this table to track real assets as they arrive. Update it when a file is swa
 
 ### Storefront (mock-products.json — 14 SKUs, image pairs borrowed from atelier assets)
 
-| Universe | Product (slug) | Effective image pair | Dedicated assets? |
+| Universe | Product (slug) | Effective image set | Dedicated assets? |
 |---|---|---|---|
-| Animeverse | sakura-ronin-hoodie | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | sakura-ronin-hoodie | `sakura-ronin-hoodie-{1..6}.jpg` (cropped from v1 spec board, 2026-10-12) | ✅ dedicated |
 | Animeverse | roaring-spirit-tee | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
 | Animeverse | koi-no-yume-sweatshirt | `crewel-cashmere-cardigan-{1,2}.jpg` | ❌ pending shoot |
 | Animeverse | oni-spirit-jacket | `nocturne-velvet-vest-{1,2}.jpg` | ❌ pending shoot |
