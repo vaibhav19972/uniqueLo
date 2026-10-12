@@ -52,16 +52,23 @@ bucket and writes the URLs into SQL + JSON.
 ### v1 board geometry (measured off `Cherry Blossom Hoodie Spec Board.png`, 1312×1199)
 
 - Grid: **3 columns × 2 rows**. Each cell = photo area + numbered label strip.
-- Column photo bounds (x, px): `[3, 436]` · `[443, 922]` · `[931, 1308]`
-  (vertical dividers at x≈439–440 and x≈925–928 are excluded).
+- Column photo bounds (x, px): `[3, 436]` · `[443, ~871]` (measured —
+  the middle divider drifts left of the full-height-scan estimate) · `[931, 1308]`
+  (vertical dividers and label strips excluded).
 - Row photo bounds (y, px): top `[3, 554]` · bottom `[601, 1147]`
   (top label strip ≈555–600 and bottom label strip ≈1148–1198 are excluded;
   no divider line separates the top strip from the bottom photos, so the
   boundary is positional, not detected).
 - Safety inset: 4px on every side (label/divider bleed guard).
 - Reference fractions (of W/H) with inset applied at crop time:
-  cols `[0.0023, 0.3323]` · `[0.3377, 0.7027]` · `[0.7096, 0.9969]`;
+  cols `[0.0023, 0.3323]` · `[0.3377, 0.664]` · `[0.7096, 0.9969]`;
   rows top `[0.0025, 0.4621]` · bottom `[0.5013, 0.9566]`.
+  **Caution (learned 2026-10-12):** dividers drift between boards — the
+  reference middle-column divider sits at x≈873 top / x≈862 bottom, well left
+  of a full-height scan estimate. Fixed fractions ALONE bleed a white line +
+  neighbor sliver into middle-column crops. The cropper therefore
+  measures each board at runtime (`detectGeometry`) and uses these fractions
+  as fallback priors only.
 - Resulting crops ≈ 434×548px (aspect ≈ 0.79 — PDP renders `object-cover`
   at 3:4, so no distortion).
 
