@@ -171,11 +171,15 @@ export interface CartItem {
 > `src/data/products.json` (the original 13-product atelier line) is
 > **deprecated-retained**: kept on disk, no longer imported anywhere in `src/`.
 > Do not add products there — the storefront will never render them.
-> `supabase/seed.sql` still seeds that legacy 13-product line and predates the
-> universe schema; `data.ts` feature-detects pre-migration rows and serves the
-> bundled mock catalog instead (see docs/07 §3 "Migration debt"). Precedence:
-> **`mock-products.json` (runtime) → Supabase (once universe schema is
-> migrated) → `products.json`/`seed.sql` (legacy, non-serving)**.
+> `supabase/seed.sql` (as migrated 2026-10-11) seeds that legacy line with
+> `is_mock = false`, and the schema now carries the full universe columns.
+> **Caution:** `getProducts()` does not yet filter `is_mock` (docs/08 §03-2c
+> requirement) — after applying the migrated seed, legacy rows pass universe
+> feature-detection and would leak to the storefront. Add the `.eq('is_mock',
+> true)` guard (or treat this as a real-SKU launch, not a mock-phase deploy).
+> Precedence:
+> **`mock-products.json` (bundled, mock phase) → Supabase `is_mock = true`
+> rows (real SKUs, post-launch) → `products.json` (deprecated, never served)**.
 
 ### `src/data/categories.json`
 
