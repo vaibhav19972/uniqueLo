@@ -32,6 +32,15 @@ interface VariantForm {
   quantity: number;
 }
 
+// Session-unique upload suffix (module scope: pure, lint-clean alternative to
+// Date.now() inside the component). Filenames are already namespaced by
+// product slug + slot key; storage uploads use upsert so retries overwrite.
+let uploadSequence = 0;
+const nextUploadSuffix = (): string => {
+  uploadSequence += 1;
+  return `u${uploadSequence.toString(36)}`;
+};
+
 const TECHNIQUE_OPTIONS: { value: EmbroideryTechnique; label: string; defaultStory: string }[] = [
   {
     value: 'botanical-chain',
@@ -188,6 +197,27 @@ const AdminStudio: React.FC = () => {
   const slotAltFor = (index: number, productName: string, colorway: string) =>
     `${productName || 'New Product'} — ${colorway} — ${SPEC_BOARD_SLOTS[index].altSuffix}`;
 
+  /** Fill empty slot alts from the slot templates (used by both Apply and Upload). */
+  const fillSlotAlts = () => {
+    const colorway = selectedColors[0]?.name || variants[0]?.color || 'Natural';
+    setSlotImages((prev) =>
+      prev.map((slot, i) => (slot.alt ? slot : { ...slot, alt: slotAltFor(i, name, colorway) }))
+    );
+  };
+
+  /** Slots holding local-only sources must reach the CDN before publishing. */
+  const hasUnpublishedSlots = slotImages.some(
+    (s) => s.src.startsWith('blob:') || s.src.startsWith('data:')
+  );
+
+  const blobToDataUrl = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('Could not read crop data'));
+      reader.readAsDataURL(blob);
+    });
+
   // Upload directly to Supabase Storage CDN
   const uploadBlobToCdn = async (blob: Blob, fileName: string): Promise<string> => {
     if (!supabase) throw new Error('Supabase client unavailable');
@@ -222,7 +252,7 @@ const AdminStudio: React.FC = () => {
     try {
       const fileExt = file.name.split('.').pop() || 'png';
       const cleanSlug = (slug || 'product').replace(/[^a-z0-9-]/gi, '-').toLowerCase();
-      const fileName = `${cleanSlug}-${SPEC_BOARD_SLOTS[target].key}-${Date.now()}.${fileExt}`;
+      const fileName = `${cleanSlug}-${SPEC_BOARD_SLOTS[target].key}-${nextUploadSuffix()}.${fileExt}`;
       const publicUrl = await uploadBlobToCdn(file, fileName);
       updateSlot(target, { src: publicUrl });
       showToast({
@@ -275,26 +305,39 @@ const AdminStudio: React.FC = () => {
     }
   };
 
-  // Fill the six slots from the current board previews (local URLs; upload after)
-  const applyBoardCrops = () => {
+  // Fill the six slots from the current board previews. Previews are stored
+  // as self-contained data URLs (never revocable blob: URLs), so a later
+  // clearBoard() or a second board cannot break already-applied slots.
+  const applyBoardCrops = async () => {
     if (!boardCrops) return;
-    const colorway = selectedColors[0]?.name || variants[0]?.color || 'Natural';
-    setSlotImages(
-      boardCrops.map((crop, i) => ({
-        src: crop.previewUrl,
-        alt: slotImages[i]?.alt || slotAltFor(i, name, colorway),
-      }))
-    );
-    showToast({
-      title: 'Slots filled from board',
-      description: 'Six previews applied. Use “Upload all 6 to CDN” to publish.',
-      type: 'accent',
-    });
+    try {
+      const urls = await Promise.all(boardCrops.map((crop) => blobToDataUrl(crop.blob)));
+      const colorway = selectedColors[0]?.name || variants[0]?.color || 'Natural';
+      setSlotImages(
+        urls.map((url, i) => ({
+          src: url,
+          alt: slotImages[i]?.alt || slotAltFor(i, name, colorway),
+        }))
+      );
+      showToast({
+        title: 'Slots filled from board',
+        description: 'Six previews applied. Use “Upload all 6 to CDN” before publishing.',
+        type: 'accent',
+      });
+    } catch {
+      showToast({
+        title: 'Apply failed',
+        description: 'Could not read the crop data. Try selecting the board again.',
+        type: 'info',
+      });
+    }
   };
 
   // Upload all six board crops to the CDN in slot order
   const uploadBoardCrops = async () => {
     if (!boardCrops) return;
+    // Direct-upload path fills alts too, so SQL/JSON never fall back to the bare name.
+    fillSlotAlts();
     if (!isSupabaseConfigured() || !supabase) {
       // No backend: previews are already applied as local URLs.
       applyBoardCrops();
@@ -303,7 +346,7 @@ const AdminStudio: React.FC = () => {
     setIsBoardUploading(true);
     try {
       const cleanSlug = (slug || 'product').replace(/[^a-z0-9-]/gi, '-').toLowerCase();
-      const stamp = Date.now();
+      const stamp = nextUploadSuffix();
       for (let i = 0; i < boardCrops.length; i++) {
         const blob = boardBlobs.current[i];
         if (!blob) continue;
@@ -1708,6 +1751,13 @@ INSERT INTO public.embroidery_details (
                 </a>
 
                 {/* Copy JSON snippet */}
+                {hasUnpublishedSlots && (
+                  <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-300 px-2.5 py-1.5 font-medium">
+                    Some slots still hold local previews — upload all images to
+                    the CDN before copying SQL/JSON, or the snippets will embed
+                    unusable local URLs.
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={() => copyToClipboard(generatedJSON, 'products.json snippet')}

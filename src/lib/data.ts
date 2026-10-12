@@ -880,7 +880,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Rooted in 16th-century Awadh patronage, Chikankari combines delicate shadow-work and tight chain looping using unbleached mulberry silk floss.',
     description: 'Fluid floral and vine geometries stitched with calibrated tension directly onto heavy organic cotton and washed canvas.',
     stitchType: 'Chain Stitch & Shadow Work',
-    image: '/images/products/botanical-silk-jacket-2.png',
+    image: '/images/placeholders/product-botanical-silk-jacket-2.jpg',
   },
   {
     slug: 'kantha-quilt',
@@ -902,7 +902,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Executed using a fine pointed aari hook, Kashmiri crewel work renders wild flora and alpine botanicals in thick 2-ply natural wool yarn.',
     description: 'Thick, dimensional wool embroidery on Mongolian cashmere and hand-woven wool coats that provides both tactile relief and natural insulation.',
     stitchType: 'Pointed Aari Hook Chain',
-    image: '/images/products/crewel-cashmere-cardigan-2.png',
+    image: '/images/products/crewel-cashmere-cardigan-2.jpg',
   },
   {
     slug: 'satin-stitch',
@@ -913,7 +913,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Originating in classical handloom textile hubs, high-density satin stitching lays long, unbroken loops of mercerized thread edge-to-edge.',
     description: 'Creates a mirror-like textile sheen and dense color saturation that remains completely flat against the skin without backing irritation.',
     stitchType: 'Flat Satin Parallel Stitch',
-    image: '/images/products/vine-heavyweight-tee-2.jpg',
+    image: '/images/products/vine-heavyweight-tee-1.jpg',
   },
   {
     slug: 'sashiko-selvedge',
@@ -935,7 +935,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Mughal-court gold sewing: coiled bullion wires and French spirals hand-anchored onto wool and silk. The atelier standard for bridal-grade relief.',
     description: 'Raised metallic relief with gilded wire, built to catch low light without losing tension.',
     stitchType: 'Anchor Bullion & Metallic Wire',
-    image: '/images/products/celestial-zardozi-coat-2.png',
+    image: '/images/placeholders/product-celestial-zardozi-coat-2.jpg',
   },
   {
     slug: 'metallic-zari',
@@ -968,7 +968,7 @@ export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
     historicalContext: 'Patron-initial satin work and crest embroidery — the atelier personalisation studio for shirts, scarves and heirloom linens.',
     description: 'Precision satin initials tailored to the patron, with archival thread and placement choice.',
     stitchType: 'Precision Satin Initial',
-    image: '/images/products/monogram-poplin-shirt-2.jpg',
+    image: '/images/products/monogram-poplin-shirt-1.jpg',
   },
 ];
 
