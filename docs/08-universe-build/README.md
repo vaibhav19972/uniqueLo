@@ -33,7 +33,7 @@ ChatGPT image-2 target renders live in `sketches/design-renders/chatgpt-v2/` (**
 - Stack: Vite 6 + React 19 + TS + Tailwind v4 + Supabase + zustand + react-query.
 - Currency: INR, prices stored as integer paise (`price_cents`).
 - **Outlets, not data:** components render whatever the catalog holds. Render images, names, prices, and counts are mock variables — never hardcoded. New universes, categories, genders, and products must work with zero component changes.
-- Active catalog: **mock render SKUs** (`src/data/mock-products.json`, `isMock: true`) built from the chatgpt-v2 renders. The original 13 products (`products.json`) are **deprecated-retained**: kept in repo, excluded from the storefront (DB: `is_mock = false` rows hidden until real catalog lands).
+- Active catalog: **mock render SKUs** (`src/data/mock-products.json`, `isMock: true`) built from the chatgpt-v2 renders — curated to 5 products for local testing (2026-10-12). The old 13-product `products.json` was deleted as stale; its DB-side record lives on in `supabase/seed.sql` (`is_mock = false` rows hidden until real catalog lands).
 - Taxonomy: universe (extensible, 3 at launch) · vibe (extensible registry, 7 at launch: 4 featured + noir/pearl/gilded — presentation-only; relaxed from fixed-4 Oct 2026, see `01-vision-and-scope.md`) · gender (`men | women | unisex`; unisex appears under both Men and Women).
 - Commerce constants: free shipping ≥ ₹29,050 · gift ≥ ₹49,800 · standard shipping ₹1,999 · NEEDLECRAFT coupon ₹3,320.
 - All UI data flows through `src/lib/data.ts`. No direct JSON imports in components.

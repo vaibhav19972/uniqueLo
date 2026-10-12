@@ -98,13 +98,13 @@ const PRESET_REGIONS = [
 ];
 
 const PRESET_IMAGES = [
-  { label: 'Botanical Jacket 1', src: '/images/products/botanical-silk-jacket-1.png' },
-  { label: 'Botanical Jacket 2', src: '/images/products/botanical-silk-jacket-2.png' },
-  { label: 'Celestial Coat 1', src: '/images/products/celestial-zardozi-coat-1.png' },
-  { label: 'Celestial Coat 2', src: '/images/products/celestial-zardozi-coat-2.png' },
-  { label: 'Crewel Cardigan 1', src: '/images/products/crewel-cashmere-cardigan-1.png' },
-  { label: 'Crewel Cardigan 2', src: '/images/products/crewel-cashmere-cardigan-2.png' },
-  { label: 'Silk Scarf 1', src: '/images/products/embroidered-silk-scarf-1.png' },
+  { label: 'Sakura Hoodie 1', src: '/images/products/sakura-ronin-hoodie-1.jpg' },
+  { label: 'Sakura Hoodie 2', src: '/images/products/sakura-ronin-hoodie-2.jpg' },
+  { label: 'Sakura Hoodie 3', src: '/images/products/sakura-ronin-hoodie-3.jpg' },
+  { label: 'Sakura Hoodie 4', src: '/images/products/sakura-ronin-hoodie-4.jpg' },
+  { label: 'Sakura Hoodie 5', src: '/images/products/sakura-ronin-hoodie-5.jpg' },
+  { label: 'Sakura Hoodie 6', src: '/images/products/sakura-ronin-hoodie-6.jpg' },
+  { label: 'Hero Placeholder', src: '/images/placeholders/hero.jpg' },
 ];
 
 const AdminStudio: React.FC = () => {
@@ -158,8 +158,8 @@ const AdminStudio: React.FC = () => {
   // Slots 0–1 default to atelier imagery; 2–5 default to the shared placeholder
   // until dedicated crops land via single upload or All-in-One spec board.
   const [slotImages, setSlotImages] = useState<{ src: string; alt: string }[]>([
-    { src: '/images/products/botanical-silk-jacket-1.png', alt: '' },
-    { src: '/images/products/botanical-silk-jacket-2.png', alt: '' },
+    { src: '/images/products/sakura-ronin-hoodie-1.jpg', alt: '' },
+    { src: '/images/products/sakura-ronin-hoodie-2.jpg', alt: '' },
     { src: '/images/placeholders/hero.jpg', alt: '' },
     { src: '/images/placeholders/hero.jpg', alt: '' },
     { src: '/images/placeholders/hero.jpg', alt: '' },

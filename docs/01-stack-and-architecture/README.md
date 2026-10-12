@@ -66,8 +66,7 @@ UniqueLo/
 │   │   ├── motion.ts           ← shared easings, variants, stagger helpers
 │   │   └── lenis.ts            ← Lenis init + React Router integration
 │   ├── data/
-│   │   ├── mock-products.json  ← canonical storefront catalog (render-mock SKUs)
-│   │   ├── products.json       ← deprecated-retained legacy atelier line (not imported)
+│   │   ├── mock-products.json  ← canonical storefront catalog (5 curated products, local testing set)
 │   │   ├── categories.json
 │   │   ├── universes.json      ← universe roster + theme tokens
 │   │   ├── motifs.json         ← IP-cleared motif lore registry
