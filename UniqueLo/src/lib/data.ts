@@ -251,8 +251,8 @@ export interface Review {
 // ─────────────────────────────────────────────────────────────────────
 
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
-// NOTE: src/data/products.json (original 13) is deprecated-retained on disk and no
-// longer imported. The storefront runs on mock-products.json until real SKUs land.
+// NOTE: the old src/data/products.json (original 13) was deleted 2026-10-12.
+// The storefront runs on mock-products.json until real SKUs land.
 const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).products;
 const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
 const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
@@ -279,18 +279,6 @@ const mockReviews: Record<string, Review[]> = {
       comment: 'Feels premium and even better in person. Oversized fit is perfect.',
       verified: true,
       createdAt: '2 weeks ago',
-    },
-  ],
-  'koi-no-yume-sweatshirt': [
-    {
-      id: 'mock-rev-2',
-      productSlug: 'koi-no-yume-sweatshirt',
-      author: 'Ishita Rao',
-      rating: 5,
-      title: 'Perfect for anime events',
-      comment: 'So many people asked me where I got this from.',
-      verified: true,
-      createdAt: '1 week ago',
     },
   ],
 };

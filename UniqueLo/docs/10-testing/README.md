@@ -48,7 +48,7 @@ jsdom.
 
 | ID | Case | Asserts |
 |---|---|---|
-| T1.1 | Data integrity gate | Every mock product: slug unique; every variant has sku/color/size/price_cents; `technique` ∈ `CRAFT_TECHNIQUES`; every `vibe` ∈ `VIBES`; every `mood` ∈ mood registry; `image paths` resolve (join `public/`) — turns the manual parity audit (14 SKUs/73 variants, 26 image paths) into a 5 ms failing test |
+| T1.1 | Data integrity gate | Every mock product: slug unique; every variant has sku/color/size/price_cents; `technique` ∈ `CRAFT_TECHNIQUES`; every `vibe` ∈ `VIBES`; every `mood` ∈ mood registry; `image paths` resolve (join `public/`) — turns the manual parity audit (5 products/31 variants, 25 image paths) into a 5 ms failing test |
 | T1.2 | `formatPrice` | INR grouping (`Intl.NumberFormat('en-IN')`), no decimals; non-negative; matches docs/03 contract |
 | T1.3 | `filterProducts()` | Each `FilterState` dimension alone filters correctly (universe, gender, technique, vibe, mood, size, price); combinations AND together; empty state returns `[]` not throw |
 | T1.4 | Catalog fallback precedence | With Supabase unset → mock catalog; with Supabase error → mock catalog; with rows lacking `universe_slug` → mock catalog (feature detection); **with `is_mock=true` rows → still filtered out (TDD for the `[[kb/is-mock-guard-gap]]` guard: write this test red first, then add the `.eq('is_mock', true)`)** |

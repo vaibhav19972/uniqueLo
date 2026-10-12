@@ -74,7 +74,7 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 ### Step 3.3 — Seed Initial Needlecraft Catalog
 1. In the Supabase SQL Editor, open a **New Query**.
 2. Paste the contents of [`supabase/seed.sql`](../supabase/seed.sql) and click **Run**.
-3. This seeds the **legacy 13-product atelier line** (`is_mock = false`, 6 categories) plus the `universes`/`motifs` registries into your Supabase database — the schema was migrated to the universe model on 2026-10-11. **Caution:** the storefront currently serves the 14-SKU mock catalog from `src/data/mock-products.json`, but `getProducts()` does **not yet filter `is_mock`** — once seeded, the legacy rows carry `universe_slug` and will be served to the storefront. Add the `.eq('is_mock', true)` guard in `src/lib/data.ts` (docs/07 §3) before deploying a mock-phase storefront against the seeded DB.
+3. This seeds the **legacy 13-product atelier line** (`is_mock = false`, 6 categories) plus the `universes`/`motifs` registries into your Supabase database — the schema was migrated to the universe model on 2026-10-11. **Caution:** the storefront currently serves the 5-product curated mock catalog from `src/data/mock-products.json`, but `getProducts()` does **not yet filter `is_mock`** — once seeded, the legacy rows carry `universe_slug` and will be served to the storefront. Add the `.eq('is_mock', true)` guard in `src/lib/data.ts` (docs/07 §3) before deploying a mock-phase storefront against the seeded DB.
 
 ### Step 3.4 — Copy API Keys
 In Supabase, navigate to **Project Settings** > **API**:

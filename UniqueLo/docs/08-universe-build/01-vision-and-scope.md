@@ -47,4 +47,4 @@ Original-inspired motifs only. No trademarked characters, logos, names, or disti
 3. INR-only, India-only.
 4. IP-originality rule is launch-blocking.
 5. **Outlets, not data:** all render content (names, prices, counts, faces) is mock seed. Components must render empty/large/changed catalogs without edits.
-6. Original 13 products deprecated-retained; launch catalog = render mock SKUs.
+6. Old 13-product `products.json` deleted as stale (2026-10-12); launch catalog = curated render mock SKUs.

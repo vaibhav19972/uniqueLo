@@ -52,7 +52,7 @@ web
 ## Evidence on Hand
 
 - Fully operational React 19 + TypeScript + Vite codebase running locally on dev server.
-- Catalog infrastructure: 14 render-mock SKUs (73 variants) in `src/data/mock-products.json` (canonical storefront catalog, `isMock: true`), with the original 13-product atelier line (`products.json`) deprecated-retained for the eventual real-SKU launch. Supabase backend live for orders/newsletter (see docs/07).
+- Catalog infrastructure: 5 curated products (31 variants) in `src/data/mock-products.json` (canonical storefront catalog, `isMock: true`; trimmed from 14 for local testing on 2026-10-12, Sakura fully dedicated). Placeholders, category tiles, and campaign frames stay in-repo for owner updates. Supabase backend live for orders/newsletter (see docs/07).
 - High-definition macro photography and garment assets in `public/images/` (products, categories, campaigns — placeholder tonal blocks pending the real shoot; see docs/06).
 - Validated build pipeline: `tsc -b`, `vite build`, and `oxlint` all passing with 0 errors.
 
