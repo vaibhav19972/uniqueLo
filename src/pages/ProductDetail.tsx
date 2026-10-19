@@ -486,7 +486,7 @@ export const ProductDetail: React.FC = () => {
                           {formatPrice(currentVariant.compareAtPriceCents)}
                         </span>
                         <span
-                          className={`text-[12px] font-sans px-2 py-0.5 rounded ${
+                          className={`text-[12px] font-sans px-2 py-0.5 ${
                             isV2
                               ? 'font-semibold text-emerald-700 bg-emerald-50'
                               : 'bg-gold-deep/10 text-gold-deep'
@@ -500,14 +500,14 @@ export const ProductDetail: React.FC = () => {
 
                 {/* V2 D2C Promo Callout matching bag design system */}
                 {isV2 && (
-                  <div className="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/90 flex items-center justify-between text-xs text-emerald-950 font-sans">
+                  <div className="mt-3 p-3 bg-emerald-50/80 border border-emerald-200/90 flex items-center justify-between text-xs text-emerald-950 font-sans">
                     <div className="flex items-center gap-2">
                       <span className="text-base text-emerald-600">⚡</span>
                       <span>
                         Get extra 10% OFF with code <strong className="font-mono font-bold text-emerald-800">HUSTLE10</strong> at checkout
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold bg-emerald-700 text-white px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-semibold bg-emerald-700 text-white px-2 py-0.5">
                       APPLY IN BAG
                     </span>
                   </div>

@@ -76,8 +76,8 @@ export const UniverseHero: React.FC = () => {
       aria-label="Hero carousel"
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
-        {/* Full-width container frame with margins and rounded border */}
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-stone/70 min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex items-center">
+        {/* Full-width container frame with margins and square border */}
+        <div className="relative overflow-hidden rounded-sm border border-stone/70 min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex items-center">
           {/* ─────────────────────────────────────────────────────────────
               1. Background Crossfade Carousel
               ───────────────────────────────────────────────────────────── */}

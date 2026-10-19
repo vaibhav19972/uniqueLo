@@ -174,12 +174,5 @@
    /* Typography: Full Neo-Grotesque Sans-Serif */
    --font-sans:  'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
    --font-serif: 'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-
-   /* Modern rounded card radius */
-   --radius-sm:   0.25rem;  /* 4px */
-   --radius-md:   0.5rem;   /* 8px */
-   --radius-lg:   0.75rem;  /* 12px */
-   --radius-xl:   1rem;     /* 16px */
-   --radius-2xl:  1.25rem;  /* 20px */
 }
 

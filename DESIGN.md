@@ -235,6 +235,10 @@ The system automatically synchronizes:
 - Headings: Bold, tight letter-spacing (`-0.02em`), uppercase labels (`tracking-widest`).
 - Body: 14–16px crisp sans with 1.5 line height.
 
+## Corner Radius Scope Rule
+- **Cart Bag Only:** Rounded corner behavior (`rounded-2xl`, `rounded-xl`, `rounded-full`) is strictly confined to the Cart Bag drawer and its line items matching `sketches/design system.png`.
+- **Rest of Website:** Retains clean architectural square rectangles for product cards, homepage components, and storefront sections to maintain the unified site aesthetic.
+
 ## The Cart Bag (Exact Match to `sketches/design system.png`)
 
 When `USE_THEME_V2 = true`, clicking the Bag trigger opens the Gokwik-style cart drawer with:

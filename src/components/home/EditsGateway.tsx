@@ -54,7 +54,7 @@ export const EditsGateway: React.FC = () => {
           {featured.map((e) => (
             <article
               key={e.slug}
-              className="group relative rounded-2xl overflow-hidden text-left transition-all duration-300 hover:z-10 hover:scale-[1.03] hover:ring-2 hover:ring-gold"
+              className="group relative rounded-sm overflow-hidden text-left transition-all duration-300 hover:z-10 hover:scale-[1.03] hover:ring-2 hover:ring-gold"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-stone/30">
                 <img
@@ -87,7 +87,7 @@ export const EditsGateway: React.FC = () => {
                   explore(e.slug);
                 }}
                 aria-label={`Explore ${e.title}`}
-                className="absolute inset-0 rounded-2xl focus-visible:outline focus-visible:outline-accent"
+                className="absolute inset-0 rounded-sm focus-visible:outline focus-visible:outline-accent"
               />
             </article>
           ))}

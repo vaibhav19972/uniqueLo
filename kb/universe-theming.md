@@ -1,41 +1,33 @@
 ---
-title: Universe Theming
+title: Universe Theming & Unified Design System
 type: mechanism
-updated: 2026-10-12
-sources: [src/app/Layout.tsx, src/styles/universes.css, src/pages/Universe.tsx, docs/08-universe-build/04-universe-theming-system.md]
+updated: 2026-10-19
+sources: [src/app/Layout.tsx, src/config/theme.ts, src/styles/tokens.css, src/pages/Universe.tsx, docs/08-universe-build/04-universe-theming-system.md]
 links: ["[[mood-vibe-taxonomy]]", "[[route-map]]", "[[catalog-spine]]"]
 ---
 
-# Universe Theming
+# Universe Theming & Unified Design System
 
-Whole-site theming passes universe identity down through CSS custom properties, not
-per-component conditionals:
+## Theme Unification (The Atelier & Design System v2)
 
-- `Layout.tsx` sets `data-universe="<slug>"` on `<html>` (from the route's universe
-  slug) and cleans it up on unmount — verified in source lines 37–39.
-- `src/styles/universes.css` scopes token remaps (surface, accent, on-gold, glow) to
-  `[data-universe="…"]` selectors; components just read tokens and never branch on
-  universe inside JSX.
-- Checkout/account areas stay neutral **by construction** — an opt-in `data-u-zone`
-  attribute (used by `Universe.tsx`, `BundleBand.tsx`, `universes.css`) scopes themed
-  treatment where wanted, rather than theming leaking into commerce zones.
+Per user directive, the website design system has been unified across the entire site including all universes. Disparate saturated dark backgrounds per universe have been superseded by a cohesive aesthetic:
 
-## Palette reality check (2026-10-12)
+- **v1 (The Atelier):** Quiet-luxury editorial house canvas (`#f7f5f0`), white paper surfaces (`#ffffff`), Playfair Display serif headings, hairline stone rules (`#e5e1d8`), and obsidian action buttons (`bg-ink text-cream`).
+- **v2 (Modern D2C Streetwear & Gokwik Cart Bag):** Cool slate ground (`#f0f2f5`), pure white surfaces (`#ffffff`), neo-grotesque sans-serif typography (Satoshi/Inter), emerald savings green accents (`#059669`), and an interactive Gokwik-style Cart Bag drawer.
 
-- Shell gold = champagne `#c2a878`, shell coal = `#111116`,
-  `--brand-gold-deep: #7a6234`, `--on-gold: #141414` — matches audit.md's
-  de-browning record.
-- `text-on-gold` consumers: `Cta.tsx` (1 hit) + universe scoping; light-surface gold
-  text should use `--color-gold-deep` instead — the contrast-sweep pass covered 14
-  components. **Automated re-run of the §08 ≥4.5:1 gate is still pending** — that's
-  the open item in [[audit-trail]].
+Global theme selection is controlled by `USE_THEME_V2` in `src/config/theme.ts`. `Layout.tsx` calls `useIsThemeV2()` which synchronizes `data-theme="v2" | "v1"` and `.theme-v2 | .theme-v1` onto `<html>`.
 
-## Mirror parity
+## Corner Radius Scope Rule
+- **Cart Bag Only:** Rounded corners (`rounded-2xl`, `rounded-xl`, `rounded-full`) are strictly confined to the Cart Bag drawer (`CartDrawer.tsx` & `CartLineItem.tsx`).
+- **Rest of Website:** Product cards, bestseller cards, hero banners, PDP, newsletter, and universe pages strictly preserve clean architectural square rectangles (`--radius-sm: 0.125rem`, `--radius-md: 0.25rem`).
 
-`src/data/universes.json` ↔ `universes.css` are meant to stay in sync (colors on both
-sides). The audit pass claimed parity was maintained; a re-check after every palette
-edit is cheap and should be part of the T1.1 integrity test when written
-(docs/10-testing).
+## Universe Content Preservation
+
+While chrome, layout framing, and surface styling are unified, universe identity remains preserved through:
+- Curated editorial lore, kicking eyebrows, and custom headlines in `Universe.tsx`.
+- Universe-specific embroidery motifs, character filters, and technique chips.
+- Universe catalog capsules (Animeverse, Heroverse, Itihaas) curated in `src/data/mock-products.json`.
 
 ## Changelog
-- 2026-10-12 — created; verified `data-universe` wiring + gold token values in source.
+- 2026-10-19 — documented site-wide theme unification under The Atelier / v2 Modern D2C Streetwear (`USE_THEME_V2`), updated Layout wiring, and noted the Corner Radius Scope Rule.
+- 2026-10-12 — created; initial check of earlier per-universe `[data-universe]` scoping.
