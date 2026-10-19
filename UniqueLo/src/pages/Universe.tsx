@@ -1,7 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useProducts, useUniverse, useMotifsByUniverse } from '../hooks/useCatalog';
-import { filterProducts, ART_STYLES, getCharacterIds, type FilterState, type ArtStyleSlug } from '../lib/data';
+import {
+  filterProducts,
+  ART_STYLES,
+  getCharacterIds,
+  EXPRESSION_LEVELS,
+  type FilterState,
+  type ArtStyleSlug,
+  type ExpressionScore,
+} from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
 import { BundleBand } from '../components/shop/BundleBand';
 
@@ -29,6 +37,7 @@ export const Universe: React.FC = () => {
   const [garment, setGarment] = useState<string>('all');
   const [artStyle, setArtStyle] = useState<ArtStyleSlug | 'all'>('all');
   const [character, setCharacter] = useState<string>('all');
+  const [expression, setExpression] = useState<ExpressionScore | 'all'>('all');
 
   const garmentTypes = useMemo(() => {
     const set = new Set<string>();
@@ -62,12 +71,13 @@ export const Universe: React.FC = () => {
       garmentTypes: garment === 'all' ? [] : [garment],
       characterId: character === 'all' ? 'all' : character,
       artStyleSlug: artStyle,
+      expressionScore: expression === 'all' ? undefined : expression,
       colors: [],
       sizes: [],
       sort: 'newest',
     };
     return filterProducts(allProducts ?? [], f);
-  }, [allProducts, universeSlug, garment, character, artStyle]);
+  }, [allProducts, universeSlug, garment, character, artStyle, expression]);
 
   if (universe === undefined) {
     return (
@@ -232,10 +242,10 @@ export const Universe: React.FC = () => {
           {/* Filter chips — garments + characters + art styles */}
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => { setGarment('all'); setCharacter('all'); setArtStyle('all'); }}
-              aria-pressed={garment === 'all' && character === 'all' && artStyle === 'all'}
+              onClick={() => { setGarment('all'); setCharacter('all'); setArtStyle('all'); setExpression('all'); }}
+              aria-pressed={garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                garment === 'all' && character === 'all' && artStyle === 'all'
+                garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'
                   ? 'bg-ink text-cream border border-transparent font-medium'
                   : 'text-ink border border-stone bg-paper hover:border-ink'
               }`}
@@ -254,6 +264,22 @@ export const Universe: React.FC = () => {
                 }`}
               >
                 {garmentLabel(g)}
+              </button>
+            ))}
+            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
+            {EXPRESSION_LEVELS.map((e) => (
+              <button
+                key={e.score}
+                onClick={() => setExpression(e.score === expression ? 'all' : e.score)}
+                aria-pressed={expression === e.score}
+                title={e.tagline}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-sans min-h-[44px] transition-colors cursor-pointer ${
+                  expression === e.score
+                    ? 'bg-accent text-cream border border-transparent font-medium shadow-sm'
+                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
+                }`}
+              >
+                ✦ L{e.score} {e.name}
               </button>
             ))}
             <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />

@@ -5,9 +5,19 @@ import { useCartStore } from '../stores/cart';
 import { useCustomizerStore } from '../stores/customizer';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
-import { formatPrice, getDefaultVariant, getMotifSync, ART_STYLES, type ProductVariant, submitReview } from '../lib/data';
+import {
+  formatPrice,
+  getDefaultVariant,
+  getMotifSync,
+  ART_STYLES,
+  getExpressionScore,
+  getExpressionByScore,
+  type ProductVariant,
+  submitReview,
+} from '../lib/data';
 import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
+import { ExpressionGuideModal } from '../components/shop/ExpressionGuideModal';
 import { CtaButton } from '../components/ui/Cta';
 import { useIsThemeV2 } from '../config/theme';
 
@@ -29,6 +39,7 @@ export const ProductDetail: React.FC = () => {
   const [activeAccordion, setActiveAccordion] = useState<string | null>('technique');
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isExpressionModalOpen, setIsExpressionModalOpen] = useState(false);
 
   // Review Form State
   const [reviewAuthor, setReviewAuthor] = useState('');
@@ -112,6 +123,25 @@ export const ProductDetail: React.FC = () => {
     if (!currentVariant || !compare || compare <= currentVariant.priceCents) return 0;
     return Math.round((1 - currentVariant.priceCents / compare) * 100);
   }, [currentVariant]);
+
+  const expScore = useMemo(() => getExpressionScore(product), [product]);
+  const expInfo = useMemo(() => getExpressionByScore(expScore), [expScore]);
+
+  // Universe Recommendations (same world / story)
+  const universeProducts = useMemo(() => {
+    if (!product || !allProducts || !product.universeSlug) return [];
+    return allProducts
+      .filter((p) => p.slug !== product.slug && p.universeSlug === product.universeSlug)
+      .slice(0, 3);
+  }, [product, allProducts]);
+
+  // Expression Recommendations (same visual presence across worlds)
+  const expressionProducts = useMemo(() => {
+    if (!product || !allProducts) return [];
+    return allProducts
+      .filter((p) => p.slug !== product.slug && getExpressionScore(p) === expScore)
+      .slice(0, 3);
+  }, [product, allProducts, expScore]);
 
   const relatedProducts = useMemo(() => {
     if (!product || !allProducts) return [];
@@ -472,6 +502,48 @@ export const ProductDetail: React.FC = () => {
               <p className="font-serif italic text-lg text-ink-muted mt-2 leading-relaxed">
                 {product.subtitle}
               </p>
+
+              {/* Expression Scale & Placement Badge (Spec PDP requirement) */}
+              <div className="mt-4 p-3.5 bg-paper border border-stone/70 space-y-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 bg-ink text-cream text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                      {expScore}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] uppercase font-sans tracking-widest text-ink-muted">
+                          Expression
+                        </span>
+                        <span className="text-xs font-serif font-semibold text-accent">
+                          Level {expScore} / 5 · {expInfo?.name ?? 'Artistic'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-ink-muted leading-tight font-light mt-0.5">
+                        {expInfo?.tagline ?? 'Medium compositions, illustrative designs.'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsExpressionModalOpen(true)}
+                    className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold cursor-pointer shrink-0 ml-2"
+                  >
+                    Explain Scale ↗
+                  </button>
+                </div>
+
+                {product.embroidery?.placement && product.embroidery.placement.length > 0 && (
+                  <div className="pt-2 border-t border-stone/30 flex items-center gap-2 text-[10px] text-ink-muted">
+                    <span className="uppercase tracking-wider font-medium text-ink/70">
+                      Placement Zones:
+                    </span>
+                    <span className="font-serif italic text-ink">
+                      {product.embroidery.placement.join(' • ')}
+                    </span>
+                  </div>
+                )}
+              </div>
 
               {/* Price: serif + compare-at + computed %OFF (render 09) */}
               <div className="mt-5 pb-5 border-b border-stone/50">
@@ -994,53 +1066,190 @@ export const ProductDetail: React.FC = () => {
           </div>
         </section>
 
-        {/* FREQUENTLY STITCHED TOGETHER / RECOMMENDATIONS */}
-        {relatedProducts.length > 0 && (
-          <section className="mt-20 pt-16 border-t border-stone/60">
-            <div className="mb-8">
-              <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                Curated Wardrobe
-              </span>
-              <h2 className="font-serif text-3xl text-ink mt-1">
-                Frequently Stitched Together
-              </h2>
-            </div>
+        {/* DUAL DISCOVERY AXIS RECOMMENDATIONS */}
+        <div className="mt-20 pt-16 border-t border-stone/60 space-y-16">
+          {/* Stream 1: More from the same Universe */}
+          {universe && universeProducts.length > 0 && (
+            <section aria-labelledby="universe-recs-heading">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                <div>
+                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                    Curated Universe
+                  </span>
+                  <h2 id="universe-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
+                    More from {universe.name}
+                  </h2>
+                  <p className="text-xs text-ink-muted mt-1 font-light">
+                    Heirloom pieces woven from the same lore, characters, and needlework aesthetic.
+                  </p>
+                </div>
+                <Link
+                  to={`/worlds/${universe.slug}`}
+                  className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold shrink-0"
+                >
+                  Explore All {universe.name} Pieces →
+                </Link>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {relatedProducts.map((rel) => {
-                const relVariant = getDefaultVariant(rel);
-                return (
-                  <Link
-                    key={rel.slug}
-                    to={`/product/${rel.slug}`}
-                    className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
-                  >
-                    <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
-                      <img
-                        src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
-                        alt={rel.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {rel.embroidery && (
-                        <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
-                          {rel.embroidery.techniqueLabel}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {universeProducts.map((rel) => {
+                  const relVariant = getDefaultVariant(rel);
+                  return (
+                    <Link
+                      key={rel.slug}
+                      to={`/product/${rel.slug}`}
+                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                    >
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                        <img
+                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
+                          alt={rel.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {rel.embroidery && (
+                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                            {rel.embroidery.techniqueLabel}
+                          </span>
+                        )}
+                        <span className="absolute top-2 right-2 bg-paper/90 text-accent text-[9px] uppercase tracking-widest px-2 py-0.5 font-sans font-semibold">
+                          ✦ L{getExpressionScore(rel)}
                         </span>
-                      )}
-                    </div>
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
-                        {rel.name}
-                      </h4>
-                      <span className="font-sans text-xs font-medium text-ink">
-                        {formatPrice(relVariant.priceCents)}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
+                            {rel.name}
+                          </h4>
+                          <span className="font-sans text-[11px] text-ink-muted block mt-0.5">
+                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
+                          </span>
+                        </div>
+                        <span className="font-sans text-xs font-semibold text-ink">
+                          {formatPrice(relVariant.priceCents)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Stream 2: More at the same Expression Level */}
+          {expressionProducts.length > 0 && (
+            <section aria-labelledby="expression-recs-heading">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                <div>
+                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                    The Expression Spectrum
+                  </span>
+                  <h2 id="expression-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
+                    Pieces at Level {expScore} ({expInfo?.name})
+                  </h2>
+                  <p className="text-xs text-ink-muted mt-1 font-light">
+                    Cross-world pieces sharing the same visual presence and needlecraft density.
+                  </p>
+                </div>
+                <Link
+                  to={`/expression/${product.expressionSlug || 'artistic'}`}
+                  className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold shrink-0"
+                >
+                  Explore All Level {expScore} Pieces →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {expressionProducts.map((rel) => {
+                  const relVariant = getDefaultVariant(rel);
+                  return (
+                    <Link
+                      key={rel.slug}
+                      to={`/product/${rel.slug}`}
+                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                    >
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                        <img
+                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
+                          alt={rel.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {rel.embroidery && (
+                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                            {rel.embroidery.techniqueLabel}
+                          </span>
+                        )}
+                        <span className="absolute top-2 right-2 bg-paper/90 text-accent text-[9px] uppercase tracking-widest px-2 py-0.5 font-sans font-semibold">
+                          ✦ L{getExpressionScore(rel)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
+                            {rel.name}
+                          </h4>
+                          <span className="font-sans text-[11px] text-ink-muted block mt-0.5">
+                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
+                          </span>
+                        </div>
+                        <span className="font-sans text-xs font-semibold text-ink">
+                          {formatPrice(relVariant.priceCents)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Fallback Curated Wardrobe when neither stream populated */}
+          {!universeProducts.length && !expressionProducts.length && relatedProducts.length > 0 && (
+            <section>
+              <div className="mb-8">
+                <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                  Curated Wardrobe
+                </span>
+                <h2 className="font-serif text-3xl text-ink mt-1">
+                  Frequently Stitched Together
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {relatedProducts.map((rel) => {
+                  const relVariant = getDefaultVariant(rel);
+                  return (
+                    <Link
+                      key={rel.slug}
+                      to={`/product/${rel.slug}`}
+                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                    >
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                        <img
+                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
+                          alt={rel.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {rel.embroidery && (
+                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                            {rel.embroidery.techniqueLabel}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
+                          {rel.name}
+                        </h4>
+                        <span className="font-sans text-xs font-medium text-ink">
+                          {formatPrice(relVariant.priceCents)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </div>
       </div>
 
       {/* Sizing Guide Modal */}
@@ -1048,6 +1257,13 @@ export const ProductDetail: React.FC = () => {
         isOpen={isSizeGuideOpen}
         onClose={() => setIsSizeGuideOpen(false)}
         category={product.categorySlug}
+      />
+
+      {/* Expression Guide Modal */}
+      <ExpressionGuideModal
+        isOpen={isExpressionModalOpen}
+        onClose={() => setIsExpressionModalOpen(false)}
+        currentScore={expScore}
       />
 
       {/* Review Submission Modal */}

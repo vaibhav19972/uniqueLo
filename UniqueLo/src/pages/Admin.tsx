@@ -6,9 +6,10 @@ import { useToastStore } from '../stores/toast';
 import {
   formatPrice,
   EDITS,
-  INTENSITY_LEVELS,
+  EXPRESSION_LEVELS,
   type EditSlug,
   type IntensityLevel,
+  type ExpressionScore,
   type Gender,
   type EmbroideryTechnique,
 } from '../lib/data';
@@ -137,10 +138,15 @@ const AdminStudio: React.FC = () => {
   const [motifId, setMotifId] = useState('');
   const [tagsInput, setTagsInput] = useState('tops, embroidery, handcrafted');
   const [selectedMoods, setSelectedMoods] = useState<EditSlug[]>(['everyday', 'heritage']);
+  const [selectedExpressionScore, setSelectedExpressionScore] = useState<ExpressionScore>(3);
   const [selectedIntensity, setSelectedIntensity] = useState<IntensityLevel>('balanced');
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
   const [handcrafted, setHandcrafted] = useState(true);
+
+  const selectedExpression =
+    EXPRESSION_LEVELS.find((e) => e.score === selectedExpressionScore) || EXPRESSION_LEVELS[2];
+  const selectedExpressionSlug = selectedExpression.slug;
 
   const { data: universes } = useUniverses();
   const { data: motifs } = useMotifsByUniverse(universeSlug);
@@ -492,7 +498,7 @@ const AdminStudio: React.FC = () => {
 -- 1. Insert Base Product
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  garment_type, gender, motif_id, is_mock, handcrafted, intensity, edits,
+  garment_type, gender, motif_id, is_mock, handcrafted, intensity, expression_score, expression_slug, edits,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -509,6 +515,8 @@ INSERT INTO public.products (
   false,
   ${handcrafted},
   '${selectedIntensity}',
+  ${selectedExpressionScore},
+  '${selectedExpressionSlug}',
   ARRAY[${moodsArr}],
   5.0,
   12,
@@ -536,6 +544,8 @@ INSERT INTO public.products (
   motif_id = EXCLUDED.motif_id,
   handcrafted = EXCLUDED.handcrafted,
   intensity = EXCLUDED.intensity,
+  expression_score = EXCLUDED.expression_score,
+  expression_slug = EXCLUDED.expression_slug,
   edits = EXCLUDED.edits,
   featured = EXCLUDED.featured;
 
@@ -629,6 +639,8 @@ INSERT INTO public.embroidery_details (
       isMock: false,
       handcrafted,
       intensity: selectedIntensity,
+      expressionScore: selectedExpressionScore,
+      expressionSlug: selectedExpressionSlug,
       edits: selectedMoods,
       rating: 5.0,
       reviewCount: 12,
@@ -681,6 +693,8 @@ INSERT INTO public.embroidery_details (
     motifId,
     handcrafted,
     selectedMoods,
+    selectedExpressionScore,
+    selectedExpressionSlug,
     selectedIntensity,
     tagsInput,
     variants,
@@ -995,29 +1009,43 @@ INSERT INTO public.embroidery_details (
                     </div>
                   </div>
 
-                  {/* Intensity Selector — Quiet ↔ Loud shopping axis */}
+                  {/* Expression Intensity Selector — 1 to 5 scale (Spec Signature Discovery Axis) */}
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Intensity (Quiet ↔ Loud shopping axis)
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {INTENSITY_LEVELS.map((lvl) => {
-                        const isSel = selectedIntensity === lvl.slug;
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Embroidery Expression (1–5 Discovery Axis)
+                      </label>
+                      <span className="text-[10px] font-sans text-accent font-semibold uppercase tracking-widest">
+                        Level {selectedExpressionScore}: {selectedExpression.name}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                      {EXPRESSION_LEVELS.map((exp) => {
+                        const isSel = selectedExpressionScore === exp.score;
                         return (
                           <button
-                            key={lvl.slug}
+                            key={exp.score}
                             type="button"
-                            onClick={() => setSelectedIntensity(lvl.slug)}
+                            onClick={() => {
+                              setSelectedExpressionScore(exp.score);
+                              if (exp.score <= 2) setSelectedIntensity('quiet');
+                              else if (exp.score === 3) setSelectedIntensity('balanced');
+                              else setSelectedIntensity('loud');
+                            }}
                             aria-pressed={isSel}
-                            title={lvl.tagline}
-                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer font-sans ${
+                            title={exp.description}
+                            className={`p-2.5 text-left border transition-all cursor-pointer font-sans ${
                               isSel
-                                ? 'border-accent bg-accent/15 text-accent font-semibold'
+                                ? 'border-accent bg-accent/15 text-accent shadow-xs'
                                 : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
                             }`}
                           >
-                            {isSel ? '✓ ' : '+ '}
-                            {lvl.name}
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] uppercase tracking-widest font-bold">Level {exp.score}</span>
+                              {isSel && <span className="text-xs text-accent font-bold">✓</span>}
+                            </div>
+                            <div className="font-serif text-sm font-semibold text-ink mt-0.5">{exp.name}</div>
+                            <p className="text-[10px] text-ink-muted line-clamp-2 mt-1 leading-tight">{exp.characteristics}</p>
                           </button>
                         );
                       })}
@@ -1823,6 +1851,7 @@ INSERT INTO public.embroidery_details (
                     <tr>
                       <th className="py-3 px-3">Product</th>
                       <th className="py-3 px-3">Category</th>
+                      <th className="py-3 px-3">Expression</th>
                       <th className="py-3 px-3">Technique</th>
                       <th className="py-3 px-3">Price</th>
                       <th className="py-3 px-3">Variants</th>
@@ -1849,6 +1878,11 @@ INSERT INTO public.embroidery_details (
                         <td className="py-3 px-3">
                           <span className="px-2 py-0.5 bg-cream border border-stone/40 text-[10px] uppercase tracking-wider">
                             {product.categorySlug}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-[10px] uppercase tracking-wider text-accent font-medium whitespace-nowrap">
+                            ✦ L{product.expressionScore ?? 3} · {(product.expressionSlug || 'artistic').replace(/-/g, ' ')}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-xs text-ink-muted">
@@ -1910,7 +1944,7 @@ INSERT INTO public.embroidery_details (
                   type="button"
                   onClick={() =>
                     copyToClipboard(
-                      `-- 1. Wipe Previous Tables\nDROP TABLE IF EXISTS public.order_items CASCADE;\nDROP TABLE IF EXISTS public.orders CASCADE;\nDROP TABLE IF EXISTS public.reviews CASCADE;\nDROP TABLE IF EXISTS public.newsletter_subscribers CASCADE;\nDROP TABLE IF EXISTS public.embroidery_details CASCADE;\nDROP TABLE IF EXISTS public.product_images CASCADE;\nDROP TABLE IF EXISTS public.variants CASCADE;\nDROP TABLE IF EXISTS public.products CASCADE;\nDROP TABLE IF EXISTS public.motifs CASCADE;\nDROP TABLE IF EXISTS public.universes CASCADE;\nDROP TABLE IF EXISTS public.categories CASCADE;\n\n-- 2. Enable UUID Extension\nCREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n\n-- 3. Universes Table\nCREATE TABLE public.universes (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  tagline text NOT NULL,\n  lore text NOT NULL,\n  emblem_src text,\n  hero_image text,\n  drop_cadence text,\n  is_active boolean DEFAULT true,\n  order_num integer DEFAULT 0,\n  theme_tokens jsonb DEFAULT '{}'::jsonb,\n  portal_title_color text,\n  lore_heading text,\n  hero_headline text,\n  hero_headline_accent text,\n  hero_lead_color text,\n  hero_accent_color text,\n  hero_headline_case text,\n  hero_kicker text,\n  hero_ornament text,\n  hero_note text,\n  hero_vertical_text text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 4. Motifs Table\nCREATE TABLE public.motifs (\n  id text PRIMARY KEY,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE CASCADE NOT NULL,\n  name text NOT NULL,\n  meaning text NOT NULL,\n  symbol_notes text,\n  ip_cleared boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5. Categories Table\nCREATE TABLE public.categories (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  label text NOT NULL,\n  description text NOT NULL,\n  image text,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 6. Products Table\nCREATE TABLE public.products (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  subtitle text NOT NULL,\n  foreign_tagline text,\n  description text NOT NULL,\n  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,\n  garment_type text,\n  gender text DEFAULT 'unisex' CHECK (gender in ('men', 'women', 'unisex')),\n  motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,\n  is_mock boolean DEFAULT false,\n  handcrafted boolean DEFAULT false,\n  vibes text[] DEFAULT '{}',\n  moods text[] DEFAULT '{}',\n  rating numeric(3,1),\n  review_count integer DEFAULT 0,\n  sold_count text,\n  tags text[] DEFAULT '{}',\n  featured boolean DEFAULT false,\n  customizable boolean DEFAULT false,\n  material text[] DEFAULT '{}',\n  care text[] DEFAULT '{}',\n  fit text,\n  batch_number integer DEFAULT 1,\n  batch_total integer DEFAULT 50,\n  craft_region text,\n  craft_cluster text,\n  fabric_gsm text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 7. Variants Table\nCREATE TABLE public.variants (\n  sku text PRIMARY KEY,\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  color text NOT NULL,\n  color_hex text NOT NULL,\n  size text NOT NULL,\n  price_cents integer NOT NULL,\n  compare_at_price_cents integer,\n  status text DEFAULT 'in-stock' CHECK (status in ('in-stock', 'low-stock', 'out-of-stock')),\n  quantity integer DEFAULT 10,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 8. Product Images Table\nCREATE TABLE public.product_images (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  src text NOT NULL,\n  alt text NOT NULL,\n  color text,\n  sort_order integer DEFAULT 0\n);\n\n-- 9. Embroidery Details Table\nCREATE TABLE public.embroidery_details (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL UNIQUE,\n  technique text NOT NULL,\n  technique_label text NOT NULL,\n  artisan_hours integer DEFAULT 0,\n  placement text[] DEFAULT '{}',\n  thread_composition text NOT NULL,\n  motif_story text NOT NULL,\n  macro_image_src text,\n  macro_image_alt text\n);\n\n-- 10. Reviews Table\nCREATE TABLE public.reviews (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  author text NOT NULL,\n  rating integer CHECK (rating >= 1 and rating <= 5) NOT NULL,\n  title text NOT NULL,\n  comment text NOT NULL,\n  verified boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 11. Newsletter Subscribers Table\nCREATE TABLE public.newsletter_subscribers (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  email text UNIQUE NOT NULL,\n  subscribed_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 12. Orders & Order Items Table\nCREATE TABLE public.orders (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  customer_name text NOT NULL,\n  customer_email text NOT NULL,\n  status text DEFAULT 'confirmed',\n  subtotal_cents integer NOT NULL,\n  discount_cents integer DEFAULT 0,\n  shipping_cents integer DEFAULT 0,\n  total_cents integer NOT NULL,\n  coupon_code text,\n  gift_note text,\n  shipping_address jsonb,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\nCREATE TABLE public.order_items (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  order_id uuid REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,\n  product_slug text NOT NULL,\n  variant_sku text NOT NULL,\n  product_name text NOT NULL,\n  color text NOT NULL,\n  size text NOT NULL,\n  quantity integer NOT NULL,\n  price_cents integer NOT NULL,\n  customization jsonb\n);\n\n-- 13. Enable Row Level Security (RLS)\nALTER TABLE public.universes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.motifs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.products ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.variants ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.embroidery_details ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;\n\n-- Public READ Policies\nCREATE POLICY "Allow public read universes" ON public.universes FOR SELECT USING (true);\nCREATE POLICY "Allow public read motifs" ON public.motifs FOR SELECT USING (true);\nCREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USING (true);\nCREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);\nCREATE POLICY "Allow public read variants" ON public.variants FOR SELECT USING (true);\nCREATE POLICY "Allow public read product images" ON public.product_images FOR SELECT USING (true);\nCREATE POLICY "Allow public read embroidery details" ON public.embroidery_details FOR SELECT USING (true);\nCREATE POLICY "Allow public read reviews" ON public.reviews FOR SELECT USING (true);\n\n-- Public WRITE Policies\nCREATE POLICY "Allow public newsletter subscribe" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public submit review" ON public.reviews FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create orders" ON public.orders FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create order items" ON public.order_items FOR INSERT WITH CHECK (true);\n\n-- Admin Studio Policies\nCREATE POLICY "Allow admin insert products" ON public.products FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update products" ON public.products FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert variants" ON public.variants FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update variants" ON public.variants FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert product images" ON public.product_images FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin delete product images" ON public.product_images FOR DELETE USING (true);\nCREATE POLICY "Allow admin insert embroidery details" ON public.embroidery_details FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update embroidery details" ON public.embroidery_details FOR UPDATE USING (true);\n\n-- Storage Setup\nINSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING;\nCREATE POLICY "Public Read Product Images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');\nCREATE POLICY "Public Upload Product Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');`,
+                      `-- 1. Wipe Previous Tables\nDROP TABLE IF EXISTS public.order_items CASCADE;\nDROP TABLE IF EXISTS public.orders CASCADE;\nDROP TABLE IF EXISTS public.reviews CASCADE;\nDROP TABLE IF EXISTS public.newsletter_subscribers CASCADE;\nDROP TABLE IF EXISTS public.embroidery_details CASCADE;\nDROP TABLE IF EXISTS public.product_images CASCADE;\nDROP TABLE IF EXISTS public.variants CASCADE;\nDROP TABLE IF EXISTS public.products CASCADE;\nDROP TABLE IF EXISTS public.motifs CASCADE;\nDROP TABLE IF EXISTS public.universes CASCADE;\nDROP TABLE IF EXISTS public.categories CASCADE;\n\n-- 2. Enable UUID Extension\nCREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n\n-- 3. Universes Table\nCREATE TABLE public.universes (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  tagline text NOT NULL,\n  lore text NOT NULL,\n  emblem_src text,\n  hero_image text,\n  drop_cadence text,\n  is_active boolean DEFAULT true,\n  order_num integer DEFAULT 0,\n  theme_tokens jsonb DEFAULT '{}'::jsonb,\n  portal_title_color text,\n  lore_heading text,\n  hero_headline text,\n  hero_headline_accent text,\n  hero_lead_color text,\n  hero_accent_color text,\n  hero_headline_case text,\n  hero_kicker text,\n  hero_ornament text,\n  hero_note text,\n  hero_vertical_text text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 4. Motifs Table\nCREATE TABLE public.motifs (\n  id text PRIMARY KEY,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE CASCADE NOT NULL,\n  name text NOT NULL,\n  meaning text NOT NULL,\n  symbol_notes text,\n  ip_cleared boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5. Categories Table\nCREATE TABLE public.categories (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  label text NOT NULL,\n  description text NOT NULL,\n  image text,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 6. Products Table\nCREATE TABLE public.products (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  subtitle text NOT NULL,\n  foreign_tagline text,\n  description text NOT NULL,\n  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,\n  garment_type text,\n  gender text DEFAULT 'unisex' CHECK (gender in ('men', 'women', 'unisex')),\n  motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,\n  is_mock boolean DEFAULT false,\n  handcrafted boolean DEFAULT false,\n  vibes text[] DEFAULT '{}',\n  moods text[] DEFAULT '{}',\n  intensity text DEFAULT 'balanced' CHECK (intensity in ('quiet', 'balanced', 'loud')),\n  expression_score smallint DEFAULT 3 CHECK (expression_score between 1 and 5),\n  expression_slug text DEFAULT 'artistic',\n  rating numeric(3,1),\n  review_count integer DEFAULT 0,\n  sold_count text,\n  tags text[] DEFAULT '{}',\n  featured boolean DEFAULT false,\n  customizable boolean DEFAULT false,\n  material text[] DEFAULT '{}',\n  care text[] DEFAULT '{}',\n  fit text,\n  batch_number integer DEFAULT 1,\n  batch_total integer DEFAULT 50,\n  craft_region text,\n  craft_cluster text,\n  fabric_gsm text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 7. Variants Table\nCREATE TABLE public.variants (\n  sku text PRIMARY KEY,\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  color text NOT NULL,\n  color_hex text NOT NULL,\n  size text NOT NULL,\n  price_cents integer NOT NULL,\n  compare_at_price_cents integer,\n  status text DEFAULT 'in-stock' CHECK (status in ('in-stock', 'low-stock', 'out-of-stock')),\n  quantity integer DEFAULT 10,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 8. Product Images Table\nCREATE TABLE public.product_images (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  src text NOT NULL,\n  alt text NOT NULL,\n  color text,\n  sort_order integer DEFAULT 0\n);\n\n-- 9. Embroidery Details Table\nCREATE TABLE public.embroidery_details (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL UNIQUE,\n  technique text NOT NULL,\n  technique_label text NOT NULL,\n  artisan_hours integer DEFAULT 0,\n  placement text[] DEFAULT '{}',\n  thread_composition text NOT NULL,\n  motif_story text NOT NULL,\n  macro_image_src text,\n  macro_image_alt text\n);\n\n-- 10. Reviews Table\nCREATE TABLE public.reviews (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  author text NOT NULL,\n  rating integer CHECK (rating >= 1 and rating <= 5) NOT NULL,\n  title text NOT NULL,\n  comment text NOT NULL,\n  verified boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 11. Newsletter Subscribers Table\nCREATE TABLE public.newsletter_subscribers (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  email text UNIQUE NOT NULL,\n  subscribed_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 12. Orders & Order Items Table\nCREATE TABLE public.orders (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  customer_name text NOT NULL,\n  customer_email text NOT NULL,\n  status text DEFAULT 'confirmed',\n  subtotal_cents integer NOT NULL,\n  discount_cents integer DEFAULT 0,\n  shipping_cents integer DEFAULT 0,\n  total_cents integer NOT NULL,\n  coupon_code text,\n  gift_note text,\n  shipping_address jsonb,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\nCREATE TABLE public.order_items (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  order_id uuid REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,\n  product_slug text NOT NULL,\n  variant_sku text NOT NULL,\n  product_name text NOT NULL,\n  color text NOT NULL,\n  size text NOT NULL,\n  quantity integer NOT NULL,\n  price_cents integer NOT NULL,\n  customization jsonb\n);\n\n-- 13. Enable Row Level Security (RLS)\nALTER TABLE public.universes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.motifs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.products ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.variants ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.embroidery_details ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;\n\n-- Public READ Policies\nCREATE POLICY "Allow public read universes" ON public.universes FOR SELECT USING (true);\nCREATE POLICY "Allow public read motifs" ON public.motifs FOR SELECT USING (true);\nCREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USING (true);\nCREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);\nCREATE POLICY "Allow public read variants" ON public.variants FOR SELECT USING (true);\nCREATE POLICY "Allow public read product images" ON public.product_images FOR SELECT USING (true);\nCREATE POLICY "Allow public read embroidery details" ON public.embroidery_details FOR SELECT USING (true);\nCREATE POLICY "Allow public read reviews" ON public.reviews FOR SELECT USING (true);\n\n-- Public WRITE Policies\nCREATE POLICY "Allow public newsletter subscribe" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public submit review" ON public.reviews FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create orders" ON public.orders FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create order items" ON public.order_items FOR INSERT WITH CHECK (true);\n\n-- Admin Studio Policies\nCREATE POLICY "Allow admin insert products" ON public.products FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update products" ON public.products FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert variants" ON public.variants FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update variants" ON public.variants FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert product images" ON public.product_images FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin delete product images" ON public.product_images FOR DELETE USING (true);\nCREATE POLICY "Allow admin insert embroidery details" ON public.embroidery_details FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update embroidery details" ON public.embroidery_details FOR UPDATE USING (true);\n\n-- Storage Setup\nINSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING;\nCREATE POLICY "Public Read Product Images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');\nCREATE POLICY "Public Upload Product Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');`,
                       'Full Schema Wipe & Re-initialization SQL'
                     )
                   }
