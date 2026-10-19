@@ -1,7 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
-import type { Product } from '../../lib/data';
-import { formatPrice, getDefaultVariant, getExpressionByScore, getExpressionScore } from '../../lib/data';
+import {
+  type Product,
+  formatPrice,
+  getDefaultVariant,
+  getExpressionByScore,
+  getExpressionScore,
+  COLLECTIONS,
+} from '../../lib/data';
 import { useCartStore } from '../../stores/cart';
 import { useCustomizerStore } from '../../stores/customizer';
 import { useQuickViewStore } from '../../stores/quickView';
@@ -165,7 +171,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-paper">
         <div>
           <div className="flex items-center justify-between text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-1">
-            <span>{product.craftRegion || 'Made in India'}</span>
+            <span>
+              {product.craftRegion || 'Made in India'}
+              {product.garmentType ? ` · ${product.garmentType}` : ''}
+            </span>
             {product.batchNumber != null && product.batchTotal != null && (
               <span>Ed. {product.batchNumber}/{product.batchTotal}</span>
             )}
@@ -202,7 +211,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 ✦ {expInfo.name}
               </span>
             )}
-            {product.artStyleSlug && (
+            {product.collectionSlug && (
+              <Link
+                to={`/collections/${product.collectionSlug}`}
+                className="font-medium text-ink hover:text-accent transition-colors underline decoration-stone/60 underline-offset-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {COLLECTIONS.find((c) => c.slug === product.collectionSlug)?.name || product.collectionSlug.replace(/-/g, ' ')}
+              </Link>
+            )}
+            {!product.collectionSlug && product.artStyleSlug && (
               <span className="font-medium">{product.artStyleSlug.replace(/-/g, ' ')}</span>
             )}
             {(product.craftTechniques ?? []).slice(0, 2).map((t) => (

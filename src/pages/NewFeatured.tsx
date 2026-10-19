@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router';
-import { useProducts } from '../hooks/useCatalog';
+import { useProducts, useCollections } from '../hooks/useCatalog';
 import { ProductGrid } from '../components/shop/ProductGrid';
 
-type TabKey = 'all' | 'new-arrivals' | 'bestsellers' | 'limited-editions';
+type TabKey = 'all' | 'new-arrivals' | 'bestsellers' | 'limited-editions' | 'collections';
 
 interface TabMeta {
   key: TabKey;
@@ -42,11 +42,19 @@ const TABS: TabMeta[] = [
     tagline: 'Small-batch, numbered runs with rare bullion and silk threadwork.',
     description: 'Strictly limited releases featuring high artisan hours, hand-numbered certificates, and non-repeating thread palettes.',
   },
+  {
+    key: 'collections',
+    slug: 'collections',
+    name: 'Collections',
+    tagline: 'Thematic seasonal drops curated across worlds & silhouettes.',
+    description: 'Explore our curated thematic drops where singular embroidery stories unite diverse apparel silhouettes into unified aesthetic capsules.',
+  },
 ];
 
 export const NewFeatured: React.FC = () => {
   const { tabSlug } = useParams<{ tabSlug?: string }>();
   const { data: allProducts } = useProducts();
+  const { data: collections } = useCollections();
 
   const activeTabKey: TabKey = useMemo(() => {
     if (!tabSlug) return 'all';
@@ -66,6 +74,8 @@ export const NewFeatured: React.FC = () => {
         return list.filter((p) => p.tags.includes('bestseller') || (p.rating && p.rating >= 4.7));
       case 'limited-editions':
         return list.filter((p) => p.batchNumber != null || p.edits?.includes('collector') || p.handcrafted);
+      case 'collections':
+        return list.filter((p) => Boolean(p.collectionSlug));
       case 'all':
       default:
         return list.filter((p) => p.featured || p.tags.includes('bestseller') || p.batchNumber != null);
@@ -111,17 +121,42 @@ export const NewFeatured: React.FC = () => {
                   key={t.key}
                   to={to}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`px-4 py-2 text-xs uppercase tracking-widest font-sans border transition-colors ${
-                    isActive
-                      ? 'bg-ink text-cream border-transparent font-medium shadow-xs'
-                      : 'bg-paper text-ink border-stone hover:border-ink'
-                  }`}
+                  className={`px-4 py-2 text-xs uppercase tracking-widest font-sans border transition-colors ${isActive
+                    ? 'bg-ink text-cream border-transparent font-medium shadow-xs'
+                    : 'bg-paper text-ink border-stone hover:border-ink'
+                    }`}
                 >
                   {t.name}
                 </Link>
               );
             })}
           </div>
+
+          {/* Collection Hub Callout */}
+          {activeTabKey === 'collections' && (
+            <div className="mt-6 p-4 sm:p-5 bg-cream/70 border border-stone/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="font-serif text-base text-ink font-medium">Looking for complete collection stories & lookbooks?</p>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {(collections ?? []).map((col) => (
+                    <Link
+                      key={col.slug}
+                      to={`/collections/${col.slug}`}
+                      className="px-2.5 py-1 text-[11px] font-sans uppercase tracking-wider bg-paper border border-stone/60 hover:border-accent text-ink hover:text-accent transition-colors"
+                    >
+                      {col.name} →
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <Link
+                to="/collections"
+                className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold whitespace-nowrap transition-colors shrink-0"
+              >
+                All Collections Hub →
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

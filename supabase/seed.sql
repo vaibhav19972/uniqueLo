@@ -167,6 +167,36 @@ INSERT INTO public.categories (slug, name, label, description, image, order_num)
   name = EXCLUDED.name,
   description = EXCLUDED.description;
 
+-- 3b. Seed Garment Silhouettes (Taxonomy Definition)
+INSERT INTO public.garments (slug, name, category_slug, description, order_num) VALUES
+  ('hoodie', 'Hoodies', 'tops', 'Heavyweight fleece hoodies with back-panel and crest embroidery.', 1),
+  ('tee', 'Tees', 'tops', 'Combed-cotton tees carrying chest and back threadwork.', 2),
+  ('shirt', 'Shirts', 'tops', 'Oxfords, poplins and band-collar tunics with monogram detail.', 3),
+  ('jacket', 'Jackets', 'outerwear', 'Chore jackets, capes and overcoats with procession-scale embroidery.', 4),
+  ('cardigan', 'Cardigans', 'knitwear', 'Cashmere cardigans with crewel relief.', 5),
+  ('vest', 'Vests', 'knitwear', 'Knit vests with sculpted knot texture.', 6),
+  ('pants', 'Pants', 'bottoms', 'Selvedge denim and work pants with structural stitching.', 7),
+  ('scarf', 'Scarves', 'accessories', 'Silk scarves with arch-jaal and flora borders.', 8),
+  ('tote', 'Totes', 'accessories', 'Raw-canvas totes with sun-disc and motif hits.', 9)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  category_slug = EXCLUDED.category_slug,
+  description = EXCLUDED.description,
+  order_num = EXCLUDED.order_num;
+
+-- 3c. Seed Collections (Seasonal Drops & Thematic Capsules)
+INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num) VALUES
+  ('spring-sakura', 'Spring Sakura Collection', 'Japanese woodblock waves, blossom scatter, ink-line calm.', 'Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery.', 'animeverse', true, 1),
+  ('royal-heritage', 'Royal Heritage Collection', 'Arches, jaals and royal court processions in gold zardozi.', 'Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages.', 'itihaas', true, 2),
+  ('midnight-atelier', 'Midnight Atelier Collection', 'No world, just pure cloth, heroic crests, and tonal needlecraft.', 'Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing.', 'atelier', true, 3)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  description = EXCLUDED.description,
+  universe_slug = EXCLUDED.universe_slug,
+  featured = EXCLUDED.featured,
+  order_num = EXCLUDED.order_num;
+
 -- 4. Seed Original Handcrafted Products (13 SKUs, is_mock = false)
 -- Product: Botanical Silk Embroidered Jacket
 INSERT INTO public.products (

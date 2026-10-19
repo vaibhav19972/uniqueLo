@@ -4,7 +4,7 @@
       "slug": "sakura-ronin-hoodie",
       "name": "Sakura Ronin Hoodie",
       "subtitle": "A lone journey, a blossoming hope.",
-      "description": "Oversized hoodie carrying the Sakura Ronin \u2014 a wandering swordsman beneath falling cherry blossoms. Embroidered zardozi and layered threadwork across the back panel.",
+      "description": "Oversized hoodie carrying the Sakura Ronin — a wandering swordsman beneath falling cherry blossoms. Embroidered zardozi and layered threadwork across the back panel.",
       "categorySlug": "tops",
       "universeSlug": "animeverse",
       "garmentType": "hoodie",
@@ -21,7 +21,7 @@
       ],
       "motifId": "sakura",
       "isMock": true,
-      "foreignTagline": "\u685c\u306e\u6d6a\u4eba",
+      "foreignTagline": "桜の浪人",
       "rating": 4.8,
       "reviewCount": 320,
       "soldCount": "1.2K+",
@@ -145,27 +145,27 @@
       "images": [
         {
           "src": "/images/products/sakura-ronin-hoodie-1.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 front"
+          "alt": "Sakura Ronin Hoodie — front"
         },
         {
           "src": "/images/products/sakura-ronin-hoodie-2.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 back panel embroidery"
+          "alt": "Sakura Ronin Hoodie — back panel embroidery"
         },
         {
           "src": "/images/products/sakura-ronin-hoodie-3.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 stitch detail"
+          "alt": "Sakura Ronin Hoodie — stitch detail"
         },
         {
           "src": "/images/products/sakura-ronin-hoodie-4.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 lifestyle"
+          "alt": "Sakura Ronin Hoodie — lifestyle"
         },
         {
           "src": "/images/products/sakura-ronin-hoodie-5.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 collar detail"
+          "alt": "Sakura Ronin Hoodie — collar detail"
         },
         {
           "src": "/images/products/sakura-ronin-hoodie-6.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 lifestyle shot"
+          "alt": "Sakura Ronin Hoodie — lifestyle shot"
         }
       ],
       "embroidery": {
@@ -177,7 +177,7 @@
           "sleeves"
         ],
         "threadComposition": "Silk floss, gilded bullion wire",
-        "motifStory": "The ronin walks beneath blossoms that fall faster than he moves \u2014 beauty and transience stitched at 40 hours.",
+        "motifStory": "The ronin walks beneath blossoms that fall faster than he moves — beauty and transience stitched at 40 hours.",
         "macroImage": {
           "src": "/images/products/sakura-ronin-hoodie-5.jpg",
           "alt": "Sakura Ronin zardozi macro"
@@ -195,13 +195,14 @@
       "artStyleSlug": "ukiyo-line",
       "characterIds": [
         "sakura"
-      ]
+      ],
+      "collectionSlug": "spring-sakura"
     },
     {
       "slug": "koi-current-tee",
       "name": "Koi Current Tee",
       "subtitle": "One crest, one current. Swim quietly.",
-      "description": "Boxy drop-shoulder tee with a single tonal koi crest embroidered high on the chest \u2014 thread-on-thread, discovered rather than announced.",
+      "description": "Boxy drop-shoulder tee with a single tonal koi crest embroidered high on the chest — thread-on-thread, discovered rather than announced.",
       "categorySlug": "tops",
       "universeSlug": "animeverse",
       "garmentType": "tee",
@@ -218,7 +219,7 @@
       ],
       "motifId": "koi",
       "isMock": true,
-      "foreignTagline": "\u9bc9\u306e\u6d41\u308c",
+      "foreignTagline": "鯉の流れ",
       "rating": 4.6,
       "reviewCount": 86,
       "soldCount": "400+",
@@ -341,15 +342,15 @@
       "images": [
         {
           "src": "/images/placeholders/product-vine-heavyweight-tee-1.jpg",
-          "alt": "Koi Current Tee \u2014 front"
+          "alt": "Koi Current Tee — front"
         },
         {
           "src": "/images/placeholders/product-vine-heavyweight-tee-2.jpg",
-          "alt": "Koi Current Tee \u2014 crest macro"
+          "alt": "Koi Current Tee — crest macro"
         },
         {
           "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Koi Current Tee \u2014 lifestyle"
+          "alt": "Koi Current Tee — lifestyle"
         }
       ],
       "embroidery": {
@@ -360,7 +361,7 @@
           "left chest"
         ],
         "threadComposition": "Mercerized cotton floss, tonal ecru",
-        "motifStory": "The koi swims in single-color satin \u2014 perseverance rendered in one quiet pass.",
+        "motifStory": "The koi swims in single-color satin — perseverance rendered in one quiet pass.",
         "macroImage": {
           "src": "/images/placeholders/product-vine-heavyweight-tee-2.jpg",
           "alt": "Koi crest satin macro"
@@ -377,13 +378,14 @@
       "artStyleSlug": "ukiyo-line",
       "characterIds": [
         "koi"
-      ]
+      ],
+      "collectionSlug": "spring-sakura"
     },
     {
       "slug": "red-sun-motif-tote",
       "name": "Red Sun Motif Tote",
       "subtitle": "A flat crimson disc on raw canvas. Daylight carried.",
-      "description": "Heavy raw-canvas tote with the Red Sun motif worked flat and frontal \u2014 a symbol of new beginnings on an everyday carry.",
+      "description": "Heavy raw-canvas tote with the Red Sun motif worked flat and frontal — a symbol of new beginnings on an everyday carry.",
       "categorySlug": "accessories",
       "universeSlug": "animeverse",
       "garmentType": "tote",
@@ -431,11 +433,11 @@
       "images": [
         {
           "src": "/images/placeholders/product-needlework-canvas-tote-1.jpg",
-          "alt": "Red Sun Motif Tote \u2014 front"
+          "alt": "Red Sun Motif Tote — front"
         },
         {
           "src": "/images/placeholders/product-needlework-canvas-tote-2.jpg",
-          "alt": "Red Sun Motif Tote \u2014 embroidery detail"
+          "alt": "Red Sun Motif Tote — embroidery detail"
         }
       ],
       "embroidery": {
@@ -464,13 +466,14 @@
       "artStyleSlug": "ukiyo-line",
       "characterIds": [
         "red-sun"
-      ]
+      ],
+      "collectionSlug": "spring-sakura"
     },
     {
       "slug": "ascendant-hoodie",
       "name": "Ascendant Hoodie",
       "subtitle": "The crest carries. Quietly.",
-      "description": "Heavyweight fleece hoodie with the Ascendant Crest worked as a tonal chest mark \u2014 the everyday hero\u2019s emblem, stitched to be noticed slowly.",
+      "description": "Heavyweight fleece hoodie with the Ascendant Crest worked as a tonal chest mark — the everyday hero’s emblem, stitched to be noticed slowly.",
       "categorySlug": "tops",
       "universeSlug": "heroverse",
       "garmentType": "hoodie",
@@ -609,15 +612,15 @@
       "images": [
         {
           "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "Ascendant Hoodie \u2014 front"
+          "alt": "Ascendant Hoodie — front"
         },
         {
           "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "Ascendant Hoodie \u2014 crest macro"
+          "alt": "Ascendant Hoodie — crest macro"
         },
         {
           "src": "/images/placeholders/category-tops.jpg",
-          "alt": "Ascendant Hoodie \u2014 lifestyle"
+          "alt": "Ascendant Hoodie — lifestyle"
         }
       ],
       "embroidery": {
@@ -628,7 +631,7 @@
           "chest"
         ],
         "threadComposition": "Tonal charcoal bullion wire, silk core",
-        "motifStory": "Shield-crest geometry, gold on deep red in the loud line \u2014 here rendered tonal, charcoal on ash.",
+        "motifStory": "Shield-crest geometry, gold on deep red in the loud line — here rendered tonal, charcoal on ash.",
         "macroImage": {
           "src": "/images/products/french-knot-turtleneck-2.jpg",
           "alt": "Ascendant crest tonal macro"
@@ -645,13 +648,14 @@
       "artStyleSlug": "crest-emblem",
       "characterIds": [
         "ascendant-crest"
-      ]
+      ],
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "guardian-stripes-pullover",
       "name": "Guardian Stripes Pullover",
       "subtitle": "Speed lines of those who show up first.",
-      "description": "Loopback crewneck pullover with Guardian Stripes running diagonal across the chest \u2014 navy bands and burst-yellow knots in structural sashiko grid.",
+      "description": "Loopback crewneck pullover with Guardian Stripes running diagonal across the chest — navy bands and burst-yellow knots in structural sashiko grid.",
       "categorySlug": "tops",
       "universeSlug": "heroverse",
       "garmentType": "hoodie",
@@ -790,11 +794,11 @@
       "images": [
         {
           "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Guardian Stripes Pullover \u2014 front"
+          "alt": "Guardian Stripes Pullover — front"
         },
         {
           "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Guardian Stripes Pullover \u2014 stripe macro"
+          "alt": "Guardian Stripes Pullover — stripe macro"
         }
       ],
       "embroidery": {
@@ -806,7 +810,7 @@
           "cuffs"
         ],
         "threadComposition": "White cotton thread, burst-yellow accent",
-        "motifStory": "Diagonal action-line bands \u2014 the geometry of first responders.",
+        "motifStory": "Diagonal action-line bands — the geometry of first responders.",
         "macroImage": {
           "src": "/images/products/sashiko-selvedge-denim-2.jpg",
           "alt": "Guardian stripes sashiko macro"
@@ -823,13 +827,14 @@
       "artStyleSlug": "comic-noir",
       "characterIds": [
         "guardian-stripes"
-      ]
+      ],
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "herald-cape-jacket",
       "name": "Herald Cape Jacket",
       "subtitle": "Icons are ideas. Wear yours.",
-      "description": "Structured cape jacket with full-back Ascendant relief in zardozi wire \u2014 a showcase garment for those who carry their own weight. Limited numbered edition.",
+      "description": "Structured cape jacket with full-back Ascendant relief in zardozi wire — a showcase garment for those who carry their own weight. Limited numbered edition.",
       "categorySlug": "outerwear",
       "universeSlug": "heroverse",
       "garmentType": "jacket",
@@ -849,7 +854,7 @@
       "isMock": true,
       "batchNumber": 3,
       "batchTotal": 40,
-      "rating": 5.0,
+      "rating": 5,
       "reviewCount": 41,
       "soldCount": "120+",
       "featured": true,
@@ -972,19 +977,19 @@
       "images": [
         {
           "src": "/images/products/nocturne-velvet-vest-1.jpg",
-          "alt": "Herald Cape Jacket \u2014 front"
+          "alt": "Herald Cape Jacket — front"
         },
         {
           "src": "/images/products/nocturne-velvet-vest-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 back relief"
+          "alt": "Herald Cape Jacket — back relief"
         },
         {
           "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Herald Cape Jacket \u2014 texture detail"
+          "alt": "Herald Cape Jacket — texture detail"
         },
         {
           "src": "/images/products/pleated-zari-trousers-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 zari macro"
+          "alt": "Herald Cape Jacket — zari macro"
         }
       ],
       "embroidery": {
@@ -996,7 +1001,7 @@
           "back"
         ],
         "threadComposition": "Silver-gilt zari couched cord, French knots",
-        "motifStory": "Crest relief built in two techniques \u2014 couching for the form, knots for the light.",
+        "motifStory": "Crest relief built in two techniques — couching for the form, knots for the light.",
         "macroImage": {
           "src": "/images/products/pleated-zari-trousers-2.jpg",
           "alt": "Herald cape zari couching macro"
@@ -1014,13 +1019,14 @@
       "artStyleSlug": "crest-emblem",
       "characterIds": [
         "ascendant-crest"
-      ]
+      ],
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "royal-procession-jacket",
       "name": "Royal Procession Jacket",
       "subtitle": "Moments and empires, embroidered for now.",
-      "description": "Chore jacket carrying the Royal Procession across the back panel in couched zari \u2014 caparisoned elephant beneath a Mughal arch, festive and full.",
+      "description": "Chore jacket carrying the Royal Procession across the back panel in couched zari — caparisoned elephant beneath a Mughal arch, festive and full.",
       "categorySlug": "outerwear",
       "universeSlug": "itihaas",
       "garmentType": "jacket",
@@ -1037,7 +1043,7 @@
       ],
       "motifId": "procession-elephant",
       "isMock": true,
-      "foreignTagline": "\u0936\u093e\u0939\u0940 \u091c\u0941\u0932\u0942\u0938",
+      "foreignTagline": "शाही जुलूस",
       "rating": 4.9,
       "reviewCount": 157,
       "soldCount": "600+",
@@ -1161,15 +1167,15 @@
       "images": [
         {
           "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Royal Procession Jacket \u2014 back panel"
+          "alt": "Royal Procession Jacket — back panel"
         },
         {
           "src": "/images/products/pleated-zari-trousers-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 front placket"
+          "alt": "Royal Procession Jacket — front placket"
         },
         {
           "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 detail"
+          "alt": "Royal Procession Jacket — detail"
         }
       ],
       "embroidery": {
@@ -1181,7 +1187,7 @@
           "placket"
         ],
         "threadComposition": "Silver-gilt zari, maroon silk core",
-        "motifStory": "The procession enters the courtyard \u2014 ceremony stitched in continuous metallic inlay.",
+        "motifStory": "The procession enters the courtyard — ceremony stitched in continuous metallic inlay.",
         "macroImage": {
           "src": "/images/products/pleated-zari-trousers-2.jpg",
           "alt": "Procession zari macro"
@@ -1199,13 +1205,14 @@
       "artStyleSlug": "mughal-miniature",
       "characterIds": [
         "procession-elephant"
-      ]
+      ],
+      "collectionSlug": "royal-heritage"
     },
     {
       "slug": "arch-jaal-scarf",
       "name": "Arch Jaal Silk Scarf",
-      "subtitle": "Courtyards of patience \u2014 geometry as devotion.",
-      "description": "Mulberry silk scarf with the Arch Jaal lattice worked in tonal gold \u2014 Mughal geometry held to a whisper.",
+      "subtitle": "Courtyards of patience — geometry as devotion.",
+      "description": "Mulberry silk scarf with the Arch Jaal lattice worked in tonal gold — Mughal geometry held to a whisper.",
       "categorySlug": "accessories",
       "universeSlug": "itihaas",
       "garmentType": "scarf",
@@ -1245,11 +1252,11 @@
       "images": [
         {
           "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Arch Jaal Silk Scarf \u2014 drape"
+          "alt": "Arch Jaal Silk Scarf — drape"
         },
         {
           "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Arch Jaal Silk Scarf \u2014 lattice macro"
+          "alt": "Arch Jaal Silk Scarf — lattice macro"
         }
       ],
       "embroidery": {
@@ -1261,7 +1268,7 @@
           "allover lattice"
         ],
         "threadComposition": "Champagne zari on ivory silk",
-        "motifStory": "Mughal arch lattice, symmetric, tonal \u2014 the geometry reads only at arm\u2019s length.",
+        "motifStory": "Mughal arch lattice, symmetric, tonal — the geometry reads only at arm’s length.",
         "macroImage": {
           "src": "/images/products/embroidered-silk-scarf-1.jpg",
           "alt": "Arch jaal lattice macro"
@@ -1278,13 +1285,14 @@
       "artStyleSlug": "mughal-miniature",
       "characterIds": [
         "arch-jaal"
-      ]
+      ],
+      "collectionSlug": "royal-heritage"
     },
     {
       "slug": "sashiko-selvedge-denim",
       "name": "Sashiko Selvedge Denim",
       "subtitle": "Reinforced where work lives. Aged with patina.",
-      "description": "Raw selvedge denim work pants with sashiko lattices anchoring the high-friction zones \u2014 white cotton thread over deep indigo, built to age.",
+      "description": "Raw selvedge denim work pants with sashiko lattices anchoring the high-friction zones — white cotton thread over deep indigo, built to age.",
       "categorySlug": "bottoms",
       "universeSlug": null,
       "garmentType": "pants",
@@ -1404,11 +1412,11 @@
       "images": [
         {
           "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Sashiko Selvedge Denim \u2014 front"
+          "alt": "Sashiko Selvedge Denim — front"
         },
         {
           "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Sashiko Selvedge Denim \u2014 lattice macro"
+          "alt": "Sashiko Selvedge Denim — lattice macro"
         }
       ],
       "embroidery": {
@@ -1436,13 +1444,14 @@
       "craftRegion": "Kutch & Okayama Collaboration",
       "craftCluster": "Craft Textile Atelier",
       "handcrafted": true,
-      "artStyleSlug": "atelier-tonal"
+      "artStyleSlug": "atelier-tonal",
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "crewel-cashmere-cardigan",
       "name": "Crewel Cashmere Cardigan",
       "subtitle": "Alpine botanicals in thick wool relief.",
-      "description": "Hand-woven wool cardigan with Kashmiri crewel botanicals in 2-ply natural yarn \u2014 dimensional relief and real insulation in one garment.",
+      "description": "Hand-woven wool cardigan with Kashmiri crewel botanicals in 2-ply natural yarn — dimensional relief and real insulation in one garment.",
       "categorySlug": "knitwear",
       "universeSlug": null,
       "garmentType": "cardigan",
@@ -1562,11 +1571,11 @@
       "images": [
         {
           "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Crewel Cashmere Cardigan \u2014 front"
+          "alt": "Crewel Cashmere Cardigan — front"
         },
         {
           "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
-          "alt": "Crewel Cashmere Cardigan \u2014 botanical relief"
+          "alt": "Crewel Cashmere Cardigan — botanical relief"
         }
       ],
       "embroidery": {
@@ -1593,13 +1602,14 @@
       "craftRegion": "Anantnag & Srinagar, Kashmir",
       "craftCluster": "Valley Aari Craftspersons",
       "handcrafted": true,
-      "artStyleSlug": "atelier-tonal"
+      "artStyleSlug": "atelier-tonal",
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "monogram-poplin-shirt",
       "name": "Monogram Poplin Shirt",
       "subtitle": "Your initials in precision satin. Nothing louder.",
-      "description": "Supima cotton poplin shirt with a bespoke satin monogram at the cuff \u2014 the atelier\u2019s quietest personalization.",
+      "description": "Supima cotton poplin shirt with a bespoke satin monogram at the cuff — the atelier’s quietest personalization.",
       "categorySlug": "tops",
       "universeSlug": null,
       "garmentType": "shirt",
@@ -1738,11 +1748,11 @@
       "images": [
         {
           "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Monogram Poplin Shirt \u2014 front"
+          "alt": "Monogram Poplin Shirt — front"
         },
         {
           "src": "/images/placeholders/product-monogram-poplin-shirt-2.jpg",
-          "alt": "Monogram Poplin Shirt \u2014 cuff monogram"
+          "alt": "Monogram Poplin Shirt — cuff monogram"
         }
       ],
       "embroidery": {
@@ -1753,7 +1763,7 @@
           "left cuff"
         ],
         "threadComposition": "Archival silk floss, 3-letter satin",
-        "motifStory": "Precision satin initials \u2014 patron-chosen thread and placement.",
+        "motifStory": "Precision satin initials — patron-chosen thread and placement.",
         "macroImage": {
           "src": "/images/placeholders/product-monogram-poplin-shirt-2.jpg",
           "alt": "Monogram satin macro"
@@ -1768,13 +1778,14 @@
       "craftRegion": "Jaipur Atelier",
       "craftCluster": "Pink City Monogram Atelier",
       "handcrafted": true,
-      "artStyleSlug": "atelier-tonal"
+      "artStyleSlug": "atelier-tonal",
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "nocturne-velvet-crewel-vest",
       "name": "Nocturne Velvet Crewel Vest",
       "subtitle": "Two techniques, one night garden.",
-      "description": "Cotton velvet vest layered with crewel night-blooms and French-knot stars \u2014 an after-hours collector piece, numbered edition.",
+      "description": "Cotton velvet vest layered with crewel night-blooms and French-knot stars — an after-hours collector piece, numbered edition.",
       "categorySlug": "knitwear",
       "universeSlug": null,
       "garmentType": "vest",
@@ -1916,11 +1927,11 @@
       "images": [
         {
           "src": "/images/products/nocturne-velvet-vest-1.jpg",
-          "alt": "Nocturne Velvet Crewel Vest \u2014 front"
+          "alt": "Nocturne Velvet Crewel Vest — front"
         },
         {
           "src": "/images/products/nocturne-velvet-vest-2.jpg",
-          "alt": "Nocturne Velvet Crewel Vest \u2014 knot stars macro"
+          "alt": "Nocturne Velvet Crewel Vest — knot stars macro"
         }
       ],
       "embroidery": {
@@ -1932,7 +1943,7 @@
           "collar"
         ],
         "threadComposition": "Wool crewel yarn, silk-knot stars",
-        "motifStory": "Night garden in two hands \u2014 crewel for the blooms, knots for the constellation.",
+        "motifStory": "Night garden in two hands — crewel for the blooms, knots for the constellation.",
         "macroImage": {
           "src": "/images/products/nocturne-velvet-vest-2.jpg",
           "alt": "French knot stars macro"
@@ -1946,13 +1957,14 @@
       "craftRegion": "Srinagar, Kashmir",
       "craftCluster": "Valley Aari Craftspersons",
       "handcrafted": true,
-      "artStyleSlug": "atelier-tonal"
+      "artStyleSlug": "atelier-tonal",
+      "collectionSlug": "midnight-atelier"
     },
     {
       "slug": "heritage-flora-silk-scarf",
       "name": "Heritage Flora Silk Scarf",
       "subtitle": "Botanical chain shadow-work on mulberry twill.",
-      "description": "Mulberry silk scarf with Chikankari botanical chain \u2014 shadow-work flowers at 14 hours, heirloom-soft.",
+      "description": "Mulberry silk scarf with Chikankari botanical chain — shadow-work flowers at 14 hours, heirloom-soft.",
       "categorySlug": "accessories",
       "universeSlug": null,
       "garmentType": "scarf",
@@ -2000,11 +2012,11 @@
       "images": [
         {
           "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Heritage Flora Silk Scarf \u2014 drape"
+          "alt": "Heritage Flora Silk Scarf — drape"
         },
         {
           "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Heritage Flora Silk Scarf \u2014 shadow-work macro"
+          "alt": "Heritage Flora Silk Scarf — shadow-work macro"
         }
       ],
       "embroidery": {
@@ -2030,7 +2042,8 @@
       "craftRegion": "Lucknow, Uttar Pradesh",
       "craftCluster": "Old City Needlework Collective",
       "handcrafted": true,
-      "artStyleSlug": "atelier-tonal"
+      "artStyleSlug": "atelier-tonal",
+      "collectionSlug": "midnight-atelier"
     }
   ]
 }
