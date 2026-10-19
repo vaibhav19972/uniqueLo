@@ -9,6 +9,7 @@ import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
+import { useIsThemeV2 } from '../../config/theme';
 
 interface ProductCardProps {
   product: Product;
@@ -25,6 +26,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const frontImage = product.images[0]?.src || '/images/placeholders/hero.jpg';
   const macroImage = product.images[1]?.src || frontImage;
   const isWish = isWishlisted(product.slug);
+  const isV2 = useIsThemeV2();
+
+  const compareAt = defaultVariant.compareAtPriceCents;
+  const offPct =
+    compareAt && compareAt > defaultVariant.priceCents
+      ? Math.round((1 - defaultVariant.priceCents / compareAt) * 100)
+      : 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,7 +40,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     if (defaultVariant.status === 'out-of-stock') {
       showToast({
         title: 'Sold out',
-        description: `${product.name} is currently sold out in ${defaultVariant.color}.`,
+        description: `${product.name} is currently sold out in size ${defaultVariant.size}.`,
         type: 'info',
       });
       return;
@@ -40,7 +48,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     addItem(product.slug, defaultVariant.sku, 1, undefined, defaultVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${product.name} (${defaultVariant.color} / ${defaultVariant.size})`,
+      description: `${product.name} (size ${defaultVariant.size})`,
       type: 'success',
     });
   };
@@ -69,7 +77,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1">
+    <div
+      className={`group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 ${
+        isV2 ? 'rounded-2xl overflow-hidden' : ''
+      }`}
+    >
       {/* Visual Canvas */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
@@ -89,7 +101,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               aspectRatio="3/4"
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-3 left-3 bg-ink/90 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans border border-stone/30">
+            <div className="absolute top-3 left-3 bg-ink/90 text-cream px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans border border-stone/30">
               ✦ 3x Macro Stitch
             </div>
           </div>
@@ -112,7 +124,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Technique Badge */}
         {product.embroidery && (
-          <div className="absolute bottom-3 left-3 bg-cream/95 text-ink backdrop-blur-md px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
+          <div className="absolute bottom-3 left-3 bg-cream/95 text-ink px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
             {product.embroidery.techniqueLabel}
           </div>
         )}
@@ -161,31 +173,49 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           <div className="flex justify-between items-start gap-2">
-            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors">
+            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors flex-1">
               <h3 className="font-serif text-base sm:text-lg text-ink font-normal leading-snug">
                 {product.name}
               </h3>
             </Link>
-            <span className="font-sans text-sm font-medium text-ink whitespace-nowrap">
-              {formatPrice(defaultVariant.priceCents)}
-            </span>
+            <div className="flex flex-col items-end shrink-0">
+              <span className="font-sans text-sm font-semibold text-ink whitespace-nowrap">
+                {formatPrice(defaultVariant.priceCents)}
+              </span>
+              {compareAt && compareAt > defaultVariant.priceCents && (
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
+                  {isV2 && offPct > 0 && (
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
+                      ({offPct}% OFF)
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2">
             {product.subtitle}
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-wider text-ink-muted">
+            {product.artStyleSlug && (
+              <span className="font-medium">{product.artStyleSlug.replace(/-/g, ' ')}</span>
+            )}
+            {(product.craftTechniques ?? []).slice(0, 2).map((t) => (
+              <span key={t} className="normal-case tracking-normal text-ink/70">
+                {t.replace(/-/g, ' ')}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Footer Meta: Color Dots & Embroidery Hours */}
+        {/* Footer Meta: Sizes & Embroidery Hours */}
         <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
-          {/* Color Dots */}
+          {/* Available sizes (no colour option — one colour per piece) */}
           <div className="flex items-center gap-1.5">
-            {Array.from(new Set(product.variants.map((v) => v.colorHex))).slice(0, 4).map((hex, i) => (
-              <span
-                key={i}
-                className="w-2.5 h-2.5 rounded-full border border-stone/70"
-                style={{ backgroundColor: hex }}
-              />
-            ))}
+            <span className="text-[9px] text-ink-muted">
+              Sizes {Array.from(new Set(product.variants.map((v) => v.size))).slice(0, 5).join(' · ')}
+            </span>
             <span className="text-[9px] text-ink-muted ml-0.5">({product.variants.length})</span>
           </div>
 

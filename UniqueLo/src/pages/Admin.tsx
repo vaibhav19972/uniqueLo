@@ -1,18 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useProducts, useUniverses, useMotifsByUniverse } from '../hooks/useCatalog';
 import { useToastStore } from '../stores/toast';
 import {
   formatPrice,
-  VIBES,
-  MOODS,
-  type Vibe,
-  type MoodSlug,
+  EDITS,
+  INTENSITY_LEVELS,
+  type EditSlug,
+  type IntensityLevel,
   type Gender,
   type EmbroideryTechnique,
 } from '../lib/data';
 import { NotFound } from './NotFound';
+import {
+  SPEC_BOARD_SLOTS,
+  cropSpecBoard,
+  validateCrops,
+  revokeCropPreviews,
+  type CroppedSlot,
+  type CropIssue,
+} from '../lib/cropSpecBoard';
 
 interface VariantForm {
   sku: string;
@@ -23,6 +31,15 @@ interface VariantForm {
   status: 'in-stock' | 'low-stock' | 'out-of-stock';
   quantity: number;
 }
+
+// Session-unique upload suffix (module scope: pure, lint-clean alternative to
+// Date.now() inside the component). Filenames are already namespaced by
+// product slug + slot key; storage uploads use upsert so retries overwrite.
+let uploadSequence = 0;
+const nextUploadSuffix = (): string => {
+  uploadSequence += 1;
+  return `u${uploadSequence.toString(36)}`;
+};
 
 const TECHNIQUE_OPTIONS: { value: EmbroideryTechnique; label: string; defaultStory: string }[] = [
   {
@@ -90,13 +107,13 @@ const PRESET_REGIONS = [
 ];
 
 const PRESET_IMAGES = [
-  { label: 'Botanical Jacket 1', src: '/images/products/botanical-silk-jacket-1.png' },
-  { label: 'Botanical Jacket 2', src: '/images/products/botanical-silk-jacket-2.png' },
-  { label: 'Celestial Coat 1', src: '/images/products/celestial-zardozi-coat-1.png' },
-  { label: 'Celestial Coat 2', src: '/images/products/celestial-zardozi-coat-2.png' },
-  { label: 'Crewel Cardigan 1', src: '/images/products/crewel-cashmere-cardigan-1.png' },
-  { label: 'Crewel Cardigan 2', src: '/images/products/crewel-cashmere-cardigan-2.png' },
-  { label: 'Silk Scarf 1', src: '/images/products/embroidered-silk-scarf-1.png' },
+  { label: 'Sakura Hoodie 1', src: '/images/products/sakura-ronin-hoodie-1.jpg' },
+  { label: 'Sakura Hoodie 2', src: '/images/products/sakura-ronin-hoodie-2.jpg' },
+  { label: 'Sakura Hoodie 3', src: '/images/products/sakura-ronin-hoodie-3.jpg' },
+  { label: 'Sakura Hoodie 4', src: '/images/products/sakura-ronin-hoodie-4.jpg' },
+  { label: 'Sakura Hoodie 5', src: '/images/products/sakura-ronin-hoodie-5.jpg' },
+  { label: 'Sakura Hoodie 6', src: '/images/products/sakura-ronin-hoodie-6.jpg' },
+  { label: 'Hero Placeholder', src: '/images/placeholders/hero.jpg' },
 ];
 
 const AdminStudio: React.FC = () => {
@@ -119,8 +136,8 @@ const AdminStudio: React.FC = () => {
   const [garmentType, setGarmentType] = useState('tops');
   const [motifId, setMotifId] = useState('');
   const [tagsInput, setTagsInput] = useState('tops, embroidery, handcrafted');
-  const [selectedVibes, setSelectedVibes] = useState<Vibe[]>(['aesthetic', 'clean']);
-  const [selectedMoods, setSelectedMoods] = useState<MoodSlug[]>(['everyday', 'heritage']);
+  const [selectedMoods, setSelectedMoods] = useState<EditSlug[]>(['everyday', 'heritage']);
+  const [selectedIntensity, setSelectedIntensity] = useState<IntensityLevel>('balanced');
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
   const [handcrafted, setHandcrafted] = useState(true);
@@ -146,25 +163,83 @@ const AdminStudio: React.FC = () => {
   const [careInput, setCareInput] = useState('Machine wash gentle cold (30°C) inside out, Line dry in shade');
   const [fit, setFit] = useState('Boxy atelier drop-shoulder fit, true to size');
 
-  // Images
-  const [image1Src, setImage1Src] = useState('/images/products/botanical-silk-jacket-1.png');
-  const [image1Alt, setImage1Alt] = useState('');
-  const [image2Src, setImage2Src] = useState('/images/products/botanical-silk-jacket-2.png');
-  const [image2Alt, setImage2Alt] = useState('');
-  const [isUploading1, setIsUploading1] = useState(false);
-  const [isUploading2, setIsUploading2] = useState(false);
+  // Images — six catalog slots (sort_order 0–5; see SPEC_BOARD_SLOTS).
+  // Slots 0–1 default to atelier imagery; 2–5 default to the shared placeholder
+  // until dedicated crops land via single upload or All-in-One spec board.
+  const [slotImages, setSlotImages] = useState<{ src: string; alt: string }[]>([
+    { src: '/images/products/sakura-ronin-hoodie-1.jpg', alt: '' },
+    { src: '/images/products/sakura-ronin-hoodie-2.jpg', alt: '' },
+    { src: '/images/placeholders/hero.jpg', alt: '' },
+    { src: '/images/placeholders/hero.jpg', alt: '' },
+    { src: '/images/placeholders/hero.jpg', alt: '' },
+    { src: '/images/placeholders/hero.jpg', alt: '' },
+  ]);
+  const [slotUploading, setSlotUploading] = useState<boolean[]>(Array(6).fill(false));
+
+  const updateSlot = (index: number, patch: Partial<{ src: string; alt: string }>) => {
+    setSlotImages((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
+  };
+
+  // All-in-One spec-board intake (single board PNG → six slot crops)
+  const [boardCrops, setBoardCrops] = useState<CroppedSlot[] | null>(null);
+  const [boardIssues, setBoardIssues] = useState<CropIssue[]>([]);
+  const [isBoardWorking, setIsBoardWorking] = useState(false);
+  const [isBoardUploading, setIsBoardUploading] = useState(false);
+  const boardBlobs = useRef<(Blob | null)[]>(Array(6).fill(null));
+
+  const clearBoard = () => {
+    if (boardCrops) revokeCropPreviews(boardCrops);
+    setBoardCrops(null);
+    setBoardIssues([]);
+    boardBlobs.current = Array(6).fill(null);
+  };
+
+  const slotAltFor = (index: number, productName: string, colorway: string) =>
+    `${productName || 'New Product'} — ${colorway} — ${SPEC_BOARD_SLOTS[index].altSuffix}`;
+
+  /** Fill empty slot alts from the slot templates (used by both Apply and Upload). */
+  const fillSlotAlts = () => {
+    const colorway = selectedColors[0]?.name || variants[0]?.color || 'Natural';
+    setSlotImages((prev) =>
+      prev.map((slot, i) => (slot.alt ? slot : { ...slot, alt: slotAltFor(i, name, colorway) }))
+    );
+  };
+
+  /** Slots holding local-only sources must reach the CDN before publishing. */
+  const hasUnpublishedSlots = slotImages.some(
+    (s) => s.src.startsWith('blob:') || s.src.startsWith('data:')
+  );
+
+  const blobToDataUrl = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('Could not read crop data'));
+      reader.readAsDataURL(blob);
+    });
 
   // Upload directly to Supabase Storage CDN
-  const handleUploadImage = async (file: File, target: 1 | 2) => {
+  const uploadBlobToCdn = async (blob: Blob, fileName: string): Promise<string> => {
+    if (!supabase) throw new Error('Supabase client unavailable');
+    const filePath = `products/${fileName}`;
+    const { error: uploadErr } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, blob, { cacheControl: '3600', upsert: true });
+    if (uploadErr) throw uploadErr;
+    const { data: publicUrlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    return publicUrlData.publicUrl;
+  };
+
+  const handleUploadImage = async (file: File, target: number) => {
     if (!file) return;
-    const setUploading = target === 1 ? setIsUploading1 : setIsUploading2;
-    const setSrc = target === 1 ? setImage1Src : setImage2Src;
+    const setUploadingAt = (v: boolean) =>
+      setSlotUploading((prev) => prev.map((u, i) => (i === target ? v : u)));
 
     // Set immediate preview
     const localPreviewUrl = URL.createObjectURL(file);
 
     if (!isSupabaseConfigured() || !supabase) {
-      setSrc(localPreviewUrl);
+      updateSlot(target, { src: localPreviewUrl });
       showToast({
         title: 'Preview Loaded',
         description: 'Local preview active. Configure Supabase to upload to Cloud CDN.',
@@ -173,40 +248,127 @@ const AdminStudio: React.FC = () => {
       return;
     }
 
-    setUploading(true);
+    setUploadingAt(true);
     try {
       const fileExt = file.name.split('.').pop() || 'png';
       const cleanSlug = (slug || 'product').replace(/[^a-z0-9-]/gi, '-').toLowerCase();
-      const fileName = `${cleanSlug}-${target}-${Date.now()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
-
-      const { error: uploadErr } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file, { cacheControl: '3600', upsert: true });
-
-      if (uploadErr) throw uploadErr;
-
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      setSrc(publicUrlData.publicUrl);
+      const fileName = `${cleanSlug}-${SPEC_BOARD_SLOTS[target].key}-${nextUploadSuffix()}.${fileExt}`;
+      const publicUrl = await uploadBlobToCdn(file, fileName);
+      updateSlot(target, { src: publicUrl });
       showToast({
         title: '✦ Image Uploaded to CDN',
-        description: 'Public URL generated and embedded into your JSON & SQL!',
+        description: `Slot ${target + 1} URL generated and embedded into your JSON & SQL!`,
         type: 'success',
       });
     } catch (err: any) {
       console.warn('[Storage Upload Error]:', err);
       // Fallback to local preview so user still sees the picture
-      setSrc(localPreviewUrl);
+      updateSlot(target, { src: localPreviewUrl });
       showToast({
         title: 'Storage Bucket Notice',
         description: `Could not save to bucket "${err?.message || 'product-images'}". Check SQL tab to create bucket!`,
         type: 'info',
       });
     } finally {
-      setUploading(false);
+      setUploadingAt(false);
+    }
+  };
+
+  // All-in-One: crop a spec-board PNG into the six slot previews
+  const handleBoardSelect = async (file: File) => {
+    if (!file) return;
+    clearBoard();
+    setIsBoardWorking(true);
+    try {
+      const crops = await cropSpecBoard(file);
+      const issues = await validateCrops(crops);
+      setBoardCrops(crops);
+      setBoardIssues(issues);
+      boardBlobs.current = crops.map((c) => c.blob);
+      showToast({
+        title: issues.length === 0 ? '✦ Board cropped into 6 slots' : 'Board cropped with warnings',
+        description:
+          issues.length === 0
+            ? 'Review the previews, then Apply to fill the six slots.'
+            : `${issues.length} slot(s) need review before applying.`,
+        type: issues.length === 0 ? 'success' : 'info',
+      });
+    } catch (err: any) {
+      console.warn('[Spec Board Crop Error]:', err);
+      showToast({
+        title: 'Board Crop Failed',
+        description: err?.message || 'Could not split the board image. Is it the 3×2 v1 template?',
+        type: 'info',
+      });
+    } finally {
+      setIsBoardWorking(false);
+    }
+  };
+
+  // Fill the six slots from the current board previews. Previews are stored
+  // as self-contained data URLs (never revocable blob: URLs), so a later
+  // clearBoard() or a second board cannot break already-applied slots.
+  const applyBoardCrops = async () => {
+    if (!boardCrops) return;
+    try {
+      const urls = await Promise.all(boardCrops.map((crop) => blobToDataUrl(crop.blob)));
+      const colorway = selectedColors[0]?.name || variants[0]?.color || 'Natural';
+      setSlotImages(
+        urls.map((url, i) => ({
+          src: url,
+          alt: slotImages[i]?.alt || slotAltFor(i, name, colorway),
+        }))
+      );
+      showToast({
+        title: 'Slots filled from board',
+        description: 'Six previews applied. Use “Upload all 6 to CDN” before publishing.',
+        type: 'accent',
+      });
+    } catch {
+      showToast({
+        title: 'Apply failed',
+        description: 'Could not read the crop data. Try selecting the board again.',
+        type: 'info',
+      });
+    }
+  };
+
+  // Upload all six board crops to the CDN in slot order
+  const uploadBoardCrops = async () => {
+    if (!boardCrops) return;
+    // Direct-upload path fills alts too, so SQL/JSON never fall back to the bare name.
+    fillSlotAlts();
+    if (!isSupabaseConfigured() || !supabase) {
+      // No backend: previews are already applied as local URLs.
+      applyBoardCrops();
+      return;
+    }
+    setIsBoardUploading(true);
+    try {
+      const cleanSlug = (slug || 'product').replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+      const stamp = nextUploadSuffix();
+      for (let i = 0; i < boardCrops.length; i++) {
+        const blob = boardBlobs.current[i];
+        if (!blob) continue;
+        try {
+          const publicUrl = await uploadBlobToCdn(blob, `${cleanSlug}-${SPEC_BOARD_SLOTS[i].key}-${stamp}.jpg`);
+          updateSlot(i, { src: publicUrl });
+        } catch (err: any) {
+          console.warn(`[Board Upload Error] slot ${i}:`, err);
+          showToast({
+            title: `Slot ${i + 1} upload failed`,
+            description: 'Local preview kept. Check the SQL tab for bucket setup.',
+            type: 'info',
+          });
+        }
+      }
+      showToast({
+        title: '✦ All 6 crops uploaded',
+        description: 'CDN URLs embedded into your JSON & SQL!',
+        type: 'success',
+      });
+    } finally {
+      setIsBoardUploading(false);
     }
   };
 
@@ -266,8 +428,9 @@ const AdminStudio: React.FC = () => {
         .trim()
         .replace(/\s+/g, '-');
       setSlug(generated);
-      if (!image1Alt) setImage1Alt(`${val} — front view`);
-      if (!image2Alt) setImage2Alt(`${val} — macro stitch relief`);
+      const colorway = selectedColors[0]?.name || 'Natural';
+      if (!slotImages[0]?.alt) updateSlot(0, { alt: slotAltFor(0, val, colorway) });
+      if (!slotImages[3]?.alt) updateSlot(3, { alt: slotAltFor(3, val, colorway) });
     }
   };
 
@@ -316,7 +479,6 @@ const AdminStudio: React.FC = () => {
   const generatedSQL = useMemo(() => {
     const finalSlug = slug || 'new-product-slug';
     const tagsArr = tagsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
-    const vibesArr = selectedVibes.map((v) => `'${v}'`).join(', ');
     const moodsArr = selectedMoods.map((m) => `'${m}'`).join(', ');
     const matArr = materialsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const careArr = careInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
@@ -330,7 +492,7 @@ const AdminStudio: React.FC = () => {
 -- 1. Insert Base Product
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods,
+  garment_type, gender, motif_id, is_mock, handcrafted, intensity, edits,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -346,7 +508,7 @@ INSERT INTO public.products (
   ${motifId ? `'${motifId.replace(/'/g, "''")}'` : 'NULL'},
   false,
   ${handcrafted},
-  ARRAY[${vibesArr}],
+  '${selectedIntensity}',
   ARRAY[${moodsArr}],
   5.0,
   12,
@@ -373,15 +535,19 @@ INSERT INTO public.products (
   gender = EXCLUDED.gender,
   motif_id = EXCLUDED.motif_id,
   handcrafted = EXCLUDED.handcrafted,
-  vibes = EXCLUDED.vibes,
-  moods = EXCLUDED.moods,
+  intensity = EXCLUDED.intensity,
+  edits = EXCLUDED.edits,
   featured = EXCLUDED.featured;
 
--- 2. Insert Images
+-- 2. Insert Images (six catalog slots, sort_order 0–5)
 INSERT INTO public.product_images (product_slug, src, alt, color, sort_order) 
 VALUES 
-  ('${finalSlug}', '${image1Src}', '${(image1Alt || name).replace(/'/g, "''")}', '${(variants[0]?.colorHex || '#121214').replace(/'/g, "''")}', 0),
-  ('${finalSlug}', '${image2Src}', '${(image2Alt || name).replace(/'/g, "''")}', '${(variants[0]?.colorHex || '#121214').replace(/'/g, "''")}', 1);
+${slotImages
+  .map(
+    (img, i) =>
+      `  ('${finalSlug}', '${img.src}', '${(img.alt || name).replace(/'/g, "''")}', '${(variants[0]?.colorHex || '#121214').replace(/'/g, "''")}', ${i})`
+  )
+  .join(',\n')};
 
 -- 3. Insert Variants
 INSERT INTO public.variants (sku, product_slug, color, color_hex, size, price_cents, status, quantity) 
@@ -423,8 +589,8 @@ INSERT INTO public.embroidery_details (
     gender,
     motifId,
     handcrafted,
-    selectedVibes,
     selectedMoods,
+    selectedIntensity,
     tagsInput,
     featured,
     customizable,
@@ -436,10 +602,7 @@ INSERT INTO public.embroidery_details (
     craftRegion,
     craftCluster,
     fabricGsm,
-    image1Src,
-    image1Alt,
-    image2Src,
-    image2Alt,
+    slotImages,
     variants,
     technique,
     techniqueLabel,
@@ -465,8 +628,8 @@ INSERT INTO public.embroidery_details (
       motifId: motifId || undefined,
       isMock: false,
       handcrafted,
-      vibes: selectedVibes,
-      moods: selectedMoods,
+      intensity: selectedIntensity,
+      edits: selectedMoods,
       rating: 5.0,
       reviewCount: 12,
       soldCount: '50+',
@@ -480,10 +643,11 @@ INSERT INTO public.embroidery_details (
         status: v.status,
         quantity: v.quantity,
       })),
-      images: [
-        { src: image1Src, alt: image1Alt || name, color: variants[0]?.colorHex || '#121214' },
-        { src: image2Src, alt: image2Alt || name, color: variants[0]?.colorHex || '#121214' },
-      ],
+      images: slotImages.map((img) => ({
+        src: img.src,
+        alt: img.alt || name,
+        color: variants[0]?.colorHex || '#121214',
+      })),
       featured,
       customizable,
       material: materialsInput.split(',').map((t) => t.trim()).filter(Boolean),
@@ -516,14 +680,11 @@ INSERT INTO public.embroidery_details (
     gender,
     motifId,
     handcrafted,
-    selectedVibes,
     selectedMoods,
+    selectedIntensity,
     tagsInput,
     variants,
-    image1Src,
-    image1Alt,
-    image2Src,
-    image2Alt,
+    slotImages,
     featured,
     customizable,
     materialsInput,
@@ -801,66 +962,62 @@ INSERT INTO public.embroidery_details (
                     />
                   </div>
 
-                  {/* Style Vibes Selector */}
+                  {/* Edits Selector — curated collections (powers Explore-by-Edit Gateway) */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Style Vibes (Powers Explore-by-Style Gateway)
+                      Edits — Curated Collections (powers Explore-by-Edit Gateway)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {VIBES.map((v) => {
-                        const isSel = selectedVibes.includes(v.slug);
+                      {EDITS.map((e) => {
+                        const isSel = selectedMoods.includes(e.slug);
                         return (
                           <button
-                            key={v.slug}
+                            key={e.slug}
                             type="button"
                             onClick={() => {
-                              setSelectedVibes(
+                              setSelectedMoods(
                                 isSel
-                                  ? selectedVibes.filter((s) => s !== v.slug)
-                                  : [...selectedVibes, v.slug]
+                                  ? selectedMoods.filter((s) => s !== e.slug)
+                                  : [...selectedMoods, e.slug]
                               );
                             }}
-                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer font-sans ${
                               isSel
                                 ? 'border-accent bg-accent/15 text-accent font-semibold'
                                 : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
                             }`}
                           >
                             {isSel ? '✓ ' : '+ '}
-                            {v.title}
+                            {e.title}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Intent Moods Selector */}
+                  {/* Intensity Selector — Quiet ↔ Loud shopping axis */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Intent Moods (Powers Explore-by-Mood Gateway)
+                      Intensity (Quiet ↔ Loud shopping axis)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {MOODS.map((m) => {
-                        const isSel = selectedMoods.includes(m.slug);
+                      {INTENSITY_LEVELS.map((lvl) => {
+                        const isSel = selectedIntensity === lvl.slug;
                         return (
                           <button
-                            key={m.slug}
+                            key={lvl.slug}
                             type="button"
-                            onClick={() => {
-                              setSelectedMoods(
-                                isSel
-                                  ? selectedMoods.filter((s) => s !== m.slug)
-                                  : [...selectedMoods, m.slug]
-                              );
-                            }}
-                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                            onClick={() => setSelectedIntensity(lvl.slug)}
+                            aria-pressed={isSel}
+                            title={lvl.tagline}
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer font-sans ${
                               isSel
                                 ? 'border-accent bg-accent/15 text-accent font-semibold'
                                 : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
                             }`}
                           >
                             {isSel ? '✓ ' : '+ '}
-                            {m.title}
+                            {lvl.name}
                           </button>
                         );
                       })}
@@ -1363,148 +1520,196 @@ INSERT INTO public.embroidery_details (
                   </span>
                 </div>
 
-                {/* Image 1: Main Silhouette */}
-                <div className="space-y-3 p-3.5 bg-cream/60 border border-stone/40 rounded-sm">
+                {/* All-in-One Spec Board Intake (v1: one 3×2 board → six slots) */}
+                <div className="space-y-3 p-3.5 bg-cream/60 border border-accent/40 rounded-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">
-                      1. Main Silhouette Image (3:4)
+                      ✦ All-in-One Spec Board → 6 Slots
                     </span>
-                    {image1Src.startsWith('http') && (
+                    {boardCrops && boardIssues.length === 0 && (
                       <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
-                        CDN Active
+                        6 crops ready
                       </span>
                     )}
                   </div>
+                  <p className="text-[10px] text-ink-muted leading-relaxed font-light">
+                    Upload one v1 board PNG (3×2 cells + numbered labels). It is split
+                    into the six slots below in cell order; label strips are excluded
+                    automatically. Review previews, Apply, then upload all to the CDN.
+                  </p>
 
-                  {/* Prominent Upload Button */}
                   <label className={`w-full py-2.5 px-3 border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                    isUploading1
+                    isBoardWorking
                       ? 'border-accent bg-accent/10 text-accent font-medium'
                       : 'border-accent/50 bg-paper hover:border-accent hover:bg-accent/5 text-ink'
                   }`}>
-                    <span className="text-base">{isUploading1 ? '⏳' : '📁'}</span>
+                    <span className="text-base">{isBoardWorking ? '⏳' : '🖼️'}</span>
                     <span className="text-xs font-semibold uppercase tracking-wider">
-                      {isUploading1 ? 'Uploading to Supabase CDN...' : 'Upload Image from Device'}
+                      {isBoardWorking ? 'Splitting board...' : 'Upload Spec Board PNG'}
                     </span>
                     <input
                       type="file"
-                      accept="image/*"
-                      disabled={isUploading1}
+                      accept="image/png,image/jpeg"
+                      disabled={isBoardWorking || isBoardUploading}
                       className="hidden"
                       onChange={(e) => {
-                        if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 1);
+                        if (e.target.files?.[0]) handleBoardSelect(e.target.files[0]);
+                        e.target.value = '';
                       }}
                     />
                   </label>
 
-                  {/* URL Display (embedded directly into JSON & SQL) */}
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
-                      Image 1 URL (Embedded in JSON):
-                    </label>
-                    <input
-                      type="text"
-                      value={image1Src}
-                      onChange={(e) => setImage1Src(e.target.value)}
-                      placeholder="/images/products/... or https://..."
-                      className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
-                    />
-                  </div>
+                  {boardIssues.length > 0 && (
+                    <div className="p-2.5 bg-amber-50 border border-amber-300 space-y-1">
+                      {boardIssues.map((issue, i) => (
+                        <p key={i} className="text-[10px] text-amber-800 font-medium">
+                          Slot {issue.slotIndex >= 0 ? issue.slotIndex + 1 : '—'}: {issue.message}
+                        </p>
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Preset quick picker */}
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    <span className="text-[9px] text-ink-muted uppercase self-center mr-1">Presets:</span>
-                    {PRESET_IMAGES.slice(0, 3).map((p, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setImage1Src(p.src)}
-                        className="text-[9px] px-1.5 py-0.5 bg-paper border border-stone/40 hover:border-accent text-ink-muted"
-                      >
-                        {p.label.split(' ')[0]} {i + 1}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Live Thumbnail Preview */}
-                  <div className="aspect-[3/4] max-w-[180px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative shadow-inner">
-                    <img
-                      src={image1Src}
-                      alt="Front Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
-                      }}
-                    />
-                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
-                      Silhouette (3:4)
-                    </span>
-                  </div>
+                  {boardCrops && (
+                    <>
+                      <div className="grid grid-cols-3 gap-2">
+                        {boardCrops.map((crop) => (
+                          <div key={crop.def.index} className="aspect-[3/4] bg-stone/10 border border-stone/40 overflow-hidden relative">
+                            <img
+                              src={crop.previewUrl}
+                              alt={`${crop.def.label} preview`}
+                              className="w-full h-full object-cover"
+                            />
+                            <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 font-mono">
+                              {crop.def.index + 1} · {crop.width}×{crop.height}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={applyBoardCrops}
+                          className="flex-1 px-3 py-2 bg-paper border border-ink/30 hover:border-ink text-ink text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors"
+                        >
+                          Apply previews to slots
+                        </button>
+                        <button
+                          type="button"
+                          onClick={uploadBoardCrops}
+                          disabled={isBoardUploading}
+                          className="flex-1 px-3 py-2 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors disabled:opacity-50"
+                        >
+                          {isBoardUploading ? 'Uploading 6...' : 'Apply + upload all 6 to CDN'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={clearBoard}
+                          className="px-3 py-2 text-ink-muted hover:text-ink text-[11px] uppercase tracking-wider cursor-pointer transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {/* Image 2: Macro Loupe Detail */}
-                <div className="space-y-3 p-3.5 bg-cream/60 border border-stone/40 rounded-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-serif font-bold text-ink">
-                      2. Macro Stitch Relief (PDP Loupe)
-                    </span>
-                    {image2Src.startsWith('http') && (
-                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
-                        CDN Active
-                      </span>
-                    )}
-                  </div>
+                {/* Six catalog image slots (sort_order 0–5) */}
+                {SPEC_BOARD_SLOTS.map((def) => {
+                  const img = slotImages[def.index] || { src: '', alt: '' };
+                  const busy = slotUploading[def.index];
+                  return (
+                    <div key={def.index} className="space-y-3 p-3.5 bg-cream/60 border border-stone/40 rounded-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-serif font-bold text-ink">
+                          {def.index + 1}. {def.label}
+                        </span>
+                        {img.src.startsWith('http') && (
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
+                            CDN Active
+                          </span>
+                        )}
+                      </div>
 
-                  {/* Prominent Upload Button */}
-                  <label className={`w-full py-2.5 px-3 border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                    isUploading2
-                      ? 'border-accent bg-accent/10 text-accent font-medium'
-                      : 'border-accent/50 bg-paper hover:border-accent hover:bg-accent/5 text-ink'
-                  }`}>
-                    <span className="text-base">{isUploading2 ? '⏳' : '🔍'}</span>
-                    <span className="text-xs font-semibold uppercase tracking-wider">
-                      {isUploading2 ? 'Uploading to Supabase CDN...' : 'Upload Macro Photo from Device'}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      disabled={isUploading2}
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) handleUploadImage(e.target.files[0], 2);
-                      }}
-                    />
-                  </label>
+                      <label className={`w-full py-2.5 px-3 border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                        busy
+                          ? 'border-accent bg-accent/10 text-accent font-medium'
+                          : 'border-accent/50 bg-paper hover:border-accent hover:bg-accent/5 text-ink'
+                      }`}>
+                        <span className="text-base">{busy ? '⏳' : '📁'}</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider">
+                          {busy ? 'Uploading to Supabase CDN...' : 'Upload Image from Device'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={busy}
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleUploadImage(e.target.files[0], def.index);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
 
-                  {/* URL Display (embedded directly into JSON & SQL) */}
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
-                      Image 2 URL (Embedded in JSON):
-                    </label>
-                    <input
-                      type="text"
-                      value={image2Src}
-                      onChange={(e) => setImage2Src(e.target.value)}
-                      placeholder="/images/products/... or https://..."
-                      className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                          Slot {def.index + 1} URL (Embedded in JSON):
+                        </label>
+                        <input
+                          type="text"
+                          value={img.src}
+                          onChange={(e) => updateSlot(def.index, { src: e.target.value })}
+                          placeholder="/images/products/... or https://..."
+                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
+                        />
+                      </div>
 
-                  {/* Live Thumbnail Preview */}
-                  <div className="aspect-[3/4] max-w-[180px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative shadow-inner">
-                    <img
-                      src={image2Src}
-                      alt="Macro Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
-                      }}
-                    />
-                    <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
-                      Macro Relief
-                    </span>
-                  </div>
-                </div>
+                      <div>
+                        <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                          Slot {def.index + 1} alt text:
+                        </label>
+                        <input
+                          type="text"
+                          value={img.alt}
+                          onChange={(e) => updateSlot(def.index, { alt: e.target.value })}
+                          placeholder={def.altSuffix}
+                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] text-ink focus:outline-none focus:border-accent"
+                        />
+                      </div>
+
+                      {/* Preset quick picker (slot 1 only) */}
+                      {def.index === 0 && (
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          <span className="text-[9px] text-ink-muted uppercase self-center mr-1">Presets:</span>
+                          {PRESET_IMAGES.slice(0, 3).map((p, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => updateSlot(0, { src: p.src })}
+                              className="text-[9px] px-1.5 py-0.5 bg-paper border border-stone/40 hover:border-accent text-ink-muted"
+                            >
+                              {p.label.split(' ')[0]} {i + 1}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="aspect-[3/4] max-w-[180px] mx-auto bg-stone/10 border border-stone/40 overflow-hidden relative shadow-inner">
+                        <img
+                          src={img.src}
+                          alt={`${def.label} preview`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
+                          }}
+                        />
+                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
+                          Slot {def.index + 1} (3:4)
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Action Deck (Option 2: Air-Gapped Secure Workflow) */}
@@ -1541,6 +1746,13 @@ INSERT INTO public.embroidery_details (
                 </a>
 
                 {/* Copy JSON snippet */}
+                {hasUnpublishedSlots && (
+                  <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-300 px-2.5 py-1.5 font-medium">
+                    Some slots still hold local previews — upload all images to
+                    the CDN before copying SQL/JSON, or the snippets will embed
+                    unusable local URLs.
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={() => copyToClipboard(generatedJSON, 'products.json snippet')}

@@ -106,11 +106,11 @@ This is the first real implementation phase. Complete everything below before mo
   - [ ] ScrollTrigger is wired to Lenis updates.
 
 #### P1.4 — Data contracts and JSON seed
-- **Files:** `src/lib/data.ts`, `src/data/mock-products.json` (canonical storefront catalog; `products.json` deprecated-retained), `src/data/categories.json`
+- **Files:** `src/lib/data.ts`, `src/data/mock-products.json` (canonical storefront catalog), `src/data/categories.json`
 - **Acceptance:**
   - [ ] All types from `docs/03-data-contracts/README.md` defined and exported.
   - [ ] `getProducts`, `getCategories`, `getFeaturedProducts`, `getAllColors`, `getAllSizes`, `getMaxPriceCents`, `filterProducts`, `formatPrice`, `getDefaultVariant`, `getCartLine` all implemented.
-  - [ ] `mock-products.json` is the canonical catalog (14 SKUs as of 2026-10-11) with all required fields.
+  - [ ] `mock-products.json` is the canonical catalog (5 curated products, 31 variants as of 2026-10-12) with all required fields.
   - [ ] `categories.json` has 6 categories including `all`.
   - [ ] All JSON schema checks pass (see `docs/03-data-contracts/README.md`).
 
@@ -305,7 +305,7 @@ TanStack Query, with JSON files demoted to dev seed data. Storefront UX unchange
 
 - [ ] `npm run build` passes.
 - [ ] With no backend running, storefront renders identically from seed JSON.
-- [ ] No component imports `../data/products.json` directly.
+- [ ] No component imports `../data/mock-products.json` directly.
 
 ---
 

@@ -27,6 +27,12 @@ Before making architectural, design, or algorithmic decisions, every engineer an
 | **[07 — Backend & Admin](./07-backend/README.md)** | Supabase + Admin Studio | Slug-keyed Postgres schema + RLS (`schema.sql`), Vercel SPA deploy, the `/admin` Supabase Product Catalog Studio (variant matrix, SQL/JSON generators, `product-images` storage uploads), and the `data.ts` async migration seam. (Strapi plan superseded — see doc.) |
 | **[08 — Universe Build](./08-universe-build/README.md)** | Themed-Universe Pre-Build Bible | Universes × vibes vision, navigation/IA, data-model deltas, theming tokens, page specs, commerce flow, image pipeline, SEO/a11y/perf gates, phase cards. Nothing builds until this section agrees. |
 | **[09 — Reference Redesign](./09-reference-redesign-from-competitors/README.md)** | Competitor-Inspired Redesign Dock | The Souled Store teardown, article-presentation analysis, pick-and-place decisions, phased implementation roadmap. |
+| **[10 — Testing](./10-testing/README.md)** | Test Strategy | Layer 1: Vitest + RTL unit/integration cases (data spine, stores, components) · Layer 2: [tester-army/e2e](https://github.com/tester-army/e2e) agent-driven E2E flows with replay caching + CI wiring. Not yet implemented — plan as of 2026-10-12. |
+
+**In-repo knowledge graph:** `kb/` — interlinked memory-graph pages over the current
+codebase state (catalog spine, fallback gate, universe theming, taxonomy, cart flow,
+route map, audit trail). Read `kb/index.md` first when orienting on how the code
+*actually* works vs. how the docs say it should.
 
 ---
 

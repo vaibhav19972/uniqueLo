@@ -166,16 +166,20 @@ export interface CartItem {
 
 ## 2. Canonical Dataset
 
-**Source of truth: `src/data/mock-products.json` (14 render-mock SKUs as of 2026-10-11), plus the registries `universes.json`, `motifs.json`, `vibes.json`, `moods.json`.**
+**Source of truth: `src/data/mock-products.json` (5 curated products, 31 variants as of 2026-10-12), plus the registries `universes.json`, `motifs.json`, `vibes.json`, `moods.json`.**
 
-> `src/data/products.json` (the original 13-product atelier line) is
-> **deprecated-retained**: kept on disk, no longer imported anywhere in `src/`.
-> Do not add products there — the storefront will never render them.
-> `supabase/seed.sql` still seeds that legacy 13-product line and predates the
-> universe schema; `data.ts` feature-detects pre-migration rows and serves the
-> bundled mock catalog instead (see docs/07 §3 "Migration debt"). Precedence:
-> **`mock-products.json` (runtime) → Supabase (once universe schema is
-> migrated) → `products.json`/`seed.sql` (legacy, non-serving)**.
+> `src/data/products.json` (the original 13-product atelier line) was
+> **deleted on 2026-10-12** as stale local data — it is no longer imported
+> anywhere and no longer on disk. `supabase/seed.sql` (as migrated 2026-10-11)
+> still seeds that legacy line with `is_mock = false`, and the schema now
+> carries the full universe columns.
+> **Caution:** `getProducts()` does not yet filter `is_mock` (docs/08 §03-2c
+> requirement) — after applying the migrated seed, legacy rows pass universe
+> feature-detection and would leak to the storefront. Add the `.eq('is_mock',
+> true)` guard (or treat this as a real-SKU launch, not a mock-phase deploy).
+> Precedence:
+> **`mock-products.json` (bundled, mock phase) → Supabase `is_mock = true`
+> rows (real SKUs, post-launch)**.
 
 ### `src/data/categories.json`
 
@@ -235,16 +239,17 @@ export interface CartItem {
 
 ### `src/data/mock-products.json`
 
-The storefront catalog. As of 2026-10-11 it holds 14 render-mock products
-(`isMock: true`, built from the chatgpt-v2 universe renders) — 9 Animeverse,
-3 Heroverse, 2 Itihaas — each with:
+The storefront catalog. As of 2026-10-12 it holds 5 curated products
+(`isMock: true`, the featured set covering all 3 universes) — 2 Animeverse,
+2 Heroverse, 1 Itihaas — each with:
 
 - 1 slug + name + subtitle + description
 - 1 categorySlug matching `categories.json`, 1 universeSlug matching `universes.json`
 - 1–3 mood tags + vibe tokens (registry-driven facets)
-- 1+ variants with at least one color and one size (73 variants total; most have
-  5–7, `samurai-cap` and `red-sun-tote` are single one-size variants)
-- 6 images each (mock SKUs currently reuse atelier/product imagery — see docs/06)
+- 1+ variants with at least one color and one size (31 variants total; most have
+  6–7)
+- 6 images each (`sakura-ronin-hoodie` fully dedicated via the All-in-One
+  spec-board intake; remaining SKUs reuse atelier/product imagery — see docs/06)
 - rating / reviewCount / soldCount mock social proof (`isMock` gates honesty rules)
 
 ### Supporting registries
@@ -253,12 +258,13 @@ The storefront catalog. As of 2026-10-11 it holds 14 render-mock products
 - `src/data/motifs.json` — motif lore per universe (`id`, `universe_slug`, `meaning`, `ip_cleared`). Products reference motifs by `motifId`; motifs must be IP-cleared before use.
 - `src/data/vibes.json` / `moods.json` — presentation-vibe and buyer-intent-mood registries driving the two home gateways and shop facets.
 
-### Deprecated: `src/data/products.json`
+### Removed: `src/data/products.json`
 
-The original 13-product / 45-variant atelier line. Retained for reference and
-for the eventual real-SKU relaunch; **not imported by any file in `src/`** —
-grep-verified. (`scripts/generate_assets.py` is a standalone PIL generator
-that reads neither catalog file.) Do not update or extend it — it is frozen.
+The original 13-product / 45-variant atelier line was deleted on 2026-10-12
+as stale local data (it had been unimported since the mock phase began).
+The DB-side legacy record lives on in `supabase/seed.sql` (`is_mock = false`).
+(`scripts/generate_assets.py` is a standalone PIL generator that reads
+neither catalog file.)
 
 ---
 

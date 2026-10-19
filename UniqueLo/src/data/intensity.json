@@ -1,0 +1,22 @@
+{
+  "intensityLevels": [
+    {
+      "slug": "quiet",
+      "name": "Quiet",
+      "tagline": "Tonal crests, discreet motifs. Worn close, noticed slowly.",
+      "order": 1
+    },
+    {
+      "slug": "balanced",
+      "name": "Balanced",
+      "tagline": "A clear story, held in measure.",
+      "order": 2
+    },
+    {
+      "slug": "loud",
+      "name": "Loud",
+      "tagline": "Full panels, rich relief. HeadTurning by design.",
+      "order": 3
+    }
+  ]
+}

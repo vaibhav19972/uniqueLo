@@ -1,52 +1,30 @@
-import React, { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import React from 'react';
+import { Outlet } from 'react-router';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { CartDrawer } from '../components/layout/CartDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { ToastContainer } from '../components/ui/Toast';
-import { useProducts } from '../hooks/useCatalog';
+import { useIsThemeV2 } from '../config/theme';
 
 /**
- * Universe theming root (docs/08 §04): sets [data-universe] on <html> for
- * universe landings and for product pages (derived from the product's
- * universe). Every other route — home, shop, checkout, account — stays
- * neutral because the attribute is removed. Chrome (header/footer) and
- * themed zones follow via scoped token remaps in universes.css.
+ * Unified site layout supporting both v1 (The Atelier) and v2 (Modern D2C Streetwear
+ * with exact Gokwik-style cart bag from sketches/design system.png) via USE_THEME_V2.
  */
-const useUniverseTheme = () => {
-  const location = useLocation();
-  const { data: products } = useProducts();
-
-  useEffect(() => {
-    const html = document.documentElement;
-    let slug: string | null = null;
-
-    const universeMatch = location.pathname.match(/^\/universes\/([\w-]+)/);
-    if (universeMatch) {
-      slug = universeMatch[1];
-    } else {
-      const productMatch = location.pathname.match(/^\/product\/([\w-]+)/);
-      if (productMatch) {
-        slug =
-          products?.find((p) => p.slug === productMatch[1])?.universeSlug ?? null;
-      }
-    }
-
-    if (slug) html.setAttribute('data-universe', slug);
-    else html.removeAttribute('data-universe');
-    return () => html.removeAttribute('data-universe');
-  }, [location.pathname, products]);
-};
-
 export const Layout: React.FC = () => {
-  useUniverseTheme();
+  useIsThemeV2();
 
   return (
     <div className="min-h-screen flex flex-col bg-cream text-ink selection:bg-accent/20 selection:text-ink">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[500] focus:bg-ink focus:text-cream focus:px-4 focus:py-2 focus:rounded-sm"
+      >
+        Skip to content
+      </a>
       <Header />
-      <main className="flex-1 pt-[calc(var(--header-height)+2.2rem)]">
+      <main id="main-content" className="flex-1 pt-[calc(var(--header-height)+2.2rem)]">
         <Outlet />
       </main>
       <Footer />

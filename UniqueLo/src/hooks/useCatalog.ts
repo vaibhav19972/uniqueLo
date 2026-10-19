@@ -6,8 +6,12 @@ import {
   getUniverses,
   getUniverse,
   getMotifsByUniverse,
+  getMotif,
+  getAllCharacters,
+  getArtStyles,
+  getArtStyle,
+  getGarments,
   getFeaturedProducts,
-  getAllColors,
   getAllSizes,
   getAllTechniques,
   getMaxPriceCents,
@@ -18,6 +22,8 @@ import {
   type Motif,
   type Review,
   type EmbroideryTechnique,
+  type ArtStyleInfo,
+  type GarmentInfo,
 } from '../lib/data';
 
 export const catalogKeys = {
@@ -27,8 +33,12 @@ export const catalogKeys = {
   universes: ['catalog', 'universes'] as const,
   universe: (slug: string) => ['catalog', 'universe', slug] as const,
   motifs: (universeSlug: string) => ['catalog', 'motifs', universeSlug] as const,
+  character: (id: string) => ['catalog', 'character', id] as const,
+  characters: ['catalog', 'characters'] as const,
+  artStyles: ['catalog', 'artStyles'] as const,
+  artStyle: (slug: string) => ['catalog', 'artStyle', slug] as const,
+  garments: ['catalog', 'garments'] as const,
   featured: (limit?: number) => ['catalog', 'featured', limit ?? 'all'] as const,
-  colors: ['catalog', 'colors'] as const,
   sizes: ['catalog', 'sizes'] as const,
   techniques: ['catalog', 'techniques'] as const,
   maxPrice: ['catalog', 'maxPrice'] as const,
@@ -68,7 +78,7 @@ export function useUniverse(slug: string | undefined): UseQueryResult<Universe |
   });
 }
 
-/** IP-cleared motifs for a universe (lore strip) */
+/** IP-cleared motifs for a universe (lore strip + character pages) */
 export function useMotifsByUniverse(universeSlug: string | undefined): UseQueryResult<Motif[]> {
   return useQuery({
     queryKey: catalogKeys.motifs(universeSlug || ''),
@@ -77,14 +87,41 @@ export function useMotifsByUniverse(universeSlug: string | undefined): UseQueryR
   });
 }
 
+/** Single character (motif) by id — powers /universes/:slug/characters/:id. */
+export function useCharacter(id: string | undefined): UseQueryResult<Motif | undefined> {
+  return useQuery({
+    queryKey: catalogKeys.character(id || ''),
+    queryFn: () => (id ? getMotif(id) : Promise.resolve(undefined)),
+    enabled: Boolean(id),
+  });
+}
+
+/** All characters across universes. */
+export function useAllCharacters(): UseQueryResult<Motif[]> {
+  return useQuery({ queryKey: catalogKeys.characters, queryFn: getAllCharacters });
+}
+
+/** Art-style registry (genre art direction doors). */
+export function useArtStyles(): UseQueryResult<ArtStyleInfo[]> {
+  return useQuery({ queryKey: catalogKeys.artStyles, queryFn: getArtStyles });
+}
+
+export function useArtStyle(slug: string | undefined): UseQueryResult<ArtStyleInfo | undefined> {
+  return useQuery({
+    queryKey: catalogKeys.artStyle(slug || ''),
+    queryFn: () => (slug ? getArtStyle(slug) : Promise.resolve(undefined)),
+    enabled: Boolean(slug),
+  });
+}
+
+/** Garment registry (merchandise doors). */
+export function useGarments(): UseQueryResult<GarmentInfo[]> {
+  return useQuery({ queryKey: catalogKeys.garments, queryFn: getGarments });
+}
+
 /** Featured products for the home reel */
 export function useFeaturedProducts(limit?: number): UseQueryResult<Product[]> {
   return useQuery({ queryKey: catalogKeys.featured(limit), queryFn: () => getFeaturedProducts(limit) });
-}
-
-/** Unique variant colors across the catalog */
-export function useAllColors(): UseQueryResult<{ name: string; hex: string }[]> {
-  return useQuery({ queryKey: catalogKeys.colors, queryFn: getAllColors });
 }
 
 /** Unique variant sizes across the catalog */

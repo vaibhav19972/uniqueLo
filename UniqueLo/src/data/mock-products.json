@@ -9,11 +9,21 @@
       "universeSlug": "animeverse",
       "garmentType": "hoodie",
       "gender": "unisex",
-      "isMock": true,
+      "intensity": "loud",
+      "craftTechniques": [
+        "hand-zardozi"
+      ],
+      "edits": [
+        "statement",
+        "everyday"
+      ],
       "motifId": "sakura",
+      "isMock": true,
+      "foreignTagline": "\u685c\u306e\u6d6a\u4eba",
       "rating": 4.8,
       "reviewCount": 320,
       "soldCount": "1.2K+",
+      "featured": true,
       "tags": [
         "animeverse",
         "hoodie",
@@ -22,150 +32,193 @@
       ],
       "variants": [
         {
-          "sku": "SRH-IV-XS",
+          "sku": "SRH-WARM-XS",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
           "size": "XS",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "SRH-IV-S",
+          "sku": "SRH-WARM-S",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
           "size": "S",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
           "status": "in-stock",
-          "quantity": 12
+          "quantity": 14
         },
         {
-          "sku": "SRH-IV-M",
+          "sku": "SRH-WARM-M",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
           "size": "M",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
-          "status": "in-stock",
-          "quantity": 15
+          "status": "low-stock",
+          "quantity": 2
         },
         {
-          "sku": "SRH-IV-L",
+          "sku": "SRH-WARM-L",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
           "size": "L",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
-          "status": "low-stock",
-          "quantity": 3
+          "status": "in-stock",
+          "quantity": 14
         },
         {
-          "sku": "SRH-IV-XL",
+          "sku": "SRH-WARM-XL",
           "color": "Warm Ivory",
           "colorHex": "#f3ede2",
           "size": "XL",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "SRH-WARM-2XL",
+          "color": "Warm Ivory",
+          "colorHex": "#f3ede2",
+          "size": "2XL",
+          "priceCents": 349900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "SRH-WARM-3XL",
+          "color": "Warm Ivory",
+          "colorHex": "#f3ede2",
+          "size": "3XL",
+          "priceCents": 349900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "SRH-MIDNIGHT-S",
+          "color": "Midnight Ink",
+          "colorHex": "#1c1c24",
+          "size": "S",
+          "priceCents": 349900,
           "status": "in-stock",
           "quantity": 9
         },
         {
-          "sku": "SRH-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
+          "sku": "SRH-MIDNIGHT-M",
+          "color": "Midnight Ink",
+          "colorHex": "#1c1c24",
           "size": "M",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
           "status": "in-stock",
-          "quantity": 8
+          "quantity": 9
         },
         {
-          "sku": "SRH-BK-L",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
+          "sku": "SRH-MIDNIGHT-L",
+          "color": "Midnight Ink",
+          "colorHex": "#1c1c24",
           "size": "L",
           "priceCents": 349900,
-          "compareAtPriceCents": 499900,
           "status": "in-stock",
-          "quantity": 6
+          "quantity": 9
+        },
+        {
+          "sku": "SRH-MIDNIGHT-XL",
+          "color": "Midnight Ink",
+          "colorHex": "#1c1c24",
+          "size": "XL",
+          "priceCents": 349900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "SRH-MIDNIGHT-2XL",
+          "color": "Midnight Ink",
+          "colorHex": "#1c1c24",
+          "size": "2XL",
+          "priceCents": 349900,
+          "status": "in-stock",
+          "quantity": 9
         }
       ],
       "images": [
         {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 Warm Ivory \u2014 back view with ronin embroidery"
+          "src": "/images/products/sakura-ronin-hoodie-1.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 front"
         },
         {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 Warm Ivory \u2014 front view"
+          "src": "/images/products/sakura-ronin-hoodie-2.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 back panel embroidery"
         },
         {
-          "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 embroidery macro, cherry blossom stitches"
+          "src": "/images/products/sakura-ronin-hoodie-3.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 stitch detail"
         },
         {
-          "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 flat lay with thread details"
+          "src": "/images/products/sakura-ronin-hoodie-4.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 lifestyle"
         },
         {
-          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 scale view on model"
+          "src": "/images/products/sakura-ronin-hoodie-5.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 collar detail"
         },
         {
-          "src": "/images/placeholders/hero.jpg",
-          "alt": "Sakura Ronin Hoodie \u2014 lifestyle atelier shot"
+          "src": "/images/products/sakura-ronin-hoodie-6.jpg",
+          "alt": "Sakura Ronin Hoodie \u2014 lifestyle shot"
         }
       ],
-      "featured": true,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Zardozi",
+        "techniqueLabel": "Hand Zardozi",
         "artisanHours": 40,
         "placement": [
           "back panel",
           "sleeves"
         ],
-        "threadComposition": "Gold dabka, silk floss, sequins",
-        "motifStory": "The Sakura Ronin represents a soul in motion \u2014 carrying the weight of the past, yet finding beauty in new beginnings."
+        "threadComposition": "Silk floss, gilded bullion wire",
+        "motifStory": "The ronin walks beneath blossoms that fall faster than he moves \u2014 beauty and transience stitched at 40 hours.",
+        "macroImage": {
+          "src": "/images/products/sakura-ronin-hoodie-5.jpg",
+          "alt": "Sakura Ronin zardozi macro"
+        }
       },
       "material": [
         "400 GSM cotton fleece",
         "Brass drawcord tips"
       ],
-      "care": [
-        "Machine wash cold, inside out",
-        "Dry in shade",
-        "Warm iron on reverse"
-      ],
       "fit": "Oversized Fit",
       "fabricGsm": "380 GSM",
       "craftRegion": "Uttar Pradesh",
       "craftCluster": "Lucknow zardozi cluster",
-      "vibes": [
-        "expressive",
-        "aesthetic"
-      ],
-      "foreignTagline": "\u685c\u306e\u6d6a\u4eba",
       "handcrafted": true,
-      "moods": [
-        "statement",
-        "everyday"
+      "artStyleSlug": "ukiyo-line",
+      "characterIds": [
+        "sakura"
       ]
     },
     {
-      "slug": "roaring-spirit-tee",
-      "name": "Roaring Spirit Tee",
-      "description": "Oversized tee with a roaring tiger spirit wrapped in peony threadwork. Bold anime energy, embroidered chest and back.",
+      "slug": "koi-current-tee",
+      "name": "Koi Current Tee",
+      "subtitle": "One crest, one current. Swim quietly.",
+      "description": "Boxy drop-shoulder tee with a single tonal koi crest embroidered high on the chest \u2014 thread-on-thread, discovered rather than announced.",
       "categorySlug": "tops",
       "universeSlug": "animeverse",
       "garmentType": "tee",
       "gender": "unisex",
-      "isMock": true,
+      "intensity": "quiet",
+      "craftTechniques": [
+        "satin-stitch"
+      ],
+      "edits": [
+        "everyday",
+        "comfort"
+      ],
       "motifId": "koi",
-      "rating": 4.7,
-      "reviewCount": 184,
+      "isMock": true,
+      "foreignTagline": "\u9bc9\u306e\u6d41\u308c",
+      "rating": 4.6,
+      "reviewCount": 86,
+      "soldCount": "400+",
+      "featured": false,
       "tags": [
         "animeverse",
         "tee",
@@ -173,997 +226,177 @@
       ],
       "variants": [
         {
-          "sku": "RST-BK-XS",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
+          "sku": "KCT-UNDYED-XS",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
           "size": "XS",
           "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "RST-BK-S",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "S",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 20
-        },
-        {
-          "sku": "RST-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "M",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 18
-        },
-        {
-          "sku": "RST-BK-L",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "L",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
           "status": "in-stock",
           "quantity": 14
         },
         {
-          "sku": "RST-BK-XL",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XL",
+          "sku": "KCT-UNDYED-S",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
+          "size": "S",
           "priceCents": 279900,
-          "compareAtPriceCents": 349900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "RST-EC-M",
-          "color": "Ecru",
+          "sku": "KCT-UNDYED-M",
+          "color": "Undyed Cotton",
           "colorHex": "#efe7d8",
           "size": "M",
           "priceCents": 279900,
-          "compareAtPriceCents": 349900,
           "status": "in-stock",
-          "quantity": 7
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Roaring Spirit Tee \u2014 Ink Black \u2014 front with tiger embroidery"
+          "quantity": 14
         },
         {
-          "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "Roaring Spirit Tee \u2014 Ink Black \u2014 back view"
-        },
-        {
-          "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Roaring Spirit Tee \u2014 tiger stitch macro"
-        },
-        {
-          "src": "/images/products/nocturne-velvet-vest-1.jpg",
-          "alt": "Roaring Spirit Tee \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Roaring Spirit Tee \u2014 scale on model"
-        },
-        {
-          "src": "/images/placeholders/hero.jpg",
-          "alt": "Roaring Spirit Tee \u2014 lifestyle shot"
-        }
-      ],
-      "featured": true,
-      "embroidery": {
-        "technique": "hand-zardozi",
-        "techniqueLabel": "Zardozi",
-        "artisanHours": 22,
-        "placement": [
-          "chest",
-          "back"
-        ],
-        "threadComposition": "Silk floss, metallic accents",
-        "motifStory": "The tiger spirit roars once a year \u2014 wear it on the days you need to be heard."
-      },
-      "material": [
-        "240 GSM combed cotton"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
-      ],
-      "fit": "Oversized Fit",
-      "fabricGsm": "240 GSM",
-      "craftRegion": "West Bengal",
-      "craftCluster": "Nakshi collective",
-      "vibes": [
-        "expressive"
-      ],
-      "moods": [
-        "statement"
-      ]
-    },
-    {
-      "slug": "royal-procession-jacket",
-      "name": "Royal Procession Jacket",
-      "description": "Utility jacket carrying a caparisoned elephant procession beneath palace arches. Itihaas grandeur in metallic thread.",
-      "categorySlug": "outerwear",
-      "universeSlug": "itihaas",
-      "garmentType": "jacket",
-      "gender": "women",
-      "isMock": true,
-      "motifId": "procession-elephant",
-      "rating": 4.9,
-      "reviewCount": 271,
-      "tags": [
-        "itihaas",
-        "jacket",
-        "women",
-        "bestseller"
-      ],
-      "variants": [
-        {
-          "sku": "RPJ-IV-XS",
-          "color": "Warm Ivory",
-          "colorHex": "#f3ede2",
-          "size": "XS",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "RPJ-IV-S",
-          "color": "Warm Ivory",
-          "colorHex": "#f3ede2",
-          "size": "S",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 8
-        },
-        {
-          "sku": "RPJ-IV-M",
-          "color": "Warm Ivory",
-          "colorHex": "#f3ede2",
-          "size": "M",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "RPJ-IV-L",
-          "color": "Warm Ivory",
-          "colorHex": "#f3ede2",
+          "sku": "KCT-UNDYED-L",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
           "size": "L",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "low-stock",
-          "quantity": 2
-        },
-        {
-          "sku": "RPJ-OL-M",
-          "color": "Olive",
-          "colorHex": "#5a5b3a",
-          "size": "M",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
+          "priceCents": 279900,
           "status": "in-stock",
-          "quantity": 5
+          "quantity": 14
         },
         {
-          "sku": "RPJ-IV-XL",
-          "color": "Warm Ivory",
-          "colorHex": "#f3ede2",
+          "sku": "KCT-UNDYED-XL",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
           "size": "XL",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
+          "priceCents": 279900,
           "status": "in-stock",
-          "quantity": 10
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Royal Procession Jacket \u2014 Warm Ivory \u2014 back with elephant procession"
+          "quantity": 14
         },
         {
-          "src": "/images/products/pleated-zari-trousers-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 front view"
-        },
-        {
-          "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 zari stitch macro"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Royal Procession Jacket \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/knitwear.jpg",
-          "alt": "Royal Procession Jacket \u2014 lifestyle shot"
-        }
-      ],
-      "featured": true,
-      "embroidery": {
-        "technique": "metallic-zari",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 52,
-        "placement": [
-          "back panel",
-          "placket"
-        ],
-        "threadComposition": "Gold zari, silk floss",
-        "motifStory": "A piece of history you can wear \u2014 the royal procession, frozen mid-step in gold."
-      },
-      "material": [
-        "320 GSM cotton twill",
-        "Antique brass buttons"
-      ],
-      "care": [
-        "Dry clean recommended",
-        "Warm iron on reverse"
-      ],
-      "fit": "Utility Fit",
-      "fabricGsm": "320 GSM",
-      "craftRegion": "Rajasthan",
-      "craftCluster": "Jaipur zardozi houses",
-      "vibes": [
-        "aesthetic"
-      ],
-      "handcrafted": true,
-      "moods": [
-        "heritage",
-        "festive-gifting"
-      ]
-    },
-    {
-      "slug": "koi-no-yume-sweatshirt",
-      "name": "Koi No Yume Sweatshirt",
-      "description": "Relaxed sweatshirt with koi swimming upstream through wave curls. Perseverance, stitched in satin-smooth thread.",
-      "categorySlug": "tops",
-      "universeSlug": "animeverse",
-      "garmentType": "sweatshirt",
-      "gender": "unisex",
-      "isMock": true,
-      "motifId": "koi",
-      "rating": 4.8,
-      "reviewCount": 196,
-      "tags": [
-        "animeverse",
-        "sweatshirt",
-        "unisex"
-      ],
-      "variants": [
-        {
-          "sku": "KNY-MN-XS",
-          "color": "Midnight",
-          "colorHex": "#232a3a",
-          "size": "XS",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
+          "sku": "KCT-UNDYED-2XL",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
+          "size": "2XL",
+          "priceCents": 279900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "KNY-MN-S",
-          "color": "Midnight",
-          "colorHex": "#232a3a",
+          "sku": "KCT-UNDYED-3XL",
+          "color": "Undyed Cotton",
+          "colorHex": "#efe7d8",
+          "size": "3XL",
+          "priceCents": 279900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "KCT-INDIGO-S",
+          "color": "Indigo Current",
+          "colorHex": "#2b3446",
           "size": "S",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 11
-        },
-        {
-          "sku": "KNY-MN-M",
-          "color": "Midnight",
-          "colorHex": "#232a3a",
-          "size": "M",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 13
-        },
-        {
-          "sku": "KNY-MN-L",
-          "color": "Midnight",
-          "colorHex": "#232a3a",
-          "size": "L",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
+          "priceCents": 279900,
           "status": "in-stock",
           "quantity": 9
         },
         {
-          "sku": "KNY-MN-XL",
-          "color": "Midnight",
-          "colorHex": "#232a3a",
-          "size": "XL",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
+          "sku": "KCT-INDIGO-M",
+          "color": "Indigo Current",
+          "colorHex": "#2b3446",
+          "size": "M",
+          "priceCents": 279900,
           "status": "in-stock",
-          "quantity": 6
+          "quantity": 9
         },
         {
-          "sku": "KNY-EC-M",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "M",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
+          "sku": "KCT-INDIGO-L",
+          "color": "Indigo Current",
+          "colorHex": "#2b3446",
+          "size": "L",
+          "priceCents": 279900,
           "status": "in-stock",
-          "quantity": 8
+          "quantity": 9
+        },
+        {
+          "sku": "KCT-INDIGO-XL",
+          "color": "Indigo Current",
+          "colorHex": "#2b3446",
+          "size": "XL",
+          "priceCents": 279900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "KCT-INDIGO-2XL",
+          "color": "Indigo Current",
+          "colorHex": "#2b3446",
+          "size": "2XL",
+          "priceCents": 279900,
+          "status": "in-stock",
+          "quantity": 9
         }
       ],
       "images": [
         {
-          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 Midnight \u2014 front with koi embroidery"
+          "src": "/images/placeholders/product-vine-heavyweight-tee-1.jpg",
+          "alt": "Koi Current Tee \u2014 front"
         },
         {
-          "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 back view"
+          "src": "/images/placeholders/product-vine-heavyweight-tee-2.jpg",
+          "alt": "Koi Current Tee \u2014 crest macro"
         },
         {
-          "src": "/images/products/nocturne-velvet-vest-2.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 wave stitch macro"
-        },
-        {
-          "src": "/images/products/monogram-poplin-shirt-2.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/tops.jpg",
-          "alt": "Koi No Yume Sweatshirt \u2014 lifestyle shot"
+          "src": "/images/products/vine-heavyweight-tee-1.jpg",
+          "alt": "Koi Current Tee \u2014 lifestyle"
         }
       ],
-      "featured": false,
       "embroidery": {
         "technique": "satin-stitch",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 28,
+        "techniqueLabel": "Satin Stitch",
+        "artisanHours": 6,
         "placement": [
-          "chest",
-          "sleeve"
+          "left chest"
         ],
-        "threadComposition": "Mulberry silk floss",
-        "motifStory": "The koi swims upstream \u2014 perseverance through every current."
+        "threadComposition": "Mercerized cotton floss, tonal ecru",
+        "motifStory": "The koi swims in single-color satin \u2014 perseverance rendered in one quiet pass.",
+        "macroImage": {
+          "src": "/images/placeholders/product-vine-heavyweight-tee-2.jpg",
+          "alt": "Koi crest satin macro"
+        }
       },
       "material": [
-        "320 GSM loopback cotton"
+        "280 GSM combed organic cotton jersey"
       ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
-      ],
-      "fit": "Relaxed Fit",
-      "fabricGsm": "320 GSM",
-      "craftRegion": "Tamil Nadu",
-      "craftCluster": "Mahabalipuram stitch unit",
-      "vibes": [
-        "aesthetic",
-        "expressive"
-      ],
-      "moods": [
-        "everyday",
-        "comfort"
-      ]
-    },
-    {
-      "slug": "oni-spirit-jacket",
-      "name": "Oni Spirit Jacket",
-      "description": "Regular-fit jacket with a guardian oni spirit wreathed in flame threadwork. Protection you can wear.",
-      "categorySlug": "outerwear",
-      "universeSlug": "animeverse",
-      "garmentType": "jacket",
-      "gender": "men",
-      "isMock": true,
-      "motifId": "koi",
-      "rating": 4.9,
-      "reviewCount": 271,
-      "tags": [
-        "animeverse",
-        "jacket",
-        "men"
-      ],
-      "variants": [
-        {
-          "sku": "OSJ-BK-XS",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XS",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "OSJ-BK-S",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "S",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "OSJ-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "M",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 7
-        },
-        {
-          "sku": "OSJ-BK-L",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "L",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 9
-        },
-        {
-          "sku": "OSJ-BK-XL",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XL",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 5
-        },
-        {
-          "sku": "OSJ-MR-L",
-          "color": "Maroon",
-          "colorHex": "#5c1a24",
-          "size": "L",
-          "priceCents": 499900,
-          "compareAtPriceCents": 649900,
-          "status": "in-stock",
-          "quantity": 4
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/nocturne-velvet-vest-1.jpg",
-          "alt": "Oni Spirit Jacket \u2014 Ink Black \u2014 back with oni spirit"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Oni Spirit Jacket \u2014 front view"
-        },
-        {
-          "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "Oni Spirit Jacket \u2014 knot stitch macro"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Oni Spirit Jacket \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Oni Spirit Jacket \u2014 scale on model"
-        },
-        {
-          "src": "/images/placeholders/hero.jpg",
-          "alt": "Oni Spirit Jacket \u2014 lifestyle shot"
-        }
-      ],
-      "featured": false,
-      "embroidery": {
-        "technique": "french-knot",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 46,
-        "placement": [
-          "back panel"
-        ],
-        "threadComposition": "Wool floss, silk accents",
-        "motifStory": "The oni guards the threshold \u2014 face every spirit, stitched in knots of courage."
-      },
-      "material": [
-        "320 GSM cotton canvas"
-      ],
-      "care": [
-        "Dry clean recommended"
-      ],
-      "fit": "Regular Fit",
-      "fabricGsm": "320 GSM",
-      "craftRegion": "Uttar Pradesh",
-      "craftCluster": "Lucknow zardozi cluster",
-      "vibes": [
-        "expressive"
-      ],
+      "fit": "Boxy Drop-Shoulder",
+      "fabricGsm": "280 GSM",
+      "craftRegion": "Varanasi, Uttar Pradesh",
+      "craftCluster": "Ghat Artisan Weavers",
       "handcrafted": true,
-      "moods": [
-        "statement",
-        "collector"
+      "artStyleSlug": "ukiyo-line",
+      "characterIds": [
+        "koi"
       ]
     },
     {
-      "slug": "tsuki-crane-sweatshirt",
-      "name": "Tsuki Crane Sweatshirt",
-      "description": "Relaxed sweatshirt with cranes crossing a golden moon. Grace under moonlight, in fine chain stitch.",
-      "categorySlug": "tops",
-      "universeSlug": "animeverse",
-      "garmentType": "sweatshirt",
-      "gender": "women",
-      "isMock": true,
-      "motifId": "sakura",
-      "rating": 4.8,
-      "reviewCount": 196,
-      "tags": [
-        "animeverse",
-        "sweatshirt",
-        "women"
-      ],
-      "variants": [
-        {
-          "sku": "TCS-EC-XS",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "XS",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "TCS-EC-S",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "S",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "TCS-EC-M",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "M",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 12
-        },
-        {
-          "sku": "TCS-EC-L",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "L",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 8
-        },
-        {
-          "sku": "TCS-SL-M",
-          "color": "Slate",
-          "colorHex": "#6b7280",
-          "size": "M",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 6
-        },
-        {
-          "sku": "TCS-EC-XL",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "XL",
-          "priceCents": 329900,
-          "compareAtPriceCents": 449900,
-          "status": "in-stock",
-          "quantity": 10
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 Ecru \u2014 front with crane and moon"
-        },
-        {
-          "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 back view"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 chain stitch macro"
-        },
-        {
-          "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/tops.jpg",
-          "alt": "Tsuki Crane Sweatshirt \u2014 lifestyle shot"
-        }
-      ],
-      "featured": false,
-      "embroidery": {
-        "technique": "botanical-chain",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 26,
-        "placement": [
-          "chest",
-          "back yoke"
-        ],
-        "threadComposition": "Cotton floss, gold highlights",
-        "motifStory": "Cranes cross the moon once a year \u2014 grace, fidelity, safe return."
-      },
-      "material": [
-        "320 GSM loopback cotton"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
-      ],
-      "fit": "Relaxed Fit",
-      "fabricGsm": "320 GSM",
-      "craftRegion": "West Bengal",
-      "craftCluster": "Nakshi collective",
-      "vibes": [
-        "aesthetic",
-        "clean"
-      ],
-      "moods": [
-        "everyday",
-        "comfort"
-      ]
-    },
-    {
-      "slug": "koi-no-yume-tee",
-      "name": "Koi No Yume T-Shirt",
-      "description": "The koi dream in a lighter frame \u2014 relaxed tee with wave-and-koi chest embroidery for everyday wear.",
-      "categorySlug": "tops",
-      "universeSlug": "animeverse",
-      "garmentType": "tee",
-      "gender": "unisex",
-      "isMock": true,
-      "motifId": "koi",
-      "rating": 4.7,
-      "reviewCount": 184,
-      "tags": [
-        "animeverse",
-        "tee",
-        "unisex"
-      ],
-      "variants": [
-        {
-          "sku": "KNT-BK-XS",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XS",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "KNT-BK-S",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "S",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 16
-        },
-        {
-          "sku": "KNT-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "M",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 18
-        },
-        {
-          "sku": "KNT-BK-L",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "L",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 12
-        },
-        {
-          "sku": "KNT-BK-XL",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XL",
-          "priceCents": 279900,
-          "compareAtPriceCents": 349900,
-          "status": "in-stock",
-          "quantity": 9
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 Ink Black \u2014 front with koi"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 back view"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 stitch macro"
-        },
-        {
-          "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 scale on model"
-        },
-        {
-          "src": "/images/placeholders/hero.jpg",
-          "alt": "Koi No Yume T-Shirt \u2014 lifestyle shot"
-        }
-      ],
-      "featured": false,
-      "embroidery": {
-        "technique": "hand-zardozi",
-        "techniqueLabel": "Zardozi",
-        "artisanHours": 16,
-        "placement": [
-          "chest"
-        ],
-        "threadComposition": "Silk floss, metallic accents",
-        "motifStory": "A smaller current for everyday swimming \u2014 the koi dream, daily edition."
-      },
-      "material": [
-        "240 GSM combed cotton"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
-      ],
-      "fit": "Relaxed Fit",
-      "fabricGsm": "240 GSM",
-      "craftRegion": "Tamil Nadu",
-      "craftCluster": "Mahabalipuram stitch unit",
-      "vibes": [
-        "clean"
-      ],
-      "moods": [
-        "everyday"
-      ]
-    },
-    {
-      "slug": "tech-cargo-pants",
-      "name": "Tech Cargo Pants",
-      "description": "Utility cargo pants cut to pair with the Sakura Ronin set. Clean, pocketed, embroidery-free \u2014 the quiet base for loud tops.",
-      "categorySlug": "bottoms",
-      "universeSlug": "animeverse",
-      "garmentType": "lowers",
-      "gender": "men",
-      "isMock": true,
-      "rating": 4.6,
-      "reviewCount": 58,
-      "tags": [
-        "animeverse",
-        "lowers",
-        "men"
-      ],
-      "variants": [
-        {
-          "sku": "TCP-BK-XS",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XS",
-          "priceCents": 249900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "TCP-BK-S",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "S",
-          "priceCents": 249900,
-          "status": "in-stock",
-          "quantity": 14
-        },
-        {
-          "sku": "TCP-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "M",
-          "priceCents": 249900,
-          "status": "in-stock",
-          "quantity": 16
-        },
-        {
-          "sku": "TCP-BK-L",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "L",
-          "priceCents": 249900,
-          "status": "in-stock",
-          "quantity": 12
-        },
-        {
-          "sku": "TCP-BK-XL",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "XL",
-          "priceCents": 249900,
-          "status": "in-stock",
-          "quantity": 8
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/pleated-zari-trousers-1.jpg",
-          "alt": "Tech Cargo Pants \u2014 Ink Black \u2014 front"
-        },
-        {
-          "src": "/images/products/pleated-zari-trousers-2.jpg",
-          "alt": "Tech Cargo Pants \u2014 back"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Tech Cargo Pants \u2014 pocket detail"
-        },
-        {
-          "src": "/images/products/monogram-poplin-shirt-2.jpg",
-          "alt": "Tech Cargo Pants \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Tech Cargo Pants \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/bottoms.jpg",
-          "alt": "Tech Cargo Pants \u2014 lifestyle shot"
-        }
-      ],
-      "featured": false,
-      "material": [
-        "240 GSM ripstop cotton",
-        "Matte cordura trims"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
-      ],
-      "fit": "Tapered Utility Fit",
-      "fabricGsm": "240 GSM",
-      "craftRegion": "Karnataka",
-      "craftCluster": "Bengaluru stitch unit",
-      "vibes": [
-        "clean",
-        "minimal"
-      ],
-      "moods": [
-        "everyday"
-      ]
-    },
-    {
-      "slug": "samurai-cap",
-      "name": "Samurai Cap",
-      "description": "Six-panel cap with a single embroidered kanji-strength glyph. One character, endless attitude.",
-      "categorySlug": "accessories",
-      "universeSlug": "animeverse",
-      "garmentType": "cap",
-      "gender": "unisex",
-      "isMock": true,
-      "rating": 4.5,
-      "reviewCount": 41,
-      "tags": [
-        "animeverse",
-        "accessories",
-        "unisex"
-      ],
-      "variants": [
-        {
-          "sku": "SCP-BK-OS",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "OS",
-          "priceCents": 129900,
-          "status": "in-stock",
-          "quantity": 30
-        }
-      ],
-      "images": [
-        {
-          "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Samurai Cap \u2014 Ink Black \u2014 front with glyph"
-        },
-        {
-          "src": "/images/products/monogram-poplin-shirt-2.jpg",
-          "alt": "Samurai Cap \u2014 side view"
-        },
-        {
-          "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "Samurai Cap \u2014 glyph stitch macro"
-        },
-        {
-          "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Samurai Cap \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Samurai Cap \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/accessories.jpg",
-          "alt": "Samurai Cap \u2014 lifestyle shot"
-        }
-      ],
-      "featured": false,
-      "embroidery": {
-        "technique": "monogram-bespoke",
-        "techniqueLabel": "Monogram",
-        "artisanHours": 3,
-        "placement": [
-          "front panel"
-        ],
-        "threadComposition": "Silk floss, tonal",
-        "motifStory": "One character for strength \u2014 the smallest canvas in the Animeverse."
-      },
-      "material": [
-        "Brushed cotton twill",
-        "Antique brass slider"
-      ],
-      "care": [
-        "Spot clean only"
-      ],
-      "fit": "Adjustable",
-      "craftRegion": "Karnataka",
-      "craftCluster": "Bengaluru stitch unit",
-      "vibes": [
-        "minimal"
-      ],
-      "moods": [
-        "everyday"
-      ]
-    },
-    {
-      "slug": "red-sun-tote",
-      "name": "Red Sun Tote",
-      "description": "Everyday canvas tote with the Red Sun rising over stitched waves. Carries groceries, laptops, and hope.",
+      "slug": "red-sun-motif-tote",
+      "name": "Red Sun Motif Tote",
+      "subtitle": "A flat crimson disc on raw canvas. Daylight carried.",
+      "description": "Heavy raw-canvas tote with the Red Sun motif worked flat and frontal \u2014 a symbol of new beginnings on an everyday carry.",
       "categorySlug": "accessories",
       "universeSlug": "animeverse",
       "garmentType": "tote",
       "gender": "unisex",
-      "isMock": true,
+      "intensity": "balanced",
+      "craftTechniques": [
+        "satin-stitch"
+      ],
+      "edits": [
+        "everyday"
+      ],
       "motifId": "red-sun",
-      "rating": 4.6,
-      "reviewCount": 73,
+      "isMock": true,
+      "rating": 4.7,
+      "reviewCount": 54,
+      "soldCount": "300+",
+      "featured": false,
       "tags": [
         "animeverse",
         "accessories",
@@ -1171,84 +404,85 @@
       ],
       "variants": [
         {
-          "sku": "RST-NT-OS",
-          "color": "Natural",
-          "colorHex": "#e8e0d0",
+          "sku": "RST-OS-NAT",
+          "color": "Natural Canvas",
+          "colorHex": "#e8e2d2",
           "size": "OS",
-          "priceCents": 99900,
+          "priceCents": 199900,
           "status": "in-stock",
-          "quantity": 40
+          "quantity": 16
+        },
+        {
+          "sku": "RST-OS-WAX",
+          "color": "Waxed Umber",
+          "colorHex": "#8a6b4a",
+          "size": "OS",
+          "priceCents": 199900,
+          "status": "low-stock",
+          "quantity": 2
         }
       ],
       "images": [
         {
-          "src": "/images/products/needlework-canvas-tote-1.jpg",
-          "alt": "Red Sun Tote \u2014 Natural \u2014 front with red sun"
+          "src": "/images/placeholders/product-needlework-canvas-tote-1.jpg",
+          "alt": "Red Sun Motif Tote \u2014 front"
         },
         {
-          "src": "/images/products/needlework-canvas-tote-2.jpg",
-          "alt": "Red Sun Tote \u2014 back view"
-        },
-        {
-          "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Red Sun Tote \u2014 sun stitch macro"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Red Sun Tote \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Red Sun Tote \u2014 scale carried"
-        },
-        {
-          "src": "/images/categories/accessories.jpg",
-          "alt": "Red Sun Tote \u2014 lifestyle shot"
+          "src": "/images/placeholders/product-needlework-canvas-tote-2.jpg",
+          "alt": "Red Sun Motif Tote \u2014 embroidery detail"
         }
       ],
-      "featured": false,
       "embroidery": {
         "technique": "satin-stitch",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 6,
+        "techniqueLabel": "Satin Stitch",
+        "artisanHours": 4,
         "placement": [
           "front panel"
         ],
-        "threadComposition": "Cotton floss",
-        "motifStory": "The Red Sun rises on every errand \u2014 hope, resilience, new beginnings."
+        "threadComposition": "Crimson silk floss on raw canvas",
+        "motifStory": "A flat crimson disc, minimal, paired with mountain linework.",
+        "macroImage": {
+          "src": "/images/placeholders/product-needlework-canvas-tote-2.jpg",
+          "alt": "Red Sun motif macro"
+        }
       },
       "material": [
-        "16 oz cotton canvas",
-        "Reinforced handles"
+        "18 oz raw cotton canvas",
+        "Reinforced box stitches"
       ],
-      "care": [
-        "Spot clean only"
-      ],
-      "fit": "One size",
-      "craftRegion": "West Bengal",
-      "craftCluster": "Nakshi collective",
-      "vibes": [
-        "clean",
-        "minimal"
-      ],
-      "moods": [
-        "everyday",
-        "festive-gifting"
+      "fit": "One Size",
+      "fabricGsm": "18 oz canvas",
+      "craftRegion": "Varanasi, Uttar Pradesh",
+      "craftCluster": "Ghat Artisan Weavers",
+      "handcrafted": false,
+      "artStyleSlug": "ukiyo-line",
+      "characterIds": [
+        "red-sun"
       ]
     },
     {
       "slug": "ascendant-hoodie",
       "name": "Ascendant Hoodie",
-      "subtitle": "Rise, carry, protect.",
-      "description": "Heavyweight hoodie bearing the Ascendant Crest in gold zardozi on deep red. The everyday hero's mark, stitched to inspire.",
+      "subtitle": "The crest carries. Quietly.",
+      "description": "Heavyweight fleece hoodie with the Ascendant Crest worked as a tonal chest mark \u2014 the everyday hero\u2019s emblem, stitched to be noticed slowly.",
       "categorySlug": "tops",
       "universeSlug": "heroverse",
       "garmentType": "hoodie",
       "gender": "unisex",
-      "isMock": true,
+      "intensity": "quiet",
+      "craftTechniques": [
+        "hand-zardozi"
+      ],
+      "edits": [
+        "everyday",
+        "statement"
+      ],
       "motifId": "ascendant-crest",
-      "rating": 4.8,
-      "reviewCount": 142,
+      "isMock": true,
+      "rating": 4.9,
+      "reviewCount": 210,
+      "soldCount": "900+",
+      "featured": true,
       "tags": [
         "heroverse",
         "hoodie",
@@ -1256,535 +490,1521 @@
       ],
       "variants": [
         {
-          "sku": "ASC-DR-XS",
-          "color": "Deep Red",
-          "colorHex": "#7a1f1f",
+          "sku": "ASH-CHARCOAL-XS",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
           "size": "XS",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "ASC-DR-S",
-          "color": "Deep Red",
-          "colorHex": "#7a1f1f",
+          "sku": "ASH-CHARCOAL-S",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
           "size": "S",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "ASC-DR-M",
-          "color": "Deep Red",
-          "colorHex": "#7a1f1f",
+          "sku": "ASH-CHARCOAL-M",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
           "size": "M",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
           "status": "in-stock",
-          "quantity": 12
+          "quantity": 14
         },
         {
-          "sku": "ASC-DR-L",
-          "color": "Deep Red",
-          "colorHex": "#7a1f1f",
+          "sku": "ASH-CHARCOAL-L",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
           "size": "L",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
-          "status": "in-stock",
-          "quantity": 8
+          "status": "low-stock",
+          "quantity": 2
         },
         {
-          "sku": "ASC-DR-XL",
-          "color": "Deep Red",
-          "colorHex": "#7a1f1f",
+          "sku": "ASH-CHARCOAL-XL",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
           "size": "XL",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
           "status": "in-stock",
-          "quantity": 6
+          "quantity": 14
         },
         {
-          "sku": "ASC-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
+          "sku": "ASH-CHARCOAL-2XL",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
+          "size": "2XL",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "ASH-CHARCOAL-3XL",
+          "color": "Charcoal Ash",
+          "colorHex": "#33333a",
+          "size": "3XL",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "ASH-DEEP-S",
+          "color": "Deep Bone",
+          "colorHex": "#d9d2c4",
+          "size": "S",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "ASH-DEEP-M",
+          "color": "Deep Bone",
+          "colorHex": "#d9d2c4",
           "size": "M",
           "priceCents": 399900,
-          "compareAtPriceCents": 549900,
           "status": "in-stock",
-          "quantity": 7
+          "quantity": 9
+        },
+        {
+          "sku": "ASH-DEEP-L",
+          "color": "Deep Bone",
+          "colorHex": "#d9d2c4",
+          "size": "L",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "ASH-DEEP-XL",
+          "color": "Deep Bone",
+          "colorHex": "#d9d2c4",
+          "size": "XL",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "ASH-DEEP-2XL",
+          "color": "Deep Bone",
+          "colorHex": "#d9d2c4",
+          "size": "2XL",
+          "priceCents": 399900,
+          "status": "in-stock",
+          "quantity": 9
         }
       ],
       "images": [
         {
           "src": "/images/products/french-knot-turtleneck-1.jpg",
-          "alt": "Ascendant Hoodie \u2014 Deep Red \u2014 front with crest"
+          "alt": "Ascendant Hoodie \u2014 front"
         },
         {
           "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "Ascendant Hoodie \u2014 back view"
+          "alt": "Ascendant Hoodie \u2014 crest macro"
         },
         {
-          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
-          "alt": "Ascendant Hoodie \u2014 crest stitch macro"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Ascendant Hoodie \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Ascendant Hoodie \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/outerwear.jpg",
-          "alt": "Ascendant Hoodie \u2014 lifestyle shot"
+          "src": "/images/placeholders/category-tops.jpg",
+          "alt": "Ascendant Hoodie \u2014 lifestyle"
         }
       ],
-      "featured": true,
       "embroidery": {
         "technique": "hand-zardozi",
-        "techniqueLabel": "Zardozi",
+        "techniqueLabel": "Hand Zardozi",
         "artisanHours": 38,
         "placement": [
-          "chest",
-          "back"
+          "chest"
         ],
-        "threadComposition": "Gold dabka, silk floss",
-        "motifStory": "Rise, carry, protect \u2014 the everyday hero's mark in gold."
+        "threadComposition": "Tonal charcoal bullion wire, silk core",
+        "motifStory": "Shield-crest geometry, gold on deep red in the loud line \u2014 here rendered tonal, charcoal on ash.",
+        "macroImage": {
+          "src": "/images/products/french-knot-turtleneck-2.jpg",
+          "alt": "Ascendant crest tonal macro"
+        }
       },
       "material": [
         "400 GSM cotton fleece"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
       ],
       "fit": "Oversized Fit",
       "fabricGsm": "400 GSM",
       "craftRegion": "Uttar Pradesh",
       "craftCluster": "Lucknow zardozi cluster",
-      "vibes": [
-        "expressive",
-        "aesthetic"
-      ],
       "handcrafted": true,
-      "moods": [
-        "statement",
-        "everyday"
+      "artStyleSlug": "crest-emblem",
+      "characterIds": [
+        "ascendant-crest"
       ]
     },
     {
-      "slug": "guardian-stripe-tee",
-      "name": "Guardian Stripe Tee",
-      "description": "Relaxed tee with diagonal guardian-stripe bands in navy and burst yellow. Speed lines of those who show up first.",
+      "slug": "guardian-stripes-pullover",
+      "name": "Guardian Stripes Pullover",
+      "subtitle": "Speed lines of those who show up first.",
+      "description": "Loopback crewneck pullover with Guardian Stripes running diagonal across the chest \u2014 navy bands and burst-yellow knots in structural sashiko grid.",
       "categorySlug": "tops",
       "universeSlug": "heroverse",
-      "garmentType": "tee",
-      "gender": "men",
-      "isMock": true,
+      "garmentType": "hoodie",
+      "gender": "unisex",
+      "intensity": "balanced",
+      "craftTechniques": [
+        "sashiko-selvedge"
+      ],
+      "edits": [
+        "statement",
+        "everyday"
+      ],
       "motifId": "guardian-stripes",
+      "isMock": true,
       "rating": 4.7,
-      "reviewCount": 98,
+      "reviewCount": 68,
+      "soldCount": "200+",
+      "featured": false,
       "tags": [
         "heroverse",
-        "tee",
-        "men"
+        "hoodie",
+        "unisex"
       ],
       "variants": [
         {
-          "sku": "GST-NV-XS",
-          "color": "Navy",
-          "colorHex": "#22355c",
+          "sku": "GSP-NAVY-XS",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
           "size": "XS",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "GST-NV-S",
-          "color": "Navy",
-          "colorHex": "#22355c",
+          "sku": "GSP-NAVY-S",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
           "size": "S",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 15
+          "quantity": 14
         },
         {
-          "sku": "GST-NV-M",
-          "color": "Navy",
-          "colorHex": "#22355c",
+          "sku": "GSP-NAVY-M",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
           "size": "M",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 17
+          "quantity": 14
         },
         {
-          "sku": "GST-NV-L",
-          "color": "Navy",
-          "colorHex": "#22355c",
+          "sku": "GSP-NAVY-L",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
           "size": "L",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 11
+          "quantity": 14
         },
         {
-          "sku": "GST-NV-XL",
-          "color": "Navy",
-          "colorHex": "#22355c",
+          "sku": "GSP-NAVY-XL",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
           "size": "XL",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 8
+          "quantity": 14
         },
         {
-          "sku": "GST-EC-M",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "M",
-          "priceCents": 249900,
-          "compareAtPriceCents": 329900,
+          "sku": "GSP-NAVY-2XL",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
+          "size": "2XL",
+          "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 6
+          "quantity": 14
+        },
+        {
+          "sku": "GSP-NAVY-3XL",
+          "color": "Navy Surge",
+          "colorHex": "#25314d",
+          "size": "3XL",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "GSP-STORM-S",
+          "color": "Storm Grey",
+          "colorHex": "#6b6f76",
+          "size": "S",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "GSP-STORM-M",
+          "color": "Storm Grey",
+          "colorHex": "#6b6f76",
+          "size": "M",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "GSP-STORM-L",
+          "color": "Storm Grey",
+          "colorHex": "#6b6f76",
+          "size": "L",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "GSP-STORM-XL",
+          "color": "Storm Grey",
+          "colorHex": "#6b6f76",
+          "size": "XL",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "GSP-STORM-2XL",
+          "color": "Storm Grey",
+          "colorHex": "#6b6f76",
+          "size": "2XL",
+          "priceCents": 359900,
+          "status": "in-stock",
+          "quantity": 9
         }
       ],
       "images": [
         {
-          "src": "/images/products/monogram-poplin-shirt-1.jpg",
-          "alt": "Guardian Stripe Tee \u2014 Navy \u2014 front with stripes"
+          "src": "/images/products/kantha-chore-jacket-1.jpg",
+          "alt": "Guardian Stripes Pullover \u2014 front"
         },
         {
-          "src": "/images/products/monogram-poplin-shirt-2.jpg",
-          "alt": "Guardian Stripe Tee \u2014 back view"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
-          "alt": "Guardian Stripe Tee \u2014 stripe stitch macro"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-2.jpg",
-          "alt": "Guardian Stripe Tee \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/french-knot-turtleneck-2.jpg",
-          "alt": "Guardian Stripe Tee \u2014 scale on model"
-        },
-        {
-          "src": "/images/placeholders/hero.jpg",
-          "alt": "Guardian Stripe Tee \u2014 lifestyle shot"
+          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
+          "alt": "Guardian Stripes Pullover \u2014 stripe macro"
         }
       ],
-      "featured": false,
       "embroidery": {
-        "technique": "satin-stitch",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 14,
+        "technique": "sashiko-selvedge",
+        "techniqueLabel": "Sashiko Selvedge",
+        "artisanHours": 16,
         "placement": [
           "chest",
-          "sleeve"
+          "cuffs"
         ],
-        "threadComposition": "Mulberry silk floss",
-        "motifStory": "Speed lines of those who show up first."
+        "threadComposition": "White cotton thread, burst-yellow accent",
+        "motifStory": "Diagonal action-line bands \u2014 the geometry of first responders.",
+        "macroImage": {
+          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
+          "alt": "Guardian stripes sashiko macro"
+        }
       },
       "material": [
-        "240 GSM combed cotton"
-      ],
-      "care": [
-        "Machine wash cold",
-        "Dry in shade"
+        "340 GSM loopback cotton"
       ],
       "fit": "Relaxed Fit",
-      "fabricGsm": "240 GSM",
-      "craftRegion": "Karnataka",
-      "craftCluster": "Bengaluru stitch unit",
-      "vibes": [
-        "clean",
-        "minimal"
-      ],
-      "moods": [
-        "everyday"
+      "fabricGsm": "340 GSM",
+      "craftRegion": "Kutch & Okayama Collaboration",
+      "craftCluster": "Craft Textile Atelier",
+      "handcrafted": true,
+      "artStyleSlug": "comic-noir",
+      "characterIds": [
+        "guardian-stripes"
       ]
     },
     {
       "slug": "herald-cape-jacket",
       "name": "Herald Cape Jacket",
-      "description": "Statement jacket with a sweeping crest across the shoulders, gold on royal blue. For entrances that matter.",
+      "subtitle": "Icons are ideas. Wear yours.",
+      "description": "Structured cape jacket with full-back Ascendant relief in zardozi wire \u2014 a showcase garment for those who carry their own weight. Limited numbered edition.",
       "categorySlug": "outerwear",
       "universeSlug": "heroverse",
       "garmentType": "jacket",
       "gender": "women",
-      "isMock": true,
+      "intensity": "loud",
+      "craftTechniques": [
+        "metallic-zari",
+        "french-knot"
+      ],
+      "edits": [
+        "statement",
+        "collector"
+      ],
       "motifId": "ascendant-crest",
-      "rating": 4.9,
-      "reviewCount": 167,
+      "isMock": true,
+      "batchNumber": 3,
+      "batchTotal": 40,
+      "rating": 5.0,
+      "reviewCount": 41,
+      "soldCount": "120+",
+      "featured": true,
       "tags": [
         "heroverse",
         "jacket",
-        "women"
+        "women",
+        "limited"
       ],
       "variants": [
         {
-          "sku": "HCJ-RB-XS",
-          "color": "Royal Blue",
-          "colorHex": "#1d4ed8",
+          "sku": "HCJ-CRIMSON-XS",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
           "size": "XS",
           "priceCents": 549900,
-          "compareAtPriceCents": 699900,
-          "status": "in-stock",
-          "quantity": 10
-        },
-        {
-          "sku": "HCJ-RB-S",
-          "color": "Royal Blue",
-          "colorHex": "#1d4ed8",
-          "size": "S",
-          "priceCents": 549900,
-          "compareAtPriceCents": 699900,
-          "status": "in-stock",
-          "quantity": 6
-        },
-        {
-          "sku": "HCJ-RB-M",
-          "color": "Royal Blue",
-          "colorHex": "#1d4ed8",
-          "size": "M",
-          "priceCents": 549900,
-          "compareAtPriceCents": 699900,
-          "status": "in-stock",
-          "quantity": 8
-        },
-        {
-          "sku": "HCJ-RB-L",
-          "color": "Royal Blue",
-          "colorHex": "#1d4ed8",
-          "size": "L",
-          "priceCents": 549900,
-          "compareAtPriceCents": 699900,
           "status": "low-stock",
           "quantity": 2
         },
         {
-          "sku": "HCJ-BK-M",
-          "color": "Ink Black",
-          "colorHex": "#1c1a18",
-          "size": "M",
+          "sku": "HCJ-CRIMSON-S",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
+          "size": "S",
           "priceCents": 549900,
-          "compareAtPriceCents": 699900,
           "status": "in-stock",
-          "quantity": 5
+          "quantity": 14
         },
         {
-          "sku": "HCJ-RB-XL",
-          "color": "Royal Blue",
-          "colorHex": "#1d4ed8",
+          "sku": "HCJ-CRIMSON-M",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
+          "size": "M",
+          "priceCents": 549900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "HCJ-CRIMSON-L",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
+          "size": "L",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "HCJ-CRIMSON-XL",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
           "size": "XL",
           "priceCents": 549900,
-          "compareAtPriceCents": 699900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
+        },
+        {
+          "sku": "HCJ-CRIMSON-2XL",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
+          "size": "2XL",
+          "priceCents": 549900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "HCJ-CRIMSON-3XL",
+          "color": "Crimson Court",
+          "colorHex": "#7a2230",
+          "size": "3XL",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "HCJ-GILDED-S",
+          "color": "Gilded Ivory",
+          "colorHex": "#f1e7cf",
+          "size": "S",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "HCJ-GILDED-M",
+          "color": "Gilded Ivory",
+          "colorHex": "#f1e7cf",
+          "size": "M",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "HCJ-GILDED-L",
+          "color": "Gilded Ivory",
+          "colorHex": "#f1e7cf",
+          "size": "L",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "HCJ-GILDED-XL",
+          "color": "Gilded Ivory",
+          "colorHex": "#f1e7cf",
+          "size": "XL",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "HCJ-GILDED-2XL",
+          "color": "Gilded Ivory",
+          "colorHex": "#f1e7cf",
+          "size": "2XL",
+          "priceCents": 549900,
+          "status": "in-stock",
+          "quantity": 9
         }
       ],
       "images": [
         {
+          "src": "/images/products/nocturne-velvet-vest-1.jpg",
+          "alt": "Herald Cape Jacket \u2014 front"
+        },
+        {
           "src": "/images/products/nocturne-velvet-vest-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 Royal Blue \u2014 back with crest"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 front view"
-        },
-        {
-          "src": "/images/products/pleated-zari-trousers-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 crest stitch macro"
-        },
-        {
-          "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Herald Cape Jacket \u2014 flat lay"
+          "alt": "Herald Cape Jacket \u2014 back relief"
         },
         {
           "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
-          "alt": "Herald Cape Jacket \u2014 scale on model"
+          "alt": "Herald Cape Jacket \u2014 texture detail"
         },
         {
-          "src": "/images/categories/outerwear.jpg",
-          "alt": "Herald Cape Jacket \u2014 lifestyle shot"
+          "src": "/images/products/pleated-zari-trousers-2.jpg",
+          "alt": "Herald Cape Jacket \u2014 zari macro"
         }
       ],
-      "featured": true,
       "embroidery": {
         "technique": "metallic-zari",
-        "techniqueLabel": "Embroidery",
+        "techniqueLabel": "Metallic Zari",
         "artisanHours": 48,
         "placement": [
           "shoulders",
           "back"
         ],
-        "threadComposition": "Gold zari, silk floss",
-        "motifStory": "The herald announces arrival \u2014 a crest across the shoulders, gold on blue."
+        "threadComposition": "Silver-gilt zari couched cord, French knots",
+        "motifStory": "Crest relief built in two techniques \u2014 couching for the form, knots for the light.",
+        "macroImage": {
+          "src": "/images/products/pleated-zari-trousers-2.jpg",
+          "alt": "Herald cape zari couching macro"
+        }
       },
       "material": [
         "320 GSM cotton canvas",
         "Antique brass buttons"
       ],
-      "care": [
-        "Dry clean recommended"
-      ],
       "fit": "Statement Fit",
       "fabricGsm": "320 GSM",
       "craftRegion": "Rajasthan",
       "craftCluster": "Jaipur zardozi houses",
-      "vibes": [
-        "expressive"
-      ],
       "handcrafted": true,
-      "moods": [
-        "statement",
-        "collector"
+      "artStyleSlug": "crest-emblem",
+      "characterIds": [
+        "ascendant-crest"
       ]
     },
     {
-      "slug": "arch-jaal-kurta",
-      "name": "Arch Jaal Kurta",
-      "description": "Airy kurta patterned with Mughal arch lattice in tonal thread. Courtyards of patience \u2014 geometry as devotion.",
-      "categorySlug": "tops",
+      "slug": "royal-procession-jacket",
+      "name": "Royal Procession Jacket",
+      "subtitle": "Moments and empires, embroidered for now.",
+      "description": "Chore jacket carrying the Royal Procession across the back panel in couched zari \u2014 caparisoned elephant beneath a Mughal arch, festive and full.",
+      "categorySlug": "outerwear",
       "universeSlug": "itihaas",
-      "garmentType": "kurta",
+      "garmentType": "jacket",
       "gender": "unisex",
+      "intensity": "loud",
+      "craftTechniques": [
+        "metallic-zari"
+      ],
+      "edits": [
+        "heritage",
+        "festive-gifting"
+      ],
+      "motifId": "procession-elephant",
       "isMock": true,
-      "motifId": "arch-jaal",
-      "rating": 4.8,
-      "reviewCount": 88,
+      "foreignTagline": "\u0936\u093e\u0939\u0940 \u091c\u0941\u0932\u0942\u0938",
+      "rating": 4.9,
+      "reviewCount": 157,
+      "soldCount": "600+",
+      "featured": true,
       "tags": [
         "itihaas",
-        "kurta",
-        "unisex"
+        "jacket",
+        "unisex",
+        "festive"
       ],
       "variants": [
         {
-          "sku": "AJK-EC-XS",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
+          "sku": "RPJ-MAROON-XS",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
           "size": "XS",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
+          "priceCents": 499900,
           "status": "in-stock",
-          "quantity": 10
+          "quantity": 14
         },
         {
-          "sku": "AJK-EC-S",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
+          "sku": "RPJ-MAROON-S",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
           "size": "S",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "RPJ-MAROON-M",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
+          "size": "M",
+          "priceCents": 499900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "RPJ-MAROON-L",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
+          "size": "L",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "RPJ-MAROON-XL",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
+          "size": "XL",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "RPJ-MAROON-2XL",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
+          "size": "2XL",
+          "priceCents": 499900,
+          "status": "out-of-stock",
+          "quantity": 0
+        },
+        {
+          "sku": "RPJ-MAROON-3XL",
+          "color": "Maroon Darbar",
+          "colorHex": "#6d1f2c",
+          "size": "3XL",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "RPJ-IVORY-S",
+          "color": "Ivory Darbar",
+          "colorHex": "#f3ecdc",
+          "size": "S",
+          "priceCents": 499900,
           "status": "in-stock",
           "quantity": 9
         },
         {
-          "sku": "AJK-EC-M",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
+          "sku": "RPJ-IVORY-M",
+          "color": "Ivory Darbar",
+          "colorHex": "#f3ecdc",
           "size": "M",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "RPJ-IVORY-L",
+          "color": "Ivory Darbar",
+          "colorHex": "#f3ecdc",
+          "size": "L",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "RPJ-IVORY-XL",
+          "color": "Ivory Darbar",
+          "colorHex": "#f3ecdc",
+          "size": "XL",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "RPJ-IVORY-2XL",
+          "color": "Ivory Darbar",
+          "colorHex": "#f3ecdc",
+          "size": "2XL",
+          "priceCents": 499900,
+          "status": "in-stock",
+          "quantity": 9
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/kantha-chore-jacket-2.jpg",
+          "alt": "Royal Procession Jacket \u2014 back panel"
+        },
+        {
+          "src": "/images/products/pleated-zari-trousers-1.jpg",
+          "alt": "Royal Procession Jacket \u2014 front placket"
+        },
+        {
+          "src": "/images/products/embroidered-silk-scarf-1.jpg",
+          "alt": "Royal Procession Jacket \u2014 detail"
+        }
+      ],
+      "embroidery": {
+        "technique": "metallic-zari",
+        "techniqueLabel": "Metallic Zari",
+        "artisanHours": 52,
+        "placement": [
+          "back panel",
+          "placket"
+        ],
+        "threadComposition": "Silver-gilt zari, maroon silk core",
+        "motifStory": "The procession enters the courtyard \u2014 ceremony stitched in continuous metallic inlay.",
+        "macroImage": {
+          "src": "/images/products/pleated-zari-trousers-2.jpg",
+          "alt": "Procession zari macro"
+        }
+      },
+      "material": [
+        "320 GSM cotton twill",
+        "Antique brass buttons"
+      ],
+      "fit": "Utility Fit",
+      "fabricGsm": "320 GSM",
+      "craftRegion": "Varanasi & Surat",
+      "craftCluster": "Ghat Zari Weavers Collective",
+      "handcrafted": true,
+      "artStyleSlug": "mughal-miniature",
+      "characterIds": [
+        "procession-elephant"
+      ]
+    },
+    {
+      "slug": "arch-jaal-scarf",
+      "name": "Arch Jaal Silk Scarf",
+      "subtitle": "Courtyards of patience \u2014 geometry as devotion.",
+      "description": "Mulberry silk scarf with the Arch Jaal lattice worked in tonal gold \u2014 Mughal geometry held to a whisper.",
+      "categorySlug": "accessories",
+      "universeSlug": "itihaas",
+      "garmentType": "scarf",
+      "gender": "unisex",
+      "intensity": "quiet",
+      "craftTechniques": [
+        "metallic-zari"
+      ],
+      "edits": [
+        "heritage",
+        "festive-gifting"
+      ],
+      "motifId": "arch-jaal",
+      "isMock": true,
+      "rating": 4.8,
+      "reviewCount": 33,
+      "soldCount": "150+",
+      "featured": false,
+      "tags": [
+        "itihaas",
+        "accessories",
+        "unisex"
+      ],
+      "variants": [
+        {
+          "sku": "AJS-OS-GLD",
+          "color": "Ivory & Gold",
+          "colorHex": "#efe4c8",
+          "size": "OS",
+          "priceCents": 189900,
           "status": "in-stock",
           "quantity": 11
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/embroidered-silk-scarf-2.jpg",
+          "alt": "Arch Jaal Silk Scarf \u2014 drape"
         },
         {
-          "sku": "AJK-EC-L",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "L",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
+          "src": "/images/products/embroidered-silk-scarf-1.jpg",
+          "alt": "Arch Jaal Silk Scarf \u2014 lattice macro"
+        }
+      ],
+      "embroidery": {
+        "technique": "metallic-zari",
+        "techniqueLabel": "Metallic Zari",
+        "artisanHours": 9,
+        "placement": [
+          "border",
+          "allover lattice"
+        ],
+        "threadComposition": "Champagne zari on ivory silk",
+        "motifStory": "Mughal arch lattice, symmetric, tonal \u2014 the geometry reads only at arm\u2019s length.",
+        "macroImage": {
+          "src": "/images/products/embroidered-silk-scarf-1.jpg",
+          "alt": "Arch jaal lattice macro"
+        }
+      },
+      "material": [
+        "18 Momme Mulberry Silk Twill"
+      ],
+      "fit": "One Size",
+      "fabricGsm": "18 momme silk",
+      "craftRegion": "Murshidabad, West Bengal",
+      "craftCluster": "Shantiniketan Silk Guild",
+      "handcrafted": true,
+      "artStyleSlug": "mughal-miniature",
+      "characterIds": [
+        "arch-jaal"
+      ]
+    },
+    {
+      "slug": "sashiko-selvedge-denim",
+      "name": "Sashiko Selvedge Denim",
+      "subtitle": "Reinforced where work lives. Aged with patina.",
+      "description": "Raw selvedge denim work pants with sashiko lattices anchoring the high-friction zones \u2014 white cotton thread over deep indigo, built to age.",
+      "categorySlug": "bottoms",
+      "universeSlug": null,
+      "garmentType": "pants",
+      "gender": "unisex",
+      "intensity": "balanced",
+      "craftTechniques": [
+        "sashiko-selvedge"
+      ],
+      "edits": [
+        "everyday",
+        "heritage"
+      ],
+      "isMock": true,
+      "rating": 4.8,
+      "reviewCount": 74,
+      "soldCount": "310+",
+      "featured": false,
+      "tags": [
+        "atelier",
+        "bottoms",
+        "unisex"
+      ],
+      "variants": [
+        {
+          "sku": "SSD-RAW-S",
+          "color": "Raw Indigo",
+          "colorHex": "#1e2a4a",
+          "size": "S",
+          "priceCents": 419900,
           "status": "in-stock",
-          "quantity": 7
+          "quantity": 14
         },
         {
-          "sku": "AJK-EC-XL",
-          "color": "Ecru",
-          "colorHex": "#efe7d8",
-          "size": "XL",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
-          "status": "in-stock",
-          "quantity": 5
-        },
-        {
-          "sku": "AJK-MR-M",
-          "color": "Maroon",
-          "colorHex": "#5c1a24",
+          "sku": "SSD-RAW-M",
+          "color": "Raw Indigo",
+          "colorHex": "#1e2a4a",
           "size": "M",
-          "priceCents": 449900,
-          "compareAtPriceCents": 599900,
+          "priceCents": 419900,
           "status": "in-stock",
-          "quantity": 6
+          "quantity": 14
+        },
+        {
+          "sku": "SSD-RAW-L",
+          "color": "Raw Indigo",
+          "colorHex": "#1e2a4a",
+          "size": "L",
+          "priceCents": 419900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "SSD-RAW-XL",
+          "color": "Raw Indigo",
+          "colorHex": "#1e2a4a",
+          "size": "XL",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "SSD-RAW-2XL",
+          "color": "Raw Indigo",
+          "colorHex": "#1e2a4a",
+          "size": "2XL",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "SSD-WASHED-S",
+          "color": "Washed Carbon",
+          "colorHex": "#3a3a3e",
+          "size": "S",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "SSD-WASHED-M",
+          "color": "Washed Carbon",
+          "colorHex": "#3a3a3e",
+          "size": "M",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "SSD-WASHED-L",
+          "color": "Washed Carbon",
+          "colorHex": "#3a3a3e",
+          "size": "L",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "SSD-WASHED-XL",
+          "color": "Washed Carbon",
+          "colorHex": "#3a3a3e",
+          "size": "XL",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "SSD-WASHED-2XL",
+          "color": "Washed Carbon",
+          "colorHex": "#3a3a3e",
+          "size": "2XL",
+          "priceCents": 419900,
+          "status": "in-stock",
+          "quantity": 9
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
+          "alt": "Sashiko Selvedge Denim \u2014 front"
+        },
+        {
+          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
+          "alt": "Sashiko Selvedge Denim \u2014 lattice macro"
+        }
+      ],
+      "embroidery": {
+        "technique": "sashiko-selvedge",
+        "techniqueLabel": "Sashiko Selvedge",
+        "artisanHours": 18,
+        "placement": [
+          "knees",
+          "pockets",
+          "hem"
+        ],
+        "threadComposition": "Crisp white cotton thread on raw indigo",
+        "motifStory": "Functional geometric needlework that strengthens and signatures the cloth at once.",
+        "macroImage": {
+          "src": "/images/products/sashiko-selvedge-denim-2.jpg",
+          "alt": "Sashiko lattice macro"
+        }
+      },
+      "material": [
+        "14 oz raw selvedge denim",
+        "Copper rivets"
+      ],
+      "fit": "Straight Work Fit",
+      "fabricGsm": "14 oz denim",
+      "craftRegion": "Kutch & Okayama Collaboration",
+      "craftCluster": "Craft Textile Atelier",
+      "handcrafted": true,
+      "artStyleSlug": "atelier-tonal"
+    },
+    {
+      "slug": "crewel-cashmere-cardigan",
+      "name": "Crewel Cashmere Cardigan",
+      "subtitle": "Alpine botanicals in thick wool relief.",
+      "description": "Hand-woven wool cardigan with Kashmiri crewel botanicals in 2-ply natural yarn \u2014 dimensional relief and real insulation in one garment.",
+      "categorySlug": "knitwear",
+      "universeSlug": null,
+      "garmentType": "cardigan",
+      "gender": "women",
+      "intensity": "balanced",
+      "craftTechniques": [
+        "crewel-needlework"
+      ],
+      "edits": [
+        "comfort",
+        "heritage"
+      ],
+      "isMock": true,
+      "rating": 4.9,
+      "reviewCount": 59,
+      "soldCount": "240+",
+      "featured": false,
+      "tags": [
+        "atelier",
+        "outerwear",
+        "women"
+      ],
+      "variants": [
+        {
+          "sku": "CCC-LICHEN-S",
+          "color": "Lichen Sage",
+          "colorHex": "#8a8f7a",
+          "size": "S",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "CCC-LICHEN-M",
+          "color": "Lichen Sage",
+          "colorHex": "#8a8f7a",
+          "size": "M",
+          "priceCents": 469900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "CCC-LICHEN-L",
+          "color": "Lichen Sage",
+          "colorHex": "#8a8f7a",
+          "size": "L",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "CCC-LICHEN-XL",
+          "color": "Lichen Sage",
+          "colorHex": "#8a8f7a",
+          "size": "XL",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "CCC-LICHEN-2XL",
+          "color": "Lichen Sage",
+          "colorHex": "#8a8f7a",
+          "size": "2XL",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "CCC-OAT-S",
+          "color": "Oat Fleece",
+          "colorHex": "#d8cdb6",
+          "size": "S",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "CCC-OAT-M",
+          "color": "Oat Fleece",
+          "colorHex": "#d8cdb6",
+          "size": "M",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "CCC-OAT-L",
+          "color": "Oat Fleece",
+          "colorHex": "#d8cdb6",
+          "size": "L",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "CCC-OAT-XL",
+          "color": "Oat Fleece",
+          "colorHex": "#d8cdb6",
+          "size": "XL",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "CCC-OAT-2XL",
+          "color": "Oat Fleece",
+          "colorHex": "#d8cdb6",
+          "size": "2XL",
+          "priceCents": 469900,
+          "status": "in-stock",
+          "quantity": 9
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/crewel-cashmere-cardigan-1.jpg",
+          "alt": "Crewel Cashmere Cardigan \u2014 front"
+        },
+        {
+          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
+          "alt": "Crewel Cashmere Cardigan \u2014 botanical relief"
+        }
+      ],
+      "embroidery": {
+        "technique": "crewel-needlework",
+        "techniqueLabel": "Kashmiri Crewel",
+        "artisanHours": 22,
+        "placement": [
+          "front plackets",
+          "cuffs"
+        ],
+        "threadComposition": "2-ply natural wool yarn",
+        "motifStory": "Wild flora and alpine botanicals, hooked-loop relief through a fine aari.",
+        "macroImage": {
+          "src": "/images/products/crewel-cashmere-cardigan-2.jpg",
+          "alt": "Crewel botanical macro"
+        }
+      },
+      "material": [
+        "Hand-woven wool shell",
+        "2-ply crewel yarn"
+      ],
+      "fit": "Boxy Cardigan",
+      "fabricGsm": "480 GSM knit",
+      "craftRegion": "Anantnag & Srinagar, Kashmir",
+      "craftCluster": "Valley Aari Craftspersons",
+      "handcrafted": true,
+      "artStyleSlug": "atelier-tonal"
+    },
+    {
+      "slug": "monogram-poplin-shirt",
+      "name": "Monogram Poplin Shirt",
+      "subtitle": "Your initials in precision satin. Nothing louder.",
+      "description": "Supima cotton poplin shirt with a bespoke satin monogram at the cuff \u2014 the atelier\u2019s quietest personalization.",
+      "categorySlug": "tops",
+      "universeSlug": null,
+      "garmentType": "shirt",
+      "gender": "unisex",
+      "intensity": "quiet",
+      "craftTechniques": [
+        "monogram-bespoke"
+      ],
+      "edits": [
+        "everyday",
+        "festive-gifting"
+      ],
+      "isMock": true,
+      "customizable": true,
+      "rating": 4.7,
+      "reviewCount": 45,
+      "soldCount": "190+",
+      "featured": false,
+      "tags": [
+        "atelier",
+        "shirt",
+        "unisex"
+      ],
+      "variants": [
+        {
+          "sku": "MPS-OPTIC-XS",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "XS",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-S",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "S",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-M",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "M",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-L",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "L",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-XL",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "XL",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-2XL",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "2XL",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-OPTIC-3XL",
+          "color": "Optic White",
+          "colorHex": "#f7f6f2",
+          "size": "3XL",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "MPS-PALE-S",
+          "color": "Pale Blue",
+          "colorHex": "#c9d4de",
+          "size": "S",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "MPS-PALE-M",
+          "color": "Pale Blue",
+          "colorHex": "#c9d4de",
+          "size": "M",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "MPS-PALE-L",
+          "color": "Pale Blue",
+          "colorHex": "#c9d4de",
+          "size": "L",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "MPS-PALE-XL",
+          "color": "Pale Blue",
+          "colorHex": "#c9d4de",
+          "size": "XL",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "MPS-PALE-2XL",
+          "color": "Pale Blue",
+          "colorHex": "#c9d4de",
+          "size": "2XL",
+          "priceCents": 259900,
+          "status": "in-stock",
+          "quantity": 9
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/monogram-poplin-shirt-1.jpg",
+          "alt": "Monogram Poplin Shirt \u2014 front"
+        },
+        {
+          "src": "/images/placeholders/product-monogram-poplin-shirt-2.jpg",
+          "alt": "Monogram Poplin Shirt \u2014 cuff monogram"
+        }
+      ],
+      "embroidery": {
+        "technique": "monogram-bespoke",
+        "techniqueLabel": "Bespoke Monogram",
+        "artisanHours": 6,
+        "placement": [
+          "left cuff"
+        ],
+        "threadComposition": "Archival silk floss, 3-letter satin",
+        "motifStory": "Precision satin initials \u2014 patron-chosen thread and placement.",
+        "macroImage": {
+          "src": "/images/placeholders/product-monogram-poplin-shirt-2.jpg",
+          "alt": "Monogram satin macro"
+        }
+      },
+      "material": [
+        "140 GSM Supima Cotton Poplin",
+        "Mother-of-pearl buttons"
+      ],
+      "fit": "Relaxed Classic",
+      "fabricGsm": "140 GSM",
+      "craftRegion": "Jaipur Atelier",
+      "craftCluster": "Pink City Monogram Atelier",
+      "handcrafted": true,
+      "artStyleSlug": "atelier-tonal"
+    },
+    {
+      "slug": "nocturne-velvet-crewel-vest",
+      "name": "Nocturne Velvet Crewel Vest",
+      "subtitle": "Two techniques, one night garden.",
+      "description": "Cotton velvet vest layered with crewel night-blooms and French-knot stars \u2014 an after-hours collector piece, numbered edition.",
+      "categorySlug": "knitwear",
+      "universeSlug": null,
+      "garmentType": "vest",
+      "gender": "unisex",
+      "intensity": "loud",
+      "craftTechniques": [
+        "crewel-needlework",
+        "french-knot"
+      ],
+      "edits": [
+        "statement",
+        "collector"
+      ],
+      "isMock": true,
+      "batchNumber": 7,
+      "batchTotal": 25,
+      "rating": 4.9,
+      "reviewCount": 28,
+      "soldCount": "90+",
+      "featured": false,
+      "tags": [
+        "atelier",
+        "vest",
+        "unisex",
+        "limited"
+      ],
+      "variants": [
+        {
+          "sku": "NVV-NOCTURNE-XS",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "XS",
+          "priceCents": 529900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "NVV-NOCTURNE-S",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "S",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "NVV-NOCTURNE-M",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "M",
+          "priceCents": 529900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "NVV-NOCTURNE-L",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "L",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "NVV-NOCTURNE-XL",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "XL",
+          "priceCents": 529900,
+          "status": "low-stock",
+          "quantity": 2
+        },
+        {
+          "sku": "NVV-NOCTURNE-2XL",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "2XL",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "NVV-NOCTURNE-3XL",
+          "color": "Nocturne Black",
+          "colorHex": "#121214",
+          "size": "3XL",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 14
+        },
+        {
+          "sku": "NVV-DEEP-S",
+          "color": "Deep Oxblood",
+          "colorHex": "#4a1b20",
+          "size": "S",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "NVV-DEEP-M",
+          "color": "Deep Oxblood",
+          "colorHex": "#4a1b20",
+          "size": "M",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "NVV-DEEP-L",
+          "color": "Deep Oxblood",
+          "colorHex": "#4a1b20",
+          "size": "L",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "NVV-DEEP-XL",
+          "color": "Deep Oxblood",
+          "colorHex": "#4a1b20",
+          "size": "XL",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 9
+        },
+        {
+          "sku": "NVV-DEEP-2XL",
+          "color": "Deep Oxblood",
+          "colorHex": "#4a1b20",
+          "size": "2XL",
+          "priceCents": 529900,
+          "status": "in-stock",
+          "quantity": 9
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/products/nocturne-velvet-vest-1.jpg",
+          "alt": "Nocturne Velvet Crewel Vest \u2014 front"
+        },
+        {
+          "src": "/images/products/nocturne-velvet-vest-2.jpg",
+          "alt": "Nocturne Velvet Crewel Vest \u2014 knot stars macro"
+        }
+      ],
+      "embroidery": {
+        "technique": "french-knot",
+        "techniqueLabel": "French Knot",
+        "artisanHours": 26,
+        "placement": [
+          "front panels",
+          "collar"
+        ],
+        "threadComposition": "Wool crewel yarn, silk-knot stars",
+        "motifStory": "Night garden in two hands \u2014 crewel for the blooms, knots for the constellation.",
+        "macroImage": {
+          "src": "/images/products/nocturne-velvet-vest-2.jpg",
+          "alt": "French knot stars macro"
+        }
+      },
+      "material": [
+        "320 GSM Cotton Velvet"
+      ],
+      "fit": "Fitted Vest",
+      "fabricGsm": "320 GSM",
+      "craftRegion": "Srinagar, Kashmir",
+      "craftCluster": "Valley Aari Craftspersons",
+      "handcrafted": true,
+      "artStyleSlug": "atelier-tonal"
+    },
+    {
+      "slug": "heritage-flora-silk-scarf",
+      "name": "Heritage Flora Silk Scarf",
+      "subtitle": "Botanical chain shadow-work on mulberry twill.",
+      "description": "Mulberry silk scarf with Chikankari botanical chain \u2014 shadow-work flowers at 14 hours, heirloom-soft.",
+      "categorySlug": "accessories",
+      "universeSlug": null,
+      "garmentType": "scarf",
+      "gender": "women",
+      "intensity": "quiet",
+      "craftTechniques": [
+        "botanical-chain"
+      ],
+      "edits": [
+        "heritage",
+        "festive-gifting"
+      ],
+      "isMock": true,
+      "rating": 4.8,
+      "reviewCount": 38,
+      "soldCount": "160+",
+      "featured": false,
+      "tags": [
+        "atelier",
+        "accessories",
+        "women"
+      ],
+      "variants": [
+        {
+          "sku": "HFS-OS-ECR",
+          "color": "Ecru Whisper",
+          "colorHex": "#efe9db",
+          "size": "OS",
+          "priceCents": 179900,
+          "status": "in-stock",
+          "quantity": 10
+        },
+        {
+          "sku": "HFS-OS-PRL",
+          "color": "Pearl Blush",
+          "colorHex": "#e9d9d5",
+          "size": "OS",
+          "priceCents": 179900,
+          "status": "low-stock",
+          "quantity": 2
         }
       ],
       "images": [
         {
           "src": "/images/products/embroidered-silk-scarf-1.jpg",
-          "alt": "Arch Jaal Kurta \u2014 Ecru \u2014 front with lattice"
+          "alt": "Heritage Flora Silk Scarf \u2014 drape"
         },
         {
           "src": "/images/products/embroidered-silk-scarf-2.jpg",
-          "alt": "Arch Jaal Kurta \u2014 back view"
-        },
-        {
-          "src": "/images/products/kantha-chore-jacket-1.jpg",
-          "alt": "Arch Jaal Kurta \u2014 lattice stitch macro"
-        },
-        {
-          "src": "/images/products/vine-heavyweight-tee-1.jpg",
-          "alt": "Arch Jaal Kurta \u2014 flat lay"
-        },
-        {
-          "src": "/images/products/sashiko-selvedge-denim-1.jpg",
-          "alt": "Arch Jaal Kurta \u2014 scale on model"
-        },
-        {
-          "src": "/images/categories/knitwear.jpg",
-          "alt": "Arch Jaal Kurta \u2014 lifestyle shot"
+          "alt": "Heritage Flora Silk Scarf \u2014 shadow-work macro"
         }
       ],
-      "featured": false,
       "embroidery": {
-        "technique": "kantha-quilt",
-        "techniqueLabel": "Embroidery",
-        "artisanHours": 34,
+        "technique": "botanical-chain",
+        "techniqueLabel": "Chikankari Chain",
+        "artisanHours": 14,
         "placement": [
-          "front panel",
-          "yoke"
+          "borders",
+          "pallu corners"
         ],
-        "threadComposition": "Handspun cotton thread",
-        "motifStory": "Courtyards of patience \u2014 Mughal geometry as devotion, running stitch by running stitch."
+        "threadComposition": "Unbleached mulberry silk floss",
+        "motifStory": "Fluid florals in shadow-work and chain looping, calibrated tension throughout.",
+        "macroImage": {
+          "src": "/images/products/embroidered-silk-scarf-2.jpg",
+          "alt": "Chikankari shadow macro"
+        }
       },
       "material": [
-        "Handloom mulmul cotton"
+        "18 Momme Mulberry Silk Twill"
       ],
-      "care": [
-        "Gentle machine wash",
-        "Dry in shade"
-      ],
-      "fit": "Relaxed Kurta Fit",
-      "fabricGsm": "120 GSM",
-      "craftRegion": "West Bengal",
-      "craftCluster": "Nakshi collective",
-      "vibes": [
-        "aesthetic",
-        "clean"
-      ],
+      "fit": "One Size",
+      "fabricGsm": "18 momme silk",
+      "craftRegion": "Lucknow, Uttar Pradesh",
+      "craftCluster": "Old City Needlework Collective",
       "handcrafted": true,
-      "moods": [
-        "heritage",
-        "festive-gifting"
-      ]
+      "artStyleSlug": "atelier-tonal"
     }
   ]
 }

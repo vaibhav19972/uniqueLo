@@ -60,7 +60,7 @@ export const Hero: React.FC = () => {
       {/* Background Campaign Visual */}
       <div
         ref={imageRef}
-        className="absolute inset-0 z-0 bg-cover bg-center filter brightness-[0.72] transform will-change-transform"
+        className="absolute inset-0 z-0 bg-cover bg-center filter brightness-[0.72] transform"
         style={{
           backgroundImage: `url('/images/campaigns/hero.jpg')`,
         }}

@@ -66,8 +66,7 @@ UniqueLo/
 │   │   ├── motion.ts           ← shared easings, variants, stagger helpers
 │   │   └── lenis.ts            ← Lenis init + React Router integration
 │   ├── data/
-│   │   ├── mock-products.json  ← canonical storefront catalog (render-mock SKUs)
-│   │   ├── products.json       ← deprecated-retained legacy atelier line (not imported)
+│   │   ├── mock-products.json  ← canonical storefront catalog (5 curated products, local testing set)
 │   │   ├── categories.json
 │   │   ├── universes.json      ← universe roster + theme tokens
 │   │   ├── motifs.json         ← IP-cleared motif lore registry
@@ -143,7 +142,7 @@ Do not bump these without updating this file and re-verifying the build.
 
 - **Backend evolution?** Only replace `src/lib/data.ts` internals. Supabase is the chosen backend (see docs/07); Shopify Storefront API remains a documented *alternative* if out-of-the-box inventory/checkout is ever preferred, but no work is planned against it.
 - **SEO / SSR later?** Components carry over cleanly to Next.js App Router once the routing/data layer is adapted. Do not optimize for SEO now.
-- **Database later?** Supabase is live (Phase 8) — checkout/orders/newsletter writes go to Postgres; bundled `mock-products.json` serves the catalog until the universe-schema migration lands.
+- **Database later?** Supabase is live (Phase 8) — checkout/orders/newsletter writes go to Postgres. The universe schema migrated 2026-10-11 (`95b1193`); the bundled `mock-products.json` still serves the storefront catalog for the mock phase, and `getProducts()` needs the `is_mock` filter before the migrated legacy seed is safe on a mock-phase deploy (see docs/07 §3).
 
 ---
 

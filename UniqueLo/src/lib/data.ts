@@ -2,9 +2,12 @@ import rawCategories from '../data/categories.json';
 import rawMockProducts from '../data/mock-products.json';
 import rawUniverses from '../data/universes.json';
 import rawMotifs from '../data/motifs.json';
-import rawVibes from '../data/vibes.json';
-import rawMoods from '../data/moods.json';
-import { supabase, isSupabaseConfigured } from './supabase';
+import rawEdits from '../data/edits.json';
+import rawIntensity from '../data/intensity.json';
+import rawCraft from '../data/craft-techniques.json';
+import rawArtStyles from '../data/art-styles.json';
+import rawGarments from '../data/garments.json';
+import { supabase, isSupabaseConfigured, shouldUseSupabaseReads } from './supabase';
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 export type Currency = 'INR';
@@ -13,33 +16,61 @@ export type Currency = 'INR';
 export type Gender = 'men' | 'women' | 'unisex';
 
 /**
- * Vibe = presentation-only token modifier (how loud a surface renders).
- * Registry: src/data/vibes.json — one JSON row + one [data-vibe] CSS block
- * per vibe; components never hardcode the list.
+ * ArtStyle = genre art direction (how the world is drawn).
+ * Registry: src/data/art-styles.json — ukiyo-line, anime-pop, comic-noir,
+ * crest-emblem, mughal-miniature, atelier-tonal. One per product.
+ * Distinct from craft technique (how it is stitched).
  */
-export type Vibe = 'aesthetic' | 'clean' | 'minimal' | 'expressive' | 'noir' | 'pearl' | 'gilded';
+export type ArtStyleSlug =
+  | 'ukiyo-line'
+  | 'anime-pop'
+  | 'comic-noir'
+  | 'crest-emblem'
+  | 'mughal-miniature'
+  | 'atelier-tonal';
+
+export interface ArtStyleInfo {
+  slug: ArtStyleSlug;
+  name: string;
+  tagline: string;
+  description: string;
+  /** Universe slugs this style natively belongs to; empty = atelier-wide. */
+  universes: string[];
+  order: number;
+}
+
+export interface GarmentInfo {
+  slug: string;
+  name: string;
+  categorySlug: string;
+  description: string;
+  order: number;
+}
 
 /**
- * Mood = buyer-intent shopping family (why the customer is here).
- * Registry: src/data/moods.json. Products carry 1–3 mood tags; moods are
- * merchandising facets, never render modifiers.
+ * Intensity = how loudly a piece wears its world — the Minimalist↔Expressive
+ * polarity as a shoppable 3-stop axis. Registry: src/data/intensity.json.
  */
-export type MoodSlug = 'everyday' | 'statement' | 'heritage' | 'festive-gifting' | 'comfort' | 'collector';
+export type IntensityLevel = 'quiet' | 'balanced' | 'loud';
 
-export interface VibeInfo {
-  slug: Vibe;
+/**
+ * Edit = curated, shoppable collection (buyer intent promoted to campaigns).
+ * Registry: src/data/edits.json — moods were folded into it.
+ */
+export type EditSlug = 'everyday' | 'statement' | 'heritage' | 'festive-gifting' | 'comfort' | 'collector';
+
+export interface EditInfo {
+  slug: EditSlug;
   title: string;
   tagline: string;
-  /** Featured vibes render as homepage gateway cards; the rest sit behind "More". */
   featured: boolean;
   order: number;
 }
 
-export interface MoodInfo {
-  slug: MoodSlug;
-  title: string;
+export interface IntensityInfo {
+  slug: IntensityLevel;
+  name: string;
   tagline: string;
-  featured: boolean;
   order: number;
 }
 
@@ -101,6 +132,7 @@ export interface ProductImage {
 
 export interface ProductVariant {
   sku: string;
+  /** Fulfillment-only SKU identity — never a shoppable option (no colour picker). */
   color: string;
   colorHex: string;
   size: string;
@@ -139,24 +171,33 @@ export interface Product {
   /** Decorative transliteration shown beside the universe tag (e.g. product-name script). */
   foreignTagline?: string;
   categorySlug: string;
-  /** Universe this product belongs to (exactly one). Extensible — new universes need no code changes. */
+  /** Universe this product belongs to (optional — null = Atelier base line). */
   universeSlug?: string;
-  /** Free-vocabulary garment type facet (hoodie, tee, jacket, cap, tote, lowers…). */
+  /** Garment type facet, registry-driven (src/data/garments.json). */
   garmentType?: string;
   /** Gender facet. `unisex` appears under both Men and Women. */
   gender?: Gender;
-  /** Motif lore link (motifs.json id). */
+  /** Character lore link (motifs.json id — the browsable character). */
   motifId?: string;
+  /** Forward-compat multi-character membership; single-motif rows read as [motifId]. */
+  characterIds?: string[];
+  /** Genre art direction (src/data/art-styles.json). One per product. */
+  artStyleSlug?: ArtStyleSlug;
   /**
-   * Discovery hint for the "Explore by Mood" gateway (counts + entry filtering).
-   * Rendering stays token-driven; this only powers merchandising surfaces.
+   * Intensity stop: how loudly this piece wears its world. Products without
+   * an explicit value read as `balanced` (axis midpoint).
    */
-  vibes?: Vibe[];
+  intensity?: IntensityLevel;
   /**
-   * Buyer-intent mood tags (1–3 per product, from src/data/moods.json).
-   * Powers the "Explore by Mood" gateway + mood facet — never rendering.
+   * Craft techniques on this piece (1+ slugs from craft-techniques.json).
+   * PDP provenance + optional refinement facet — never the primary axis.
    */
-  moods?: MoodSlug[];
+  craftTechniques?: EmbroideryTechnique[];
+  /**
+   * Curated Edit memberships (1–3 slugs from src/data/edits.json).
+   * Powers the Edits gateway + edit facet — never rendering.
+   */
+  edits?: EditSlug[];
   /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
   isMock?: boolean;
   /**
@@ -199,11 +240,13 @@ export type SortKey = 'newest' | 'price-asc' | 'price-desc';
 
 export interface FilterState {
   categorySlug: string | 'all';
-  universeSlug?: string | 'all';
+  universeSlug?: string | 'all' | 'atelier';
   gender?: Gender | 'all';
   garmentTypes?: string[];
-  vibe?: Vibe | 'all';
-  mood?: MoodSlug | 'all';
+  intensity?: IntensityLevel | 'all';
+  characterId?: string | 'all';
+  artStyleSlug?: ArtStyleSlug | 'all';
+  edit?: EditSlug | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
@@ -251,21 +294,47 @@ export interface Review {
 // ─────────────────────────────────────────────────────────────────────
 
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
-// NOTE: src/data/products.json (original 13) is deprecated-retained on disk and no
-// longer imported. The storefront runs on mock-products.json until real SKUs land.
+// NOTE: the old src/data/products.json (original 13) was deleted 2026-10-12.
+// The storefront runs on mock-products.json until real SKUs land.
 const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).products;
 const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
 const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
 
-/** Style-vibe registry (sorted by order). Homepage shows featured; rest behind "More". */
-export const VIBES: VibeInfo[] = ((rawVibes as { vibes: VibeInfo[] }).vibes)
+/** Edits registry (sorted by order) — curated shoppable collections. */
+export const EDITS: EditInfo[] = ((rawEdits as { edits: EditInfo[] }).edits)
   .slice()
   .sort((a, b) => a.order - b.order);
 
-/** Mood registry (sorted by order). Extensible — one JSON row, no code changes. */
-export const MOODS: MoodInfo[] = ((rawMoods as { moods: MoodInfo[] }).moods)
+/** Intensity registry (sorted by order) — the Quiet↔Loud shopping axis. */
+export const INTENSITY_LEVELS: IntensityInfo[] = ((rawIntensity as { intensityLevels: IntensityInfo[] }).intensityLevels)
   .slice()
   .sort((a, b) => a.order - b.order);
+
+/** Effective intensity with the balanced-midpoint default applied. */
+export function getIntensity(p: Product | undefined): IntensityLevel {
+  return p?.intensity ?? 'balanced';
+}
+
+/** Art-style registry (genre art direction — how the world is drawn). */
+export const ART_STYLES: ArtStyleInfo[] = (
+  (rawArtStyles as { artStyles: ArtStyleInfo[] }).artStyles
+)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
+/** Garment registry (merchandise types — what the thing is). */
+export const GARMENTS: GarmentInfo[] = (
+  (rawGarments as { garments: GarmentInfo[] }).garments
+)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
+/** Characters linked to a product (multi-id forward-compat). */
+export function getCharacterIds(p: Product | undefined): string[] {
+  if (!p) return [];
+  if (p.characterIds?.length) return p.characterIds;
+  return p.motifId ? [p.motifId] : [];
+}
 
 const mockReviews: Record<string, Review[]> = {
   // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
@@ -281,18 +350,6 @@ const mockReviews: Record<string, Review[]> = {
       createdAt: '2 weeks ago',
     },
   ],
-  'koi-no-yume-sweatshirt': [
-    {
-      id: 'mock-rev-2',
-      productSlug: 'koi-no-yume-sweatshirt',
-      author: 'Ishita Rao',
-      rating: 5,
-      title: 'Perfect for anime events',
-      comment: 'So many people asked me where I got this from.',
-      verified: true,
-      createdAt: '1 week ago',
-    },
-  ],
 };
 
 // ─────────────────────────────────────────────────────────────────────
@@ -305,16 +362,17 @@ export function resolveImageUrl(src: string): string {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, garment_type, gender, motif_id, character_ids, art_style_slug, intensity, is_mock, handcrafted, craft_techniques, edits, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
-        `);
+        `)
+        .eq('is_mock', true); // legacy migrated rows must never leak to the storefront
 
       if (error) {
         console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
@@ -344,10 +402,16 @@ export async function getProducts(): Promise<Product[]> {
             garmentType: item.garment_type,
             gender: item.gender ?? 'unisex',
             motifId: item.motif_id,
+            characterIds: item.character_ids ?? (item.motif_id ? [item.motif_id] : []),
+            artStyleSlug: item.art_style_slug,
+            intensity: item.intensity ?? 'balanced',
             isMock: item.is_mock ?? false,
             handcrafted: item.handcrafted ?? false,
-            vibes: item.vibes ?? [],
-            moods: item.moods ?? [],
+            craftTechniques: item.craft_techniques ?? [],
+            edits: item.edits ?? [],
+            rating: item.rating,
+            reviewCount: item.review_count,
+            soldCount: item.sold_count,
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,
@@ -405,7 +469,7 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('categories')
@@ -467,7 +531,7 @@ export async function getUniverse(slug: string): Promise<Universe | undefined> {
   return universes.find((u) => u.slug === slug);
 }
 
-/** Only IP-cleared motifs are ever returned. */
+/** Only IP-cleared characters are ever returned (motifs = characters). */
 export async function getMotifsByUniverse(universeSlug: string): Promise<Motif[]> {
   return seedMotifs.filter((m) => m.universe_slug === universeSlug && m.ip_cleared);
 }
@@ -481,6 +545,46 @@ export async function getMotif(id: string | undefined): Promise<Motif | undefine
 export function getMotifSync(id: string | undefined): Motif | undefined {
   if (!id) return undefined;
   return seedMotifs.find((m) => m.id === id && m.ip_cleared);
+}
+
+/** Character aliases — motifs ARE the browsable characters. */
+export const getCharactersByUniverse = getMotifsByUniverse;
+export const getCharacter = getMotif;
+export const getCharacterSync = getMotifSync;
+
+export async function getAllCharacters(): Promise<Motif[]> {
+  return seedMotifs.filter((m) => m.ip_cleared);
+}
+
+export async function getArtStyles(): Promise<ArtStyleInfo[]> {
+  return [...ART_STYLES];
+}
+
+export async function getArtStyle(slug: string): Promise<ArtStyleInfo | undefined> {
+  return ART_STYLES.find((s) => s.slug === slug);
+}
+
+export async function getGarments(): Promise<GarmentInfo[]> {
+  return [...GARMENTS];
+}
+
+export async function getGarment(slug: string): Promise<GarmentInfo | undefined> {
+  return GARMENTS.find((g) => g.slug === slug);
+}
+
+export async function getProductsByCharacter(characterId: string): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => getCharacterIds(p).includes(characterId));
+}
+
+export async function getProductsByArtStyle(styleSlug: string): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => p.artStyleSlug === styleSlug);
+}
+
+export async function getProductsByGarment(garmentSlug: string): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => p.garmentType === garmentSlug);
 }
 
 export async function getProductsByUniverse(universeSlug: string | 'all'): Promise<Product[]> {
@@ -518,19 +622,6 @@ export async function getFeaturedProducts(limit?: number): Promise<Product[]> {
   return typeof limit === 'number' ? featured.slice(0, limit) : featured;
 }
 
-export async function getAllColors(): Promise<{ name: string; hex: string }[]> {
-  const products = await getProducts();
-  const map = new Map<string, string>();
-  for (const product of products) {
-    for (const v of product.variants) {
-      if (!map.has(v.color)) {
-        map.set(v.color, v.colorHex);
-      }
-    }
-  }
-  return Array.from(map.entries()).map(([name, hex]) => ({ name, hex }));
-}
-
 export async function getAllSizes(): Promise<string[]> {
   const products = await getProducts();
   const set = new Set<string>();
@@ -554,8 +645,13 @@ export async function getAllTechniques(): Promise<{ technique: EmbroideryTechniq
   const products = await getProducts();
   const map = new Map<EmbroideryTechnique, string>();
   for (const p of products) {
-    if (p.embroidery) {
-      map.set(p.embroidery.technique, p.embroidery.techniqueLabel);
+    for (const t of p.craftTechniques?.length
+      ? p.craftTechniques
+      : p.embroidery
+        ? [p.embroidery.technique]
+        : []) {
+      const label = CRAFT_TECHNIQUES.find((c) => c.slug === t)?.name ?? p.embroidery?.techniqueLabel;
+      if (label && !map.has(t)) map.set(t, label);
     }
   }
   return Array.from(map.entries()).map(([technique, label]) => ({ technique, label }));
@@ -579,9 +675,12 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       return false;
     }
 
-    // Universe check
-    if (filters.universeSlug && filters.universeSlug !== 'all' && product.universeSlug !== filters.universeSlug) {
-      return false;
+    // Universe check ('atelier' = the neutral base line: universe-null products)
+    if (filters.universeSlug && filters.universeSlug !== 'all') {
+      const inUniverse = filters.universeSlug === 'atelier'
+        ? product.universeSlug == null
+        : product.universeSlug === filters.universeSlug;
+      if (!inUniverse) return false;
     }
 
     // Gender check (`unisex` matches both Men and Women)
@@ -596,25 +695,35 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       }
     }
 
-    // Vibe discovery check
-    if (filters.vibe && filters.vibe !== 'all') {
-      if (!product.vibes || !product.vibes.includes(filters.vibe)) {
-        return false;
-      }
+    // Character check (motif/character own pages)
+    if (filters.characterId && filters.characterId !== 'all') {
+      if (!getCharacterIds(product).includes(filters.characterId)) return false;
     }
 
-    // Mood (buyer-intent) check
-    if (filters.mood && filters.mood !== 'all') {
-      if (!product.moods || !product.moods.includes(filters.mood)) {
-        return false;
-      }
+    // Art-style check (genre art direction)
+    if (filters.artStyleSlug && filters.artStyleSlug !== 'all') {
+      if (product.artStyleSlug !== filters.artStyleSlug) return false;
     }
 
-    // Technique check
+    // Intensity check (products default to the balanced midpoint)
+    if (filters.intensity && filters.intensity !== 'all') {
+      if (getIntensity(product) !== filters.intensity) return false;
+    }
+
+    // Edit (curated collection) check
+    if (filters.edit && filters.edit !== 'all') {
+      if (!product.edits || !product.edits.includes(filters.edit)) return false;
+    }
+
+    // Craft-technique check — matches the craftTechniques[] facet or the
+    // embroidery block, so rows predating the new schema still filter.
     if (filters.techniques && filters.techniques.length > 0) {
-      if (!product.embroidery || !filters.techniques.includes(product.embroidery.technique)) {
-        return false;
-      }
+      const productTechs = product.craftTechniques?.length
+        ? product.craftTechniques
+        : product.embroidery
+          ? [product.embroidery.technique]
+          : [];
+      if (!filters.techniques.some((t) => productTechs.includes(t))) return false;
     }
 
     // Colors check
@@ -643,7 +752,8 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       const matchDesc = product.description.toLowerCase().includes(q);
       const matchTag = product.tags.some((t) => t.toLowerCase().includes(q));
       const matchTech = product.embroidery?.techniqueLabel.toLowerCase().includes(q);
-      if (!matchName && !matchSub && !matchDesc && !matchTag && !matchTech) {
+      const matchStyle = (product.artStyleSlug ?? '').toLowerCase().includes(q);
+      if (!matchName && !matchSub && !matchDesc && !matchTag && !matchTech && !matchStyle) {
         return false;
       }
     }
@@ -695,10 +805,6 @@ export function getDefaultVariant(product: Product): ProductVariant {
   };
 }
 
-export function getSizesForColor(product: Product, color: string): ProductVariant[] {
-  return product.variants.filter((v) => v.color.toLowerCase() === color.toLowerCase());
-}
-
 export function getCartLine(item: CartItem, products: Product[]): CartLine | null {
   const product = products.find((p) => p.slug === item.productSlug);
   if (!product) return null;
@@ -721,7 +827,7 @@ export function getCartLine(item: CartItem, products: Product[]): CartLine | nul
 // ─────────────────────────────────────────────────────────────────────
 
 export async function getReviews(productSlug: string): Promise<Review[]> {
-  if (isSupabaseConfigured() && supabase) {
+  if (shouldUseSupabaseReads() && supabase) {
     try {
       const { data, error } = await supabase
         .from('reviews')
@@ -882,107 +988,7 @@ export interface CraftTechniqueInfo {
   image: string;
 }
 
-export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = [
-  {
-    slug: 'botanical-chain',
-    name: 'Chikankari & Botanical Chain',
-    region: 'Lucknow, Uttar Pradesh',
-    cluster: 'Old City Needlework Collective',
-    artisanPace: '14–20 hours per garment',
-    historicalContext: 'Rooted in 16th-century Awadh patronage, Chikankari combines delicate shadow-work and tight chain looping using unbleached mulberry silk floss.',
-    description: 'Fluid floral and vine geometries stitched with calibrated tension directly onto heavy organic cotton and washed canvas.',
-    stitchType: 'Chain Stitch & Shadow Work',
-    image: '/images/products/botanical-silk-jacket-2.png',
-  },
-  {
-    slug: 'kantha-quilt',
-    name: 'Kantha Running Needlework',
-    region: 'Bolpur & Murshidabad, West Bengal',
-    cluster: 'Shantiniketan Artisan Guild',
-    artisanPace: '20–26 hours per garment',
-    historicalContext: 'Centuries-old Bengali craft where layered handloom and vintage indigo fabrics are reinforced into structural quilts through rhythmic, parallel running stitches.',
-    description: 'Thousands of close-set running stitches that bond multiple fabric layers together, yielding a distinctive crinkled, heirloom drape.',
-    stitchType: 'Running Stitch & Quilt Bond',
-    image: '/images/products/kantha-chore-jacket-2.jpg',
-  },
-  {
-    slug: 'crewel-needlework',
-    name: 'Kashmiri Crewel Needlecraft',
-    region: 'Anantnag & Srinagar, Kashmir',
-    cluster: 'Valley Aari Craftspersons',
-    artisanPace: '18–24 hours per garment',
-    historicalContext: 'Executed using a fine pointed aari hook, Kashmiri crewel work renders wild flora and alpine botanicals in thick 2-ply natural wool yarn.',
-    description: 'Thick, dimensional wool embroidery on Mongolian cashmere and hand-woven wool coats that provides both tactile relief and natural insulation.',
-    stitchType: 'Pointed Aari Hook Chain',
-    image: '/images/products/crewel-cashmere-cardigan-2.png',
-  },
-  {
-    slug: 'satin-stitch',
-    name: 'High-Density Satin Needlecraft',
-    region: 'Varanasi, Uttar Pradesh',
-    cluster: 'Ghat Artisan Weavers',
-    artisanPace: '12–16 hours per garment',
-    historicalContext: 'Originating in classical handloom textile hubs, high-density satin stitching lays long, unbroken loops of mercerized thread edge-to-edge.',
-    description: 'Creates a mirror-like textile sheen and dense color saturation that remains completely flat against the skin without backing irritation.',
-    stitchType: 'Flat Satin Parallel Stitch',
-    image: '/images/products/vine-heavyweight-tee-2.jpg',
-  },
-  {
-    slug: 'sashiko-selvedge',
-    name: 'Sashiko Structural Needlecraft',
-    region: 'Kutch & Okayama Collaboration',
-    cluster: 'Craft Textile Atelier',
-    artisanPace: '16–22 hours per garment',
-    historicalContext: 'Functional geometric needlework developed to reinforce heavy workwear textiles, combining Indian hand-dyeing with Japanese selvedge denim looms.',
-    description: 'Crisp white cotton thread anchored in geometric lattices that strengthen high-friction zones and age with unique patina.',
-    stitchType: 'Structural Geometric Grid',
-    image: '/images/products/sashiko-selvedge-denim-2.jpg',
-  },
-  {
-    slug: 'hand-zardozi',
-    name: 'Hand Zardozi Wirework',
-    region: 'Jaipur, Rajasthan',
-    cluster: 'Pink City Bullion Guild',
-    artisanPace: '28–34 hours per garment',
-    historicalContext: 'Mughal-court gold sewing: coiled bullion wires and French spirals hand-anchored onto wool and silk. The atelier standard for bridal-grade relief.',
-    description: 'Raised metallic relief with gilded wire, built to catch low light without losing tension.',
-    stitchType: 'Anchor Bullion & Metallic Wire',
-    image: '/images/products/celestial-zardozi-coat-2.png',
-  },
-  {
-    slug: 'metallic-zari',
-    name: 'Metallic Zari & Tilla',
-    region: 'Varanasi & Surat',
-    cluster: 'Ghat Zari Weavers Collective',
-    artisanPace: '20–28 hours per garment',
-    historicalContext: 'Silver-gilt zari cords couched with silk core along pleats and borders — temple and court textile lineage adapted to modern tailoring.',
-    description: 'Continuous metallic inlay that holds pleat structure while adding heirloom sheen.',
-    stitchType: 'Couched Metallic Cord',
-    image: '/images/products/pleated-zari-trousers-2.jpg',
-  },
-  {
-    slug: 'french-knot',
-    name: 'French Knot Needlecraft',
-    region: 'Kashmir & Kutch',
-    cluster: 'Highland Knot Artisans',
-    artisanPace: '14–18 hours per garment',
-    historicalContext: 'Hand-wound spiral knots in merino and silk floss — pebble-grain texture that reads as sculpture up close and solid colour at distance.',
-    description: 'Micro-sculpted knots delivering tactile dimension on knitwear and heavyweight jersey.',
-    stitchType: 'Hand-Wound Spiral Knot',
-    image: '/images/products/french-knot-turtleneck-2.jpg',
-  },
-  {
-    slug: 'monogram-bespoke',
-    name: 'Bespoke Monogram & Crest',
-    region: 'Jaipur Atelier',
-    cluster: 'Pink City Monogram Atelier',
-    artisanPace: '6–10 hours per commission',
-    historicalContext: 'Patron-initial satin work and crest embroidery — the atelier personalisation studio for shirts, scarves and heirloom linens.',
-    description: 'Precision satin initials tailored to the patron, with archival thread and placement choice.',
-    stitchType: 'Precision Satin Initial',
-    image: '/images/products/monogram-poplin-shirt-2.jpg',
-  },
-];
+export const CRAFT_TECHNIQUES: CraftTechniqueInfo[] = (rawCraft as unknown as CraftTechniqueInfo[]);
 
 export async function getCraftTechniques(): Promise<CraftTechniqueInfo[]> {
   return [...CRAFT_TECHNIQUES];

@@ -1,8 +1,7 @@
 import React from 'react';
 import { UniverseHero } from '../components/home/UniverseHero';
 import { TrustStrip } from '../components/home/TrustStrip';
-import { VibeGateway } from '../components/home/VibeGateway';
-import { MoodGateway } from '../components/home/MoodGateway';
+import { EditsGateway } from '../components/home/EditsGateway';
 import { UniversePortals } from '../components/home/UniversePortals';
 import { CraftStory } from '../components/home/CraftStory';
 import { Bestsellers } from '../components/home/Bestsellers';
@@ -15,8 +14,7 @@ export const Home: React.FC = () => {
       {/* Render targets 01–07 (new universe system) */}
       <UniverseHero />
       <TrustStrip />
-      <VibeGateway />
-      <MoodGateway />
+      <EditsGateway />
       <UniversePortals />
       <CraftStory />
       <Bestsellers />

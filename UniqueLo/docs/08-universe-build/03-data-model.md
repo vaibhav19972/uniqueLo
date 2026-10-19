@@ -1,6 +1,6 @@
 # 03 — Data Model
 
-> Mirrors `supabase/schema.sql`. Existing tables are quoted verbatim; **§B** proposes the only allowed deltas for the universe build. `src/data/products.json` must stay in parity with seed data until the async migration seam (`07-backend`) is cut over.
+> Mirrors `supabase/schema.sql`. Existing tables are quoted verbatim; **§B** proposes the only allowed deltas for the universe build. `src/data/mock-products.json` is the local catalog of record (the old `products.json` was deleted 2026-10-12).
 
 ## §A — Existing tables (do not redesign)
 
@@ -33,7 +33,7 @@
 2. Prices: integer paise only; `compare_at_price_cents` required when showing a discount; never invent strikethroughs. **All render prices/names/counts are mock seed** (`is_mock`), swappable without UI changes.
 3. Stock: `quantity` is source of truth for clamping; `status` derivation (`0 → out-of-stock`, `≤3 → low-stock`) applies at migration seeding. **Note:** current code stores `status` explicitly (no derivation in `data.ts` — see docs/07 §6); the migration must either implement this derivation in seed/mapping code or revise this rule.
 4. Snapshots: order_items freeze name/price at purchase; later catalog edits must not rewrite history.
-5. Seed parity: any catalog change lands in **both** the active seed file and `seed.sql` until migration. The deprecated `products.json` (original 13) is frozen — no edits, no parity duty.
+5. Seed parity: any catalog change lands in **both** the active seed file and `seed.sql` until migration. (The old local `products.json` was deleted 2026-10-12 — no parity duty remains on it.)
 6. Copy honesty: generic surfaces say "embroidery / threadwork", never "hand-". The `handcrafted` boolean (product-level, default false; Supabase: add column at the backend pass) gates the per-product "Handcrafted" tag on cards + PDP. Mock rule (≥30 embroidery-hours) is a placeholder — re-verify per SKU at cutover.
 
 ## Decisions locked

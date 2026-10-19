@@ -5,10 +5,11 @@ import { useCartStore } from '../stores/cart';
 import { useCustomizerStore } from '../stores/customizer';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
-import { formatPrice, getDefaultVariant, getMotifSync, type ProductVariant, submitReview } from '../lib/data';
+import { formatPrice, getDefaultVariant, getMotifSync, ART_STYLES, type ProductVariant, submitReview } from '../lib/data';
 import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
 import { CtaButton } from '../components/ui/Cta';
+import { useIsThemeV2 } from '../config/theme';
 
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -20,6 +21,7 @@ export const ProductDetail: React.FC = () => {
   const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((state) => state.showToast);
+  const isV2 = useIsThemeV2();
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -165,7 +167,7 @@ export const ProductDetail: React.FC = () => {
     addItem(product.slug, currentVariant.sku, safeQty, undefined, max);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${safeQty}× ${product.name} (${currentVariant.color} / ${currentVariant.size})`,
+      description: `${safeQty}× ${product.name} (size ${currentVariant.size})`,
       type: 'success',
     });
   };
@@ -429,6 +431,28 @@ export const ProductDetail: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Art style + Craft provenance strip */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] uppercase font-sans tracking-widest">
+                  {product.artStyleSlug && (
+                    <span className="inline-flex items-center gap-2 text-ink">
+                      <span className="text-ink-muted font-medium">Style</span>
+                      <span className="font-medium">
+                        {ART_STYLES.find((s) => s.slug === product.artStyleSlug)?.name ??
+                          product.artStyleSlug.replace(/-/g, ' ')}
+                      </span>
+                    </span>
+                  )}
+                  {(product.craftTechniques ?? []).map((t) => (
+                    <Link
+                      key={t}
+                      to={`/atelier/${t}`}
+                      className="border border-stone/70 px-2 py-0.5 hover:border-ink hover:text-accent transition-colors"
+                    >
+                      {t.replace(/-/g, ' ')}
+                    </Link>
+                  ))}
+                </div>
+
                 {/* Quiet Batch Scarcity Marker */}
                 <div className="inline-flex items-center gap-2 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
                   {product.batchNumber != null && product.batchTotal != null && (
@@ -452,7 +476,7 @@ export const ProductDetail: React.FC = () => {
               {/* Price: serif + compare-at + computed %OFF (render 09) */}
               <div className="mt-5 pb-5 border-b border-stone/50">
                 <div className="flex items-baseline gap-3 flex-wrap">
-                  <span className="font-serif text-3xl sm:text-4xl text-ink">
+                  <span className="font-serif text-3xl sm:text-4xl text-ink font-bold">
                     {formatPrice(currentVariant.priceCents)}
                   </span>
                   {currentVariant.compareAtPriceCents &&
@@ -461,13 +485,35 @@ export const ProductDetail: React.FC = () => {
                         <span className="text-base text-ink-muted line-through">
                           {formatPrice(currentVariant.compareAtPriceCents)}
                         </span>
-                        <span className="text-[11px] font-sans bg-gold-deep/10 text-gold-deep px-2 py-0.5">
-                          {discountPct}% OFF
+                        <span
+                          className={`text-[12px] font-sans px-2 py-0.5 rounded ${
+                            isV2
+                              ? 'font-semibold text-emerald-700 bg-emerald-50'
+                              : 'bg-gold-deep/10 text-gold-deep'
+                          }`}
+                        >
+                          {isV2 ? `(${discountPct}% OFF)` : `${discountPct}% OFF`}
                         </span>
                       </>
                     )}
                 </div>
-                <p className="text-[11px] text-ink-muted mt-1 font-light">
+
+                {/* V2 D2C Promo Callout matching bag design system */}
+                {isV2 && (
+                  <div className="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/90 flex items-center justify-between text-xs text-emerald-950 font-sans">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base text-emerald-600">⚡</span>
+                      <span>
+                        Get extra 10% OFF with code <strong className="font-mono font-bold text-emerald-800">HUSTLE10</strong> at checkout
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-semibold bg-emerald-700 text-white px-2 py-0.5 rounded">
+                      APPLY IN BAG
+                    </span>
+                  </div>
+                )}
+
+                <p className="text-[11px] text-ink-muted mt-2 font-light">
                   Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
                 </p>
                 {/* EMI line (render 09) — figure computed from variant price; the
@@ -509,39 +555,7 @@ export const ProductDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* Variant Picker: Colors (dots, render 09) */}
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-sans tracking-widest uppercase text-ink font-medium">
-                    Color: <span className="text-ink-muted font-normal">{currentVariant.color}</span>
-                  </span>
-                </div>
-                <div className="flex gap-3">
-                  {Array.from(new Set(product.variants.map((v) => v.color))).map((color) => {
-                    const variantForColor = product.variants.find((v) => v.color === color);
-                    const isSelected = currentVariant.color === color;
-                    return (
-                      <button
-                        key={color}
-                        onClick={() => variantForColor && setSelectedVariant(variantForColor)}
-                        title={color}
-                        aria-label={`Choose color ${color}`}
-                        aria-pressed={isSelected}
-                        className={`w-11 h-11 rounded-full border-2 transition-all flex items-center justify-center ${
-                          isSelected ? 'border-gold ring-2 ring-gold/30' : 'border-stone hover:border-ink/50'
-                        }`}
-                      >
-                        <span
-                          className="w-7 h-7 rounded-full border border-ink/10"
-                          style={{ backgroundColor: variantForColor?.colorHex }}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Variant Picker: Sizes (India sizes first) */}
+              {/* Variant Picker: Sizes (no colour option — one colour per piece) */}
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-sans tracking-widest uppercase text-ink font-medium">
@@ -556,7 +570,6 @@ export const ProductDetail: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-2.5">
                   {product.variants
-                    .filter((v) => v.color === currentVariant.color)
                     .map((v) => {
                       const isSelected = currentVariant.sku === v.sku;
                       const isOut = v.status === 'out-of-stock';
@@ -646,7 +659,7 @@ export const ProductDetail: React.FC = () => {
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                   </svg>
-                  Free shipping on orders above ₹29,050
+                  {isV2 ? 'Free shipping on orders above ₹500' : 'Free shipping on orders above ₹29,050'}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -1152,7 +1165,7 @@ export const ProductDetail: React.FC = () => {
                   {product.batchNumber != null && product.batchTotal != null
                     ? `Edition ${product.batchNumber}/${product.batchTotal} • `
                     : ''}
-                  {currentVariant.color} / {currentVariant.size}
+                  {currentVariant.size}
                 </span>
               </div>
             </div>

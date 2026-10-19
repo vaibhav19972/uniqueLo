@@ -1,0 +1,67 @@
+{
+  "garments": [
+    {
+      "slug": "hoodie",
+      "name": "Hoodies",
+      "categorySlug": "tops",
+      "description": "Heavyweight fleece hoodies with back-panel and crest embroidery.",
+      "order": 1
+    },
+    {
+      "slug": "tee",
+      "name": "Tees",
+      "categorySlug": "tops",
+      "description": "Combed-cotton tees carrying chest and back threadwork.",
+      "order": 2
+    },
+    {
+      "slug": "shirt",
+      "name": "Shirts",
+      "categorySlug": "tops",
+      "description": "Oxfords, poplins and band-collar tunics with monogram detail.",
+      "order": 3
+    },
+    {
+      "slug": "jacket",
+      "name": "Jackets",
+      "categorySlug": "outerwear",
+      "description": "Chore jackets, capes and overcoats with procession-scale embroidery.",
+      "order": 4
+    },
+    {
+      "slug": "cardigan",
+      "name": "Cardigans",
+      "categorySlug": "knitwear",
+      "description": "Cashmere cardigans with crewel relief.",
+      "order": 5
+    },
+    {
+      "slug": "vest",
+      "name": "Vests",
+      "categorySlug": "knitwear",
+      "description": "Knit vests with sculpted knot texture.",
+      "order": 6
+    },
+    {
+      "slug": "pants",
+      "name": "Pants",
+      "categorySlug": "bottoms",
+      "description": "Selvedge denim and work pants with structural stitching.",
+      "order": 7
+    },
+    {
+      "slug": "scarf",
+      "name": "Scarves",
+      "categorySlug": "accessories",
+      "description": "Silk scarves with arch-jaal and flora borders.",
+      "order": 8
+    },
+    {
+      "slug": "tote",
+      "name": "Totes",
+      "categorySlug": "accessories",
+      "description": "Raw-canvas totes with sun-disc and motif hits.",
+      "order": 9
+    }
+  ]
+}

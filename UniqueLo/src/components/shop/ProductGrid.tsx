@@ -19,7 +19,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
         </div>
         <h3 className="font-serif text-2xl text-ink">No Silhouettes Matched</h3>
         <p className="text-xs text-ink-muted mt-2 font-light leading-relaxed">
-          No items match your active technique, size, or color filters. 
+          No items match your active technique or size filters. 
           Try resetting filters to explore the complete atelier catalogue.
         </p>
         <Button

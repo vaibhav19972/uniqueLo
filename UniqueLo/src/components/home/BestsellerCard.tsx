@@ -5,6 +5,7 @@ import { useCartStore } from '../../stores/cart';
 import { useQuickViewStore } from '../../stores/quickView';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
+import { useIsThemeV2 } from '../../config/theme';
 
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
@@ -21,8 +22,8 @@ function Stars({ rating }: { rating: number }) {
 
 /**
  * Render-05 product card: ribbon, technique tag, fit+GSM, stars, price +
- * compare-at + computed %OFF, color dots, hover Quick-View overlay with
- * size chips + Add to Cart.
+ * compare-at + computed %OFF, hover Quick-View overlay with
+ * size chips + Add to Cart. No colour option — sizes only.
  */
 const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'OS'];
 
@@ -35,6 +36,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const openQuickView = useQuickViewStore((s) => s.openQuickView);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((s) => s.showToast);
+  const isV2 = useIsThemeV2();
 
   const sizes = useMemo(() => {
     const unique = [...new Set(product.variants.map((v) => v.size))];
@@ -46,14 +48,6 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
       if (ib !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [product]);
-
-  const colors = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const v of product.variants) {
-      if (!seen.has(v.color)) seen.set(v.color, v.colorHex);
-    }
-    return [...seen.entries()];
   }, [product]);
 
   const inStockSizes = useMemo(
@@ -89,7 +83,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
     addItem(product.slug, currentVariant.sku, 1, undefined, currentVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${product.name} (${currentVariant.color} / ${currentVariant.size})`,
+      description: `${product.name} (size ${currentVariant.size})`,
       type: 'success',
     });
   };
@@ -139,7 +133,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
               openQuickView(product);
             }}
             aria-label={`Quick view ${product.name}`}
-            className="w-full flex items-center justify-center gap-2 rounded-t-xl bg-[#201c18]/85 hover:bg-[#201c18]/95 backdrop-blur-md text-white py-2 min-h-[34px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-t-xl bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
           >
             <svg className="w-4 h-4 shrink-0 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
@@ -165,10 +159,12 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
                     }}
                     aria-pressed={size === s}
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                    className={`h-8 px-1 text-[12px] sm:text-[13px] font-serif border rounded-[5px] transition-colors flex items-center justify-center ${
+                    className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border rounded-[5px] transition-colors flex items-center justify-center ${
                       size === s
-                        ? 'bg-gold text-on-gold border-transparent font-medium shadow-xs'
-                        : 'bg-white border-[#ded8cf] text-ink hover:border-gold-deep'
+                        ? isV2
+                          ? 'bg-ink text-paper border-transparent font-semibold shadow-xs'
+                          : 'bg-gold text-on-gold border-transparent font-medium shadow-xs'
+                        : 'bg-white border-stone-deep text-ink hover:border-gold-deep'
                     } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
                   >
                     {s}
@@ -179,7 +175,11 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <button
               type="button"
               onClick={handleAdd}
-              className="w-full mt-2 h-[36px] sm:h-[38px] bg-gold text-on-gold rounded-[6px] font-serif text-[13px] sm:text-[14px] hover:bg-gold-hover transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99]"
+              className={`w-full mt-2 min-h-[44px] py-2 rounded-[6px] font-serif text-[13px] sm:text-[14px] transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
+                isV2
+                  ? 'bg-ink text-paper hover:bg-black font-sans font-semibold'
+                  : 'bg-gold text-on-gold hover:bg-gold-hover'
+              }`}
             >
               Add to Cart — {formatPrice(currentVariant.priceCents)}
             </button>
@@ -222,21 +222,22 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           {compareAt && compareAt > defaultVariant.priceCents && (
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
-              <span className="text-[11px] font-sans bg-gold-deep/10 text-gold-deep px-1.5 py-0.5">{offPct}% OFF</span>
+              <span
+                className={`text-[11px] font-sans px-1.5 py-0.5 rounded ${
+                  isV2
+                    ? 'font-semibold text-emerald-700 bg-emerald-50'
+                    : 'bg-gold-deep/10 text-gold-deep'
+                }`}
+              >
+                {isV2 ? `(${offPct}% OFF)` : `${offPct}% OFF`}
+              </span>
             </>
           )}
         </p>
-        {colors.length > 0 && (
-          <div className="flex items-center gap-2 mt-2.5" aria-label="Available colors">
-            {colors.map(([name, hex]) => (
-              <span
-                key={name}
-                title={name}
-                className="w-5 h-5 rounded-full border border-ink/20"
-                style={{ backgroundColor: hex }}
-              />
-            ))}
-          </div>
+        {product.artStyleSlug && (
+          <p className="text-[11px] uppercase tracking-widest text-ink-muted mt-2">
+            {product.artStyleSlug.replace(/-/g, ' ')}
+          </p>
         )}
       </div>
     </div>

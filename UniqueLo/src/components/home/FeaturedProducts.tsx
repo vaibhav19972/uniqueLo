@@ -72,7 +72,7 @@ export const FeaturedProducts: React.FC = () => {
         {/* Scroll Track */}
         <div
           ref={trackRef}
-          className="flex gap-6 sm:gap-8 px-4 sm:px-6 lg:px-12 w-max will-change-transform"
+          className="flex gap-6 sm:gap-8 px-4 sm:px-6 lg:px-12 w-max"
         >
           {(featured ?? []).map((product: Product) => {
             const defaultVariant = getDefaultVariant(product);
@@ -102,7 +102,7 @@ export const FeaturedProducts: React.FC = () => {
                         aspectRatio="3/4"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-3 left-3 bg-ink/80 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
+                      <div className="absolute top-3 left-3 bg-ink/80 text-cream px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
                         ✦ 3x Macro Stitch
                       </div>
                     </div>
@@ -110,7 +110,7 @@ export const FeaturedProducts: React.FC = () => {
 
                   {/* Craft Technique Tag */}
                   {product.embroidery && (
-                    <div className="absolute bottom-3 left-3 bg-cream/90 text-ink backdrop-blur-md px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80">
+                    <div className="absolute bottom-3 left-3 bg-cream/90 text-ink px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80">
                       {product.embroidery.techniqueLabel}
                     </div>
                   )}

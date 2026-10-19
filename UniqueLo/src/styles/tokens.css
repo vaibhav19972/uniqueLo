@@ -24,6 +24,17 @@
    --color-error:           #c9372d;
    --color-success:         #2f6b3a;
 
+   /* Universe identity (portal stickers/rings/glows render on neutral
+      ground outside [data-universe] scopes, so these are base tokens) */
+   --color-anime-deep:      #7a1f23; /* torii sakura-maroon */
+   --color-hero-crimson:    #c0392b; /* heroverse issue-red */
+   --color-itihaas-bronze:  #5d3a1a; /* darbar arch bronze */
+   --color-champagne:       #d4af37; /* heroverse sticker text */
+   --color-ivory:           #f6efe3; /* itihaas sticker text */
+   /* Warm overlay + deep border companions */
+   --color-coal-glass:      #201c18; /* smoky quick-view tab */
+   --color-stone-deep:      #ded8cf; /* size-chip border */
+
    /* ─────────────────────────────────────
       Typography
       ───────────────────────────────────── */
@@ -120,3 +131,55 @@
    --z-modal:    400;
    --z-toast:    500;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   v2 Design System Tokens — Extracted from sketches/design system.png
+   Modern D2C Streetwear & Gokwik-Style Cart Bag aesthetic:
+   • Cool slate canvas ground (#f0f2f5)
+   • Crisp paper white (#ffffff)
+   • Deep onyx text (#111827)
+   • Cool muted text (#6b7280)
+   • Emerald savings green (#059669) & Mint surface (#e6f7ef)
+   • High-contrast onyx buttons & progress tracks (#111111)
+   • Neo-grotesque sans-serif typography across all headings & body
+   ───────────────────────────────────────────────────────────────────────────── */
+:root[data-theme="v2"], [data-theme="v2"], html.theme-v2 {
+   --color-cream:           #f0f2f5; /* cool slate canvas ground */
+   --color-paper:           #ffffff; /* crisp white cards & surfaces */
+   --color-ink:             #111827; /* deep onyx / true charcoal black */
+   --color-ink-muted:       #6b7280; /* cool muted slate */
+   --color-stone:           #e5e7eb; /* clean hairline border */
+   --color-warm-gray:       #9ca3af; /* placeholder & strikethrough price */
+
+   /* Savings & Discount Green Accents */
+   --color-accent:          #059669; /* emerald green savings accent */
+   --color-accent-hover:    #047857;
+   --color-accent-light:    #e6f7ef; /* mint discount badge surface */
+   --color-accent-border:   #a7f3d0;
+
+   --color-saffron:         #111827;
+   --color-gold-zari:       #059669; /* remapped to emerald for discount tags */
+   --color-pistachio:       #059669;
+   --color-pistachio-light: #e6f7ef;
+   --color-blush:           #f3f4f6;
+   --color-parchment:       #f9fafb;
+
+   --brand-gold:            #111111;
+   --brand-gold-hover:      #262626;
+   --brand-gold-deep:       #059669;
+   --on-gold:               #ffffff;
+   --brand-coal:            #111111;
+   --brand-coal-soft:       #1f2937;
+
+   /* Typography: Full Neo-Grotesque Sans-Serif */
+   --font-sans:  'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+   --font-serif: 'Satoshi', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+   /* Modern rounded card radius */
+   --radius-sm:   0.25rem;  /* 4px */
+   --radius-md:   0.5rem;   /* 8px */
+   --radius-lg:   0.75rem;  /* 12px */
+   --radius-xl:   1rem;     /* 16px */
+   --radius-2xl:  1.25rem;  /* 20px */
+}
+

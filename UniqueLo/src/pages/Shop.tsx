@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
-import { filterProducts } from '../lib/data';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router';
+import { filterProducts, type ArtStyleSlug, type EditSlug } from '../lib/data';
 import { useProducts, useCategories } from '../hooks/useCatalog';
 import { useFiltersStore } from '../stores/filters';
 import { CategoryTabs } from '../components/shop/CategoryTabs';
@@ -9,8 +10,10 @@ import { ProductGrid } from '../components/shop/ProductGrid';
 function CatalogState({ message, detail }: { message: string; detail?: string }) {
   return (
     <div className="py-24 text-center max-w-md mx-auto px-4">
-      <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center text-stone text-xl mb-4">
-        ✦
+      <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center mb-4 text-ink-muted" aria-hidden="true">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" />
+        </svg>
       </div>
       <h3 className="font-serif text-2xl text-ink">{message}</h3>
       {detail && (
@@ -24,6 +27,27 @@ export const Shop: React.FC = () => {
   const { data: allProducts, isPending, isError, error } = useProducts();
   const { data: categories } = useCategories();
   const filters = useFiltersStore((state) => state.filters);
+  const [searchParams] = useSearchParams();
+  const lastSearchRef = useRef<string | null>(null);
+
+  // Door deep-links: /shop?universe=x&character=y&style=z&garment=w&edit=e
+  useEffect(() => {
+    const currentSearch = searchParams.toString();
+    if (lastSearchRef.current === currentSearch) return;
+    lastSearchRef.current = currentSearch;
+
+    const s = useFiltersStore.getState();
+    const universe = searchParams.get('universe');
+    const character = searchParams.get('character');
+    const style = searchParams.get('style');
+    const garment = searchParams.get('garment');
+    const edit = searchParams.get('edit');
+    if (universe) s.setUniverse(universe);
+    if (character) s.setCharacter(character);
+    if (style) s.setArtStyle(style as ArtStyleSlug);
+    if (garment) s.setGarmentTypes([garment]);
+    if (edit) s.setEdit(edit as EditSlug);
+  }, [searchParams]);
 
   const currentCategory = useMemo(() => {
     if (!categories || filters.categorySlug === 'all') return null;

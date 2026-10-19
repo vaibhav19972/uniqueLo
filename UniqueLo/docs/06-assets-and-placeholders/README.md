@@ -53,19 +53,20 @@ Example:
 - Placeholder: `public/images/placeholders/product-cashmere-robe-coat-1.jpg`
 - Real asset: `public/images/products/cashmere-robe-coat-1.jpg`
 
-Update the image `src` in `src/data/mock-products.json` (the canonical catalog;
-`products.json` is frozen — do not point it at new assets) to the real path once it exists. Until then, point `src` to the placeholder.
+Update the image `src` in `src/data/mock-products.json` (the canonical catalog)
+to the real path once it exists. Until then, point `src` to the placeholder.
 
-**Current state (2026-10-11):** the storefront catalog is
-`src/data/mock-products.json` (14 render-mock SKUs; `isMock: true`). Its image
-`src` paths point at real files in `public/images/products/`,
-`public/images/categories/`, and `public/images/placeholders/` — tonal
-placeholder blocks generated per §4 (all 26 referenced paths verified on
-disk, 2026-10-11). Mock SKUs **reuse** imagery from the legacy atelier line
-(e.g. `sakura-ronin-hoodie` renders with `vine-heavyweight-tee-*` files) —
-every mock product will need dedicated `product-<slug>-{1,2}.jpg` pairs at
-the P5 campaign shoot. The deprecated `src/data/products.json` (13 atelier
-SKUs) keeps its dedicated pairs below.
+**Current state (2026-10-12):** the storefront catalog is
+`src/data/mock-products.json` (5 curated products, 31 variants;
+`isMock: true`). Its image `src` paths point at real files in
+`public/images/products/`, `public/images/categories/`, and
+`public/images/placeholders/` (all referenced paths verified on disk,
+2026-10-12). `sakura-ronin-hoodie` is fully dedicated (v1 spec-board crop);
+the other 4 SKUs **reuse** atelier files plus category/placeholder frames
+until their dedicated boards land. The old `src/data/products.json` (13
+atelier SKUs) was deleted as stale — 24 unreferenced files in
+`public/images/products/` went with it. Placeholders, category tiles, and
+campaign frames stay in the repo by intent (owner-updated).
 
 ---
 
@@ -106,68 +107,50 @@ A hero placeholder is a 1920×1080 image:
 
 Use this table to track real assets as they arrive. Update it when a file is swapped.
 
-> **Two catalogs, two registries (2026-10-11).** The **storefront** registry is
-> derived from `src/data/mock-products.json` (14 render-mock SKUs) — those SKUs
-> currently *reuse* files from the legacy atelier set below, so they are listed
-> with their effective file pairs, pending dedicated shoots. The **legacy**
-> registry covers the deprecated `products.json` 13-SKU atelier line (dedicated
-> pairs on disk, non-serving). The JSON files are the source of truth for
-> which images each catalog references — never regenerate this table from
-> folder listings.
+> **Curated catalog (2026-10-12).** The **storefront** registry is derived
+> from `src/data/mock-products.json` (5 curated products, 31 variants) — SKUs
+> not yet re-shot *reuse* atelier files plus category/placeholder frames, so
+> they are listed with their effective 6-image sets, pending dedicated shoots
+> via the All-in-One spec-board intake. The local `products.json` 13-SKU line
+> was deleted as stale; its DB-side record lives on in `supabase/seed.sql`.
+> The JSON file is the source of truth for which images the catalog references
+> — never regenerate this table from folder listings.
 
-### Storefront (mock-products.json — 14 SKUs, image pairs borrowed from atelier assets)
+### Storefront (mock-products.json — 5 SKUs; Sakura dedicated, rest borrowed)
 
-| Universe | Product (slug) | Effective image pair | Dedicated assets? |
+| Universe | Product (slug) | Effective image set | Dedicated assets? |
 |---|---|---|---|
-| Animeverse | sakura-ronin-hoodie | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | roaring-spirit-tee | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | koi-no-yume-sweatshirt | `crewel-cashmere-cardigan-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | oni-spirit-jacket | `nocturne-velvet-vest-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | tsuki-crane-sweatshirt | `embroidered-silk-scarf-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | koi-no-yume-tee | `pleated-zari-trousers-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | tech-cargo-pants | `pleated-zari-trousers-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | samurai-cap | `monogram-poplin-shirt-{1,2}.jpg` | ❌ pending shoot |
-| Animeverse | red-sun-tote | `needlework-canvas-tote-{1,2}.jpg` | ❌ pending shoot |
-| Heroverse | ascendant-hoodie | `vine-heavyweight-tee-{1,2}.jpg` | ❌ pending shoot |
-| Heroverse | guardian-stripe-tee | `sashiko-selvedge-denim-{1,2}.jpg` | ❌ pending shoot |
-| Heroverse | herald-cape-jacket | `botanical-silk-jacket-{1,2}.jpg` | ❌ pending shoot |
-| Itihaas | royal-procession-jacket | `kantha-chore-jacket-{1,2}.jpg` | ❌ pending shoot |
-| Itihaas | arch-jaal-kurta | `french-knot-turtleneck-{1,2}.jpg` | ❌ pending shoot |
+| Animeverse | sakura-ronin-hoodie | `sakura-ronin-hoodie-{1..6}.jpg` (cropped from v1 spec board, 2026-10-12) | ✅ dedicated |
+| Animeverse | roaring-spirit-tee | sashiko-denim-2, french-knot-1, crewel-cardigan-1, nocturne-vest-1, monogram-shirt-1 + hero placeholder | ❌ pending shoot |
+| Heroverse | ascendant-hoodie | french-knot-{1,2}, crewel-cardigan-2, kantha-jacket-1, sashiko-denim-1 + outerwear category frame | ❌ pending shoot |
+| Heroverse | herald-cape-jacket | nocturne-vest-2, kantha-jacket-2, pleated-trousers-2, scarf-2, crewel-cardigan-1 + outerwear category frame | ❌ pending shoot |
+| Itihaas | royal-procession-jacket | kantha-jacket-2, pleated-trousers-1, scarf-1, vine-tee-1, sashiko-denim-1 + knitwear category frame | ❌ pending shoot |
 
-*(Effective pairs above were derived from `mock-products.json` on 2026-10-11;
-several SKUs cycle through more than two borrowed images. Verify against the
-JSON before relying on this snapshot.)*
+*(Effective sets above were derived from `mock-products.json` on 2026-10-12.
+Verify against the JSON before relying on this snapshot.)*
 
-### Legacy atelier line (products.json — deprecated, non-serving)
+### Retired atelier files (deleted 2026-10-12)
 
-| Type | Slug / Name | Current Path | Status |
-|------|-------------|--------------|--------|
-| Hero | home-hero | `/images/campaigns/hero.jpg` | placeholder |
-| Category | outerwear / knitwear / tops / bottoms / accessories | `/images/categories/<slug>.jpg` | placeholder |
-| Product | botanical-silk-embroidered-jacket | `/images/products/botanical-silk-jacket-{1,2}.jpg` | placeholder |
-| Product | celestial-zardozi-wool-coat | `/images/products/celestial-zardozi-coat-{1,2}.jpg` | placeholder |
-| Product | kantha-quilted-chore-jacket | `/images/products/kantha-chore-jacket-{1,2}.jpg` | placeholder |
-| Product | flora-crewel-cashmere-cardigan | `/images/products/crewel-cashmere-cardigan-{1,2}.jpg` | placeholder |
-| Product | french-knot-merino-turtleneck | `/images/products/french-knot-turtleneck-{1,2}.jpg` | placeholder |
-| Product | atelier-monogram-poplin-shirt | `/images/products/monogram-poplin-shirt-{1,2}.jpg` | placeholder |
-| Product | vine-embroidered-heavyweight-tee | `/images/products/vine-heavyweight-tee-{1,2}.jpg` | placeholder |
-| Product | selvedge-sashiko-embroidered-denim | `/images/products/sashiko-selvedge-denim-{1,2}.jpg` | placeholder |
-| Product | pleated-silk-zari-wool-trousers | `/images/products/pleated-zari-trousers-{1,2}.jpg` | placeholder |
-| Product | heritage-flora-embroidered-silk-scarf | `/images/products/embroidered-silk-scarf-{1,2}.jpg` | placeholder |
-| Product | artisanal-needlework-canvas-tote | `/images/products/needlework-canvas-tote-{1,2}.jpg` | placeholder |
-| Product | nocturne-velvet-crewel-vest | `/images/products/nocturne-velvet-vest-{1,2}.jpg` | placeholder |
-| Editorial | atelier-craft | `/images/campaigns/atelier-craft.jpg` | placeholder |
-| Editorial | editorial-split | `/images/campaigns/editorial-split.jpg` | placeholder |
-| Lookbook | lookbook 01–03 | `/images/campaigns/lookbook-0{1,2,3}.jpg` | placeholder |
+24 unreferenced files were removed from `public/images/products/` after an
+assert-checked sweep (every deletion verified absent from the kept catalog):
+junk-named captures (`112.jpg`, `1322.jpg`, `14.jpg`, `2123.jpg`, `54254.jpg`,
+`Cream-01/02.png`, `botanical1/2.jpg`), oversized `.png` twins, and orphaned
+pairs (`botanical-*`, `celestial-*`, `needlework-canvas-tote-*`,
+`monogram-poplin-shirt-2.jpg`, `vine-heavyweight-tee-2.jpg`). Remaining
+atelier files are all referenced by the kept 5 SKUs and are replaced as
+dedicated boards land — never delete a file still listed in the table above
+without updating the JSON first.
 
-> All storefront-referenced paths verified to exist on disk (2026-10-11 check:
-> 26 unique paths across `mock-products.json`, 0 missing).
+### Placeholders, categories, campaigns (kept in repo by intent)
 
-> **Cleanup candidates (do not delete without a grep):** unused oversized
-> `.png` twins in `public/images/products/` (~0.2–2.7MB each) and junk-named
-> files (`112.jpg`, `1322.jpg`, `14.jpg`, `2123.jpg`, `54254.jpg`,
-> `Cream-01/02.png`, `botanical1/2.jpg`). Grep `src/` and `docs/` for each
-> filename before removal.
+| Type | Path | Status |
+|------|------|--------|
+| Hero / placeholders | `/images/placeholders/*` | placeholder — kept, owner-updated |
+| Category | `/images/categories/<slug>.jpg` (5) | placeholder — kept, owner-updated |
+| Campaigns / lookbook / editorial | `/images/campaigns/*` (hero, universe heroes, lookbook 01–03, editorial) | placeholder — kept, owner-updated |
+
+> All storefront-referenced paths verified to exist on disk (2026-10-12 check:
+> 5 products, 0 missing).
 
 ---
 
@@ -216,7 +199,7 @@ Do not use "placeholder" or "image" as alt text.
 - [ ] `public/images/placeholders/` folder exists.
 - [ ] At least one hero placeholder exists.
 - [ ] At least one placeholder per category exists.
-- [ ] At least 2 placeholder images per product exist (default + hover).
-- [ ] All image `src` paths in `products.json` and `categories.json` resolve to an existing file.
+- [ ] At least 6 images per product exist (slots 0–5 per the 6-slot contract).
+- [ ] All image `src` paths in `mock-products.json` and `categories.json` resolve to an existing file.
 - [ ] Alt text is provided for every image.
 
