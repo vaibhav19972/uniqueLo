@@ -6,13 +6,14 @@ import { CartDrawer } from '../components/layout/CartDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { ToastContainer } from '../components/ui/Toast';
+import { useIsThemeV2 } from '../config/theme';
 
 /**
- * Unified site theme: The Atelier quiet-luxury design system now applies
- * uniformly across the entire site including universes. Chrome (header/footer)
- * and content surfaces maintain constant elevated luxury.
+ * Unified site layout supporting both v1 (The Atelier) and v2 (Modern D2C Streetwear
+ * with exact Gokwik-style cart bag from sketches/design system.png) via USE_THEME_V2.
  */
 export const Layout: React.FC = () => {
+  useIsThemeV2();
 
   return (
     <div className="min-h-screen flex flex-col bg-cream text-ink selection:bg-accent/20 selection:text-ink">

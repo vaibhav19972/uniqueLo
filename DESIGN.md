@@ -195,3 +195,66 @@ Square-edged editorial boxes (0–2px radius) for cards and images; fully-round 
 - **Don't** fabricate scarcity, ratings, or provenance — every number renders strictly from catalog data or not at all.
 - **Don't** add Google Fonts or icon-font/emoji icons — self-hosted faces and drawn SVGs only.
 - **Don't** let universe theming leak into checkout/account surfaces (neutral by construction).
+
+---
+
+# Design System v2: Modern D2C Streetwear & Gokwik Bag
+
+A complete modernization of UniqueLo's frontend inspired by contemporary D2C streetwear interfaces and the Gokwik-style interactive checkout bag documented in `sketches/design system.png`.
+
+## Toggle Architecture & Feature Flag
+
+The design system v2 is controlled by a single top-level flag in `src/config/theme.ts`:
+
+```typescript
+// src/config/theme.ts
+export const USE_THEME_V2 = true; // Toggle between false (v1: The Atelier) and true (v2: Modern D2C Streetwear)
+```
+
+The system automatically synchronizes:
+1. `html[data-theme="v2"]` attribute and `.theme-v2` CSS class on `document.documentElement`.
+2. Responsive CSS token remappings in `src/styles/tokens.css`.
+3. Global typography adaptation in `src/styles/globals.css` (remapping all `.font-serif` to `var(--font-sans)` for crisp neo-grotesque readability).
+4. Dual-mode React component implementations across Navigation, Cart Bag, Hero, Portals, and PDP.
+
+## Color Tokens (v2)
+
+| Token Name | Value | Purpose |
+| :--- | :--- | :--- |
+| `--color-canvas-slate` | `#f0f2f5` | Cool architectural slate canvas background |
+| `--color-card-pure` | `#ffffff` | Crisp high-contrast surface for cards and drawer |
+| `--color-ink-deep` | `#111827` | High-contrast deep obsidian text and CTA background |
+| `--color-emerald-accent` | `#059669` | Primary discount badges, savings counters, and coupon tags |
+| `--color-emerald-surface` | `#e6f7ef` | Soft mint backgrounds for applied coupons and milestone bars |
+| `--color-border-hairline` | `#e5e7eb` | Subtle neutral dividers and borders |
+| `--color-stepper-bg` | `#f3f4f6` | Quantity stepper background matching the design system |
+| `--color-gokwik-checkout` | `#111827` | Sticky instant checkout bar with payment icons |
+
+## Typography (v2)
+- **Primary & Display Voice:** Neo-Grotesque Sans-Serif (`Satoshi` / `Inter`, system fallback).
+- Headings: Bold, tight letter-spacing (`-0.02em`), uppercase labels (`tracking-widest`).
+- Body: 14–16px crisp sans with 1.5 line height.
+
+## The Cart Bag (Exact Match to `sketches/design system.png`)
+
+When `USE_THEME_V2 = true`, clicking the Bag trigger opens the Gokwik-style cart drawer with:
+1. **Top Announcement Bar:** Black strip (`#111827`) with `⚡ Get 10% off with code HUSTLE10`.
+2. **Multi-Milestone Discount Tracker:**
+   - Milestone 1: ₹500 (Unlocks 10% OFF + Free Shipping)
+   - Milestone 2: ₹5,999 (Unlocks 15% OFF)
+   - Milestone 3: ₹9,999 (Unlocks 20% OFF)
+   - Real-time animated progress bar (`bg-emerald-600`) with dynamic callout (`Add ₹X more to get...`).
+3. **Product Line Items:**
+   - 3:4 tall aspect-ratio image thumbnail.
+   - Garment title and quick size dropdown selector (`[ M ⌄ ]`) allowing in-cart variant switching.
+   - Price row: Bold black price + strikethrough original price + bold emerald `(XX% OFF)` tag.
+   - Pill stepper (`#f3f4f6`) with trash can delete icon when quantity is 1.
+4. **Coupons & Offers Card:**
+   - Clean dashed voucher pill with quick-apply `HUSTLE10` button.
+   - Interactive slide-over offers modal previewing all 12 platform promotions (`HUSTLE10`, `GOBONKERS15`, `BONKERS20`, `PREPAID5`, `FREESHIP`, etc.).
+5. **Cross-Sell Drawer:** "You may also like..." curated add-on garment carousel with single-click quick add.
+6. **Floating Savings Banner:** Sticky emerald ribbon displaying `You are saving ₹X on this order!`.
+7. **Instant Checkout Bar:**
+   - Full-width black button with total payable price and arrow.
+   - Subtext: *100% Verified Order • Instant Checkout*.
+   - Accepted payment trust badges: UPI (GPay/PhonePe), Visa, Mastercard, Netbanking, COD.

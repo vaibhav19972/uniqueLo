@@ -33,10 +33,10 @@ export const UniversePortals: React.FC = () => {
     [products],
   );
 
-  const enterAtelier = () => {
+  const enterAtelier = React.useCallback(() => {
     setUniverse('atelier');
     navigate('/shop');
-  };
+  }, [setUniverse, navigate]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -69,7 +69,7 @@ export const UniversePortals: React.FC = () => {
     });
 
     return list;
-  }, [universes, counts, atelierCount]);
+  }, [universes, counts, atelierCount, enterAtelier]);
 
   return (
     <section aria-labelledby="universes-heading" className="relative overflow-hidden bg-cream py-16 lg:py-24">

@@ -1,17 +1,55 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
+import { useIsThemeV2 } from '../../config/theme';
 
 /**
- * Render target 01: gold announcement bar (chatgpt-v2).
- * Serif, sentence case, three zones separated by hairline dividers.
- * Left: shipping promise · Center: origin line · Right: first-order offer.
- * Copy rule: "embroidery", never "hand-embroidery" — handcraft claims are
- * per-product only (Product.handcrafted flag).
+ * Announcement bar with dual-mode support:
+ * - v1: The Atelier gold bar with quiet luxury craftsmanship copy.
+ * - v2: High-contrast D2C streetwear banner matching sketches/design system.png
+ *       (HUSTLE10 promo, ₹500 free shipping threshold, express UPI/COD).
  */
 export const AnnouncementBar: React.FC = () => {
   const [isDismissed, setIsDismissed] = useState(false);
+  const isV2 = useIsThemeV2();
 
   if (isDismissed) return null;
+
+  if (isV2) {
+    return (
+      <div className="relative z-[210] bg-ink text-white text-[12px] sm:text-[13px] font-sans border-b border-stone/20">
+        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-2 flex items-center justify-center gap-3 sm:gap-6 lg:justify-between">
+          {/* Left: Free shipping promise */}
+          <div className="flex items-center gap-2 text-white/90">
+            <span className="text-emerald-400 font-bold">⚡</span>
+            <span className="font-medium">Free Shipping on orders above ₹500</span>
+          </div>
+
+          {/* Center: Promo code pill */}
+          <div className="hidden md:flex items-center gap-2">
+            <span className="text-white/80">Get 10% OFF on your order with code</span>
+            <span className="inline-flex items-center gap-1 font-mono font-bold px-2 py-0.5 rounded bg-white/10 text-emerald-400 border border-emerald-500/30 text-xs tracking-wider">
+              HUSTLE10
+            </span>
+          </div>
+
+          {/* Right: Payment modes */}
+          <div className="hidden sm:flex items-center gap-3 text-white/75 text-xs">
+            <span>COD Available</span>
+            <span className="text-white/30">|</span>
+            <span>Express UPI & Cards</span>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsDismissed(true)}
+          aria-label="Dismiss announcement"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white/60 hover:text-white transition-colors"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div

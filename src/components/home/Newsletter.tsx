@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { subscribeNewsletter } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
 import { CtaButton } from '../ui/Cta';
+import { useIsThemeV2 } from '../../config/theme';
 
 /**
  * Render target 07 (top): Join the Atelier List (chatgpt-v2).
@@ -34,6 +35,7 @@ export const Newsletter: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const showToast = useToastStore((s) => s.showToast);
+  const isV2 = useIsThemeV2();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,21 +59,21 @@ export const Newsletter: React.FC = () => {
         {/* Copy + form */}
         <div>
           <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
-            Join the Atelier List
+            {isV2 ? 'Insider Access' : 'Join the Atelier List'}
           </p>
           <h2
             id="nl-heading"
             className="font-serif font-medium text-ink mt-3 leading-display tracking-tight text-4xl sm:text-5xl"
           >
-            Get 10% Off Your First Universe Order.
+            {isV2 ? 'Get 10% Off Your First Drop.' : 'Get 10% Off Your First Universe Order.'}
           </h2>
           <p className="font-serif text-lg text-ink-muted mt-4 max-w-md">
             Early access to new drops, behind-the-scenes craft stories and members-only offers.
           </p>
 
           {isSubmitted ? (
-            <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink">
-              <svg className="w-5 h-5 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink rounded-xl">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
               </svg>
               You are on the List. Your 10% welcome code is on its way.
@@ -98,11 +100,17 @@ export const Newsletter: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
+                  className={`w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] ${
+                    isV2 ? 'rounded-xl' : 'rounded-sm'
+                  }`}
                 />
               </div>
-              <CtaButton type="submit" disabled={isLoading} className="disabled:opacity-60 px-6">
-                {isLoading ? 'Joining…' : 'Join the Atelier List'} <span aria-hidden="true">→</span>
+              <CtaButton
+                type="submit"
+                disabled={isLoading}
+                className={`disabled:opacity-60 px-6 ${isV2 ? 'rounded-xl' : ''}`}
+              >
+                {isLoading ? 'Joining…' : isV2 ? 'Get 10% Off' : 'Join the Atelier List'} <span aria-hidden="true">→</span>
               </CtaButton>
             </form>
           )}
