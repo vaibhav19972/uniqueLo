@@ -4,20 +4,22 @@ import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useFiltersStore } from '../../stores/filters';
 import { useToastStore } from '../../stores/toast';
-import { useUniverses } from '../../hooks/useCatalog';
+import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalog';
 import { prefersReducedMotion } from '../../lib/motion';
 import { AnnouncementBar } from './AnnouncementBar';
 
+type NavMenuKey = 'worlds' | 'expression' | 'clothing' | 'new-featured' | 'our-craft' | null;
+
 export const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [universesOpen, setUniversesOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<NavMenuKey>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<NavMenuKey>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const lastScrollY = useRef(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const totalItems = useCartStore((state) => state.getTotalItems());
@@ -25,7 +27,10 @@ export const Header: React.FC = () => {
   const wishlistCount = useWishlistStore((state) => state.count());
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
   const showToast = useToastStore((state) => state.showToast);
+
   const { data: universes } = useUniverses();
+  const { data: expressions } = useExpressions();
+  const { data: garments } = useGarments();
 
   // Focus the overlay input whenever it opens.
   useEffect(() => {
@@ -58,20 +63,16 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Garments', path: '/garments' },
-    { name: 'Art Styles', path: '/styles' },
-    { name: 'Shop All', path: '/shop' },
-    { name: 'Our Craft', path: '/atelier' },
-  ];
+  // Close menus on Escape or route change
+  useEffect(() => {
+    setActiveMenu(null);
+    setMobileOpen(false);
+  }, [location.pathname]);
 
-  const isUniversesActive = location.pathname.startsWith('/universes');
-
-  // Close the Universes menu / search overlay on Escape.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setUniversesOpen(false);
+        setActiveMenu(null);
         setMobileOpen(false);
         setSearchOpen(false);
       }
@@ -80,7 +81,7 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const closeUniverses = () => setUniversesOpen(false);
+  const closeMenu = () => setActiveMenu(null);
 
   const handleWishlistClick = () => {
     if (wishlistCount === 0) {
@@ -95,12 +96,22 @@ export const Header: React.FC = () => {
         description: 'Explore the Collections page to review and add them to your Atelier Bag.',
         actionLabel: 'Go to Collections',
         onAction: () => {
-          window.location.href = '/shop';
+          navigate('/shop');
         },
         type: 'accent',
       });
     }
   };
+
+  // Active path helpers
+  const isWorldsActive = location.pathname.startsWith('/worlds') || location.pathname.startsWith('/universes');
+  const isExpressionActive = location.pathname.startsWith('/expression');
+  const isClothingActive = location.pathname.startsWith('/clothing') || location.pathname.startsWith('/garments') || location.pathname === '/shop';
+  const isNewActive = location.pathname.startsWith('/new-featured');
+  const isCraftActive = location.pathname.startsWith('/our-craft') || location.pathname.startsWith('/atelier');
+
+  // Garment highlights for dropdown (tops & main silhouettes)
+  const coreGarments = (garments ?? []).slice(0, 6);
 
   return (
     <header
@@ -127,8 +138,8 @@ export const Header: React.FC = () => {
           </svg>
         </button>
 
-        {/* Left: Brand Wordmark (render 01 — sparkle mark, no tagline) */}
-        <div className="flex-1 min-w-0">
+        {/* Left: Brand Wordmark */}
+        <div className="flex-1 md:flex-initial min-w-0 md:mr-8 lg:mr-12">
           <Link
             to="/"
             className="group inline-flex items-center gap-1.5 tracking-tight focus-visible:outline-accent"
@@ -140,79 +151,300 @@ export const Header: React.FC = () => {
             </span>
           </Link>
         </div>
-        {/* Center: Navigation Links */}
-        <nav aria-label="Primary" className="hidden md:flex items-center space-x-8 lg:space-x-10">
-          {/* Universes dropdown — options rendered from data, never hardcoded */}
+
+        {/* Center: Primary Navigation (Spec Section 2) */}
+        <nav aria-label="Primary" className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          
+          {/* 1. WORLDS */}
           <div
-            ref={dropdownRef}
             className="relative"
-            onMouseEnter={() => setUniversesOpen(true)}
-            onMouseLeave={() => setUniversesOpen(false)}
+            onMouseEnter={() => setActiveMenu('worlds')}
+            onMouseLeave={() => setActiveMenu(null)}
           >
-            <button
-              onClick={() => setUniversesOpen((v) => !v)}
-              aria-expanded={universesOpen}
-              aria-haspopup="true"
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1.5 ${
-                isUniversesActive ? 'text-ink font-semibold' : 'text-ink-muted'
+            <Link
+              to="/worlds"
+              onClick={closeMenu}
+              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+                isWorldsActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
-              Universes
-              <svg className={`w-3.5 h-3.5 transition-transform ${universesOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              Worlds
+              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'worlds' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
-              {isUniversesActive && (
+              {isWorldsActive && (
                 <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
               )}
-            </button>
+            </Link>
 
-            {universesOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-72">
-                <div className="bg-paper border border-stone/70 shadow-xl py-2">
+            {activeMenu === 'worlds' && (
+              <div className="absolute top-full left-0 pt-3 w-80">
+                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
+                  <div className="px-5 py-2 border-b border-stone/40">
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                      Thematic Collections
+                    </span>
+                  </div>
                   {(universes ?? []).map((u) => (
                     <Link
                       key={u.slug}
-                      to={`/universes/${u.slug}`}
-                      onClick={closeUniverses}
-                      className="block px-5 py-3 hover:bg-cream transition-colors"
+                      to={`/worlds/${u.slug}`}
+                      onClick={closeMenu}
+                      className="block px-5 py-3 hover:bg-cream transition-colors group"
                     >
-                      <span className="block font-serif text-lg text-ink">{u.name}</span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5">{u.tagline}</span>
+                      <span className="block font-serif text-lg text-ink group-hover:text-accent transition-colors">
+                        {u.name}
+                      </span>
+                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                        {u.tagline}
+                      </span>
                     </Link>
                   ))}
+                  {/* Cosmic & Mythos teaser */}
+                  <div className="px-5 py-3 border-t border-stone/40 opacity-70 bg-cream/40">
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-base text-ink">Cosmic & Mythos</span>
+                      <span className="text-[9px] uppercase tracking-widest text-accent font-medium bg-accent/10 px-2 py-0.5">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                      Celestial folklore & cosmic legends
+                    </span>
+                  </div>
                   <Link
-                    to="/universes"
-                    onClick={closeUniverses}
-                    className="block px-5 py-3 border-t border-stone/60 text-sm font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
+                    to="/worlds"
+                    onClick={closeMenu}
+                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
                   >
-                    All universes →
+                    All Worlds →
                   </Link>
                 </div>
               </div>
             )}
           </div>
 
-          {navLinks.map((link) => {
-            const isActive = location.pathname === link.path;
-            return (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink ${
-                  isActive ? 'text-ink font-semibold' : 'text-ink-muted'
-                }`}
-              >
-                {link.name}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent animate-in fade-in duration-300" />
-                )}
-              </Link>
-            );
-          })}
+          {/* 2. EXPRESSION (Signature System) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveMenu('expression')}
+            onMouseLeave={() => setActiveMenu(null)}
+          >
+            <Link
+              to="/expression"
+              onClick={closeMenu}
+              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+                isExpressionActive ? 'text-ink font-semibold' : 'text-ink-muted'
+              }`}
+            >
+              Expression
+              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'expression' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              {isExpressionActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
+              )}
+            </Link>
+
+            {activeMenu === 'expression' && (
+              <div className="absolute top-full left-0 pt-3 w-88">
+                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
+                  <div className="px-5 py-2 border-b border-stone/40">
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                      Embroidery Intensity (1–5)
+                    </span>
+                  </div>
+                  {(expressions ?? []).map((exp) => (
+                    <Link
+                      key={exp.slug}
+                      to={`/expression/${exp.slug}`}
+                      onClick={closeMenu}
+                      className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-serif text-base text-ink group-hover:text-accent transition-colors">
+                          {exp.name}
+                        </span>
+                        <span className="text-[10px] font-sans uppercase tracking-widest text-ink-muted">
+                          Level {exp.score}
+                        </span>
+                      </div>
+                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                        {exp.tagline}
+                      </span>
+                    </Link>
+                  ))}
+                  <Link
+                    to="/expression"
+                    onClick={closeMenu}
+                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
+                  >
+                    Explore Expression Rubric →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. CLOTHING */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveMenu('clothing')}
+            onMouseLeave={() => setActiveMenu(null)}
+          >
+            <Link
+              to="/clothing"
+              onClick={closeMenu}
+              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+                isClothingActive ? 'text-ink font-semibold' : 'text-ink-muted'
+              }`}
+            >
+              Clothing
+              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'clothing' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              {isClothingActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
+              )}
+            </Link>
+
+            {activeMenu === 'clothing' && (
+              <div className="absolute top-full left-0 pt-3 w-72">
+                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
+                  <div className="px-5 py-2 border-b border-stone/40">
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                      Shop by Garment Type
+                    </span>
+                  </div>
+                  {coreGarments.map((g) => (
+                    <Link
+                      key={g.slug}
+                      to={`/clothing/${g.slug}`}
+                      onClick={closeMenu}
+                      className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                    >
+                      <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
+                        {g.name}
+                      </span>
+                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                        {g.description}
+                      </span>
+                    </Link>
+                  ))}
+                  <div className="border-t border-stone/60">
+                    <Link
+                      to="/clothing"
+                      onClick={closeMenu}
+                      className="block px-5 py-2.5 text-xs font-serif text-ink hover:text-accent hover:bg-cream transition-colors"
+                    >
+                      All Garments →
+                    </Link>
+                    <Link
+                      to="/shop"
+                      onClick={closeMenu}
+                      className="block px-5 py-2.5 bg-cream/80 text-xs font-sans font-medium uppercase tracking-wider text-ink hover:text-accent transition-colors"
+                    >
+                      Shop All Catalog →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. NEW & FEATURED */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveMenu('new-featured')}
+            onMouseLeave={() => setActiveMenu(null)}
+          >
+            <Link
+              to="/new-featured"
+              onClick={closeMenu}
+              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+                isNewActive ? 'text-ink font-semibold' : 'text-ink-muted'
+              }`}
+            >
+              New & Featured
+              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'new-featured' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              {isNewActive && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
+              )}
+            </Link>
+
+            {activeMenu === 'new-featured' && (
+              <div className="absolute top-full left-0 pt-3 w-72">
+                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
+                  <div className="px-5 py-2 border-b border-stone/40">
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                      Curated Editions
+                    </span>
+                  </div>
+                  <Link
+                    to="/new-featured/new-arrivals"
+                    onClick={closeMenu}
+                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                  >
+                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
+                      New Arrivals
+                    </span>
+                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                      Fresh threadwork from our atelier
+                    </span>
+                  </Link>
+                  <Link
+                    to="/new-featured/bestsellers"
+                    onClick={closeMenu}
+                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                  >
+                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
+                      Bestsellers
+                    </span>
+                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                      Most coveted garments in the archive
+                    </span>
+                  </Link>
+                  <Link
+                    to="/new-featured/limited-editions"
+                    onClick={closeMenu}
+                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                  >
+                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
+                      Limited Editions
+                    </span>
+                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                      Hand-numbered, small batch runs
+                    </span>
+                  </Link>
+                  <Link
+                    to="/new-featured"
+                    onClick={closeMenu}
+                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
+                  >
+                    All Featured Pieces →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 5. OUR CRAFT */}
+          <Link
+            to="/our-craft"
+            className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink ${
+              isCraftActive ? 'text-ink font-semibold' : 'text-ink-muted'
+            }`}
+          >
+            Our Craft
+            {isCraftActive && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent animate-in fade-in duration-300" />
+            )}
+          </Link>
         </nav>
 
-        {/* Right: icon rail per renders 01/08/09 — search expands an overlay,
-            never a squeezed inline pill (that pill clipped at 1024–1280px) */}
+        {/* Right: Utility actions */}
         <div className="ml-auto flex items-center gap-0.5 sm:gap-1.5">
           {/* Search trigger */}
           <button
@@ -226,7 +458,7 @@ export const Header: React.FC = () => {
             </svg>
           </button>
 
-          {/* Account (stub — honest toast until accounts launch) */}
+          {/* Account */}
           <button
             onClick={() =>
               showToast({
@@ -249,12 +481,7 @@ export const Header: React.FC = () => {
             aria-label={`Wishlist with ${wishlistCount} items`}
             className="hidden md:flex group relative items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[44px] min-h-[44px] justify-center"
           >
-            <svg
-              className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
-              fill={wishlistCount > 0 ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -263,24 +490,19 @@ export const Header: React.FC = () => {
               />
             </svg>
             {wishlistCount > 0 && (
-              <span className="absolute top-1 right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-medium rounded-full bg-accent text-paper">
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
                 {wishlistCount}
               </span>
             )}
           </button>
 
-          {/* Cart Trigger — icon + count badge (render 01) */}
+          {/* Shopping Bag */}
           <button
             onClick={openCart}
-            aria-label={`Shopping bag with ${totalItems} items`}
-            className="group relative hidden md:flex items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[44px] min-h-[44px] justify-center"
+            aria-label={`Cart with ${totalItems} items`}
+            className="relative hidden md:flex items-center p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] justify-center"
           >
-            <svg
-              className="w-5 h-5 transition-transform duration-300 group-hover:scale-105"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -288,18 +510,14 @@ export const Header: React.FC = () => {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <span
-              className={`absolute top-1 right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-medium rounded-full transition-all duration-300 ${
-                totalItems > 0
-                  ? 'bg-accent text-paper scale-100'
-                  : 'bg-stone/80 text-ink-muted scale-95'
-              }`}
-            >
-              {totalItems}
-            </span>
+            {totalItems > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </button>
 
-          {/* Mobile bag link — text variant reads better at 360–390px than an icon */}
+          {/* Mobile bag button */}
           <button
             onClick={openCart}
             aria-label={`Cart with ${totalItems} items`}
@@ -310,8 +528,7 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Expanding search overlay (render 01 has no inline pill — the old
-          squeezed pill clipped its placeholder at 1024–1280px) */}
+      {/* Expanding search overlay */}
       {searchOpen && (
         <div className="hidden md:block border-t border-stone/60 bg-cream">
           <form
@@ -327,7 +544,7 @@ export const Header: React.FC = () => {
               type="search"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search for anime, heroes, history…"
+              placeholder="Search for anime, heroes, history, garments…"
               aria-label="Search the collection"
               className="flex-1 bg-transparent font-serif text-lg text-ink placeholder:text-ink-muted/70 focus:outline-none min-h-[44px]"
             />
@@ -349,49 +566,151 @@ export const Header: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile nav panel */}
+      {/* Mobile navigation drawer */}
       {mobileOpen && (
-        <nav aria-label="Mobile" className="md:hidden bg-cream border-t border-stone/60 px-4 py-3 space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-ink-muted px-2 pt-1">Universes</p>
-          {(universes ?? []).map((u) => (
-            <Link
-              key={u.slug}
-              to={`/universes/${u.slug}`}
-              onClick={() => setMobileOpen(false)}
-              className="block px-2 py-3 font-serif text-2xl text-ink border-b border-stone/40"
+        <nav aria-label="Mobile" className="md:hidden bg-cream border-t border-stone/60 px-4 py-4 space-y-2 max-h-[85vh] overflow-y-auto">
+          {/* Worlds Accordion */}
+          <div className="border-b border-stone/40 pb-2">
+            <button
+              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'worlds' ? null : 'worlds')}
+              className="w-full py-2.5 flex items-center justify-between text-left"
             >
-              {u.name}
-            </Link>
-          ))}
-          {[
-            { name: 'Garments', path: '/garments' },
-            { name: 'Art Styles', path: '/styles' },
-            { name: 'Shop All', path: '/shop' },
-            { name: 'Our Craft', path: '/atelier' },
-          ].map((l) => (
-            <Link
-              key={l.path + l.name}
-              to={l.path}
-              onClick={() => setMobileOpen(false)}
-              className="block px-2 py-3 text-sm uppercase tracking-[0.18em] text-ink border-b border-stone/40"
+              <span className="font-serif text-2xl text-ink">Worlds</span>
+              <span className="text-sm font-sans">{mobileExpandedSection === 'worlds' ? '–' : '+'}</span>
+            </button>
+            {mobileExpandedSection === 'worlds' && (
+              <div className="pl-3 py-1 space-y-2">
+                {(universes ?? []).map((u) => (
+                  <Link
+                    key={u.slug}
+                    to={`/worlds/${u.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-1 text-sm font-serif text-ink"
+                  >
+                    {u.name}
+                  </Link>
+                ))}
+                <Link
+                  to="/worlds"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
+                >
+                  All Worlds →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Expression Accordion */}
+          <div className="border-b border-stone/40 pb-2">
+            <button
+              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'expression' ? null : 'expression')}
+              className="w-full py-2.5 flex items-center justify-between text-left"
             >
-              {l.name}
-            </Link>
-          ))}
-          <div className="flex items-center gap-2 px-2 py-3">
+              <span className="font-serif text-2xl text-ink">Expression</span>
+              <span className="text-sm font-sans">{mobileExpandedSection === 'expression' ? '–' : '+'}</span>
+            </button>
+            {mobileExpandedSection === 'expression' && (
+              <div className="pl-3 py-1 space-y-2">
+                {(expressions ?? []).map((exp) => (
+                  <Link
+                    key={exp.slug}
+                    to={`/expression/${exp.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-1 text-sm font-serif text-ink"
+                  >
+                    Level {exp.score}: {exp.name}
+                  </Link>
+                ))}
+                <Link
+                  to="/expression"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
+                >
+                  All Expressions →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Clothing Accordion */}
+          <div className="border-b border-stone/40 pb-2">
+            <button
+              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'clothing' ? null : 'clothing')}
+              className="w-full py-2.5 flex items-center justify-between text-left"
+            >
+              <span className="font-serif text-2xl text-ink">Clothing</span>
+              <span className="text-sm font-sans">{mobileExpandedSection === 'clothing' ? '–' : '+'}</span>
+            </button>
+            {mobileExpandedSection === 'clothing' && (
+              <div className="pl-3 py-1 space-y-2">
+                {coreGarments.map((g) => (
+                  <Link
+                    key={g.slug}
+                    to={`/clothing/${g.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-1 text-sm font-serif text-ink"
+                  >
+                    {g.name}
+                  </Link>
+                ))}
+                <Link
+                  to="/clothing"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
+                >
+                  All Garments →
+                </Link>
+                <Link
+                  to="/shop"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-1 text-xs uppercase tracking-wider text-ink font-semibold"
+                >
+                  Shop All Catalog →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* New & Featured */}
+          <div className="border-b border-stone/40 pb-2">
             <Link
-              to="/shop"
+              to="/new-featured"
               onClick={() => setMobileOpen(false)}
-              className="flex-1 text-center px-2 py-3 text-sm uppercase tracking-[0.18em] text-ink border border-stone"
+              className="block py-2.5 font-serif text-2xl text-ink"
+            >
+              New & Featured
+            </Link>
+          </div>
+
+          {/* Our Craft */}
+          <div className="border-b border-stone/40 pb-2">
+            <Link
+              to="/our-craft"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2.5 font-serif text-2xl text-ink"
+            >
+              Our Craft
+            </Link>
+          </div>
+
+          {/* Action Row */}
+          <div className="flex items-center gap-2 pt-3">
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                setSearchOpen(true);
+              }}
+              className="flex-1 text-center px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
             >
               Search
-            </Link>
+            </button>
             <button
               onClick={() => {
                 setMobileOpen(false);
                 handleWishlistClick();
               }}
-              className="flex-1 px-2 py-3 text-sm uppercase tracking-[0.18em] text-ink border border-stone"
+              className="flex-1 px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
             >
               Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
             </button>

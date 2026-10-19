@@ -42,11 +42,13 @@ export const Shop: React.FC = () => {
     const style = searchParams.get('style');
     const garment = searchParams.get('garment');
     const edit = searchParams.get('edit');
+    const expression = searchParams.get('expression');
     if (universe) s.setUniverse(universe);
     if (character) s.setCharacter(character);
     if (style) s.setArtStyle(style as ArtStyleSlug);
     if (garment) s.setGarmentTypes([garment]);
     if (edit) s.setEdit(edit as EditSlug);
+    if (expression) s.setExpressionSlug(expression as any);
   }, [searchParams]);
 
   const currentCategory = useMemo(() => {

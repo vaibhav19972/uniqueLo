@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   formatPrice,
   ART_STYLES,
+  EXPRESSION_LEVELS,
   type ArtStyleSlug,
   type SortKey,
   type EmbroideryTechnique,
@@ -32,6 +33,7 @@ export const FilterBar: React.FC = () => {
     setArtStyle,
     setUniverse,
     setCharacter,
+    setExpressionSlug,
     toggleGarmentType,
     toggleSize,
     toggleTechnique,
@@ -45,6 +47,7 @@ export const FilterBar: React.FC = () => {
     filters.sizes.length +
     (filters.techniques?.length || 0) +
     (filters.garmentTypes?.length || 0) +
+    (filters.expressionSlug && filters.expressionSlug !== 'all' ? 1 : 0) +
     (filters.artStyleSlug && filters.artStyleSlug !== 'all' ? 1 : 0) +
     (filters.universeSlug && filters.universeSlug !== 'all' ? 1 : 0) +
     (filters.characterId && filters.characterId !== 'all' ? 1 : 0) +
@@ -182,6 +185,13 @@ export const FilterBar: React.FC = () => {
               </span>
             )}
 
+            {filters.expressionSlug && filters.expressionSlug !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Expression: {filters.expressionSlug.replace(/-/g, ' ')}
+                <button onClick={() => setExpressionSlug('all')} aria-label="Clear expression filter" className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
             {filters.artStyleSlug && filters.artStyleSlug !== 'all' && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
                 Style: {filters.artStyleSlug}
@@ -226,10 +236,37 @@ export const FilterBar: React.FC = () => {
           </div>
         )}
 
-        {/* Expandable Filter Tray (size + technique + price — no colour option) */}
+        {/* Expandable Filter Tray */}
         {isOpen && (
-          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
-            {/* 1. Embroidery Technique */}
+          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-200">
+            {/* 1. Expression (1-5 Scale) */}
+            <div>
+              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+                Embroidery Expression
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {EXPRESSION_LEVELS.map((exp) => {
+                  const isSelected = filters.expressionSlug === exp.slug;
+                  return (
+                    <button
+                      key={exp.slug}
+                      onClick={() => setExpressionSlug(isSelected ? 'all' : exp.slug)}
+                      aria-pressed={isSelected}
+                      title={exp.tagline}
+                      className={`px-2.5 py-1 min-h-[44px] text-[11px] border transition-colors cursor-pointer ${
+                        isSelected
+                          ? 'border-ink bg-ink text-cream font-medium'
+                          : 'border-stone bg-paper text-ink hover:border-ink/50'
+                      }`}
+                    >
+                      {exp.score}. {exp.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 2. Embroidery Technique */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
                 Needlecraft Technique

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FilterState, SortKey, EmbroideryTechnique, Gender, IntensityLevel, ArtStyleSlug, EditSlug } from '../lib/data';
+import type { FilterState, SortKey, EmbroideryTechnique, Gender, IntensityLevel, ExpressionSlug, ExpressionScore, ArtStyleSlug, EditSlug } from '../lib/data';
 
 interface FiltersStore {
   filters: FilterState;
@@ -7,6 +7,8 @@ interface FiltersStore {
   setUniverse: (universeSlug: string | 'all') => void;
   setGender: (gender: Gender | 'all') => void;
   setIntensity: (intensity: IntensityLevel | 'all') => void;
+  setExpressionSlug: (expressionSlug: ExpressionSlug | 'all') => void;
+  setExpressionScore: (expressionScore: ExpressionScore | 'all') => void;
   setCharacter: (characterId: string | 'all') => void;
   setArtStyle: (artStyle: ArtStyleSlug | 'all') => void;
   setEdit: (edit: EditSlug | 'all') => void;
@@ -27,6 +29,8 @@ const initialFilters: FilterState = {
   gender: 'all',
   garmentTypes: [],
   intensity: 'all',
+  expressionSlug: 'all',
+  expressionScore: 'all',
   characterId: 'all',
   artStyleSlug: 'all',
   edit: 'all',
@@ -59,6 +63,16 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
   setIntensity: (intensity) =>
     set((state) => ({
       filters: { ...state.filters, intensity },
+    })),
+
+  setExpressionSlug: (expressionSlug) =>
+    set((state) => ({
+      filters: { ...state.filters, expressionSlug },
+    })),
+
+  setExpressionScore: (expressionScore) =>
+    set((state) => ({
+      filters: { ...state.filters, expressionScore },
     })),
 
   setCharacter: (characterId) =>

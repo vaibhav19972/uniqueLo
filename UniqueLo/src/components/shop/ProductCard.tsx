@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import type { Product } from '../../lib/data';
-import { formatPrice, getDefaultVariant } from '../../lib/data';
+import { formatPrice, getDefaultVariant, getExpressionByScore, getExpressionScore } from '../../lib/data';
 import { useCartStore } from '../../stores/cart';
 import { useCustomizerStore } from '../../stores/customizer';
 import { useQuickViewStore } from '../../stores/quickView';
@@ -27,6 +27,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const macroImage = product.images[1]?.src || frontImage;
   const isWish = isWishlisted(product.slug);
   const isV2 = useIsThemeV2();
+
+  const expScore = getExpressionScore(product);
+  const expInfo = getExpressionByScore(expScore);
 
   const compareAt = defaultVariant.compareAtPriceCents;
   const offPct =
@@ -194,6 +197,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.subtitle}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-wider text-ink-muted">
+            {expInfo && (
+              <span className="font-sans font-medium text-accent">
+                ✦ {expInfo.name}
+              </span>
+            )}
             {product.artStyleSlug && (
               <span className="font-medium">{product.artStyleSlug.replace(/-/g, ' ')}</span>
             )}
