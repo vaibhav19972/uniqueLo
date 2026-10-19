@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import { useProducts } from '../../hooks/useCatalog';
+import { useProducts, useCollections } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { ProductCard } from '../shop/ProductCard';
 
-type FeaturedTab = 'new-arrivals' | 'bestsellers' | 'limited-editions';
+type FeaturedTab = 'new-arrivals' | 'limited-editions' | 'collections';
 
 interface TabConfig {
   slug: FeaturedTab;
@@ -19,20 +19,22 @@ const TABS: TabConfig[] = [
     tagline: 'Latest embroidery releases freshly completed on atelier looms.',
   },
   {
-    slug: 'bestsellers',
-    title: 'Bestsellers',
-    tagline: 'Most-reordered collector pieces across all worlds.',
-  },
-  {
     slug: 'limited-editions',
     title: 'Limited Editions',
     tagline: 'Strictly numbered runs with zero mass reproduction.',
+  },
+  {
+    slug: 'collections',
+    title: 'Collections',
+    tagline: 'Seasonal capsule drops & unified embroidery aesthetics across worlds.',
   },
 ];
 
 export const NewAndFeaturedSection: React.FC = () => {
   const { data: allProducts } = useProducts();
+  const { data: collections } = useCollections();
   const [activeTab, setActiveTab] = useState<FeaturedTab>('new-arrivals');
+  const [selectedCollectionSlug, setSelectedCollectionSlug] = useState<string>('all');
 
   const productsForTab = useMemo(() => {
     const list = allProducts ?? [];
@@ -40,18 +42,39 @@ export const NewAndFeaturedSection: React.FC = () => {
       // Sort by newest batch or reverse catalog order
       return [...list].reverse().slice(0, 4);
     }
-    if (activeTab === 'bestsellers') {
-      return list.filter((p) => p.featured || (p.soldCount && parseInt(p.soldCount, 10) > 30)).slice(0, 4);
-    }
     if (activeTab === 'limited-editions') {
       return list
         .filter((p) => p.batchNumber != null && p.batchTotal != null)
         .slice(0, 4);
     }
+    if (activeTab === 'collections') {
+      if (selectedCollectionSlug !== 'all') {
+        return list.filter((p) => p.collectionSlug === selectedCollectionSlug).slice(0, 4);
+      }
+      return list.filter((p) => Boolean(p.collectionSlug)).slice(0, 4);
+    }
     return list.slice(0, 4);
-  }, [allProducts, activeTab]);
+  }, [allProducts, activeTab, selectedCollectionSlug]);
 
   const currentTabConfig = TABS.find((t) => t.slug === activeTab) || TABS[0];
+
+  const headerLinkTo = activeTab === 'collections' ? '/collections' : `/new-featured/${activeTab}`;
+  const headerLinkLabel = activeTab === 'collections' ? 'View all collections' : 'View all in New & Featured';
+
+  const bottomCtaTo =
+    activeTab === 'collections'
+      ? selectedCollectionSlug !== 'all'
+        ? `/collections/${selectedCollectionSlug}`
+        : '/collections'
+      : `/new-featured/${activeTab}`;
+
+  const selectedColObj = collections?.find((c) => c.slug === selectedCollectionSlug);
+  const bottomCtaLabel =
+    activeTab === 'collections'
+      ? selectedCollectionSlug !== 'all'
+        ? `Explore Full ${selectedColObj?.name || 'Collection'}`
+        : 'Explore Complete Capsule Collections'
+      : `Explore Complete ${currentTabConfig.title} Collection`;
 
   return (
     <section
@@ -63,9 +86,9 @@ export const NewAndFeaturedSection: React.FC = () => {
           eyebrow="Curated Drops & Editions"
           title="New & Featured"
           titleId="new-featured-heading"
-          sub="Explore latest atelier drops, community bestsellers, and scarce numbered runs."
-          linkTo={`/new-featured/${activeTab}`}
-          linkLabel="View all in New & Featured"
+          sub="Explore latest atelier drops, scarce numbered runs, and thematic capsule collections."
+          linkTo={headerLinkTo}
+          linkLabel={headerLinkLabel}
         />
 
         {/* Tab Controls */}
@@ -82,12 +105,16 @@ export const NewAndFeaturedSection: React.FC = () => {
                   key={tab.slug}
                   role="tab"
                   aria-selected={isSelected}
-                  onClick={() => setActiveTab(tab.slug)}
-                  className={`px-4 py-2 text-xs uppercase font-sans tracking-widest font-semibold transition-all border cursor-pointer whitespace-nowrap ${
-                    isSelected
+                  onClick={() => {
+                    setActiveTab(tab.slug);
+                    if (tab.slug === 'collections') {
+                      setSelectedCollectionSlug('all');
+                    }
+                  }}
+                  className={`px-4 py-2 text-xs uppercase font-sans tracking-widest font-semibold transition-all border cursor-pointer whitespace-nowrap ${isSelected
                       ? 'bg-ink text-cream border-ink shadow-sm'
                       : 'bg-paper text-ink border-stone/60 hover:border-accent hover:text-accent'
-                  }`}
+                    }`}
                 >
                   {tab.title}
                 </button>
@@ -100,6 +127,49 @@ export const NewAndFeaturedSection: React.FC = () => {
           </p>
         </div>
 
+        {/* Collections Dropdown Pills (when Collections tab is active) */}
+        {activeTab === 'collections' && (
+          <div className="mt-5 p-3.5 sm:p-4 bg-paper border border-stone/60 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-300">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium mr-1">
+                Capsule Drops:
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedCollectionSlug('all')}
+                className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${selectedCollectionSlug === 'all'
+                    ? 'bg-ink text-cream border-ink font-semibold'
+                    : 'bg-cream text-ink border-stone/60 hover:border-ink'
+                  }`}
+              >
+                All Drops
+              </button>
+              {(collections ?? []).map((col) => {
+                const isColActive = selectedCollectionSlug === col.slug;
+                return (
+                  <button
+                    key={col.slug}
+                    type="button"
+                    onClick={() => setSelectedCollectionSlug(col.slug)}
+                    className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${isColActive
+                        ? 'bg-accent text-paper border-accent font-semibold shadow-xs'
+                        : 'bg-cream text-ink border-stone/60 hover:border-accent hover:text-accent'
+                      }`}
+                  >
+                    {col.name}
+                  </button>
+                );
+              })}
+            </div>
+            <Link
+              to="/collections"
+              className="text-xs font-serif text-accent hover:text-ink transition-colors inline-flex items-center gap-1 font-medium"
+            >
+              All Drops Showroom →
+            </Link>
+          </div>
+        )}
+
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 mt-8">
           {productsForTab.map((product) => (
@@ -110,10 +180,10 @@ export const NewAndFeaturedSection: React.FC = () => {
         {/* Bottom Navigation CTA */}
         <div className="mt-10 text-center">
           <Link
-            to={`/new-featured/${activeTab}`}
+            to={bottomCtaTo}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-paper border border-stone/80 hover:border-ink text-ink text-xs uppercase font-sans tracking-widest font-semibold hover:bg-ink hover:text-cream transition-all shadow-sm"
           >
-            Explore Complete {currentTabConfig.title} Collection
+            {bottomCtaLabel}
             <span aria-hidden="true">→</span>
           </Link>
         </div>

@@ -17,6 +17,8 @@ drop table if exists public.embroidery_details cascade;
 drop table if exists public.product_images cascade;
 drop table if exists public.variants cascade;
 drop table if exists public.products cascade;
+drop table if exists public.garments cascade;
+drop table if exists public.collections cascade;
 drop table if exists public.motifs cascade;
 drop table if exists public.universes cascade;
 drop table if exists public.categories cascade;
@@ -70,6 +72,29 @@ create table if not exists public.categories (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 5b. Garments Table (Silhouette Taxonomy: Hoodies, Tees, Jackets, etc.)
+create table if not exists public.garments (
+  slug text primary key,
+  name text not null,
+  category_slug text references public.categories(slug) on delete set null,
+  description text not null,
+  order_num integer default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 5c. Collections Table (Seasonal Drops & Thematic Capsules)
+create table if not exists public.collections (
+  slug text primary key,
+  name text not null,
+  tagline text,
+  description text,
+  universe_slug text references public.universes(slug) on delete set null,
+  cover_image text,
+  featured boolean default true,
+  order_num integer default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- 6. Products Table (Fully synchronized with current TypeScript domain model)
 create table if not exists public.products (
   slug text primary key,
@@ -79,7 +104,8 @@ create table if not exists public.products (
   description text not null,
   category_slug text references public.categories(slug) on delete set null,
   universe_slug text references public.universes(slug) on delete set null,
-  garment_type text,
+  collection_slug text references public.collections(slug) on delete set null,
+  garment_type text references public.garments(slug) on delete set null,
   gender text default 'unisex' check (gender in ('men', 'women', 'unisex')),
   motif_id text references public.motifs(id) on delete set null,
   is_mock boolean default false,
@@ -197,6 +223,8 @@ create table if not exists public.order_items (
 -- ====================================================================
 create index if not exists idx_products_category on public.products(category_slug);
 create index if not exists idx_products_universe on public.products(universe_slug);
+create index if not exists idx_products_collection on public.products(collection_slug);
+create index if not exists idx_products_garment on public.products(garment_type);
 create index if not exists idx_products_gender on public.products(gender);
 create index if not exists idx_products_featured on public.products(featured);
 create index if not exists idx_variants_product on public.variants(product_slug);
@@ -209,6 +237,8 @@ create index if not exists idx_reviews_product on public.reviews(product_slug);
 alter table public.universes enable row level security;
 alter table public.motifs enable row level security;
 alter table public.categories enable row level security;
+alter table public.garments enable row level security;
+alter table public.collections enable row level security;
 alter table public.products enable row level security;
 alter table public.variants enable row level security;
 alter table public.product_images enable row level security;
@@ -222,6 +252,8 @@ alter table public.order_items enable row level security;
 create policy "Allow public read universes" on public.universes for select using (true);
 create policy "Allow public read motifs" on public.motifs for select using (true);
 create policy "Allow public read categories" on public.categories for select using (true);
+create policy "Allow public read garments" on public.garments for select using (true);
+create policy "Allow public read collections" on public.collections for select using (true);
 create policy "Allow public read products" on public.products for select using (true);
 create policy "Allow public read variants" on public.variants for select using (true);
 create policy "Allow public read product images" on public.product_images for select using (true);
@@ -235,6 +267,10 @@ create policy "Allow public create orders" on public.orders for insert with chec
 create policy "Allow public create order items" on public.order_items for insert with check (true);
 
 -- Allow in-app Admin Studio to insert/update catalog rows
+create policy "Allow admin insert garments" on public.garments for insert with check (true);
+create policy "Allow admin update garments" on public.garments for update using (true);
+create policy "Allow admin insert collections" on public.collections for insert with check (true);
+create policy "Allow admin update collections" on public.collections for update using (true);
 create policy "Allow admin insert products" on public.products for insert with check (true);
 create policy "Allow admin update products" on public.products for update using (true);
 create policy "Allow admin insert variants" on public.variants for insert with check (true);
@@ -243,6 +279,40 @@ create policy "Allow admin insert product images" on public.product_images for i
 create policy "Allow admin delete product images" on public.product_images for delete using (true);
 create policy "Allow admin insert embroidery details" on public.embroidery_details for insert with check (true);
 create policy "Allow admin update embroidery details" on public.embroidery_details for update using (true);
+
+-- ====================================================================
+-- Initial Seed: Garment Silhouettes (Taxonomy Definition)
+-- ====================================================================
+insert into public.garments (slug, name, category_slug, description, order_num) values
+  ('hoodie', 'Hoodies', 'tops', 'Heavyweight fleece hoodies with back-panel and crest embroidery.', 1),
+  ('tee', 'Tees', 'tops', 'Combed-cotton tees carrying chest and back threadwork.', 2),
+  ('shirt', 'Shirts', 'tops', 'Oxfords, poplins and band-collar tunics with monogram detail.', 3),
+  ('jacket', 'Jackets', 'outerwear', 'Chore jackets, capes and overcoats with procession-scale embroidery.', 4),
+  ('cardigan', 'Cardigans', 'knitwear', 'Cashmere cardigans with crewel relief.', 5),
+  ('vest', 'Vests', 'knitwear', 'Knit vests with sculpted knot texture.', 6),
+  ('pants', 'Pants', 'bottoms', 'Selvedge denim and work pants with structural stitching.', 7),
+  ('scarf', 'Scarves', 'accessories', 'Silk scarves with arch-jaal and flora borders.', 8),
+  ('tote', 'Totes', 'accessories', 'Raw-canvas totes with sun-disc and motif hits.', 9)
+on conflict (slug) do update set
+  name = excluded.name,
+  category_slug = excluded.category_slug,
+  description = excluded.description,
+  order_num = excluded.order_num;
+
+-- ====================================================================
+-- Initial Seed: Collections (Seasonal Drops & Thematic Capsules)
+-- ====================================================================
+insert into public.collections (slug, name, tagline, description, universe_slug, featured, order_num) values
+  ('spring-sakura', 'Spring Sakura Collection', 'Japanese woodblock waves, blossom scatter, ink-line calm.', 'Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery.', 'animeverse', true, 1),
+  ('royal-heritage', 'Royal Heritage Collection', 'Arches, jaals and royal court processions in gold zardozi.', 'Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages.', 'itihaas', true, 2),
+  ('midnight-atelier', 'Midnight Atelier Collection', 'No world, just pure cloth, heroic crests, and tonal needlecraft.', 'Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing.', 'atelier', true, 3)
+on conflict (slug) do update set
+  name = excluded.name,
+  tagline = excluded.tagline,
+  description = excluded.description,
+  universe_slug = excluded.universe_slug,
+  featured = excluded.featured,
+  order_num = excluded.order_num;
 
 -- ====================================================================
 -- Storage Bucket for Product Imagery (Media CDN)

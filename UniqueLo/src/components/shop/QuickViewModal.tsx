@@ -123,6 +123,7 @@ export const QuickViewModal: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
                 {product.categorySlug}
+                {product.garmentType ? ` // ${product.garmentType}` : ''}
               </span>
               {product.embroidery && (
                 <span className="text-[10px] tracking-widest text-ink-muted uppercase border-l border-stone pl-2">

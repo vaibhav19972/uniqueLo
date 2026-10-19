@@ -6,7 +6,7 @@ import rawEdits from '../data/edits.json';
 import rawIntensity from '../data/intensity.json';
 import rawExpression from '../data/expression.json';
 import rawCraft from '../data/craft-techniques.json';
-import rawArtStyles from '../data/art-styles.json';
+import rawCollections from '../data/collections.json';
 import rawGarments from '../data/garments.json';
 import { supabase, isSupabaseConfigured, shouldUseSupabaseReads } from './supabase';
 
@@ -40,28 +40,31 @@ export interface ExpressionInfo {
 export type Gender = 'men' | 'women' | 'unisex';
 
 /**
- * ArtStyle = genre art direction (how the world is drawn).
- * Registry: src/data/art-styles.json — ukiyo-line, anime-pop, comic-noir,
- * crest-emblem, mughal-miniature, atelier-tonal. One per product.
- * Distinct from craft technique (how it is stitched).
+ * CollectionSlug = seasonal drop or thematic capsule identity.
+ * Registry: src/data/collections.json — spring-sakura, royal-heritage, midnight-atelier.
+ * Cross-category: groups hoodies, tees, jackets, scarves sharing one design drop.
  */
-export type ArtStyleSlug =
-  | 'ukiyo-line'
-  | 'anime-pop'
-  | 'comic-noir'
-  | 'crest-emblem'
-  | 'mughal-miniature'
-  | 'atelier-tonal';
+export type CollectionSlug =
+  | 'spring-sakura'
+  | 'royal-heritage'
+  | 'midnight-atelier'
+  | string;
 
-export interface ArtStyleInfo {
-  slug: ArtStyleSlug;
+export interface CollectionInfo {
+  slug: string;
   name: string;
   tagline: string;
   description: string;
-  /** Universe slugs this style natively belongs to; empty = atelier-wide. */
-  universes: string[];
+  universeSlug?: string;
+  featured?: boolean;
   order: number;
 }
+
+/** @deprecated Use CollectionSlug */
+export type ArtStyleSlug = CollectionSlug;
+
+/** @deprecated Use CollectionInfo */
+export type ArtStyleInfo = CollectionInfo;
 
 export interface GarmentInfo {
   slug: string;
@@ -205,7 +208,9 @@ export interface Product {
   motifId?: string;
   /** Forward-compat multi-character membership; single-motif rows read as [motifId]. */
   characterIds?: string[];
-  /** Genre art direction (src/data/art-styles.json). One per product. */
+  /** Collection drop membership (src/data/collections.json & public.collections). */
+  collectionSlug?: string;
+  /** Genre art direction / Collection (backward compatibility). One per product. */
   artStyleSlug?: ArtStyleSlug;
   /**
    * Intensity stop: how loudly this piece wears its world. Products without
@@ -278,6 +283,8 @@ export interface FilterState {
   expressionSlug?: ExpressionSlug | 'all';
   expressionScore?: ExpressionScore | 'all';
   characterId?: string | 'all';
+  collectionSlug?: CollectionSlug | 'all';
+  /** @deprecated Use collectionSlug */
   artStyleSlug?: ArtStyleSlug | 'all';
   edit?: EditSlug | 'all';
   colors: string[];
@@ -383,12 +390,15 @@ export async function getExpression(slug: string): Promise<ExpressionInfo | unde
   return getExpressionBySlug(slug);
 }
 
-/** Art-style registry (genre art direction — how the world is drawn). */
-export const ART_STYLES: ArtStyleInfo[] = (
-  (rawArtStyles as { artStyles: ArtStyleInfo[] }).artStyles
+/** Collections registry (seasonal drops & aesthetic capsules). */
+export const COLLECTIONS: CollectionInfo[] = (
+  (rawCollections as { collections: CollectionInfo[] }).collections
 )
   .slice()
   .sort((a, b) => a.order - b.order);
+
+/** @deprecated Use COLLECTIONS */
+export const ART_STYLES: CollectionInfo[] = COLLECTIONS;
 
 /** Garment registry (merchandise types — what the thing is). */
 export const GARMENTS: GarmentInfo[] = (
@@ -435,7 +445,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, garment_type, gender, motif_id, character_ids, art_style_slug, intensity, is_mock, handcrafted, craft_techniques, edits, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, character_ids, art_style_slug, intensity, is_mock, handcrafted, craft_techniques, edits, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -467,11 +477,12 @@ export async function getProducts(): Promise<Product[]> {
             foreignTagline: item.foreign_tagline,
             categorySlug: item.category_slug,
             universeSlug: item.universe_slug,
+            collectionSlug: item.collection_slug ?? item.art_style_slug,
             garmentType: item.garment_type,
             gender: item.gender ?? 'unisex',
             motifId: item.motif_id,
             characterIds: item.character_ids ?? (item.motif_id ? [item.motif_id] : []),
-            artStyleSlug: item.art_style_slug,
+            artStyleSlug: item.collection_slug ?? item.art_style_slug,
             intensity: item.intensity ?? 'balanced',
             isMock: item.is_mock ?? false,
             handcrafted: item.handcrafted ?? false,
@@ -624,20 +635,72 @@ export async function getAllCharacters(): Promise<Motif[]> {
   return seedMotifs.filter((m) => m.ip_cleared);
 }
 
-export async function getArtStyles(): Promise<ArtStyleInfo[]> {
-  return [...ART_STYLES];
+export async function getCollections(): Promise<CollectionInfo[]> {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .select('*')
+        .order('order_num', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((c: any) => ({
+          slug: c.slug,
+          name: c.name,
+          tagline: c.tagline || '',
+          description: c.description || '',
+          universeSlug: c.universe_slug,
+          featured: c.featured ?? true,
+          order: c.order_num ?? 0,
+        }));
+      }
+    } catch {
+      // Fallback to local taxonomy
+    }
+  }
+  return [...COLLECTIONS];
 }
 
-export async function getArtStyle(slug: string): Promise<ArtStyleInfo | undefined> {
-  return ART_STYLES.find((s) => s.slug === slug);
+export async function getCollection(slug: string): Promise<CollectionInfo | undefined> {
+  const list = await getCollections();
+  return list.find((c) => c.slug === slug);
+}
+
+/** @deprecated Use getCollections() */
+export async function getArtStyles(): Promise<CollectionInfo[]> {
+  return getCollections();
+}
+
+/** @deprecated Use getCollection() */
+export async function getArtStyle(slug: string): Promise<CollectionInfo | undefined> {
+  return getCollection(slug);
 }
 
 export async function getGarments(): Promise<GarmentInfo[]> {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('garments')
+        .select('*')
+        .order('order_num', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((g: any) => ({
+          slug: g.slug,
+          name: g.name,
+          categorySlug: g.category_slug,
+          description: g.description,
+          order: g.order_num ?? 0,
+        }));
+      }
+    } catch {
+      // Fallback to local taxonomy
+    }
+  }
   return [...GARMENTS];
 }
 
 export async function getGarment(slug: string): Promise<GarmentInfo | undefined> {
-  return GARMENTS.find((g) => g.slug === slug);
+  const list = await getGarments();
+  return list.find((g) => g.slug === slug);
 }
 
 export async function getProductsByCharacter(characterId: string): Promise<Product[]> {
@@ -768,9 +831,11 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       if (!getCharacterIds(product).includes(filters.characterId)) return false;
     }
 
-    // Art-style check (genre art direction)
-    if (filters.artStyleSlug && filters.artStyleSlug !== 'all') {
-      if (product.artStyleSlug !== filters.artStyleSlug) return false;
+    // Collection / Art-style check (seasonal drops & aesthetic capsules)
+    const activeCollection = filters.collectionSlug ?? filters.artStyleSlug;
+    if (activeCollection && activeCollection !== 'all') {
+      const pColl = product.collectionSlug ?? product.artStyleSlug;
+      if (pColl !== activeCollection) return false;
     }
 
     // Intensity check (products default to the balanced midpoint)

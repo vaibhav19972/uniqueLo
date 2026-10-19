@@ -9,7 +9,7 @@ import {
   formatPrice,
   getDefaultVariant,
   getMotifSync,
-  ART_STYLES,
+  COLLECTIONS,
   getExpressionScore,
   getExpressionByScore,
   type ProductVariant,
@@ -296,7 +296,15 @@ export const ProductDetail: React.FC = () => {
               <span className="mx-2 text-stone">/</span>
             </>
           ) : null}
-          <span className="text-accent font-medium capitalize">{product.garmentType ? `${product.garmentType}s` : product.categorySlug}</span>
+          {product.garmentType ? (
+            <Link to={`/clothing/${product.garmentType}`} className="text-accent hover:text-ink transition-colors font-medium capitalize">
+              {product.garmentType}s
+            </Link>
+          ) : (
+            <Link to={`/category/${product.categorySlug}`} className="text-accent hover:text-ink transition-colors font-medium capitalize">
+              {product.categorySlug}
+            </Link>
+          )}
           <span className="mx-2 text-stone">/</span>
           <span className="text-ink truncate max-w-[200px]">{product.name}</span>
         </div>
@@ -461,15 +469,18 @@ export const ProductDetail: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Art style + Craft provenance strip */}
+                {/* Collection + Craft provenance strip */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] uppercase font-sans tracking-widest">
-                  {product.artStyleSlug && (
+                  {(product.collectionSlug || product.artStyleSlug) && (
                     <span className="inline-flex items-center gap-2 text-ink">
-                      <span className="text-ink-muted font-medium">Style</span>
-                      <span className="font-medium">
-                        {ART_STYLES.find((s) => s.slug === product.artStyleSlug)?.name ??
-                          product.artStyleSlug.replace(/-/g, ' ')}
-                      </span>
+                      <span className="text-ink-muted font-medium">Collection</span>
+                      <Link
+                        to={`/collections/${product.collectionSlug || product.artStyleSlug}`}
+                        className="font-medium text-ink hover:text-accent transition-colors underline decoration-stone/50 underline-offset-4"
+                      >
+                        {COLLECTIONS.find((s) => s.slug === (product.collectionSlug || product.artStyleSlug))?.name.replace(' Collection', '') ??
+                          (product.collectionSlug || product.artStyleSlug)?.replace(/-/g, ' ')}
+                      </Link>
                     </span>
                   )}
                   {(product.craftTechniques ?? []).map((t) => (

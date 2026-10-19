@@ -11,8 +11,8 @@ const Universes = lazy(() => import('../pages/Universes').then((m) => ({ default
 const Character = lazy(() => import('../pages/Character').then((m) => ({ default: m.Character })));
 const Garments = lazy(() => import('../pages/Garments').then((m) => ({ default: m.Garments })));
 const Garment = lazy(() => import('../pages/Garment').then((m) => ({ default: m.Garment })));
-const Styles = lazy(() => import('../pages/Styles').then((m) => ({ default: m.Styles })));
-const Style = lazy(() => import('../pages/Style').then((m) => ({ default: m.Style })));
+const Collections = lazy(() => import('../pages/Collections').then((m) => ({ default: m.Collections })));
+const Collection = lazy(() => import('../pages/Collection').then((m) => ({ default: m.Collection })));
 const GenderPage = lazy(() => import('../pages/Gender').then((m) => ({ default: m.GenderPage })));
 const ProductDetail = lazy(() => import('../pages/ProductDetail').then((m) => ({ default: m.ProductDetail })));
 const Atelier = lazy(() => import('../pages/Atelier').then((m) => ({ default: m.Atelier })));
@@ -120,14 +120,23 @@ export const routes: RouteObject[] = [
         path: 'atelier/:techniqueSlug',
         element: withSuspense(<AtelierTechnique />),
       },
-      // Art Styles & Genders
+      // Collections (Curated Drops & Thematic Capsules)
+      {
+        path: 'collections',
+        element: withSuspense(<Collections />),
+      },
+      {
+        path: 'collections/:collectionSlug',
+        element: withSuspense(<Collection />),
+      },
+      // Backward-compatible styles aliases
       {
         path: 'styles',
-        element: withSuspense(<Styles />),
+        element: withSuspense(<Collections />),
       },
       {
         path: 'styles/:styleSlug',
-        element: withSuspense(<Style />),
+        element: withSuspense(<Collection />),
       },
       {
         path: 'men',

@@ -8,8 +8,8 @@ import {
   getMotifsByUniverse,
   getMotif,
   getAllCharacters,
-  getArtStyles,
-  getArtStyle,
+  getCollections,
+  getCollection,
   getGarments,
   getExpressions,
   getExpression,
@@ -24,7 +24,7 @@ import {
   type Motif,
   type Review,
   type EmbroideryTechnique,
-  type ArtStyleInfo,
+  type CollectionInfo,
   type GarmentInfo,
   type ExpressionInfo,
 } from '../lib/data';
@@ -38,8 +38,10 @@ export const catalogKeys = {
   motifs: (universeSlug: string) => ['catalog', 'motifs', universeSlug] as const,
   character: (id: string) => ['catalog', 'character', id] as const,
   characters: ['catalog', 'characters'] as const,
-  artStyles: ['catalog', 'artStyles'] as const,
-  artStyle: (slug: string) => ['catalog', 'artStyle', slug] as const,
+  collections: ['catalog', 'collections'] as const,
+  collection: (slug: string) => ['catalog', 'collection', slug] as const,
+  artStyles: ['catalog', 'collections'] as const,
+  artStyle: (slug: string) => ['catalog', 'collection', slug] as const,
   garments: ['catalog', 'garments'] as const,
   featured: (limit?: number) => ['catalog', 'featured', limit ?? 'all'] as const,
   sizes: ['catalog', 'sizes'] as const,
@@ -104,18 +106,23 @@ export function useAllCharacters(): UseQueryResult<Motif[]> {
   return useQuery({ queryKey: catalogKeys.characters, queryFn: getAllCharacters });
 }
 
-/** Art-style registry (genre art direction doors). */
-export function useArtStyles(): UseQueryResult<ArtStyleInfo[]> {
-  return useQuery({ queryKey: catalogKeys.artStyles, queryFn: getArtStyles });
+/** Collections registry (seasonal drops & aesthetic capsules). */
+export function useCollections(): UseQueryResult<CollectionInfo[]> {
+  return useQuery({ queryKey: catalogKeys.collections, queryFn: getCollections });
 }
 
-export function useArtStyle(slug: string | undefined): UseQueryResult<ArtStyleInfo | undefined> {
+export function useCollection(slug: string | undefined): UseQueryResult<CollectionInfo | undefined> {
   return useQuery({
-    queryKey: catalogKeys.artStyle(slug || ''),
-    queryFn: () => (slug ? getArtStyle(slug) : Promise.resolve(undefined)),
+    queryKey: catalogKeys.collection(slug || ''),
+    queryFn: () => (slug ? getCollection(slug) : Promise.resolve(undefined)),
     enabled: Boolean(slug),
   });
 }
+
+/** @deprecated Use useCollections() */
+export const useArtStyles = useCollections;
+/** @deprecated Use useCollection() */
+export const useArtStyle = useCollection;
 
 /** Garment registry (merchandise doors). */
 export function useGarments(): UseQueryResult<GarmentInfo[]> {

@@ -10,6 +10,7 @@ interface FiltersStore {
   setExpressionSlug: (expressionSlug: ExpressionSlug | 'all') => void;
   setExpressionScore: (expressionScore: ExpressionScore | 'all') => void;
   setCharacter: (characterId: string | 'all') => void;
+  setCollectionSlug: (collectionSlug: string | 'all') => void;
   setArtStyle: (artStyle: ArtStyleSlug | 'all') => void;
   setEdit: (edit: EditSlug | 'all') => void;
   setGarmentTypes: (garmentTypes: string[]) => void;
@@ -32,6 +33,7 @@ const initialFilters: FilterState = {
   expressionSlug: 'all',
   expressionScore: 'all',
   characterId: 'all',
+  collectionSlug: 'all',
   artStyleSlug: 'all',
   edit: 'all',
   colors: [],
@@ -80,9 +82,14 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
       filters: { ...state.filters, characterId },
     })),
 
+  setCollectionSlug: (collectionSlug) =>
+    set((state) => ({
+      filters: { ...state.filters, collectionSlug, artStyleSlug: collectionSlug },
+    })),
+
   setArtStyle: (artStyleSlug) =>
     set((state) => ({
-      filters: { ...state.filters, artStyleSlug },
+      filters: { ...state.filters, collectionSlug: artStyleSlug, artStyleSlug },
     })),
 
   setEdit: (edit) =>

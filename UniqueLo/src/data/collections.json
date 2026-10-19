@@ -1,0 +1,31 @@
+{
+  "collections": [
+    {
+      "slug": "spring-sakura",
+      "name": "Spring Sakura Collection",
+      "tagline": "Japanese woodblock waves, blossom scatter, ink-line calm.",
+      "description": "Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery across heavyweight fleece, combed cotton, and raw canvas.",
+      "universeSlug": "animeverse",
+      "featured": true,
+      "order": 1
+    },
+    {
+      "slug": "royal-heritage",
+      "name": "Royal Heritage Collection",
+      "tagline": "Arches, jaals and royal court processions in gold zardozi.",
+      "description": "Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages, rendered in metallic zari, raw silk, and fine needlework.",
+      "universeSlug": "itihaas",
+      "featured": true,
+      "order": 2
+    },
+    {
+      "slug": "midnight-atelier",
+      "name": "Midnight Atelier Collection",
+      "tagline": "No world, just pure cloth, heroic crests, and tonal needlecraft.",
+      "description": "Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing on heavyweight unbleached and charcoal yarns.",
+      "universeSlug": "atelier",
+      "featured": true,
+      "order": 3
+    }
+  ]
+}

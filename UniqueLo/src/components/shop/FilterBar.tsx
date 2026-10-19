@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
   formatPrice,
-  ART_STYLES,
+  COLLECTIONS,
   EXPRESSION_LEVELS,
-  type ArtStyleSlug,
+  GARMENTS,
   type SortKey,
   type EmbroideryTechnique,
 } from '../../lib/data';
@@ -30,7 +30,7 @@ export const FilterBar: React.FC = () => {
 
   const {
     filters,
-    setArtStyle,
+    setCollectionSlug,
     setUniverse,
     setCharacter,
     setExpressionSlug,
@@ -114,26 +114,29 @@ export const FilterBar: React.FC = () => {
             </div>
           </div>
 
-          {/* Art-style axis: genre art direction (replaces intensity) */}
-          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Art style">
+          {/* Collections axis: seasonal drops & aesthetic capsules */}
+          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Collections">
             <span className="text-[10px] uppercase tracking-widest text-ink font-medium sm:mr-4">
-              Art Style
+              Collections
             </span>
-            {ART_STYLES.map((s) => {
-              const isActive = filters.artStyleSlug === s.slug;
+            {COLLECTIONS.map((c) => {
+              const isActive = (filters.collectionSlug ?? filters.artStyleSlug) === c.slug;
               return (
                 <button
-                  key={s.slug}
-                  onClick={() => setArtStyle(isActive ? 'all' : (s.slug as ArtStyleSlug))}
+                  key={c.slug}
+                  onClick={() => {
+                    const next = isActive ? 'all' : c.slug;
+                    setCollectionSlug(next);
+                  }}
                   aria-pressed={isActive}
-                  title={s.tagline}
+                  title={c.tagline}
                   className={`rounded-full px-3.5 py-2 min-h-[44px] text-[11px] uppercase tracking-widest font-sans border transition-colors cursor-pointer ${
                     isActive
                       ? 'border-transparent bg-ink text-cream'
                       : 'border-stone bg-paper text-ink hover:border-ink'
                   }`}
                 >
-                  {s.name}
+                  {c.name.replace(' Collection', '')}
                 </button>
               );
             })}
@@ -192,10 +195,10 @@ export const FilterBar: React.FC = () => {
               </span>
             )}
 
-            {filters.artStyleSlug && filters.artStyleSlug !== 'all' && (
+            {((filters.collectionSlug && filters.collectionSlug !== 'all') || (filters.artStyleSlug && filters.artStyleSlug !== 'all')) && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
-                Style: {filters.artStyleSlug}
-                <button onClick={() => setArtStyle('all')} aria-label="Clear art-style filter" className="text-ink-muted hover:text-ink">✕</button>
+                Collection: {COLLECTIONS.find((c) => c.slug === (filters.collectionSlug || filters.artStyleSlug))?.name.replace(' Collection', '') ?? (filters.collectionSlug || filters.artStyleSlug)}
+                <button onClick={() => setCollectionSlug('all')} aria-label="Clear collection filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
@@ -238,8 +241,35 @@ export const FilterBar: React.FC = () => {
 
         {/* Expandable Filter Tray */}
         {isOpen && (
-          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in duration-200">
-            {/* 1. Expression (1-5 Scale) */}
+          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 animate-in fade-in duration-200">
+            {/* 1. Garment Silhouette */}
+            <div>
+              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+                Garment Silhouette
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {GARMENTS.map((g) => {
+                  const isSelected = filters.garmentTypes?.includes(g.slug);
+                  return (
+                    <button
+                      key={g.slug}
+                      onClick={() => toggleGarmentType(g.slug)}
+                      aria-pressed={!!isSelected}
+                      aria-label={`Filter by silhouette ${g.name}`}
+                      className={`px-2.5 py-1 min-h-[44px] text-[11px] border transition-colors cursor-pointer capitalize ${
+                        isSelected
+                          ? 'border-ink bg-ink text-cream font-medium'
+                          : 'border-stone bg-paper text-ink hover:border-ink/50'
+                      }`}
+                    >
+                      {g.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 2. Expression (1-5 Scale) */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
                 Embroidery Expression
@@ -266,7 +296,7 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 2. Embroidery Technique */}
+            {/* 3. Embroidery Technique */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
                 Needlecraft Technique
@@ -293,7 +323,7 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 2. Sizes */}
+            {/* 4. Sizes */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
                 Garment Size
@@ -320,7 +350,7 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 3. Price Max Slider & Reset */}
+            {/* 5. Price Max Slider & Reset */}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink">

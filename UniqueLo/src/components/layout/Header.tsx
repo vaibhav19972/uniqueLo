@@ -419,6 +419,18 @@ export const Header: React.FC = () => {
                     </span>
                   </Link>
                   <Link
+                    to="/collections"
+                    onClick={closeMenu}
+                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
+                  >
+                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
+                      Collections (Seasonal Drops)
+                    </span>
+                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                      Themed capsules across universes & garments
+                    </span>
+                  </Link>
+                  <Link
                     to="/new-featured"
                     onClick={closeMenu}
                     className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
@@ -680,6 +692,17 @@ export const Header: React.FC = () => {
               className="block py-2.5 font-serif text-2xl text-ink"
             >
               New & Featured
+            </Link>
+          </div>
+
+          {/* Collections */}
+          <div className="border-b border-stone/40 pb-2">
+            <Link
+              to="/collections"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2.5 font-serif text-2xl text-ink"
+            >
+              Collections
             </Link>
           </div>
 
