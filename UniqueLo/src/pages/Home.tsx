@@ -1,5 +1,5 @@
 import React from 'react';
-import { UniverseHero } from '../components/home/UniverseHero';
+import { HeroCarousel } from '../components/home/HeroCarousel';
 import { TrustStrip } from '../components/home/TrustStrip';
 import { EditsGateway } from '../components/home/EditsGateway';
 import { UniversePortals } from '../components/home/UniversePortals';
@@ -11,8 +11,8 @@ import { Newsletter } from '../components/home/Newsletter';
 export const Home: React.FC = () => {
   return (
     <div className="w-full">
-      {/* Render targets 01–07 (new universe system) */}
-      <UniverseHero />
+      {/* Section 1: Edge-to-Edge Hero Carousel with circular timer pills */}
+      <HeroCarousel />
       <TrustStrip />
       <EditsGateway />
       <UniversePortals />
