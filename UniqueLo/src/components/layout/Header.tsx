@@ -59,9 +59,9 @@ export const Header: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Men', path: '/men' },
-    { name: 'Women', path: '/women' },
-    { name: 'New Arrivals', path: '/shop' },
+    { name: 'Garments', path: '/garments' },
+    { name: 'Art Styles', path: '/styles' },
+    { name: 'Shop All', path: '/shop' },
     { name: 'Our Craft', path: '/atelier' },
   ];
 
@@ -181,7 +181,7 @@ export const Header: React.FC = () => {
                     </Link>
                   ))}
                   <Link
-                    to="/shop"
+                    to="/universes"
                     onClick={closeUniverses}
                     className="block px-5 py-3 border-t border-stone/60 text-sm font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
                   >
@@ -364,9 +364,9 @@ export const Header: React.FC = () => {
             </Link>
           ))}
           {[
-            { name: 'Men', path: '/men' },
-            { name: 'Women', path: '/women' },
-            { name: 'New Arrivals', path: '/shop' },
+            { name: 'Garments', path: '/garments' },
+            { name: 'Art Styles', path: '/styles' },
+            { name: 'Shop All', path: '/shop' },
             { name: 'Our Craft', path: '/atelier' },
           ].map((l) => (
             <Link

@@ -1,7 +1,33 @@
 # UniqueLo — Project Audit & Quality Assurance Report
 
-**Last Updated:** 2026-10-12 · **Status:** All High & Medium Audit Blockers Resolved · Production Ready (re-verified 2026-10-12)  
-**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, 2.38s, advisory: 694 kB main chunk) · `oxlint` (0 errors in `src/`; warnings only in `.agents/` tool scripts) · 10/10 Routes return 200 *(re-verified live 2026-10-12: tsc/build/lint/route-200/counts/seed/image parity all re-run)*
+**Last Updated:** 2026-10-13 · **Status:** Taxonomy re-architecture landed (unverified visually) · Production Ready (re-verified 2026-10-13)  
+**Verified by:** `tsc -b` (0 errors) · `vite build` (Passes, 2.46s, 599 modules; advisory: 694 kB main chunk) · `oxlint` (0 errors in `src/`) · 9/9 routes return 200 on dev server (live 2026-10-13)
+
+---
+
+## 🧭 2026-10-13 — Category Re-Architecture (intensity / edits / craft / atelier)
+
+Owner-approved IA change (five-question contract): universe = front door, garment
+type stays the utility filter, a 3-stop **intensity axis** (Quiet/Balanced/Loud)
+replaces the conflated art-styles facet, moods promoted to shoppable **Edits**,
+craft techniques demoted to PDP provenance + refinement facet, and **The Atelier**
+addition: the neutral base line (universe-null products) exposed as a 4th door.
+
+| Change | Files | Status |
+|---|---|---|
+| New registries: `intensity.json` (3 stops), `edits.json` (6 collections, moods promoted), `craft-techniques.json` (9 techniques externalized from `CRAFT_TECHNIQUES` literal — copy preserved verbatim) | `src/data/*.json` | ✅ |
+| Catalog regenerated: **13 SKUs / 121 variants** (was 5/31) — 3 products per universe + 5-SKU Atelier capsule (`universeSlug: null`); all 5 garment categories, all 3 intensities (5/4/4), 15 low/out variants; orphan `tops`/`hoodies-sweats/tees` slugs fixed to the real registry (`tops/knitwear/outerwear/bottoms/accessories`); generator script with referential-integrity validation (registry slugs, image paths on disk, unique SKUs, technique consistency) — 0 errors | `src/data/mock-products.json` | ✅ |
+| Adapter: `IntensityLevel`/`EditSlug` types, `EDITS`/`INTENSITY_LEVELS` registries, `getIntensity()` (balanced default), Product gains `intensity` + `craftTechniques[]` + `edits[]`; `filterProducts()` intensity/edit facets + atelier universe check; `getAllTechniques()` craftTechniques-aware; **`is_mock` guard FIXED** (`.eq('is_mock', true)` after `.select()` — the docs/03/07 + kb open bug) | `src/lib/data.ts`, `src/stores/filters.ts` | ✅ |
+| UI: `EditsGateway` replaces Vibe/Mood gateways (deleted); UniversePortals 4th Atelier door (live count); intensity trio chips in `Universe.tsx` replaces 7 vibe chips; prominent intensity selector in `FilterBar` (never drawer-buried); ProductCard intensity meter + craft tags; PDP provenance strip (intensity meter + technique chips → `/atelier/:technique`); Footer featured Edits links; Admin: Edits picker + intensity selector, SQL/JSON generators emit `intensity` + note on schema follow-up | 10 components/pages | ✅ |
+| Craft-floor fixes: unicode glyphs (✦ in Shop CatalogState, 🔍 in FilterBar search) replaced with drawn SVGs; detector advisory (bounce easing in UniversePortals heroverse) fixed to exponential ease-out | `Shop.tsx`, `FilterBar.tsx`, `UniversePortals.tsx` | ✅ |
+| `[data-vibe]` CSS blocks retired; vibe words survive only as free `tags` | `src/styles/universes.css` | ✅ |
+
+**Open (tracked):**
+1. ~~Visual verification round~~ — **DONE 2026-10-13:** 7 Playwright captures (desktop 1440 + mobile 390 across /, /shop, both theme polarities, PDP) in `.impeccable/review/`. Findings fixed in bounded rounds: intensity/sort label contrast → AA-dark ink; chip touch targets → 44px; intensity group / sort cluster separation → 45px gutter (confirmed by measurement). Animeverse/Itihaas chip rows verified below-fold captures — no migration defects. Remaining observations are the documented placeholder-image state pending the P5 shoot (pre-existing).
+2. **Supabase migration file written** (`supabase/migrations/20261013_taxonomy_columns.sql`, additive only: intensity/craft_techniques/edits — adapter feature-detects and defaults). **Applying it needs credentials this environment doesn't hold.** `seed.sql` parity + docs/07 update still open.
+3. ~~vibes.json/moods.json cleanup~~ — **DONE 2026-10-13:** both deleted (`art-styles.json` already gone); zero code refs verified by grep; `tsc -b` green after.
+4. Gateway imagery in EditsGateway reuses campaign placeholders until the P5 shoot.
+5. Catalog generator preserved from scratch into `scripts/gen-mock-products.py` (in-repo, versioned with the migration).
 
 ---
 

@@ -69,7 +69,7 @@ export const Lookbook: React.FC = () => {
                 key={look.id}
                 onClick={() => setActiveLookIndex(idx)}
                 className={`py-2 text-xs sm:text-sm uppercase tracking-[0.2em] transition-colors relative cursor-pointer font-medium ${
-                  activeLookIndex === idx ? 'text-accent' : 'text-stone/60 hover:text-stone'
+                  activeLookIndex === idx ? 'text-accent' : 'text-cream/60 hover:text-cream'
                 }`}
               >
                 {look.volume}

@@ -7,6 +7,12 @@ import { NotFound } from '../pages/NotFound';
 
 const Shop = lazy(() => import('../pages/Shop').then((m) => ({ default: m.Shop })));
 const Universe = lazy(() => import('../pages/Universe').then((m) => ({ default: m.Universe })));
+const Universes = lazy(() => import('../pages/Universes').then((m) => ({ default: m.Universes })));
+const Character = lazy(() => import('../pages/Character').then((m) => ({ default: m.Character })));
+const Garments = lazy(() => import('../pages/Garments').then((m) => ({ default: m.Garments })));
+const Garment = lazy(() => import('../pages/Garment').then((m) => ({ default: m.Garment })));
+const Styles = lazy(() => import('../pages/Styles').then((m) => ({ default: m.Styles })));
+const Style = lazy(() => import('../pages/Style').then((m) => ({ default: m.Style })));
 const GenderPage = lazy(() => import('../pages/Gender').then((m) => ({ default: m.GenderPage })));
 const ProductDetail = lazy(() => import('../pages/ProductDetail').then((m) => ({ default: m.ProductDetail })));
 const Atelier = lazy(() => import('../pages/Atelier').then((m) => ({ default: m.Atelier })));
@@ -35,8 +41,32 @@ export const routes: RouteObject[] = [
         element: withSuspense(<Shop />),
       },
       {
+        path: 'universes',
+        element: withSuspense(<Universes />),
+      },
+      {
         path: 'universes/:universeSlug',
         element: withSuspense(<Universe />),
+      },
+      {
+        path: 'universes/:universeSlug/characters/:characterId',
+        element: withSuspense(<Character />),
+      },
+      {
+        path: 'garments',
+        element: withSuspense(<Garments />),
+      },
+      {
+        path: 'garments/:garmentSlug',
+        element: withSuspense(<Garment />),
+      },
+      {
+        path: 'styles',
+        element: withSuspense(<Styles />),
+      },
+      {
+        path: 'styles/:styleSlug',
+        element: withSuspense(<Style />),
       },
       {
         path: 'men',

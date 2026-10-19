@@ -32,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     if (defaultVariant.status === 'out-of-stock') {
       showToast({
         title: 'Sold out',
-        description: `${product.name} is currently sold out in ${defaultVariant.color}.`,
+        description: `${product.name} is currently sold out in size ${defaultVariant.size}.`,
         type: 'info',
       });
       return;
@@ -40,7 +40,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     addItem(product.slug, defaultVariant.sku, 1, undefined, defaultVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${product.name} (${defaultVariant.color} / ${defaultVariant.size})`,
+      description: `${product.name} (size ${defaultVariant.size})`,
       type: 'success',
     });
   };
@@ -89,7 +89,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               aspectRatio="3/4"
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-3 left-3 bg-ink/90 text-cream backdrop-blur-md px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans border border-stone/30">
+            <div className="absolute top-3 left-3 bg-ink/90 text-cream px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans border border-stone/30">
               ✦ 3x Macro Stitch
             </div>
           </div>
@@ -112,7 +112,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Technique Badge */}
         {product.embroidery && (
-          <div className="absolute bottom-3 left-3 bg-cream/95 text-ink backdrop-blur-md px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
+          <div className="absolute bottom-3 left-3 bg-cream/95 text-ink px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
             {product.embroidery.techniqueLabel}
           </div>
         )}
@@ -173,19 +173,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2">
             {product.subtitle}
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-wider text-ink-muted">
+            {product.artStyleSlug && (
+              <span className="font-medium">{product.artStyleSlug.replace(/-/g, ' ')}</span>
+            )}
+            {(product.craftTechniques ?? []).slice(0, 2).map((t) => (
+              <span key={t} className="normal-case tracking-normal text-ink/70">
+                {t.replace(/-/g, ' ')}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Footer Meta: Color Dots & Embroidery Hours */}
+        {/* Footer Meta: Sizes & Embroidery Hours */}
         <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
-          {/* Color Dots */}
+          {/* Available sizes (no colour option — one colour per piece) */}
           <div className="flex items-center gap-1.5">
-            {Array.from(new Set(product.variants.map((v) => v.colorHex))).slice(0, 4).map((hex, i) => (
-              <span
-                key={i}
-                className="w-2.5 h-2.5 rounded-full border border-stone/70"
-                style={{ backgroundColor: hex }}
-              />
-            ))}
+            <span className="text-[9px] text-ink-muted">
+              Sizes {Array.from(new Set(product.variants.map((v) => v.size))).slice(0, 5).join(' · ')}
+            </span>
             <span className="text-[9px] text-ink-muted ml-0.5">({product.variants.length})</span>
           </div>
 

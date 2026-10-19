@@ -27,6 +27,14 @@
   --color-error: var(--color-error);
   --color-success: var(--color-success);
 
+  --color-anime-deep: var(--color-anime-deep);
+  --color-hero-crimson: var(--color-hero-crimson);
+  --color-itihaas-bronze: var(--color-itihaas-bronze);
+  --color-champagne: var(--color-champagne);
+  --color-ivory: var(--color-ivory);
+  --color-coal-glass: var(--color-coal-glass);
+  --color-stone-deep: var(--color-stone-deep);
+
   /* render-era marketing shell (chatgpt-v2 targets) — quiet-luxury graphite +
      champagne (Oct 2026). --on-gold is the text color that passes contrast
      on champagne; themed scopes remap it to --u-on-accent. */
@@ -159,7 +167,12 @@
 }
 
 /* ─────────────────────────────────────
-   Reduced-motion reset
+   Reduced motion: intentional alternative
+   Spatial movement snaps instantly (no pan, slide, or parallax);
+   opacity fades keep a brief 150ms so state feedback
+   (drawer, accordion, focus) stays legible.
+   JS mirrors this: Lenis never starts, GSAP reveals
+   early-return, staggers collapse (see lib/motion.ts).
    ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 
@@ -168,7 +181,8 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: opacity !important;
+    transition-duration: 150ms !important;
     scroll-behavior: auto !important;
   }
 }

@@ -41,7 +41,7 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
           </div>
 
           <p className="text-xs text-ink-muted mt-1">
-            {variant.color} / {variant.size}
+            Size {variant.size}
           </p>
 
           {/* Bespoke Monogram details if present */}

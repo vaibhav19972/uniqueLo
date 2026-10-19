@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T00:00:00+05:30",
+  "title": "Design System: UniqueLo",
+  "extensions": {
+    "colorMeta": {
+      "canvas-cream": { "role": "neutral", "displayName": "Atelier Canvas Cream", "canonical": "#f7f5f0" },
+      "card-paper": { "role": "neutral", "displayName": "Card Paper", "canonical": "#ffffff" },
+      "ink-obsidian": { "role": "neutral", "displayName": "Obsidian Ink", "canonical": "#141414" },
+      "ink-muted-warm": { "role": "neutral", "displayName": "Warm Ink Muted", "canonical": "#686560" },
+      "hairline-stone": { "role": "neutral", "displayName": "Stone Hairline", "canonical": "#e5e1d8" },
+      "placeholder-warm-gray": { "role": "neutral", "displayName": "Warm Gray Placeholder", "canonical": "#9e9b94" },
+      "accent-terracotta": { "role": "primary", "displayName": "Burnt Terracotta", "canonical": "#d95d39", "tonalRamp": ["#4a1a0c", "#7c2c13", "#a83a1c", "#d95d39", "#e98a68", "#f2b39c", "#f8d6c7", "#fdefe8"] },
+      "bullion-gold": { "role": "secondary", "displayName": "Bullion Zari Gold", "canonical": "#cba043", "tonalRamp": ["#463211", "#6b4c17", "#9a712c", "#cba043", "#d8b96d", "#e4cf98", "#efe4c4", "#f8f2e2"] },
+      "saffron-marigold": { "role": "tertiary", "displayName": "Marigold Saffron", "canonical": "#e69526" },
+      "botanical-pistachio": { "role": "tertiary", "displayName": "Botanical Pistachio", "canonical": "#315e45" },
+      "midnight-indigo": { "role": "tertiary", "displayName": "Midnight Indigo", "canonical": "#1c2b3d" },
+      "silk-blush": { "role": "neutral", "displayName": "Silk Petal Blush", "canonical": "#fbf1ec" },
+      "parchment": { "role": "neutral", "displayName": "Parchment", "canonical": "#faf8f5" },
+      "anime-deep": { "role": "secondary", "displayName": "Torii Sakura-Maroon", "canonical": "#7a1f23" },
+      "hero-crimson": { "role": "secondary", "displayName": "Heroverse Issue-Red", "canonical": "#c0392b" },
+      "itihaas-bronze": { "role": "secondary", "displayName": "Darbar Arch Bronze", "canonical": "#5d3a1a" },
+      "champagne": { "role": "neutral", "displayName": "Champagne Sticker Text", "canonical": "#d4af37" },
+      "ivory": { "role": "neutral", "displayName": "Ivory Sticker Text", "canonical": "#f6efe3" },
+      "coal-glass": { "role": "neutral", "displayName": "Warm Coal Glass", "canonical": "#201c18" },
+      "stone-deep": { "role": "neutral", "displayName": "Deep Stone Border", "canonical": "#ded8cf" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines, universe portals; tight-tracked, may be caps-mode." },
+      "section-title": { "displayName": "Section Title", "purpose": "Lore headings and collection titles." },
+      "body": { "displayName": "Body", "purpose": "Editorial copy and functional text — Playfair carries both." },
+      "label": { "displayName": "Label", "purpose": "Satoshi tracked-caps eyebrows, badges, counts, facet chips ONLY." }
+    },
+    "shadows": [
+      { "name": "ambient-hover", "value": "0 6px 16px rgba(20, 20, 20, 0.06)", "purpose": "Card hover lift, paired with translate-y." },
+      { "name": "focus-float", "value": "0 28px 70px rgba(20, 20, 20, 0.14)", "purpose": "Focused portal cards and drawers." },
+      { "name": "universe-glow-gold", "value": "0 0 25px rgba(203, 160, 67, 0.28)", "purpose": "Universe-card identity glow only — never ambient." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-on-paper commerce CTA — the quiet choice.",
+      "html": "<button class=\"ds-btn-primary\">Add to Atelier Bag</button>",
+      "css": ".ds-btn-primary { background: var(--color-ink, #141414); color: var(--color-cream, #f7f5f0); font-family: var(--font-serif, 'Playfair Display', Georgia, serif); font-size: 17px; padding: 12px 28px; border: none; border-radius: 4px; cursor: pointer; transition: background .2s ease-out; } .ds-btn-primary:hover { background: #333; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
+    },
+    {
+      "name": "Universe Gold Button",
+      "kind": "button",
+      "refersTo": "universe-gold-cta",
+      "description": "Themed-zone CTA — gold remaps to the active universe's accent.",
+      "html": "<button class=\"ds-btn-gold\">Enter Animeverse →</button>",
+      "css": ".ds-btn-gold { background: var(--color-gold, #cba043); color: var(--on-gold, #f7f5f0); font-family: var(--font-serif, 'Playfair Display', Georgia, serif); font-size: 17px; padding: 12px 28px; border: none; border-radius: 4px; cursor: pointer; transition: background .2s ease-out, gap .3s ease-out; } .ds-btn-gold:hover { background: var(--color-gold-hover, #b8b043); } .ds-btn-gold:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
+    },
+    {
+      "name": "Facet Chip",
+      "kind": "chip",
+      "refersTo": "chip-filter",
+      "description": "Fully-round pill; selected state is ink inversion (base) or gold fill (themed zones).",
+      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-chip\" aria-pressed=\"false\">Quiet</button><button class=\"ds-chip ds-chip-active\" aria-pressed=\"true\">Loud</button></div>",
+      "css": ".ds-chip { background: var(--color-paper, #fff); color: var(--color-ink, #141414); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 9999px; font-family: var(--font-sans, 'Satoshi', sans-serif); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; padding: 8px 16px; min-height: 44px; cursor: pointer; transition: border-color .2s, background .2s; } .ds-chip:hover { border-color: var(--color-ink, #141414); } .ds-chip-active { background: var(--color-ink, #141414); color: var(--color-cream, #f7f5f0); border-color: transparent; } .ds-chip:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
+    },
+    {
+      "name": "Intensity Meter",
+      "kind": "custom",
+      "refersTo": "card-product",
+      "description": "Signature metadata component — 3-segment Quiet↔Loud position, never a rating.",
+      "html": "<span class=\"ds-meter\" title=\"Intensity: Loud\" aria-label=\"Intensity: Loud\"><span class=\"ds-segment ds-on\"></span><span class=\"ds-segment ds-on\"></span><span class=\"ds-segment ds-on\"></span><span style=\"font-family: var(--font-sans, sans-serif); font-size: 10px; text-transform: uppercase; letter-spacing: .12em;\">Loud</span></span>",
+      "css": ".ds-meter { display: inline-flex; align-items: center; gap: 6px; } .ds-segment { display: block; width: 4px; height: 3px; background: var(--color-stone, #e5e1d8); } .ds-on { background: var(--color-gold-zari, #cba043); }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card-product",
+      "description": "Paper card over cream, hairline border, lift earned on hover only.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-media\"></div><div class=\"ds-body\"><h3>Sakura Ronin Hoodie</h3></div></article>",
+      "css": ".ds-card { background: var(--color-paper, #fff); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 2px; transition: transform .5s cubic-bezier(.25,1,.5,1), box-shadow .5s cubic-bezier(.25,1,.5,1), border-color .5s; } .ds-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(20,20,20,.06); border-color: rgba(20,20,20,.5); } .ds-media { aspect-ratio: 3/4; background: var(--color-stone, #e5e1d8); } .ds-body { padding: 16px 20px; font-family: var(--font-serif, Georgia, serif); }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "button-primary",
+      "description": "Square field, drawn SVG icon, terracotta focus.",
+      "html": "<div class=\"ds-input\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path stroke-linecap=\"round\" d=\"M16.5 16.5L21 21\"/></svg><input placeholder=\"Search stitches, coats, flora...\"></div>",
+      "css": ".ds-input { position: relative; display: flex; align-items: center; gap: 6px; background: var(--color-paper, #fff); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 4px; padding: 6px 12px; } .ds-input svg { color: var(--color-stone, #e5e1d8); } .ds-input input { border: none; outline: none; font-family: var(--font-sans, sans-serif); font-size: 12px; color: var(--color-ink, #141414); background: transparent; } .ds-input:focus-within { border-color: var(--color-accent, #d95d39); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet-Luxury Atelier",
+    "overview": "A two-layer world: a stable cream-and-obsidian editorial base carrying every page's ergonomics, with per-universe ambient theming morphing accents and atmosphere without unmounting anything. Whitespace separates, hairlines group, depth is earned by interaction. Facet UI answers one question per filter: universe is where you are, garment chips are what kind of thing, intensity is how loudly you wear it, craft technique is provenance, edits are why you're shopping.",
+    "keyCharacteristics": [
+      "Cream editorial canvas, hairline stone rules, zero hard borders by default",
+      "One serif does everything (Playfair Display); Satoshi exists only as tracked-out caps micro-labels",
+      "Depth is earned by interaction, never baked into rest state",
+      "Universe theming is ambient scope, not page replacement",
+      "Facet chips are fully-round pills; selected state = ink inversion (base) or gold fill (themed)"
+    ],
+    "rules": [
+      { "name": "The Champagne Rule", "body": "Gold (#cba043) is never body text on light surfaces — light-ground gold appears only with gold-deep contrast tokens or as fills carrying on-gold text.", "section": "colors" },
+      { "name": "The One-Serif Rule", "body": "Never introduce a second editorial face; new voices come from weight, size, case, or italic — not family swaps.", "section": "typography" },
+      { "name": "The Earned-Lift Rule", "body": "Rest state: border only. Shadow + translate + scale arrive together as one interaction response. No resting shadows on cards.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do theme through tokens only: new universes = one JSON row + one [data-universe] CSS scope, zero component edits.",
+      "Do keep facet answers orthogonal — one question per filter.",
+      "Do carry aria-pressed on every chip, aria-label on every icon button, and 44px minimum touch targets."
+    ],
+    "donts": [
+      "Don't use gold as text on light grounds or gold CTAs without the paired on-gold token.",
+      "Don't fabricate scarcity, ratings, or provenance — numbers render from catalog data or not at all.",
+      "Don't add Google Fonts or icon-font/emoji icons — self-hosted faces and drawn SVGs only.",
+      "Don't let universe theming leak into checkout/account surfaces."
+    ]
+  }
+}

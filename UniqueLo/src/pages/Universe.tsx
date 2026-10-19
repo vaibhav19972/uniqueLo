@@ -1,16 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useProducts, useUniverse, useMotifsByUniverse } from '../hooks/useCatalog';
-import { filterProducts, type FilterState, type Vibe, VIBES } from '../lib/data';
+import { filterProducts, ART_STYLES, getCharacterIds, type FilterState, type ArtStyleSlug } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
 import { BundleBand } from '../components/shop/BundleBand';
 
-/** Rendered from the vibe registry (src/data/vibes.json) — never hardcoded. */
-const VIBE_OPTIONS: Vibe[] = VIBES.map((v) => v.slug);
-
-/** Jagged torn-paper divider strip (renders 8.x) — fill = the NEXT section's bg. */
-const TORN_POINTS =
-  '0% 100%, 0% 55%, 3% 85%, 7% 30%, 11% 75%, 15% 45%, 20% 90%, 25% 35%, 30% 70%, 35% 25%, 41% 80%, 47% 40%, 53% 85%, 59% 30%, 65% 75%, 71% 45%, 77% 90%, 83% 35%, 89% 70%, 94% 30%, 100% 65%, 100% 100%';
 
 const HERO_ORNAMENTS: Record<string, React.ReactNode> = {
   lotus: (
@@ -33,7 +27,8 @@ export const Universe: React.FC = () => {
   const { data: allProducts } = useProducts();
 
   const [garment, setGarment] = useState<string>('all');
-  const [vibe, setVibe] = useState<Vibe | 'all'>('all');
+  const [artStyle, setArtStyle] = useState<ArtStyleSlug | 'all'>('all');
+  const [character, setCharacter] = useState<string>('all');
 
   const garmentTypes = useMemo(() => {
     const set = new Set<string>();
@@ -41,6 +36,14 @@ export const Universe: React.FC = () => {
       if (p.universeSlug === universeSlug && p.garmentType) set.add(p.garmentType);
     }
     return [...set].sort();
+  }, [allProducts, universeSlug]);
+
+  const universeArtStyles = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of allProducts ?? []) {
+      if (p.universeSlug === universeSlug && p.artStyleSlug) set.add(p.artStyleSlug);
+    }
+    return ART_STYLES.filter((s) => set.has(s.slug));
   }, [allProducts, universeSlug]);
 
   const garmentLabel = (g: string): string => {
@@ -57,13 +60,14 @@ export const Universe: React.FC = () => {
       categorySlug: 'all',
       universeSlug: universeSlug ?? 'all',
       garmentTypes: garment === 'all' ? [] : [garment],
-      vibe,
+      characterId: character === 'all' ? 'all' : character,
+      artStyleSlug: artStyle,
       colors: [],
       sizes: [],
       sort: 'newest',
     };
     return filterProducts(allProducts ?? [], f);
-  }, [allProducts, universeSlug, garment, vibe]);
+  }, [allProducts, universeSlug, garment, character, artStyle]);
 
   if (universe === undefined) {
     return (
@@ -93,49 +97,44 @@ export const Universe: React.FC = () => {
     : [undefined, undefined];
 
   return (
-    <div data-universe={universe.slug} className="w-full">
-      {/* Themed hero — data-u-zone opts this subtree into the universe token
-          scope (gold CTAs resolve to --u-accent with --u-on-accent text) */}
-      <section
-        data-u-zone
-        className="relative overflow-hidden"
-        style={{ backgroundColor: 'var(--u-bg)', color: 'var(--u-ink)' }}
-      >
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-20">
-          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] opacity-70">
+    <div className="w-full bg-cream min-h-screen">
+      {/* Editorial Hero — unified Atelier quiet-luxury layout */}
+      <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
+        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-20 relative z-10">
+          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
-            <Link to="/shop" className="hover:underline">Universes</Link>
+            <Link to="/universes" className="hover:underline">Universes</Link>
             <span className="mx-2">›</span>
             <span>{universe.name}</span>
           </nav>
 
-          {/* Ornament / kicker (lotus mark, compass star, or kanji kicker) */}
+          {/* Ornament / kicker */}
           {universe.hero_ornament && (
-            <svg className="w-8 h-8 mt-6" style={{ color: 'var(--u-accent-2)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-8 h-8 mt-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               {HERO_ORNAMENTS[universe.hero_ornament]}
             </svg>
           )}
           {universe.hero_kicker && (
-            <p className="font-serif text-xl mt-5 tracking-[0.2em]" style={{ color: 'var(--u-accent-2)' }} aria-hidden="true">
+            <p className="font-serif text-xl mt-5 tracking-[0.2em] text-accent" aria-hidden="true">
               {universe.hero_kicker}
             </p>
           )}
 
-          {/* Headline — caps single-tone (8.1) or two-tone sentence (8.2/8.3) */}
+          {/* Headline */}
           <h1
             className={`font-serif font-semibold tracking-tight leading-[1.02] mt-2 ${isCaps ? 'uppercase text-5xl sm:text-7xl lg:text-8xl' : 'text-5xl sm:text-6xl lg:text-7xl max-w-3xl'}`}
           >
             {accentWord ? (
               <>
-                <span style={{ color: universe.hero_lead_color ?? 'var(--u-ink)' }}>
+                <span>
                   {accentBefore}
                 </span>
-                <span style={{ color: universe.hero_accent_color ?? 'var(--u-accent-2)' }}>
+                <span className="text-accent">
                   {accentWord}
                 </span>
                 {accentAfter !== undefined && accentAfter !== '' && (
-                  <span style={{ color: universe.hero_lead_color ?? 'var(--u-ink)' }}>
+                  <span>
                     {accentAfter}
                   </span>
                 )}
@@ -145,54 +144,47 @@ export const Universe: React.FC = () => {
             )}
           </h1>
 
-          <p className="font-serif italic text-xl sm:text-2xl mt-3 opacity-90">{universe.tagline}</p>
-          <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed opacity-80">
+          <p className="font-serif italic text-xl sm:text-2xl mt-3 text-ink-muted">{universe.tagline}</p>
+          <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed text-ink/85">
             {universe.lore}
           </p>
 
           <div className="flex flex-wrap gap-3 mt-8">
             <a
               href="#collection"
-              className="inline-flex items-center gap-2 px-7 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-on-gold hover:bg-gold-hover transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3.5 font-serif text-[17px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm"
             >
               Explore Collection <span aria-hidden="true">→</span>
             </a>
             <a
               href="#lore"
-              className="inline-flex items-center gap-2 px-7 py-3.5 text-[15px] font-serif border border-current/60 min-h-[48px] hover:border-current transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-[15px] font-serif border border-stone min-h-[48px] text-ink hover:border-ink transition-colors rounded-sm"
             >
               Read the Lore <span aria-hidden="true">↓</span>
             </a>
           </div>
         </div>
 
-        {/* Handwritten-style annotation (8.2) — tracked caps, no script face yet (logged) */}
+        {/* Handwritten-style annotation */}
         {universe.hero_note && (
-          <p className="hidden lg:block absolute top-8 right-10 font-sans text-[12px] uppercase tracking-[0.25em] rotate-2 opacity-80" aria-hidden="true">
+          <p className="hidden lg:block absolute top-8 right-10 font-sans text-[12px] uppercase tracking-[0.25em] text-ink-muted rotate-2 opacity-80" aria-hidden="true">
             {universe.hero_note}
           </p>
         )}
 
-        {/* Vertical accent text along the right edge (8.1 kanji / 8.3 Devanagari) */}
+        {/* Vertical accent text along the right edge */}
         {universe.hero_vertical_text && (
           <p
-            className="hidden lg:flex absolute top-28 right-6 font-serif text-lg opacity-75 cursor-default"
+            className="hidden lg:flex absolute top-28 right-6 font-serif text-lg text-ink-muted opacity-60 cursor-default"
             style={{ writingMode: 'vertical-rl' }}
             aria-hidden="true"
           >
             {universe.hero_vertical_text}
           </p>
         )}
-
-        {/* Torn-paper edge transitioning to the cream content zone */}
-        <div
-          aria-hidden="true"
-          className="absolute bottom-0 left-0 right-0 h-5 bg-cream"
-          style={{ clipPath: `polygon(${TORN_POINTS})` }}
-        />
       </section>
 
-      {/* Lore strip — parchment panels per 8.3 (artwork slots activate at P5) */}
+      {/* Lore strip — unified Atelier parchment panels */}
       <section id="lore" aria-label={`${universe.name} lore`} className="bg-cream border-b border-stone/60">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
           <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
@@ -202,13 +194,27 @@ export const Universe: React.FC = () => {
             {universe.lore_heading ?? 'More Than Characters.'}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-7">
-            {(motifs ?? []).map((m) => (
-              <article key={m.id} className="bg-parchment border border-stone/70 p-5">
-                <div className="aspect-[16/9] bg-stone/30 mb-4" aria-hidden="true" />
-                <h3 className="font-serif text-xl text-ink">{m.name}</h3>
-                <p className="font-serif text-sm text-ink-muted mt-1.5 leading-relaxed">{m.meaning}</p>
-              </article>
-            ))}
+            {(motifs ?? []).map((m) => {
+              const count = (allProducts ?? []).filter((p) =>
+                getCharacterIds(p).includes(m.id),
+              ).length;
+              return (
+                <Link
+                  key={m.id}
+                  to={`/universes/${universe.slug}/characters/${m.id}`}
+                  className="group bg-parchment border border-stone/70 p-5 hover:border-ink transition-colors"
+                >
+                  <div className="aspect-[16/9] bg-stone/30 mb-4" aria-hidden="true" />
+                  <h3 className="font-serif text-xl text-ink group-hover:text-accent transition-colors">
+                    {m.name}
+                  </h3>
+                  <p className="font-serif text-sm text-ink-muted mt-1.5 leading-relaxed">{m.meaning}</p>
+                  <span className="inline-flex items-center gap-1.5 mt-3 text-[11px] uppercase tracking-widest text-ink font-medium">
+                    Shop character · {count} <span aria-hidden="true">→</span>
+                  </span>
+                </Link>
+              );
+            })}
             {(motifs ?? []).length > 0 && (motifs ?? []).length < 3 && (
               <article className="border border-dashed border-stone/70 p-5 flex items-center">
                 <p className="font-serif text-sm text-ink-muted leading-relaxed">
@@ -223,13 +229,15 @@ export const Universe: React.FC = () => {
       {/* Collection */}
       <section id="collection" aria-label={`${universe.name} collection`} className="bg-cream">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-          {/* Filter chips — fully rounded pills (renders 8.x) */}
+          {/* Filter chips — garments + characters + art styles */}
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setGarment('all')}
-              aria-pressed={garment === 'all'}
-              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors ${
-                garment === 'all' ? 'text-on-gold bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
+              onClick={() => { setGarment('all'); setCharacter('all'); setArtStyle('all'); }}
+              aria-pressed={garment === 'all' && character === 'all' && artStyle === 'all'}
+              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+                garment === 'all' && character === 'all' && artStyle === 'all'
+                  ? 'bg-ink text-cream border border-transparent font-medium'
+                  : 'text-ink border border-stone bg-paper hover:border-ink'
               }`}
             >
               All
@@ -239,24 +247,45 @@ export const Universe: React.FC = () => {
                 key={g}
                 onClick={() => setGarment(g === garment ? 'all' : g)}
                 aria-pressed={garment === g}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors ${
-                  garment === g ? 'text-on-gold bg-gold border border-transparent' : 'text-ink border border-stone hover:border-ink'
+                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+                  garment === g
+                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    : 'text-ink border border-stone bg-paper hover:border-ink'
                 }`}
               >
                 {garmentLabel(g)}
               </button>
             ))}
             <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
-            {VIBE_OPTIONS.map((v) => (
+            {(motifs ?? []).map((m) => (
               <button
-                key={v}
-                onClick={() => setVibe(v === vibe ? 'all' : v)}
-                aria-pressed={vibe === v}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors capitalize ${
-                  vibe === v ? 'text-on-gold bg-gold border border-transparent' : 'text-ink-muted border border-stone hover:border-ink'
+                key={m.id}
+                onClick={() => setCharacter(m.id === character ? 'all' : m.id)}
+                aria-pressed={character === m.id}
+                title={m.meaning}
+                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+                  character === m.id
+                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >
-                {v}
+                {m.name}
+              </button>
+            ))}
+            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
+            {universeArtStyles.map((s) => (
+              <button
+                key={s.slug}
+                onClick={() => setArtStyle(s.slug === artStyle ? 'all' : s.slug)}
+                aria-pressed={artStyle === s.slug}
+                title={s.tagline}
+                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+                  artStyle === s.slug
+                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
+                }`}
+              >
+                {s.name}
               </button>
             ))}
           </div>

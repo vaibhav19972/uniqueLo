@@ -61,35 +61,33 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
   return (
     <section
       aria-label="Complete the look"
-      data-u-zone
-      className="mt-4"
-      style={{ backgroundColor: 'var(--u-surface)', color: 'var(--u-ink)' }}
+      className="mt-8 bg-paper border-t border-stone/60 text-ink"
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight">Complete the Look</h2>
-            <p className="text-sm mt-1 opacity-80 font-light">Curated pieces that go together.</p>
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight text-ink">Complete the Look</h2>
+            <p className="text-sm mt-1 text-ink-muted font-light">Curated pieces from {universeName} that go together.</p>
           </div>
-          <Link to="/shop" className="hidden sm:inline-flex items-center gap-2 text-sm border-b border-current pb-1 opacity-80 hover:opacity-100">
+          <Link to="/shop" className="hidden sm:inline-flex items-center gap-2 text-sm border-b border-ink/40 pb-1 text-ink-muted hover:text-ink hover:border-ink transition-colors">
             Shop the set <span aria-hidden="true">→</span>
           </Link>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-stretch gap-4 mt-7">
+        <div className="flex flex-col lg:flex-row items-stretch gap-6 mt-7">
           <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
             {bundle.map((p, i) => (
               <div key={p.slug} className="relative">
                 {i > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-1/2 -translate-y-1/2 -left-3 z-10 font-serif text-2xl text-gold"
+                    className="absolute top-1/2 -translate-y-1/2 -left-3.5 z-10 font-serif text-xl text-ink-muted"
                   >
                     +
                   </span>
                 )}
-                <Link to={`/product/${p.slug}`} className="group bg-black/10 border border-white/10 p-2">
-                  <div className="aspect-square overflow-hidden">
+                <Link to={`/product/${p.slug}`} className="group block bg-cream/50 border border-stone/70 p-2.5 rounded-sm hover:border-ink transition-colors">
+                  <div className="aspect-square overflow-hidden bg-stone/20">
                     <img
                       src={p.images[0]?.src}
                       alt={p.images[0]?.alt || p.name}
@@ -97,24 +95,24 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <p className="font-serif text-[15px] mt-2 leading-tight">{p.name}</p>
-                  <p className="text-[13px] opacity-75">{formatPrice(getDefaultVariant(p).priceCents)}</p>
+                  <p className="font-serif text-[15px] mt-2.5 leading-tight text-ink group-hover:text-accent transition-colors">{p.name}</p>
+                  <p className="text-[13px] text-ink-muted mt-1">{formatPrice(getDefaultVariant(p).priceCents)}</p>
                 </Link>
               </div>
             ))}
           </div>
 
-          <div className="lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-white/15 pt-5 lg:pt-0 lg:pl-6 flex lg:flex-col justify-between gap-4">
+          <div className="lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-stone/60 pt-5 lg:pt-0 lg:pl-6 flex lg:flex-col justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-widest opacity-70">Set Total</p>
-              <p className="font-serif text-3xl mt-1 text-gold">
+              <p className="text-xs uppercase tracking-widest text-ink-muted">Set Total</p>
+              <p className="font-serif text-3xl mt-1 text-ink font-medium">
                 {formatPrice(setTotal)}
               </p>
-              <p className="text-[11px] mt-1 opacity-80">Unit prices · bundle discount engine lands next</p>
+              <p className="text-[11px] mt-1 text-ink-muted">Unit prices · bundle discount engine lands next</p>
             </div>
             <button
               onClick={handleAddAll}
-              className="px-6 py-3.5 font-serif text-[17px] min-h-[48px] bg-gold text-on-gold hover:bg-gold-hover transition-colors"
+              className="px-6 py-3.5 font-serif text-[16px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm cursor-pointer"
             >
               Add All to Cart <span aria-hidden="true">→</span>
             </button>

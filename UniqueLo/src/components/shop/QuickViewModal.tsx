@@ -7,9 +7,11 @@ import { useToastStore } from '../../stores/toast';
 import { formatPrice, getDefaultVariant, type ProductVariant } from '../../lib/data';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 export const QuickViewModal: React.FC = () => {
   const { isOpen, product, closeQuickView } = useQuickViewStore();
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, closeQuickView);
   const addItem = useCartStore((state) => state.addItem);
   const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
   const showToast = useToastStore((state) => state.showToast);
@@ -33,7 +35,7 @@ export const QuickViewModal: React.FC = () => {
     addItem(product.slug, currentVariant.sku, 1, undefined, currentVariant.quantity ?? 99);
     showToast({
       title: 'Added to Atelier Bag',
-      description: `${product.name} (${currentVariant.color} / ${currentVariant.size})`,
+      description: `${product.name} (size ${currentVariant.size})`,
       type: 'success',
     });
     closeQuickView();
@@ -53,7 +55,14 @@ export const QuickViewModal: React.FC = () => {
       />
 
       {/* Modal Surface */}
-      <div className="relative w-full max-w-4xl bg-paper border border-stone shadow-2xl rounded-sm overflow-hidden z-10 flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={product.name}
+        tabIndex={-1}
+        className="relative w-full max-w-4xl bg-paper border border-stone shadow-2xl rounded-sm overflow-hidden z-10 flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200"
+      >
         <button
           onClick={closeQuickView}
           aria-label="Close modal"
@@ -137,40 +146,13 @@ export const QuickViewModal: React.FC = () => {
               {product.subtitle}
             </p>
 
-            {/* Color Swatches */}
-            <div className="mt-6">
-              <label className="text-[11px] font-sans tracking-widest uppercase text-ink block mb-2 font-medium">
-                Color: <span className="text-ink-muted font-normal">{currentVariant.color}</span>
-              </label>
-              <div className="flex gap-2.5">
-                {Array.from(new Set(product.variants.map((v) => v.color))).map((color) => {
-                  const variantForColor = product.variants.find((v) => v.color === color);
-                  const isSelected = currentVariant.color === color;
-                  return (
-                    <button
-                      key={color}
-                      onClick={() => variantForColor && setSelectedVariant(variantForColor)}
-                      aria-label={`Choose color ${color}`}
-                      aria-pressed={isSelected}
-                      className={`min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border transition-all ${
-                        isSelected ? 'ring-2 ring-accent ring-offset-2 scale-105 border-transparent' : 'border-stone hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: variantForColor?.colorHex }}
-                      title={color}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Size Selector */}
+            {/* Size Selector (no colour option — one colour per piece) */}
             <div className="mt-5">
               <label className="text-[11px] font-sans tracking-widest uppercase text-ink block mb-2 font-medium">
                 Size: <span className="text-ink-muted font-normal">{currentVariant.size}</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {product.variants
-                  .filter((v) => v.color === currentVariant.color)
                   .map((v) => {
                     const isSelected = currentVariant.sku === v.sku;
                     const isOut = v.status === 'out-of-stock';

@@ -1,13 +1,16 @@
 import { create } from 'zustand';
-import type { FilterState, SortKey, EmbroideryTechnique, Gender, Vibe, MoodSlug } from '../lib/data';
+import type { FilterState, SortKey, EmbroideryTechnique, Gender, IntensityLevel, ArtStyleSlug, EditSlug } from '../lib/data';
 
 interface FiltersStore {
   filters: FilterState;
   setCategory: (categorySlug: string) => void;
   setUniverse: (universeSlug: string | 'all') => void;
   setGender: (gender: Gender | 'all') => void;
-  setVibe: (vibe: Vibe | 'all') => void;
-  setMood: (mood: MoodSlug | 'all') => void;
+  setIntensity: (intensity: IntensityLevel | 'all') => void;
+  setCharacter: (characterId: string | 'all') => void;
+  setArtStyle: (artStyle: ArtStyleSlug | 'all') => void;
+  setEdit: (edit: EditSlug | 'all') => void;
+  setGarmentTypes: (garmentTypes: string[]) => void;
   toggleGarmentType: (garmentType: string) => void;
   toggleColor: (color: string) => void;
   toggleSize: (size: string) => void;
@@ -23,8 +26,10 @@ const initialFilters: FilterState = {
   universeSlug: 'all',
   gender: 'all',
   garmentTypes: [],
-  vibe: 'all',
-  mood: 'all',
+  intensity: 'all',
+  characterId: 'all',
+  artStyleSlug: 'all',
+  edit: 'all',
   colors: [],
   sizes: [],
   techniques: [],
@@ -51,14 +56,29 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
       filters: { ...state.filters, gender },
     })),
 
-  setVibe: (vibe) =>
+  setIntensity: (intensity) =>
     set((state) => ({
-      filters: { ...state.filters, vibe },
+      filters: { ...state.filters, intensity },
     })),
 
-  setMood: (mood) =>
+  setCharacter: (characterId) =>
     set((state) => ({
-      filters: { ...state.filters, mood },
+      filters: { ...state.filters, characterId },
+    })),
+
+  setArtStyle: (artStyleSlug) =>
+    set((state) => ({
+      filters: { ...state.filters, artStyleSlug },
+    })),
+
+  setEdit: (edit) =>
+    set((state) => ({
+      filters: { ...state.filters, edit },
+    })),
+
+  setGarmentTypes: (garmentTypes) =>
+    set((state) => ({
+      filters: { ...state.filters, garmentTypes },
     })),
 
   toggleGarmentType: (garmentType) =>
