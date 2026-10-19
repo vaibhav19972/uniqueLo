@@ -9,6 +9,7 @@ import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
+import { useIsThemeV2 } from '../../config/theme';
 
 interface ProductCardProps {
   product: Product;
@@ -25,6 +26,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const frontImage = product.images[0]?.src || '/images/placeholders/hero.jpg';
   const macroImage = product.images[1]?.src || frontImage;
   const isWish = isWishlisted(product.slug);
+  const isV2 = useIsThemeV2();
+
+  const compareAt = defaultVariant.compareAtPriceCents;
+  const offPct =
+    compareAt && compareAt > defaultVariant.priceCents
+      ? Math.round((1 - defaultVariant.priceCents / compareAt) * 100)
+      : 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -69,7 +77,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1">
+    <div
+      className={`group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 ${
+        isV2 ? 'rounded-2xl overflow-hidden' : ''
+      }`}
+    >
       {/* Visual Canvas */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
@@ -161,14 +173,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           <div className="flex justify-between items-start gap-2">
-            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors">
+            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors flex-1">
               <h3 className="font-serif text-base sm:text-lg text-ink font-normal leading-snug">
                 {product.name}
               </h3>
             </Link>
-            <span className="font-sans text-sm font-medium text-ink whitespace-nowrap">
-              {formatPrice(defaultVariant.priceCents)}
-            </span>
+            <div className="flex flex-col items-end shrink-0">
+              <span className="font-sans text-sm font-semibold text-ink whitespace-nowrap">
+                {formatPrice(defaultVariant.priceCents)}
+              </span>
+              {compareAt && compareAt > defaultVariant.priceCents && (
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
+                  {isV2 && offPct > 0 && (
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
+                      ({offPct}% OFF)
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2">
             {product.subtitle}

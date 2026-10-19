@@ -83,6 +83,17 @@
     overflow-x: clip;
   }
 
+  :root[data-theme="v2"] body, html.theme-v2 body {
+    font-family: var(--font-sans);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+  }
+
+  /* When v2 is active, re-route font-serif to font-sans for full neo-grotesque coherence */
+  html.theme-v2 .font-serif, [data-theme="v2"] .font-serif {
+    font-family: var(--font-sans) !important;
+  }
+
   * {
     border-color: var(--color-stone);
   }

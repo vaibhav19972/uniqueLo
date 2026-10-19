@@ -17,6 +17,7 @@ interface CartState {
   ) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number, maxQuantity?: number) => void;
+  updateVariant: (id: string, newVariantSku: string) => void;
   clearCart: () => void;
   getTotalItems: () => number;
 }
@@ -89,6 +90,20 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.map((item) =>
             item.id === id ? { ...item, quantity: safeQty } : item
+          ),
+        }));
+      },
+
+      updateVariant: (id, newVariantSku) => {
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  id: generateCartItemId(item.productSlug, newVariantSku, item.customization),
+                  variantSku: newVariantSku,
+                }
+              : item
           ),
         }));
       },
