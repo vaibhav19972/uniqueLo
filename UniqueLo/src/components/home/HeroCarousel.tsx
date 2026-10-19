@@ -13,7 +13,7 @@ export interface CarouselSlide {
   ctaLink: string;
 }
 
-export const CAROUSEL_SLIDES: CarouselSlide[] = [
+const CAROUSEL_SLIDES: CarouselSlide[] = [
   {
     id: 'freestyle',
     image: '/images/campaigns/freestyle-hero-cleaned.jpg',
@@ -156,7 +156,7 @@ export const HeroCarousel: React.FC = () => {
   const currentSlide = slides[activeIndex];
 
   // Progress animation refs
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
   const elapsedBeforePauseRef = useRef<number>(0);
   const animFrameRef = useRef<number | null>(null);
   const touchStartXRef = useRef<number | null>(null);
@@ -277,9 +277,10 @@ export const HeroCarousel: React.FC = () => {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-opacity ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
+              style={{ transitionDuration: `${SITE_TWEAKS.carousel.fadeDurationMs}ms` }}
               aria-hidden={!isActive}
             >
               <img
@@ -439,7 +440,7 @@ export const HeroCarousel: React.FC = () => {
         <div
           role="complementary"
           aria-label="Download mobile application"
-          className="absolute bottom-6 left-5 sm:bottom-8 sm:left-8 lg:left-12 z-30 flex items-center gap-3.5 bg-black/75 backdrop-blur-md border border-white/20 rounded-2xl p-3 sm:p-3.5 shadow-2xl text-white max-w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-black/85 transition-colors"
+          className="absolute bottom-6 left-5 sm:bottom-8 sm:left-8 lg:left-12 z-30 flex items-center gap-3.5 bg-black/75 backdrop-blur-md border border-white/20 rounded-sm p-3 sm:p-3.5 shadow-2xl text-white max-w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-black/85 transition-colors"
         >
           {/* Close button with circular white badge */}
           <button
@@ -459,7 +460,7 @@ export const HeroCarousel: React.FC = () => {
           </button>
 
           {/* Dummy QR Code Image */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white p-1.5 shrink-0 flex items-center justify-center text-black shadow-md">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-sm bg-white p-1.5 shrink-0 flex items-center justify-center text-black shadow-md">
             <DummyQRCode className="w-full h-full" />
           </div>
 

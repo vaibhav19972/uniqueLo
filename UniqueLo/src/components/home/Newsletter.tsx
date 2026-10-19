@@ -72,7 +72,7 @@ export const Newsletter: React.FC = () => {
           </p>
 
           {isSubmitted ? (
-            <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink rounded-xl">
+            <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink rounded-sm">
               <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
               </svg>
@@ -100,15 +100,13 @@ export const Newsletter: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className={`w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] ${
-                    isV2 ? 'rounded-xl' : 'rounded-sm'
-                  }`}
+                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
                 />
               </div>
               <CtaButton
                 type="submit"
                 disabled={isLoading}
-                className={`disabled:opacity-60 px-6 ${isV2 ? 'rounded-xl' : ''}`}
+                className="disabled:opacity-60 px-6 rounded-sm"
               >
                 {isLoading ? 'Joining…' : isV2 ? 'Get 10% Off' : 'Join the Atelier List'} <span aria-hidden="true">→</span>
               </CtaButton>

@@ -77,11 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div
-      className={`group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 ${
-        isV2 ? 'rounded-2xl overflow-hidden' : ''
-      }`}
-    >
+    <div className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1">
       {/* Visual Canvas */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
@@ -186,7 +182,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
                   {isV2 && offPct > 0 && (
-                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5">
                       ({offPct}% OFF)
                     </span>
                   )}

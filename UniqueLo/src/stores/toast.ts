@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { SITE_TWEAKS } from '../config/tweaks';
 
 export interface ToastMessage {
   id: string;
@@ -23,11 +24,12 @@ export const useToastStore = create<ToastState>((set) => ({
       toasts: [...state.toasts, { ...toast, id }],
     }));
 
+    const duration = SITE_TWEAKS.ui.toastDurationMs || 4000;
     setTimeout(() => {
       set((state) => ({
         toasts: state.toasts.filter((t) => t.id !== id),
       }));
-    }, 4500);
+    }, duration);
   },
   removeToast: (id) =>
     set((state) => ({

@@ -22,7 +22,7 @@ web
 - **Where Haute Couture Meets Cult Aesthetics:** Unlike mass-market graphic tee sites (e.g. Redbubble, generic merch stores) or single-franchise boutiques, UniqueLo positions fandom-adjacent fashion as premium designer wear.
 - **Original, Inspired-By Artwork Only:** Universes are expressed through **original artwork and atmospheres inspired by genres and aesthetics** (anime icons and emotion, cosmic heroics, Indian royal heritage), never through unlicensed trademarked IP. The universe roster is deliberately flexible — new capsules can be added without restructuring the product.
 - **Intensity + Edits Taxonomy (2026-10-13):** Each piece answers one question per facet — Universe is where you are, garment type is what kind of thing, **Intensity (Quiet / Balanced / Loud)** is how loudly you wear it, craft technique is how it was made (provenance, 9 techniques), and **Edits** are curated shoppable collections by buyer intent (6 slugs in `src/data/edits.json`).
-- **Chameleonic Micro-Stores:** Each universe is a living micro-world over a quiet-luxury editorial base. Entering a theme dynamically shifts the ambient environment, background atmosphere, and design accents without breaking seamless single-page navigation or checkout.
+- **Unified Editorial Base, Themed Capsules:** Each universe is an artisanal capsule over a unified design base (The Atelier in v1, or Modern D2C Streetwear in v2 via `USE_THEME_V2`). Navigating between universes shifts editorial lore, ornament icons, and capsule collections without fragmenting the site's unified chrome, surface styling, or checkout.
 - **Artisanal Core, Themed Capsules:** The base catalog is pure craft (zardozi, crewel, sashiko, aari — the atelier line); each universe adds its own themed capsule of embroidery rendered in those same techniques.
 
 ## Operating Context
@@ -30,7 +30,7 @@ web
 - **Universe Micro-Store Navigation:** Browsing between distinct thematic capsules — Animeverse, Heroverse, Itihaas — plus the Atelier neutral door, with an intentionally extensible universe roster (future universes, creator collaborations) that can grow without redesign.
 - **Intensity Filter Trio:** Effortless toggling between Quiet (tonal crests, discreet motifs), Balanced (clear story, held in measure), and Loud (full-panel artwork, rich textures, high-contrast storytelling). Products without an explicit value read as Balanced.
 - **Edits Collections:** Curated shoppable collections by buyer intent (Everyday, Statement, Heritage, Festive & Gifting, Comfort, Collector), presented via the Edits gateway on Home.
-- **Dynamic Atmosphere Adaptation:** Switching themes triggers instantaneous visual transformation of ambient canvas, accent tokens, and sensory cues layered over the stable editorial base design.
+- **Unified Design & Ambience:** Clean architectural canvas with crisp square geometry across all storefront sections, and rounded corners scoped exclusively to the Gokwik-style Cart Bag drawer.
 - **Craft Provenance:** Craft technique (zari, sashiko, crewel, kantha… — 9 registered techniques) appears as product-level provenance detail, never as a primary browsing axis; the primary navigation axis is the universe.
 - **Garment & Texture Inspection:** High-definition macro zoom on fabrics, embroidery reliefs, and variant swatches.
 - **Frictionless Commerce:** Instant cart drawer opening, real-time stock-clamped inventory, and direct Supabase-backed order flows.

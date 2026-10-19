@@ -386,3 +386,19 @@ checkable in code review, and every new component must pass them.
 - Generated placeholder images are acceptable only during build phases and must
   be tracked in `docs/06-assets-and-placeholders` with replacement intent.
 
+---
+
+## 13. Design System v2 & Theme Unification (`USE_THEME_V2`)
+
+Per user direction, the site's design system supports two cohesive modes toggled via a single flag in `src/config/theme.ts`:
+
+- **v1: The Atelier** (`USE_THEME_V2 = false`): Quiet-luxury editorial canvas (`#f7f5f0`), white paper surfaces (`#ffffff`), Playfair Display serif headlines, hairline stone rules (`#e5e1d8`), and obsidian action buttons.
+- **v2: Modern D2C Streetwear & Gokwik-Style Bag** (`USE_THEME_V2 = true`): Extracted from `sketches/design system.png` — cool slate canvas (`#f0f2f5`), pure white surfaces (`#ffffff`), neo-grotesque sans typography (Satoshi/Inter), emerald savings accents (`#059669`), and an interactive Gokwik checkout drawer.
+
+### 13.1 Corner Radius Scope Rule
+- **Cart Bag Only:** Rounded corners (`rounded-2xl`, `rounded-xl`, `rounded-full`) are strictly confined to the Cart Bag drawer (`CartDrawer.tsx` & `CartLineItem.tsx`) to match the Gokwik interactive checkout bag from `sketches/design system.png`.
+- **Rest of Website:** Product cards, bestseller cards, home sections, PDP, newsletter, and universe pages strictly preserve clean architectural square rectangles (`--radius-sm: 0.125rem`, `--radius-md: 0.25rem`).
+
+For full details, specifications, and color token tables, consult the comprehensive root document [`DESIGN.md`](../../DESIGN.md).
+
+

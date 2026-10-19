@@ -96,7 +96,7 @@ export const UGCWall: React.FC = () => {
           {SAMPLE_STORIES.map((s) => (
             <figure
               key={s.name}
-              className={`group relative overflow-hidden rounded-2xl bg-stone/20 ${s.tall ? 'row-span-2' : ''}`}
+              className={`group relative overflow-hidden rounded-sm bg-stone/20 ${s.tall ? 'row-span-2' : ''}`}
             >
               <img
                 src={s.image}
@@ -126,7 +126,7 @@ export const UGCWall: React.FC = () => {
 
         {/* Stats bar (SAMPLE figures; wire to real aggregates at P5) —
             rounded beige strip, gold outline icons, serif numerals */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 rounded-2xl bg-stone/30 px-6 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 rounded-sm bg-stone/30 px-6 py-6">
           {SAMPLE_STATS.map((s, i) => (
             <div
               key={s.label}

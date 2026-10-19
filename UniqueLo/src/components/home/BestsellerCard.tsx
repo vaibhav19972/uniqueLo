@@ -90,7 +90,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
 
   return (
     <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl bg-paper ring-1 ring-stone/50 transition-all duration-300 hover:ring-2 hover:ring-gold hover:shadow-[0_28px_70px_rgba(160,114,45,0.22)] hover:-translate-y-1 w-[270px] sm:w-[300px] shrink-0 snap-start`}
+      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 w-[270px] sm:w-[300px] shrink-0 snap-start"
     >
       {/* Visual */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
@@ -104,7 +104,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
         </Link>
 
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gold text-on-gold text-[11px] font-sans tracking-wide px-3 py-1.5">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gold text-on-gold text-[11px] font-sans tracking-wide px-3 py-1.5">
             <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
           </span>
         )}
@@ -122,9 +122,9 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </svg>
         </button>
 
-        {/* Hover / focus Quick-View overlay — compact integrated capsule matching render 05 */}
+        {/* Hover / focus Quick-View overlay — compact integrated capsule */}
         <div className="absolute inset-x-2.5 sm:inset-x-3 bottom-2.5 sm:bottom-3 flex flex-col opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300 z-10 filter drop-shadow-[0_12px_28px_rgba(0,0,0,0.18)] pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
-          {/* Quick View top bar — dark smoky glass tab */}
+          {/* Quick View top bar */}
           <button
             type="button"
             onClick={(e) => {
@@ -133,7 +133,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
               openQuickView(product);
             }}
             aria-label={`Quick view ${product.name}`}
-            className="w-full flex items-center justify-center gap-2 rounded-t-xl bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
           >
             <svg className="w-4 h-4 shrink-0 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
@@ -143,7 +143,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </button>
 
           {/* Size selection & Add to Cart — crisp white floating surface */}
-          <div className="bg-white rounded-b-xl p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
+          <div className="bg-white p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
             <div className="grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="Choose size">
               {sizes.map((s) => {
                 const available = inStockSizes.has(s);
@@ -159,7 +159,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
                     }}
                     aria-pressed={size === s}
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                    className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border rounded-[5px] transition-colors flex items-center justify-center ${
+                    className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border transition-colors flex items-center justify-center ${
                       size === s
                         ? isV2
                           ? 'bg-ink text-paper border-transparent font-semibold shadow-xs'
@@ -175,7 +175,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <button
               type="button"
               onClick={handleAdd}
-              className={`w-full mt-2 min-h-[44px] py-2 rounded-[6px] font-serif text-[13px] sm:text-[14px] transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
+              className={`w-full mt-2 min-h-[44px] py-2 font-serif text-[13px] sm:text-[14px] transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
                 isV2
                   ? 'bg-ink text-paper hover:bg-black font-sans font-semibold'
                   : 'bg-gold text-on-gold hover:bg-gold-hover'
@@ -223,7 +223,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
               <span
-                className={`text-[11px] font-sans px-1.5 py-0.5 rounded ${
+                className={`text-[11px] font-sans px-1.5 py-0.5 ${
                   isV2
                     ? 'font-semibold text-emerald-700 bg-emerald-50'
                     : 'bg-gold-deep/10 text-gold-deep'

@@ -27,7 +27,7 @@ export const AnnouncementBar: React.FC = () => {
           {/* Center: Promo code pill */}
           <div className="hidden md:flex items-center gap-2">
             <span className="text-white/80">Get 10% OFF on your order with code</span>
-            <span className="inline-flex items-center gap-1 font-mono font-bold px-2 py-0.5 rounded bg-white/10 text-emerald-400 border border-emerald-500/30 text-xs tracking-wider">
+            <span className="inline-flex items-center gap-1 font-mono font-bold px-2 py-0.5 rounded-sm bg-white/10 text-emerald-400 border border-emerald-500/30 text-xs tracking-wider">
               HUSTLE10
             </span>
           </div>
