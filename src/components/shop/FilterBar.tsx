@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import {
   formatPrice,
+  ART_STYLES,
+  type ArtStyleSlug,
   type SortKey,
   type EmbroideryTechnique,
 } from '../../lib/data';
-import { useAllColors, useAllSizes, useMaxPriceCents } from '../../hooks/useCatalog';
+import { useAllSizes, useMaxPriceCents } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
 
 const EMBROIDERY_TECHNIQUES: { key: EmbroideryTechnique; label: string }[] = [
@@ -22,13 +24,15 @@ const EMBROIDERY_TECHNIQUES: { key: EmbroideryTechnique; label: string }[] = [
 export const FilterBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data: colors } = useAllColors();
   const { data: sizes } = useAllSizes();
   const { data: maxPriceCents } = useMaxPriceCents();
 
   const {
     filters,
-    toggleColor,
+    setArtStyle,
+    setUniverse,
+    setCharacter,
+    toggleGarmentType,
     toggleSize,
     toggleTechnique,
     setPriceMax,
@@ -38,19 +42,22 @@ export const FilterBar: React.FC = () => {
   } = useFiltersStore();
 
   const activeFilterCount =
-    filters.colors.length +
     filters.sizes.length +
     (filters.techniques?.length || 0) +
+    (filters.garmentTypes?.length || 0) +
+    (filters.artStyleSlug && filters.artStyleSlug !== 'all' ? 1 : 0) +
+    (filters.universeSlug && filters.universeSlug !== 'all' ? 1 : 0) +
+    (filters.characterId && filters.characterId !== 'all' ? 1 : 0) +
     (filters.priceMax ? 1 : 0) +
     (filters.searchQuery ? 1 : 0);
 
   return (
     <div className="w-full bg-cream border-b border-stone/60">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-3.5">
-        
+
         {/* Top Control Bar: Search + Filter Toggle + Sort */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          
+
           {/* Left: Filter Toggle & Search Bar */}
           <div className="flex items-center gap-4 flex-1">
             <button
@@ -77,16 +84,21 @@ export const FilterBar: React.FC = () => {
 
             {/* Instant Search Box */}
             <div className="relative flex-1 max-w-xs">
+              <label htmlFor="shop-search" className="sr-only">
+                Search products
+              </label>
               <input
+                id="shop-search"
                 type="text"
                 value={filters.searchQuery || ''}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search stitches, coats, flora..."
                 className="w-full bg-paper border border-stone/80 pl-8 pr-3 py-1.5 text-xs text-ink placeholder:text-warm-gray focus:outline-accent"
               />
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone text-xs">
-                🔍
-              </span>
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path strokeLinecap="round" d="M16.5 16.5L21 21" />
+              </svg>
               {filters.searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
@@ -99,9 +111,34 @@ export const FilterBar: React.FC = () => {
             </div>
           </div>
 
+          {/* Art-style axis: genre art direction (replaces intensity) */}
+          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Art style">
+            <span className="text-[10px] uppercase tracking-widest text-ink font-medium sm:mr-4">
+              Art Style
+            </span>
+            {ART_STYLES.map((s) => {
+              const isActive = filters.artStyleSlug === s.slug;
+              return (
+                <button
+                  key={s.slug}
+                  onClick={() => setArtStyle(isActive ? 'all' : (s.slug as ArtStyleSlug))}
+                  aria-pressed={isActive}
+                  title={s.tagline}
+                  className={`rounded-full px-3.5 py-2 min-h-[44px] text-[11px] uppercase tracking-widest font-sans border transition-colors cursor-pointer ${
+                    isActive
+                      ? 'border-transparent bg-ink text-cream'
+                      : 'border-stone bg-paper text-ink hover:border-ink'
+                  }`}
+                >
+                  {s.name}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Right Side: Sort Selector */}
-          <div className="flex items-center justify-between sm:justify-end space-x-3">
-            <label htmlFor="sort-select" className="text-xs uppercase tracking-widest text-ink-muted hidden sm:inline">
+          <div className="mt-3 flex items-center justify-between sm:justify-end space-x-3 sm:mt-0 sm:ml-8">
+            <label htmlFor="sort-select" className="text-xs uppercase tracking-widest text-ink hidden sm:inline">
               Sort By:
             </label>
             <select
@@ -131,17 +168,38 @@ export const FilterBar: React.FC = () => {
               </span>
             )}
 
+            {filters.universeSlug && filters.universeSlug !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                World: {filters.universeSlug}
+                <button onClick={() => setUniverse('all')} aria-label="Clear universe filter" className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            {filters.characterId && filters.characterId !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Character: {filters.characterId}
+                <button onClick={() => setCharacter('all')} aria-label="Clear character filter" className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            {filters.artStyleSlug && filters.artStyleSlug !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                Style: {filters.artStyleSlug}
+                <button onClick={() => setArtStyle('all')} aria-label="Clear art-style filter" className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            {filters.garmentTypes?.map((g) => (
+              <span key={g} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+                {g}
+                <button onClick={() => toggleGarmentType(g)} aria-label={`Remove ${g} filter`} className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            ))}
+
             {filters.techniques?.map((t) => (
               <span key={t} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
                 {t}
                 <button onClick={() => toggleTechnique(t)} aria-label={`Remove ${t} filter`} className="text-ink-muted hover:text-ink">✕</button>
-              </span>
-            ))}
-
-            {filters.colors.map((c) => (
-              <span key={c} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
-                Color: {c}
-                <button onClick={() => toggleColor(c)} aria-label={`Remove ${c} color filter`} className="text-ink-muted hover:text-ink">✕</button>
               </span>
             ))}
 
@@ -168,9 +226,9 @@ export const FilterBar: React.FC = () => {
           </div>
         )}
 
-        {/* Expandable Filter Tray */}
+        {/* Expandable Filter Tray (size + technique + price — no colour option) */}
         {isOpen && (
-          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 animate-in fade-in duration-200">
+          <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
             {/* 1. Embroidery Technique */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
@@ -198,40 +256,7 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 2. Color Swatches */}
-            <div>
-              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
-                Color Palette
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {colors?.map((c) => {
-                  const isSelected = filters.colors.includes(c.name);
-                  return (
-                    <button
-                      key={c.name}
-                      onClick={() => toggleColor(c.name)}
-                      title={c.name}
-                      aria-label={`Filter by color ${c.name}`}
-                      aria-pressed={isSelected}
-                      className={`relative min-w-[44px] min-h-[44px] w-11 h-11 rounded-full border transition-all cursor-pointer ${
-                        isSelected
-                          ? 'ring-2 ring-accent scale-110 border-transparent'
-                          : 'border-stone hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: c.hex }}
-                    >
-                      {isSelected && (
-                        <span className="absolute inset-0 flex items-center justify-center text-[10px] text-paper font-bold drop-shadow">
-                          ✓
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3. Sizes */}
+            {/* 2. Sizes */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
                 Garment Size
@@ -258,7 +283,7 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 4. Price Max Slider & Reset */}
+            {/* 3. Price Max Slider & Reset */}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink">
@@ -270,16 +295,16 @@ export const FilterBar: React.FC = () => {
               </div>
               <input
                 type="range"
-                min={1245000}
-                max={maxPriceCents ?? 1245000}
-                step={207500}
-                value={filters.priceMax || maxPriceCents || 1245000}
+                min={150000}
+                max={maxPriceCents ?? 600000}
+                step={25000}
+                value={filters.priceMax || maxPriceCents || 600000}
                 onChange={(e) => setPriceMax(Number(e.target.value))}
                 className="w-full accent-accent cursor-pointer"
                 disabled={maxPriceCents === undefined}
               />
               <div className="flex justify-between text-[10px] text-ink-muted mt-1">
-                <span>{formatPrice(1245000)}</span>
+                <span>{formatPrice(150000)}</span>
                 <span>{maxPriceCents !== undefined ? formatPrice(maxPriceCents) : '…'}</span>
               </div>
             </div>

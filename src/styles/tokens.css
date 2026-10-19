@@ -24,6 +24,17 @@
    --color-error:           #c9372d;
    --color-success:         #2f6b3a;
 
+   /* Universe identity (portal stickers/rings/glows render on neutral
+      ground outside [data-universe] scopes, so these are base tokens) */
+   --color-anime-deep:      #7a1f23; /* torii sakura-maroon */
+   --color-hero-crimson:    #c0392b; /* heroverse issue-red */
+   --color-itihaas-bronze:  #5d3a1a; /* darbar arch bronze */
+   --color-champagne:       #d4af37; /* heroverse sticker text */
+   --color-ivory:           #f6efe3; /* itihaas sticker text */
+   /* Warm overlay + deep border companions */
+   --color-coal-glass:      #201c18; /* smoky quick-view tab */
+   --color-stone-deep:      #ded8cf; /* size-chip border */
+
    /* ─────────────────────────────────────
       Typography
       ───────────────────────────────────── */

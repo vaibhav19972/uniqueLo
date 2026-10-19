@@ -77,11 +77,11 @@ export const UniverseHero: React.FC = () => {
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         {/* Full-width container frame with margins and rounded border */}
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-stone/70 min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex items-center shadow-[0_4px_24px_rgba(20,20,20,0.04)]">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-stone/70 min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex items-center">
           {/* ─────────────────────────────────────────────────────────────
               1. Background Crossfade Carousel
               ───────────────────────────────────────────────────────────── */}
-          <div className="absolute inset-0 z-0 bg-[#f7f5f0]" aria-hidden="true">
+          <div className="absolute inset-0 z-0 bg-cream" aria-hidden="true">
             {list.map((u, i) => {
               const isCurrent = i === validIndex;
               const imgSrc = u.hero_image || DEFAULT_HERO_IMAGES[u.slug] || u.emblem_src;
@@ -118,7 +118,7 @@ export const UniverseHero: React.FC = () => {
             className="absolute inset-0 z-10 pointer-events-none hidden sm:block"
             style={{
               background:
-                'linear-gradient(to right, #f7f5f0 0%, #f7f5f0 32%, rgba(247, 245, 240, 0.94) 46%, rgba(247, 245, 240, 0.65) 60%, rgba(247, 245, 240, 0.15) 75%, transparent 100%)',
+                'linear-gradient(to right, var(--color-cream) 0%, var(--color-cream) 32%, color-mix(in srgb, var(--color-cream) 94%, transparent) 46%, color-mix(in srgb, var(--color-cream) 65%, transparent) 60%, color-mix(in srgb, var(--color-cream) 15%, transparent) 75%, transparent 100%)',
             }}
             aria-hidden="true"
           />
@@ -128,7 +128,7 @@ export const UniverseHero: React.FC = () => {
             className="absolute inset-0 z-10 pointer-events-none sm:hidden"
             style={{
               background:
-                'linear-gradient(to bottom, #f7f5f0 0%, rgba(247, 245, 240, 0.95) 55%, rgba(247, 245, 240, 0.7) 75%, rgba(247, 245, 240, 0.2) 100%)',
+                'linear-gradient(to bottom, var(--color-cream) 0%, color-mix(in srgb, var(--color-cream) 95%, transparent) 55%, color-mix(in srgb, var(--color-cream) 70%, transparent) 75%, color-mix(in srgb, var(--color-cream) 20%, transparent) 100%)',
             }}
             aria-hidden="true"
           />
@@ -199,7 +199,7 @@ export const UniverseHero: React.FC = () => {
                           className={
                             selected
                               ? 'text-gold-deep font-semibold'
-                              : 'text-warm-gray hover:text-ink transition-colors'
+                              : 'text-ink-muted hover:text-ink transition-colors'
                           }
                         >
                           {TAB_LABELS[u.slug] ?? u.name}
@@ -245,10 +245,15 @@ export const UniverseHero: React.FC = () => {
                       key={u.slug}
                       onClick={() => setActiveIndex(idx)}
                       aria-label={`Switch to ${u.name} slide`}
-                      className={`h-2 transition-all duration-500 rounded-full cursor-pointer focus-visible:outline-accent ${
-                        isActive ? 'w-8 bg-gold-deep' : 'w-2 bg-stone hover:bg-warm-gray'
-                      }`}
-                    />
+                      className="min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer focus-visible:outline-accent group"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`h-2 transition-all duration-500 rounded-full ${
+                          isActive ? 'w-8 bg-gold-deep' : 'w-2 bg-stone group-hover:bg-warm-gray'
+                        }`}
+                      />
+                    </button>
                   );
                 })}
               </div>

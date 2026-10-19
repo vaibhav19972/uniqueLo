@@ -6,6 +6,7 @@ import { getCartLine, formatPrice, createOrder, getDefaultVariant, type CartLine
 import { useToastStore } from '../../stores/toast';
 import { CartLineItem } from './CartLineItem';
 import { Button } from '../ui/Button';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 const STANDARD_SHIPPING_CENTS = 199900;
 
@@ -97,6 +98,9 @@ export const CartDrawer: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, closeCart]);
 
+  // Focus trap + initial focus + return-focus while the drawer is open
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, closeCart);
+
   // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -143,7 +147,7 @@ export const CartDrawer: React.FC = () => {
     addItem(product.slug, variant.sku, 1, undefined, variant.quantity ?? 99);
     showToast({
       title: 'Archival Care Added',
-      description: `${product.name} (${variant.color} / ${variant.size})`,
+      description: `${product.name} (size ${variant.size})`,
       type: 'accent',
     });
   };
@@ -236,7 +240,14 @@ export const CartDrawer: React.FC = () => {
       />
 
       {/* Drawer Surface */}
-      <div className="relative w-full max-w-md bg-paper h-full flex flex-col shadow-2xl z-10 animate-in slide-in-from-right duration-300">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Shopping bag"
+        tabIndex={-1}
+        className="relative w-full max-w-md bg-paper h-full flex flex-col shadow-2xl z-10 animate-in slide-in-from-right duration-300"
+      >
         
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-stone/60 flex items-center justify-between">

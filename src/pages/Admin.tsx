@@ -5,10 +5,10 @@ import { useProducts, useUniverses, useMotifsByUniverse } from '../hooks/useCata
 import { useToastStore } from '../stores/toast';
 import {
   formatPrice,
-  VIBES,
-  MOODS,
-  type Vibe,
-  type MoodSlug,
+  EDITS,
+  INTENSITY_LEVELS,
+  type EditSlug,
+  type IntensityLevel,
   type Gender,
   type EmbroideryTechnique,
 } from '../lib/data';
@@ -136,8 +136,8 @@ const AdminStudio: React.FC = () => {
   const [garmentType, setGarmentType] = useState('tops');
   const [motifId, setMotifId] = useState('');
   const [tagsInput, setTagsInput] = useState('tops, embroidery, handcrafted');
-  const [selectedVibes, setSelectedVibes] = useState<Vibe[]>(['aesthetic', 'clean']);
-  const [selectedMoods, setSelectedMoods] = useState<MoodSlug[]>(['everyday', 'heritage']);
+  const [selectedMoods, setSelectedMoods] = useState<EditSlug[]>(['everyday', 'heritage']);
+  const [selectedIntensity, setSelectedIntensity] = useState<IntensityLevel>('balanced');
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
   const [handcrafted, setHandcrafted] = useState(true);
@@ -479,7 +479,6 @@ const AdminStudio: React.FC = () => {
   const generatedSQL = useMemo(() => {
     const finalSlug = slug || 'new-product-slug';
     const tagsArr = tagsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
-    const vibesArr = selectedVibes.map((v) => `'${v}'`).join(', ');
     const moodsArr = selectedMoods.map((m) => `'${m}'`).join(', ');
     const matArr = materialsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const careArr = careInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
@@ -493,7 +492,7 @@ const AdminStudio: React.FC = () => {
 -- 1. Insert Base Product
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  garment_type, gender, motif_id, is_mock, handcrafted, vibes, moods,
+  garment_type, gender, motif_id, is_mock, handcrafted, intensity, edits,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -509,7 +508,7 @@ INSERT INTO public.products (
   ${motifId ? `'${motifId.replace(/'/g, "''")}'` : 'NULL'},
   false,
   ${handcrafted},
-  ARRAY[${vibesArr}],
+  '${selectedIntensity}',
   ARRAY[${moodsArr}],
   5.0,
   12,
@@ -536,8 +535,8 @@ INSERT INTO public.products (
   gender = EXCLUDED.gender,
   motif_id = EXCLUDED.motif_id,
   handcrafted = EXCLUDED.handcrafted,
-  vibes = EXCLUDED.vibes,
-  moods = EXCLUDED.moods,
+  intensity = EXCLUDED.intensity,
+  edits = EXCLUDED.edits,
   featured = EXCLUDED.featured;
 
 -- 2. Insert Images (six catalog slots, sort_order 0–5)
@@ -590,8 +589,8 @@ INSERT INTO public.embroidery_details (
     gender,
     motifId,
     handcrafted,
-    selectedVibes,
     selectedMoods,
+    selectedIntensity,
     tagsInput,
     featured,
     customizable,
@@ -629,8 +628,8 @@ INSERT INTO public.embroidery_details (
       motifId: motifId || undefined,
       isMock: false,
       handcrafted,
-      vibes: selectedVibes,
-      moods: selectedMoods,
+      intensity: selectedIntensity,
+      edits: selectedMoods,
       rating: 5.0,
       reviewCount: 12,
       soldCount: '50+',
@@ -681,8 +680,8 @@ INSERT INTO public.embroidery_details (
     gender,
     motifId,
     handcrafted,
-    selectedVibes,
     selectedMoods,
+    selectedIntensity,
     tagsInput,
     variants,
     slotImages,
@@ -963,66 +962,62 @@ INSERT INTO public.embroidery_details (
                     />
                   </div>
 
-                  {/* Style Vibes Selector */}
+                  {/* Edits Selector — curated collections (powers Explore-by-Edit Gateway) */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Style Vibes (Powers Explore-by-Style Gateway)
+                      Edits — Curated Collections (powers Explore-by-Edit Gateway)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {VIBES.map((v) => {
-                        const isSel = selectedVibes.includes(v.slug);
+                      {EDITS.map((e) => {
+                        const isSel = selectedMoods.includes(e.slug);
                         return (
                           <button
-                            key={v.slug}
+                            key={e.slug}
                             type="button"
                             onClick={() => {
-                              setSelectedVibes(
+                              setSelectedMoods(
                                 isSel
-                                  ? selectedVibes.filter((s) => s !== v.slug)
-                                  : [...selectedVibes, v.slug]
+                                  ? selectedMoods.filter((s) => s !== e.slug)
+                                  : [...selectedMoods, e.slug]
                               );
                             }}
-                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer font-sans ${
                               isSel
                                 ? 'border-accent bg-accent/15 text-accent font-semibold'
                                 : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
                             }`}
                           >
                             {isSel ? '✓ ' : '+ '}
-                            {v.title}
+                            {e.title}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Intent Moods Selector */}
+                  {/* Intensity Selector — Quiet ↔ Loud shopping axis */}
                   <div className="sm:col-span-2">
                     <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Intent Moods (Powers Explore-by-Mood Gateway)
+                      Intensity (Quiet ↔ Loud shopping axis)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {MOODS.map((m) => {
-                        const isSel = selectedMoods.includes(m.slug);
+                      {INTENSITY_LEVELS.map((lvl) => {
+                        const isSel = selectedIntensity === lvl.slug;
                         return (
                           <button
-                            key={m.slug}
+                            key={lvl.slug}
                             type="button"
-                            onClick={() => {
-                              setSelectedMoods(
-                                isSel
-                                  ? selectedMoods.filter((s) => s !== m.slug)
-                                  : [...selectedMoods, m.slug]
-                              );
-                            }}
-                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer capitalize font-sans ${
+                            onClick={() => setSelectedIntensity(lvl.slug)}
+                            aria-pressed={isSel}
+                            title={lvl.tagline}
+                            className={`px-3 py-1 text-xs border transition-colors cursor-pointer font-sans ${
                               isSel
                                 ? 'border-accent bg-accent/15 text-accent font-semibold'
                                 : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
                             }`}
                           >
                             {isSel ? '✓ ' : '+ '}
-                            {m.title}
+                            {lvl.name}
                           </button>
                         );
                       })}
