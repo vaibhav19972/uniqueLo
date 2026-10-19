@@ -10,6 +10,8 @@
       "garmentType": "hoodie",
       "gender": "unisex",
       "intensity": "loud",
+      "expressionScore": 5,
+      "expressionSlug": "elaborate-intricate",
       "craftTechniques": [
         "hand-zardozi"
       ],
@@ -205,6 +207,8 @@
       "garmentType": "tee",
       "gender": "unisex",
       "intensity": "quiet",
+      "expressionScore": 1,
+      "expressionSlug": "minimal",
       "craftTechniques": [
         "satin-stitch"
       ],
@@ -385,6 +389,8 @@
       "garmentType": "tote",
       "gender": "unisex",
       "intensity": "balanced",
+      "expressionScore": 2,
+      "expressionSlug": "subtle-statements",
       "craftTechniques": [
         "satin-stitch"
       ],
@@ -470,6 +476,8 @@
       "garmentType": "hoodie",
       "gender": "unisex",
       "intensity": "quiet",
+      "expressionScore": 2,
+      "expressionSlug": "subtle-statements",
       "craftTechniques": [
         "hand-zardozi"
       ],
@@ -649,6 +657,8 @@
       "garmentType": "hoodie",
       "gender": "unisex",
       "intensity": "balanced",
+      "expressionScore": 3,
+      "expressionSlug": "artistic",
       "craftTechniques": [
         "sashiko-selvedge"
       ],
@@ -825,6 +835,8 @@
       "garmentType": "jacket",
       "gender": "women",
       "intensity": "loud",
+      "expressionScore": 4,
+      "expressionSlug": "bold-statements",
       "craftTechniques": [
         "metallic-zari",
         "french-knot"
@@ -1014,6 +1026,8 @@
       "garmentType": "jacket",
       "gender": "unisex",
       "intensity": "loud",
+      "expressionScore": 5,
+      "expressionSlug": "elaborate-intricate",
       "craftTechniques": [
         "metallic-zari"
       ],
@@ -1197,6 +1211,8 @@
       "garmentType": "scarf",
       "gender": "unisex",
       "intensity": "quiet",
+      "expressionScore": 2,
+      "expressionSlug": "subtle-statements",
       "craftTechniques": [
         "metallic-zari"
       ],
@@ -1274,6 +1290,8 @@
       "garmentType": "pants",
       "gender": "unisex",
       "intensity": "balanced",
+      "expressionScore": 3,
+      "expressionSlug": "artistic",
       "craftTechniques": [
         "sashiko-selvedge"
       ],
@@ -1430,6 +1448,8 @@
       "garmentType": "cardigan",
       "gender": "women",
       "intensity": "balanced",
+      "expressionScore": 3,
+      "expressionSlug": "artistic",
       "craftTechniques": [
         "crewel-needlework"
       ],
@@ -1585,6 +1605,8 @@
       "garmentType": "shirt",
       "gender": "unisex",
       "intensity": "quiet",
+      "expressionScore": 1,
+      "expressionSlug": "minimal",
       "craftTechniques": [
         "monogram-bespoke"
       ],
@@ -1758,6 +1780,8 @@
       "garmentType": "vest",
       "gender": "unisex",
       "intensity": "loud",
+      "expressionScore": 4,
+      "expressionSlug": "bold-statements",
       "craftTechniques": [
         "crewel-needlework",
         "french-knot"
@@ -1934,6 +1958,8 @@
       "garmentType": "scarf",
       "gender": "women",
       "intensity": "quiet",
+      "expressionScore": 1,
+      "expressionSlug": "minimal",
       "craftTechniques": [
         "botanical-chain"
       ],

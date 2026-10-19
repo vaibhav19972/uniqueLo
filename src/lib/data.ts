@@ -4,6 +4,7 @@ import rawUniverses from '../data/universes.json';
 import rawMotifs from '../data/motifs.json';
 import rawEdits from '../data/edits.json';
 import rawIntensity from '../data/intensity.json';
+import rawExpression from '../data/expression.json';
 import rawCraft from '../data/craft-techniques.json';
 import rawArtStyles from '../data/art-styles.json';
 import rawGarments from '../data/garments.json';
@@ -11,6 +12,29 @@ import { supabase, isSupabaseConfigured, shouldUseSupabaseReads } from './supaba
 
 export type ProductStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
 export type Currency = 'INR';
+
+/**
+ * Expression score (1-5): signature UniqueLo discovery axis describing
+ * the visual prominence, coverage, and intensity of the embroidery.
+ */
+export type ExpressionScore = 1 | 2 | 3 | 4 | 5;
+
+export type ExpressionSlug =
+  | 'minimal'
+  | 'subtle-statements'
+  | 'artistic'
+  | 'bold-statements'
+  | 'elaborate-intricate';
+
+export interface ExpressionInfo {
+  score: ExpressionScore;
+  slug: ExpressionSlug;
+  name: string;
+  tagline: string;
+  description: string;
+  characteristics: string;
+  order: number;
+}
 
 /** Gender taxonomy: `unisex` matches BOTH Men and Women surfaces. */
 export type Gender = 'men' | 'women' | 'unisex';
@@ -189,6 +213,13 @@ export interface Product {
    */
   intensity?: IntensityLevel;
   /**
+   * Expression score (1-5): signature UniqueLo discovery axis describing
+   * the visual prominence, coverage, and intensity of the embroidery.
+   */
+  expressionScore?: ExpressionScore;
+  /** Expression slug (minimal, subtle-statements, artistic, bold-statements, elaborate-intricate). */
+  expressionSlug?: ExpressionSlug;
+  /**
    * Craft techniques on this piece (1+ slugs from craft-techniques.json).
    * PDP provenance + optional refinement facet — never the primary axis.
    */
@@ -244,6 +275,8 @@ export interface FilterState {
   gender?: Gender | 'all';
   garmentTypes?: string[];
   intensity?: IntensityLevel | 'all';
+  expressionSlug?: ExpressionSlug | 'all';
+  expressionScore?: ExpressionScore | 'all';
   characterId?: string | 'all';
   artStyleSlug?: ArtStyleSlug | 'all';
   edit?: EditSlug | 'all';
@@ -313,6 +346,41 @@ export const INTENSITY_LEVELS: IntensityInfo[] = ((rawIntensity as { intensityLe
 /** Effective intensity with the balanced-midpoint default applied. */
 export function getIntensity(p: Product | undefined): IntensityLevel {
   return p?.intensity ?? 'balanced';
+}
+
+/** Expression registry (sorted by score 1–5) — signature UniqueLo discovery axis. */
+export const EXPRESSION_LEVELS: ExpressionInfo[] = (
+  (rawExpression as { expressionLevels: ExpressionInfo[] }).expressionLevels
+)
+  .slice()
+  .sort((a, b) => a.order - b.order);
+
+/** Lookup expression level info by numeric score (1–5) */
+export function getExpressionByScore(score: number | undefined): ExpressionInfo | undefined {
+  if (score == null) return undefined;
+  return EXPRESSION_LEVELS.find((e) => e.score === score);
+}
+
+/** Lookup expression level info by slug */
+export function getExpressionBySlug(slug: string | undefined): ExpressionInfo | undefined {
+  if (!slug) return undefined;
+  return EXPRESSION_LEVELS.find((e) => e.slug === slug);
+}
+
+/** Effective expression score with fallback from intensity or default (3 - Artistic) */
+export function getExpressionScore(p: Product | undefined): ExpressionScore {
+  if (p?.expressionScore) return p.expressionScore;
+  if (p?.intensity === 'quiet') return 1;
+  if (p?.intensity === 'loud') return 4;
+  return 3;
+}
+
+export async function getExpressions(): Promise<ExpressionInfo[]> {
+  return EXPRESSION_LEVELS;
+}
+
+export async function getExpression(slug: string): Promise<ExpressionInfo | undefined> {
+  return getExpressionBySlug(slug);
 }
 
 /** Art-style registry (genre art direction — how the world is drawn). */
@@ -708,6 +776,17 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
     // Intensity check (products default to the balanced midpoint)
     if (filters.intensity && filters.intensity !== 'all') {
       if (getIntensity(product) !== filters.intensity) return false;
+    }
+
+    // Expression check (signature 1-5 scale discovery axis)
+    if (filters.expressionSlug && filters.expressionSlug !== 'all') {
+      const pSlug = product.expressionSlug ?? getExpressionByScore(product.expressionScore)?.slug;
+      if (pSlug !== filters.expressionSlug) return false;
+    }
+
+    if (filters.expressionScore && filters.expressionScore !== 'all') {
+      const pScore = getExpressionScore(product);
+      if (pScore !== filters.expressionScore) return false;
     }
 
     // Edit (curated collection) check

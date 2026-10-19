@@ -1,0 +1,49 @@
+{
+  "expressionLevels": [
+    {
+      "score": 1,
+      "slug": "minimal",
+      "name": "Minimal",
+      "tagline": "Tiny, discreet, tonal or restrained embroidery.",
+      "description": "Quiet luxury worn close to the chest. Intimate threadwork, tonal crests, and understated accents noticed only by the discerning.",
+      "characteristics": "Discreet, tonal, micro-motifs, minimal contrast",
+      "order": 1
+    },
+    {
+      "score": 2,
+      "slug": "subtle-statements",
+      "name": "Subtle Statements",
+      "tagline": "Small but noticeable motifs, refined placement.",
+      "description": "Refined focal points that invite conversation without overwhelming. Thoughtfully placed emblems on pockets, cuffs, and hemlines.",
+      "characteristics": "Small motifs, single placement, refined contrast",
+      "order": 2
+    },
+    {
+      "score": 3,
+      "slug": "artistic",
+      "name": "Artistic",
+      "tagline": "Medium compositions, illustrative designs and multiple elements.",
+      "description": "Balancing wearable elegance with narrative needlecraft. Multi-element compositions with rich thread textures and measured storytelling.",
+      "characteristics": "Medium coverage, illustrative, dual elements, harmonic contrast",
+      "order": 3
+    },
+    {
+      "score": 4,
+      "slug": "bold-statements",
+      "name": "Bold Statements",
+      "tagline": "Large artwork, prominent contrast or multiple placements.",
+      "description": "Commanding apparel with undeniable presence. Broad panels, vibrant bullion contrast, and expressive artwork designed to turn heads.",
+      "characteristics": "Large artwork, high contrast, multiple placements, expressive",
+      "order": 4
+    },
+    {
+      "score": 5,
+      "slug": "elaborate-intricate",
+      "name": "Elaborate & Intricate",
+      "tagline": "Dense compositions, complex motifs or extensive threadwork.",
+      "description": "Museum-grade couture needlework. 30 to 60+ artisan hours of continuous hand-zardozi, bullion wire, and multi-layered relief across full panels.",
+      "characteristics": "Dense threadwork, maximum relief, full panels, master craft",
+      "order": 5
+    }
+  ]
+}

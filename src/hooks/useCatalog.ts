@@ -11,6 +11,8 @@ import {
   getArtStyles,
   getArtStyle,
   getGarments,
+  getExpressions,
+  getExpression,
   getFeaturedProducts,
   getAllSizes,
   getAllTechniques,
@@ -24,6 +26,7 @@ import {
   type EmbroideryTechnique,
   type ArtStyleInfo,
   type GarmentInfo,
+  type ExpressionInfo,
 } from '../lib/data';
 
 export const catalogKeys = {
@@ -117,6 +120,22 @@ export function useArtStyle(slug: string | undefined): UseQueryResult<ArtStyleIn
 /** Garment registry (merchandise doors). */
 export function useGarments(): UseQueryResult<GarmentInfo[]> {
   return useQuery({ queryKey: catalogKeys.garments, queryFn: getGarments });
+}
+
+/** Expression registry (signature 1-5 scale discovery axis). */
+export function useExpressions(): UseQueryResult<ExpressionInfo[]> {
+  return useQuery({
+    queryKey: ['catalog', 'expressions'],
+    queryFn: getExpressions,
+  });
+}
+
+export function useExpression(slug: string | undefined): UseQueryResult<ExpressionInfo | undefined> {
+  return useQuery({
+    queryKey: ['catalog', 'expression', slug || ''],
+    queryFn: () => (slug ? getExpression(slug) : Promise.resolve(undefined)),
+    enabled: Boolean(slug),
+  });
 }
 
 /** Featured products for the home reel */
