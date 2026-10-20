@@ -71,10 +71,14 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
    - `newsletter_subscribers`, `reviews`, `orders`, `order_items`
    - High-performance indexes and Row-Level Security (RLS) policies.
 
-### Step 3.3 — Seed Initial Needlecraft Catalog
+### Step 3.3 — Seed Production Baseline Taxonomy & Flagship Products
 1. In the Supabase SQL Editor, open a **New Query**.
-2. Paste the contents of [`supabase/seed.sql`](../supabase/seed.sql) and click **Run**.
-3. This seeds the **legacy 13-product atelier line** (`is_mock = false`, 6 categories) plus the `universes`/`motifs` registries into your Supabase database — the schema was migrated to the universe model on 2026-10-11. **Caution:** the storefront currently serves the 5-product curated mock catalog from `src/data/mock-products.json`, but `getProducts()` does **not yet filter `is_mock`** — once seeded, the legacy rows carry `universe_slug` and will be served to the storefront. Add the `.eq('is_mock', true)` guard in `src/lib/data.ts` (docs/07 §3) before deploying a mock-phase storefront against the seeded DB.
+2. Paste the contents of [`supabase/production-seed.sql`](../supabase/production-seed.sql) and click **Run**.
+3. This seeds:
+   - Complete Master Taxonomy: 3 Universes (`animeverse`, `heroverse`, `itihaas`), 7 Motifs, 5 Categories, 9 Garments, and 3 Collections.
+   - Exactly 2 authentic, handcrafted showcase products (`sakura-ronin-hoodie` and `kantha-chore-jacket`) with real variants, disk images, and embroidery provenance.
+   - Initialized `product-images` storage bucket and public policies.
+   - The database remains clean and unpolluted with dummy data, allowing you to upload real catalog items one-by-one via the **Admin Studio** (`/admin`).
 
 ### Step 3.4 — Copy API Keys
 In Supabase, navigate to **Project Settings** > **API**:

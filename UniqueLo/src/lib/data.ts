@@ -449,8 +449,7 @@ export async function getProducts(): Promise<Product[]> {
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
-        `)
-        .eq('is_mock', true); // legacy migrated rows must never leak to the storefront
+        `); // live catalog query (serves production seed & admin uploaded items)
 
       if (error) {
         console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
