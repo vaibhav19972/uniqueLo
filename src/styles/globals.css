@@ -158,6 +158,89 @@
   animation-play-state: paused;
 }
 
+.animate-marquee-paused {
+  animation-play-state: paused !important;
+}
+
+/* Announcement Bar Flashing & Glowing Effects */
+@keyframes flash-beacon {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes flash-badge-glow {
+  0%, 100% {
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+    border-color: rgba(52, 211, 153, 0.9);
+  }
+}
+
+@keyframes flash-urgent-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(244, 63, 94, 0.3);
+    border-color: rgba(244, 63, 94, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.85);
+    border-color: rgba(251, 113, 133, 0.95);
+  }
+}
+
+@keyframes flash-text-pulse {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 0px transparent;
+  }
+  50% {
+    opacity: 0.9;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.65);
+  }
+}
+
+.animate-flash-beacon {
+  animation: flash-beacon 1.4s ease-in-out infinite;
+}
+
+.animate-flash-badge-emerald {
+  animation: flash-badge-glow 2s ease-in-out infinite;
+}
+
+.animate-flash-badge-urgent {
+  animation: flash-urgent-glow 1.2s ease-in-out infinite;
+}
+
+.animate-flash-text {
+  animation: flash-text-pulse 2.2s ease-in-out infinite;
+}
+
+/* Marquee edge gradient mask for seamless edge gliding */
+.mask-marquee-fade {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 36px,
+    black calc(100% - 36px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 36px,
+    black calc(100% - 36px),
+    transparent 100%
+  );
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
