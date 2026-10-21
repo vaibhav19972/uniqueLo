@@ -1,39 +1,44 @@
 import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router';
 import { useExpressions, useProducts } from '../hooks/useCatalog';
-import { filterProducts, type FilterState, type ExpressionSlug } from '../lib/data';
+import { filterProducts, type FilterState, type ExpressionSlug, normalizeStyleSlug } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
 
 /**
- * Single expression door — /expression/:expressionSlug.
+ * Single style door — /styles/:styleSlug (and backward-compatible /expression/:expressionSlug).
  * Cross-world: every universe + garment matching this embroidery intensity tier.
  */
 export const Expression: React.FC = () => {
-  const { expressionSlug } = useParams<{ expressionSlug: string }>();
+  const { styleSlug, expressionSlug } = useParams<{ styleSlug?: string; expressionSlug?: string }>();
+  const activeSlug = styleSlug || expressionSlug;
+  const normalizedSlug = normalizeStyleSlug(activeSlug);
+
   const { data: expressions } = useExpressions();
   const { data: allProducts } = useProducts();
 
-  const currentExp = (expressions ?? []).find((e) => e.slug === expressionSlug);
+  const currentExp = (expressions ?? []).find(
+    (e) => e.slug === normalizedSlug || e.slug === activeSlug
+  );
 
   const filtered = useMemo(() => {
     if (!currentExp) return [];
     const f: FilterState = {
       categorySlug: 'all',
-      expressionSlug: expressionSlug as ExpressionSlug,
+      expressionSlug: (normalizedSlug || activeSlug) as ExpressionSlug,
       colors: [],
       sizes: [],
       sort: 'newest',
     };
     return filterProducts(allProducts ?? [], f);
-  }, [allProducts, expressionSlug, currentExp]);
+  }, [allProducts, activeSlug, normalizedSlug, currentExp]);
 
   if (expressions !== undefined && !currentExp) {
     return (
       <div className="py-24 text-center max-w-md mx-auto px-4">
-        <h1 className="font-serif text-3xl text-ink">Expression not found</h1>
-        <p className="text-sm text-ink-muted mt-2">This intensity level does not exist.</p>
-        <Link to="/expression" className="inline-block mt-6 text-sm underline underline-offset-4">
-          All expressions
+        <h1 className="font-serif text-3xl text-ink">Style not found</h1>
+        <p className="text-sm text-ink-muted mt-2">This embroidery style tier does not exist.</p>
+        <Link to="/styles" className="inline-block mt-6 text-sm underline underline-offset-4">
+          All Styles
         </Link>
       </div>
     );
@@ -47,7 +52,7 @@ export const Expression: React.FC = () => {
           <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
-            <Link to="/expression" className="hover:underline">Expression</Link>
+            <Link to="/styles" className="hover:underline">Styles</Link>
             <span className="mx-2">›</span>
             <span>{currentExp?.name ?? '…'}</span>
           </nav>
@@ -64,7 +69,7 @@ export const Expression: React.FC = () => {
                 </span>
               </div>
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
-                {currentExp?.name ?? 'Expression'}
+                {currentExp?.name ?? 'Style'}
               </h1>
               <p className="font-serif italic text-lg sm:text-xl text-ink-muted mt-2">{currentExp?.tagline}</p>
               <p className="text-xs sm:text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
@@ -78,11 +83,11 @@ export const Expression: React.FC = () => {
                 Levels:
               </span>
               {(expressions ?? []).map((exp) => {
-                const isActive = exp.slug === expressionSlug;
+                const isActive = exp.slug === normalizedSlug || exp.slug === activeSlug;
                 return (
                   <Link
                     key={exp.slug}
-                    to={`/expression/${exp.slug}`}
+                    to={`/styles/${exp.slug}`}
                     aria-current={isActive ? 'page' : undefined}
                     className={`px-3 py-1.5 text-xs font-sans border transition-all ${
                       isActive
@@ -110,3 +115,5 @@ export const Expression: React.FC = () => {
     </div>
   );
 };
+
+export const Style = Expression;

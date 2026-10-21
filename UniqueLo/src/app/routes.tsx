@@ -68,7 +68,16 @@ export const routes: RouteObject[] = [
         path: 'universes/:universeSlug/characters/:characterId',
         element: withSuspense(<Character />),
       },
-      // 2. Expression (Spec Primary Nav 2 - Signature Discovery Axis)
+      // 2. Styles (Spec Primary Nav 2 - Signature Discovery Axis: Minimal, Understated, Cult, Expressive, Maximalist)
+      {
+        path: 'styles',
+        element: withSuspense(<Expressions />),
+      },
+      {
+        path: 'styles/:styleSlug',
+        element: withSuspense(<Expression />),
+      },
+      // Backward-compatible expression routes
       {
         path: 'expression',
         element: withSuspense(<Expressions />),
@@ -127,15 +136,6 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'collections/:collectionSlug',
-        element: withSuspense(<Collection />),
-      },
-      // Backward-compatible styles aliases
-      {
-        path: 'styles',
-        element: withSuspense(<Collections />),
-      },
-      {
-        path: 'styles/:styleSlug',
         element: withSuspense(<Collection />),
       },
       {

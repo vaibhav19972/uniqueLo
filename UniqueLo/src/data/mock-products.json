@@ -11,7 +11,7 @@
       "gender": "unisex",
       "intensity": "loud",
       "expressionScore": 5,
-      "expressionSlug": "elaborate-intricate",
+      "expressionSlug": "maximalist",
       "craftTechniques": [
         "hand-zardozi"
       ],
@@ -392,7 +392,7 @@
       "gender": "unisex",
       "intensity": "balanced",
       "expressionScore": 2,
-      "expressionSlug": "subtle-statements",
+      "expressionSlug": "understated",
       "craftTechniques": [
         "satin-stitch"
       ],
@@ -480,7 +480,7 @@
       "gender": "unisex",
       "intensity": "quiet",
       "expressionScore": 2,
-      "expressionSlug": "subtle-statements",
+      "expressionSlug": "understated",
       "craftTechniques": [
         "hand-zardozi"
       ],
@@ -662,7 +662,7 @@
       "gender": "unisex",
       "intensity": "balanced",
       "expressionScore": 3,
-      "expressionSlug": "artistic",
+      "expressionSlug": "cult",
       "craftTechniques": [
         "sashiko-selvedge"
       ],
@@ -841,7 +841,7 @@
       "gender": "women",
       "intensity": "loud",
       "expressionScore": 4,
-      "expressionSlug": "bold-statements",
+      "expressionSlug": "expressive",
       "craftTechniques": [
         "metallic-zari",
         "french-knot"
@@ -1033,7 +1033,7 @@
       "gender": "unisex",
       "intensity": "loud",
       "expressionScore": 5,
-      "expressionSlug": "elaborate-intricate",
+      "expressionSlug": "maximalist",
       "craftTechniques": [
         "metallic-zari"
       ],
@@ -1219,7 +1219,7 @@
       "gender": "unisex",
       "intensity": "quiet",
       "expressionScore": 2,
-      "expressionSlug": "subtle-statements",
+      "expressionSlug": "understated",
       "craftTechniques": [
         "metallic-zari"
       ],
@@ -1299,7 +1299,7 @@
       "gender": "unisex",
       "intensity": "balanced",
       "expressionScore": 3,
-      "expressionSlug": "artistic",
+      "expressionSlug": "cult",
       "craftTechniques": [
         "sashiko-selvedge"
       ],
@@ -1458,7 +1458,7 @@
       "gender": "women",
       "intensity": "balanced",
       "expressionScore": 3,
-      "expressionSlug": "artistic",
+      "expressionSlug": "cult",
       "craftTechniques": [
         "crewel-needlework"
       ],
@@ -1792,7 +1792,7 @@
       "gender": "unisex",
       "intensity": "loud",
       "expressionScore": 4,
-      "expressionSlug": "bold-statements",
+      "expressionSlug": "expressive",
       "craftTechniques": [
         "crewel-needlework",
         "french-knot"

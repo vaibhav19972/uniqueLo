@@ -19,12 +19,26 @@ export type Currency = 'INR';
  */
 export type ExpressionScore = 1 | 2 | 3 | 4 | 5;
 
+/** Modern style spectrum slugs */
+export type StyleSlug = 'minimal' | 'understated' | 'cult' | 'expressive' | 'maximalist';
+
+/** Expression slugs (supports both modern style slugs and legacy aliases) */
 export type ExpressionSlug =
-  | 'minimal'
+  | StyleSlug
   | 'subtle-statements'
   | 'artistic'
   | 'bold-statements'
   | 'elaborate-intricate';
+
+/** Map legacy expression slugs to modern style slugs */
+export function normalizeStyleSlug(slug: string | undefined): StyleSlug | undefined {
+  if (!slug) return undefined;
+  if (slug === 'subtle-statements') return 'understated';
+  if (slug === 'artistic') return 'cult';
+  if (slug === 'bold-statements') return 'expressive';
+  if (slug === 'elaborate-intricate') return 'maximalist';
+  return slug as StyleSlug;
+}
 
 export interface ExpressionInfo {
   score: ExpressionScore;
@@ -35,6 +49,8 @@ export interface ExpressionInfo {
   characteristics: string;
   order: number;
 }
+
+export type StyleInfo = ExpressionInfo;
 
 /** Gender taxonomy: `unisex` matches BOTH Men and Women surfaces. */
 export type Gender = 'men' | 'women' | 'unisex';
@@ -222,7 +238,7 @@ export interface Product {
    * the visual prominence, coverage, and intensity of the embroidery.
    */
   expressionScore?: ExpressionScore;
-  /** Expression slug (minimal, subtle-statements, artistic, bold-statements, elaborate-intricate). */
+  /** Style / Expression slug (minimal, understated, cult, expressive, maximalist). */
   expressionSlug?: ExpressionSlug;
   /**
    * Craft techniques on this piece (1+ slugs from craft-techniques.json).
@@ -368,13 +384,14 @@ export function getExpressionByScore(score: number | undefined): ExpressionInfo 
   return EXPRESSION_LEVELS.find((e) => e.score === score);
 }
 
-/** Lookup expression level info by slug */
+/** Lookup expression level info by slug (matches both modern style slugs and legacy expression slugs) */
 export function getExpressionBySlug(slug: string | undefined): ExpressionInfo | undefined {
   if (!slug) return undefined;
-  return EXPRESSION_LEVELS.find((e) => e.slug === slug);
+  const normalized = normalizeStyleSlug(slug);
+  return EXPRESSION_LEVELS.find((e) => e.slug === slug || e.slug === normalized);
 }
 
-/** Effective expression score with fallback from intensity or default (3 - Artistic) */
+/** Effective expression score with fallback from intensity or default (3 - Cult) */
 export function getExpressionScore(p: Product | undefined): ExpressionScore {
   if (p?.expressionScore) return p.expressionScore;
   if (p?.intensity === 'quiet') return 1;
@@ -389,6 +406,13 @@ export async function getExpressions(): Promise<ExpressionInfo[]> {
 export async function getExpression(slug: string): Promise<ExpressionInfo | undefined> {
   return getExpressionBySlug(slug);
 }
+
+/** Modern Style registry aliases (/styles) */
+export const STYLE_LEVELS: StyleInfo[] = EXPRESSION_LEVELS;
+export const getStyles = getExpressions;
+export const getStyle = getExpression;
+export const getStyleByScore = getExpressionByScore;
+export const getStyleBySlug = getExpressionBySlug;
 
 /** Collections registry (seasonal drops & aesthetic capsules). */
 export const COLLECTIONS: CollectionInfo[] = (
@@ -484,7 +508,7 @@ export async function getProducts(): Promise<Product[]> {
             artStyleSlug: item.collection_slug,
             intensity: item.intensity ?? 'balanced',
             expressionScore: item.expression_score ?? 3,
-            expressionSlug: item.expression_slug ?? 'artistic',
+            expressionSlug: (item.expression_slug ? normalizeStyleSlug(item.expression_slug) : undefined) ?? 'cult',
             isMock: item.is_mock ?? false,
             handcrafted: item.handcrafted ?? false,
             craftTechniques: item.craft_techniques ?? [],
@@ -844,10 +868,10 @@ export function filterProducts(products: Product[], filters: FilterState): Produ
       if (getIntensity(product) !== filters.intensity) return false;
     }
 
-    // Expression check (signature 1-5 scale discovery axis)
+    // Style / Expression check (signature 1-5 scale discovery axis)
     if (filters.expressionSlug && filters.expressionSlug !== 'all') {
       const pSlug = product.expressionSlug ?? getExpressionByScore(product.expressionScore)?.slug;
-      if (pSlug !== filters.expressionSlug) return false;
+      if (normalizeStyleSlug(pSlug) !== normalizeStyleSlug(filters.expressionSlug)) return false;
     }
 
     if (filters.expressionScore && filters.expressionScore !== 'all') {

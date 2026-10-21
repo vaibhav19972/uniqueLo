@@ -355,7 +355,7 @@ INSERT INTO public.products (
   ARRAY['high-relief-fill', 'satin-stitch'],
   ARRAY['statement', 'everyday'],
   3,
-  'artistic',        -- 'minimal' | 'subtle-statements' | 'artistic' | 'bold-statements' | 'elaborate-intricate'
+  'cult',            -- 'minimal' | 'understated' | 'cult' | 'expressive' | 'maximalist'
   ARRAY['aesthetic', 'noir'],
   ARRAY['statement', 'poetic'],
   5.0, 14, '65+',
@@ -481,7 +481,7 @@ The in-app Admin Studio (`/admin`) connects directly to the Supabase PostgreSQL 
 | | Editorial Subtitle | `public.products` | `subtitle text` | Highlighting craft provenance or textile spec. |
 | | Narrative Story | `public.products` | `description text` | Full atelier product description. |
 | | Curated Edits | `public.products` | `edits text[]` | Array of gateway tags (e.g. `['everyday', 'heritage']`). |
-| | Expression Level | `public.products` | `expression_score smallint`, `expression_slug text` | Signature 1–5 discovery axis (`CHECK (expression_score BETWEEN 1 AND 5)`). |
+| | Style Level | `public.products` | `expression_score smallint`, `expression_slug text` | Signature 1–5 discovery axis (`minimal`, `understated`, `cult`, `expressive`, `maximalist`). |
 | | Search Tags | `public.products` | `tags text[]` | Array of keyword tags for search index. |
 | | Status Toggles | `public.products` | `featured boolean`, `customizable boolean`, `handcrafted boolean` | Booleans controlling storefront banners and studio customizer. |
 | **Embroidery Provenance** | Craft Technique | `public.embroidery_details` | `technique text` | Needlecraft method (e.g., `'aari'`, `'zardozi'`, `'sashiko'`). |

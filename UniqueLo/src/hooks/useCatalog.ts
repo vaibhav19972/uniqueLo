@@ -145,6 +145,10 @@ export function useExpression(slug: string | undefined): UseQueryResult<Expressi
   });
 }
 
+/** Modern Style registry hooks (/styles) */
+export const useStyles = useExpressions;
+export const useStyle = useExpression;
+
 /** Featured products for the home reel */
 export function useFeaturedProducts(limit?: number): UseQueryResult<Product[]> {
   return useQuery({ queryKey: catalogKeys.featured(limit), queryFn: () => getFeaturedProducts(limit) });

@@ -4,7 +4,7 @@ import { useExpressions, useProducts } from '../hooks/useCatalog';
 import { getExpressionScore } from '../lib/data';
 
 /**
- * Expression index — /expression.
+ * Styles index — /styles (with backward-compatible /expression support).
  * The signature discovery system: discover by embroidery intensity and visual style.
  */
 export const Expressions: React.FC = () => {
@@ -30,17 +30,17 @@ export const Expressions: React.FC = () => {
           <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
-            <span>Expression</span>
+            <span>Styles</span>
           </nav>
           <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium mt-4 block">
             The Signature Discovery Axis
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
-            Find Your Expression
+            Discover by Style
           </h1>
           <p className="text-sm sm:text-base text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
             Choose how prominent, understated, or elaborate you want your needlework to be.
-            From discreet tonal crests to couture 40-hour relief, every piece is calibrated on our 5-level embroidery scale.
+            From discreet tonal crests to couture 40-hour relief, every piece is calibrated across our 5 signature needlework styles.
           </p>
         </div>
       </section>
@@ -50,7 +50,7 @@ export const Expressions: React.FC = () => {
           {(expressions ?? []).map((exp) => (
             <Link
               key={exp.slug}
-              to={`/expression/${exp.slug}`}
+              to={`/styles/${exp.slug}`}
               className="group bg-paper border border-stone/70 p-7 hover:border-ink hover:shadow-lg transition-all flex flex-col justify-between"
             >
               <div>
@@ -82,3 +82,5 @@ export const Expressions: React.FC = () => {
     </div>
   );
 };
+
+export const Styles = Expressions;

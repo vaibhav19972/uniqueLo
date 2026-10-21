@@ -1162,10 +1162,10 @@ export const ProductDetail: React.FC = () => {
                   </p>
                 </div>
                 <Link
-                  to={`/expression/${product.expressionSlug || 'artistic'}`}
+                  to={`/styles/${product.expressionSlug || 'cult'}`}
                   className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold shrink-0"
                 >
-                  Explore All Level {expScore} Pieces →
+                  Explore All {expInfo?.name || `Level ${expScore}`} Pieces →
                 </Link>
               </div>
 

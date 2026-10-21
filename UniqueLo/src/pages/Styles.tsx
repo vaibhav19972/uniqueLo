@@ -1,1 +1,1 @@
-export { Collections as Styles } from './Collections';
+export { Styles, Expressions } from './Expressions';
