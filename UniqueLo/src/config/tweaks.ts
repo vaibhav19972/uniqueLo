@@ -32,6 +32,25 @@ export interface SiteTweaks {
   };
 
   /**
+   * Section 2: Announcement Bar Settings
+   */
+  announcements: {
+    /**
+     * Duration in seconds for one full loop of the marquee running ticker.
+     * Lower value = faster movement; Higher value = gentler movement.
+     */
+    speedSeconds: number;
+    /**
+     * Pause scrolling when hovered by mouse.
+     */
+    pauseOnHover: boolean;
+    /**
+     * Interval in milliseconds between items in Spotlight mode.
+     */
+    spotlightIntervalMs: number;
+  };
+
+  /**
    * General UI Timings
    */
   ui: {
@@ -53,6 +72,14 @@ export const SITE_TWEAKS: SiteTweaks = {
     // 🎨 CROSSFADE DURATION: Speed of image opacity transition in ms
     fadeDurationMs: 2000,
   },
+  announcements: {
+    // 📢 ANNOUNCEMENT MARQUEE SPEED: Duration for one full loop (in seconds)
+    speedSeconds: 32,
+    // ⏸️ PAUSE ON HOVER: Pause marquee on mouse hover
+    pauseOnHover: true,
+    // ⏱️ SPOTLIGHT ROTATION: Duration per announcement in spotlight mode (ms)
+    spotlightIntervalMs: 4500,
+  },
   ui: {
     toastDurationMs: 1000,
   },
@@ -63,3 +90,6 @@ export const SITE_TWEAKS: SiteTweaks = {
  */
 export const CAROUSEL_SPEED_MS = SITE_TWEAKS.carousel.speedMs;
 export const CAROUSEL_PAUSE_ON_HOVER = SITE_TWEAKS.carousel.pauseOnHover;
+export const ANNOUNCEMENT_SPEED_SECONDS = SITE_TWEAKS.announcements.speedSeconds;
+export const ANNOUNCEMENT_PAUSE_ON_HOVER = SITE_TWEAKS.announcements.pauseOnHover;
+
