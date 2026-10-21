@@ -482,6 +482,8 @@ The in-app Admin Studio (`/admin`) connects directly to the Supabase PostgreSQL 
 | | Narrative Story | `public.products` | `description text` | Full atelier product description. |
 | | Curated Edits | `public.products` | `edits text[]` | Array of gateway tags (e.g. `['everyday', 'heritage']`). |
 | | Style Level | `public.products` | `expression_score smallint`, `expression_slug text` | Signature 1–5 discovery axis (`minimal`, `understated`, `cult`, `expressive`, `maximalist`). |
+| | Rating & Reviews | `public.products` | `rating numeric(3,1)`, `review_count integer` | Verified star score (1.0–5.0) and patron reviews tally. |
+| | Sold Count Badge | `public.products` | `sold_count text` | Social proof badge displayed on PDP (e.g. `'50+'`, `'1.2K+'`). |
 | | Search Tags | `public.products` | `tags text[]` | Array of keyword tags for search index. |
 | | Status Toggles | `public.products` | `featured boolean`, `customizable boolean`, `handcrafted boolean` | Booleans controlling storefront banners and studio customizer. |
 | **Embroidery Provenance** | Craft Technique | `public.embroidery_details` | `technique text` | Needlecraft method (e.g., `'aari'`, `'zardozi'`, `'sashiko'`). |

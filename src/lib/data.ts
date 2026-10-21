@@ -469,7 +469,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, intensity, is_mock, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -506,16 +506,16 @@ export async function getProducts(): Promise<Product[]> {
             motifId: item.motif_id,
             characterIds: item.motif_id ? [item.motif_id] : [],
             artStyleSlug: item.collection_slug,
-            intensity: item.intensity ?? 'balanced',
+            intensity: item.intensity ?? (item.expression_score <= 2 ? 'quiet' : item.expression_score === 3 ? 'balanced' : 'loud'),
             expressionScore: item.expression_score ?? 3,
             expressionSlug: (item.expression_slug ? normalizeStyleSlug(item.expression_slug) : undefined) ?? 'cult',
-            isMock: item.is_mock ?? false,
+            isMock: false,
             handcrafted: item.handcrafted ?? false,
             craftTechniques: item.craft_techniques ?? [],
             edits: item.edits ?? [],
-            rating: item.rating,
-            reviewCount: item.review_count,
-            soldCount: item.sold_count,
+            rating: item.rating !== null && item.rating !== undefined ? Number(item.rating) : 5.0,
+            reviewCount: item.review_count !== null && item.review_count !== undefined ? Number(item.review_count) : 0,
+            soldCount: item.sold_count || undefined,
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,

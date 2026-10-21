@@ -88,15 +88,14 @@ ALTER TABLE IF EXISTS public.products
   ADD COLUMN IF NOT EXISTS garment_type text REFERENCES public.garments(slug) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS gender text DEFAULT 'unisex',
   ADD COLUMN IF NOT EXISTS motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,
-  ADD COLUMN IF NOT EXISTS is_mock boolean DEFAULT false,
   ADD COLUMN IF NOT EXISTS handcrafted boolean DEFAULT false,
-  ADD COLUMN IF NOT EXISTS vibes text[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS moods text[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS intensity text NOT NULL DEFAULT 'balanced',
   ADD COLUMN IF NOT EXISTS expression_score smallint DEFAULT 3,
   ADD COLUMN IF NOT EXISTS expression_slug text DEFAULT 'cult',
   ADD COLUMN IF NOT EXISTS craft_techniques text[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS edits text[] DEFAULT '{}';
+  ADD COLUMN IF NOT EXISTS edits text[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS rating numeric(3,1) DEFAULT 5.0,
+  ADD COLUMN IF NOT EXISTS review_count integer DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS sold_count text;
 
 -- Ensure RLS and public read policies exist on all taxonomy tables
 ALTER TABLE IF EXISTS public.universes ENABLE ROW LEVEL SECURITY;
@@ -340,8 +339,8 @@ ON CONFLICT (slug) DO UPDATE SET
 -- Product 1: Sakura Ronin Heavyweight Hoodie (Animeverse · Tops/Hoodie)
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  collection_slug, garment_type, gender, motif_id, is_mock, handcrafted, intensity,
-  craft_techniques, edits, expression_score, expression_slug, vibes, moods,
+  collection_slug, garment_type, gender, motif_id, handcrafted,
+  craft_techniques, edits, expression_score, expression_slug,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -356,15 +355,11 @@ INSERT INTO public.products (
   'hoodie',
   'unisex',
   'sakura',
-  false,
   true,
-  'balanced',
   ARRAY['high-relief-fill', 'satin-stitch'],
   ARRAY['cherry-blossom', 'street-atelier'],
   3,
   'cult',
-  ARRAY['aesthetic', 'expressive'],
-  ARRAY['statement', 'poetic'],
   4.9,
   18,
   '80+',
@@ -382,6 +377,7 @@ INSERT INTO public.products (
 ) ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   subtitle = EXCLUDED.subtitle,
+  foreign_tagline = EXCLUDED.foreign_tagline,
   description = EXCLUDED.description,
   category_slug = EXCLUDED.category_slug,
   universe_slug = EXCLUDED.universe_slug,
@@ -389,12 +385,17 @@ INSERT INTO public.products (
   garment_type = EXCLUDED.garment_type,
   gender = EXCLUDED.gender,
   motif_id = EXCLUDED.motif_id,
-  is_mock = EXCLUDED.is_mock,
   handcrafted = EXCLUDED.handcrafted,
-  intensity = EXCLUDED.intensity,
   craft_techniques = EXCLUDED.craft_techniques,
   edits = EXCLUDED.edits,
-  featured = EXCLUDED.featured;
+  expression_score = EXCLUDED.expression_score,
+  expression_slug = EXCLUDED.expression_slug,
+  rating = EXCLUDED.rating,
+  review_count = EXCLUDED.review_count,
+  sold_count = EXCLUDED.sold_count,
+  tags = EXCLUDED.tags,
+  featured = EXCLUDED.featured,
+  customizable = EXCLUDED.customizable;
 
 -- Product 1 Images
 DELETE FROM public.product_images WHERE product_slug = 'sakura-ronin-hoodie';
@@ -444,8 +445,8 @@ INSERT INTO public.reviews (product_slug, author, rating, title, comment, verifi
 -- Product 2: Heritage Kantha Stitch Chore Jacket (Itihaas · Outerwear/Jacket)
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  collection_slug, garment_type, gender, motif_id, is_mock, handcrafted, intensity,
-  craft_techniques, edits, expression_score, expression_slug, vibes, moods,
+  collection_slug, garment_type, gender, motif_id, handcrafted,
+  craft_techniques, edits, expression_score, expression_slug,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -460,15 +461,11 @@ INSERT INTO public.products (
   'jacket',
   'unisex',
   'arch-jaal',
-  false,
   true,
-  'quiet',
   ARRAY['kantha-running-stitch', 'zari-relief'],
   ARRAY['heritage', 'quiet-luxury'],
   2,
   'understated',
-  ARRAY['minimal', 'clean'],
-  ARRAY['heritage', 'subtle'],
   5.0,
   12,
   '45+',
@@ -486,6 +483,7 @@ INSERT INTO public.products (
 ) ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   subtitle = EXCLUDED.subtitle,
+  foreign_tagline = EXCLUDED.foreign_tagline,
   description = EXCLUDED.description,
   category_slug = EXCLUDED.category_slug,
   universe_slug = EXCLUDED.universe_slug,
@@ -493,12 +491,17 @@ INSERT INTO public.products (
   garment_type = EXCLUDED.garment_type,
   gender = EXCLUDED.gender,
   motif_id = EXCLUDED.motif_id,
-  is_mock = EXCLUDED.is_mock,
   handcrafted = EXCLUDED.handcrafted,
-  intensity = EXCLUDED.intensity,
   craft_techniques = EXCLUDED.craft_techniques,
   edits = EXCLUDED.edits,
-  featured = EXCLUDED.featured;
+  expression_score = EXCLUDED.expression_score,
+  expression_slug = EXCLUDED.expression_slug,
+  rating = EXCLUDED.rating,
+  review_count = EXCLUDED.review_count,
+  sold_count = EXCLUDED.sold_count,
+  tags = EXCLUDED.tags,
+  featured = EXCLUDED.featured,
+  customizable = EXCLUDED.customizable;
 
 -- Product 2 Images
 DELETE FROM public.product_images WHERE product_slug = 'kantha-chore-jacket';
