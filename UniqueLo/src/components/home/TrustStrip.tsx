@@ -37,18 +37,20 @@ const ITEMS = [
 export const TrustStrip: React.FC = () => {
   return (
     <section aria-label="Why UniqueLo" className="bg-paper border-y border-stone/60">
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone/60">
         {ITEMS.map((item, i) => (
           <div
             key={item.title}
-            className={`flex items-center gap-4 py-6 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-stone/60 sm:px-6 lg:pl-8 sm:justify-center lg:justify-start' : ''}`}
+            className={`flex items-center gap-2.5 sm:gap-4 py-3.5 sm:py-6 px-1.5 sm:px-6 lg:pl-8 sm:justify-center lg:justify-start ${
+              i % 2 === 1 ? 'border-l border-stone/60 sm:border-l-0' : ''
+            }`}
           >
-            <svg className="w-8 h-8 shrink-0" style={{ color: 'var(--brand-gold)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               {item.icon}
             </svg>
             <div>
-              <p className="font-serif text-base text-ink">{item.title}</p>
-              <p className="font-serif text-sm text-ink-muted">{item.detail}</p>
+              <p className="font-serif text-xs sm:text-base text-ink font-medium leading-tight">{item.title}</p>
+              <p className="font-serif text-[10px] sm:text-sm text-ink-muted leading-tight mt-0.5">{item.detail}</p>
             </div>
           </div>
         ))}

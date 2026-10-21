@@ -46,32 +46,32 @@ export const Expressions: React.FC = () => {
       </section>
 
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {(expressions ?? []).map((exp) => (
             <Link
               key={exp.slug}
               to={`/styles/${exp.slug}`}
-              className="group bg-paper border border-stone/70 p-7 hover:border-ink hover:shadow-lg transition-all flex flex-col justify-between"
+              className="group bg-paper border border-stone/70 p-3.5 sm:p-7 hover:border-ink hover:shadow-lg transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-accent">
+                <div className="flex items-center justify-between mb-2 sm:mb-4 gap-1">
+                  <span className="font-sans text-[9px] sm:text-[11px] font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-accent truncate">
                     Level {exp.score} of 5
                   </span>
-                  <span className="font-sans text-[10px] uppercase tracking-widest text-ink-muted">
+                  <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted shrink-0">
                     {counts[exp.slug] ?? 0} pieces
                   </span>
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl text-ink group-hover:text-accent transition-colors">
+                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl text-ink group-hover:text-accent transition-colors line-clamp-1">
                   {exp.name}
                 </h2>
-                <p className="font-serif italic text-sm text-ink-muted mt-1.5">{exp.tagline}</p>
-                <p className="text-xs text-ink-muted mt-3 font-light leading-relaxed">{exp.description}</p>
+                <p className="font-serif italic text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">{exp.tagline}</p>
+                <p className="text-[11px] sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">{exp.description}</p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-stone/40 flex items-center justify-between text-xs text-ink">
-                <span className="text-[11px] font-sans text-ink-muted">{exp.characteristics}</span>
-                <span className="uppercase tracking-widest text-[11px] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+              <div className="mt-3 sm:mt-6 pt-3 sm:pt-4 border-t border-stone/40 flex items-center justify-between text-xs text-ink gap-1">
+                <span className="text-[10px] sm:text-[11px] font-sans text-ink-muted truncate">{exp.characteristics}</span>
+                <span className="uppercase tracking-widest text-[10px] sm:text-[11px] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 shrink-0">
                   Explore <span aria-hidden="true">→</span>
                 </span>
               </div>

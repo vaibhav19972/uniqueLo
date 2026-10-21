@@ -43,7 +43,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
       </div>
 
       {/* Grid with Editorial Interludes (Task S4.4) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product, index) => {
           const showInterludeOne = index === 3;
           const showInterludeTwo = index === 7;
@@ -54,8 +54,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
               {/* Craft Interlude 1: Lucknow Chikankari / Botanical Chain */}
               {showInterludeOne && (
-                <div className="col-span-full my-4 p-8 sm:p-10 bg-parchment border border-dashed border-stone/80 relative overflow-hidden">
-                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-parchment border border-dashed border-stone/80 relative overflow-hidden">
+                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
                     <div className="space-y-3 max-w-xl">
                       <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
                         <span>01 // Craft Provenance</span>
@@ -80,7 +80,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-xs border-l border-stone/60 pl-6 w-full md:w-auto">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/60 sm:pl-6 w-full md:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-stone/40">
                       <div>
                         <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Craft Collective</span>
                         <span className="font-medium text-ink">Old City Collective</span>
@@ -104,8 +104,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
               {/* Craft Interlude 2: Jaipur Zardozi Guild */}
               {showInterludeTwo && (
-                <div className="col-span-full my-4 p-8 sm:p-10 bg-ink text-cream border border-stone/30 relative overflow-hidden">
-                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-ink text-cream border border-stone/30 relative overflow-hidden">
+                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
                     <div className="space-y-3 max-w-xl">
                       <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
                         <span>02 // Craft Provenance</span>
@@ -130,7 +130,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-xs border-l border-stone/30 pl-6 w-full md:w-auto text-cream">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/30 sm:pl-6 w-full md:w-auto text-cream pt-4 sm:pt-0 border-t sm:border-t-0 border-white/20">
                       <div>
                         <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Craft Collective</span>
                         <span className="font-medium text-cream">Pink City Bullion Guild</span>

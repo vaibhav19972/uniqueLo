@@ -36,16 +36,18 @@ export const Garments: React.FC = () => {
           </p>
         </div>
       </section>
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {(garments ?? []).map((g) => (
           <Link
             key={g.slug}
             to={`/garments/${g.slug}`}
-            className="group bg-paper border border-stone/70 p-6 hover:border-ink transition-colors"
+            className="group bg-paper border border-stone/70 p-3.5 sm:p-6 hover:border-ink transition-colors flex flex-col justify-between"
           >
-            <h2 className="font-serif text-2xl text-ink group-hover:text-accent transition-colors">{g.name}</h2>
-            <p className="text-xs text-ink-muted mt-1 font-light">{g.description}</p>
-            <span className="inline-flex items-center gap-1.5 mt-4 text-[11px] uppercase tracking-widest text-ink font-medium">
+            <div>
+              <h2 className="font-serif text-base sm:text-2xl text-ink group-hover:text-accent transition-colors truncate">{g.name}</h2>
+              <p className="text-[11px] sm:text-xs text-ink-muted mt-1 font-light line-clamp-2 sm:line-clamp-none">{g.description}</p>
+            </div>
+            <span className="inline-flex items-center gap-1 mt-2.5 sm:mt-4 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
               {counts[g.slug] ?? 0} pieces <span aria-hidden="true">→</span>
             </span>
           </Link>

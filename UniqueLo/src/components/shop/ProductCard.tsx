@@ -116,26 +116,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <button
           onClick={handleWishlist}
           aria-label={isWish ? 'Remove from wishlist' : 'Save to wishlist'}
-          className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
+          className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
             isWish
               ? 'bg-accent text-paper shadow-md scale-105'
               : 'bg-paper/85 text-ink hover:text-accent hover:scale-110'
           }`}
         >
-          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </button>
 
         {/* Technique Badge */}
         {product.embroidery && (
-          <div className="absolute bottom-3 left-3 bg-cream/95 text-ink px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-cream/95 text-ink px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
             {product.embroidery.techniqueLabel}
           </div>
         )}
 
-        {/* Quick Action Flyout */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-gradient-to-t from-ink/90 via-ink/60 to-transparent flex gap-1.5 z-10">
+        {/* Quick Action Flyout - Desktop hover */}
+        <div className="hidden sm:flex absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-gradient-to-t from-ink/90 via-ink/60 to-transparent gap-1.5 z-10">
           <Button
             variant="ghost"
             size="sm"
@@ -168,44 +168,44 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Info Body */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-paper">
+      <div className="p-2.5 sm:p-4 md:p-5 flex-1 flex flex-col justify-between bg-paper">
         <div>
-          <div className="flex items-center justify-between text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-1">
-            <span>
+          <div className="flex items-center justify-between text-[9px] sm:text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-0.5 sm:mb-1">
+            <span className="truncate max-w-[120px] sm:max-w-none">
               {product.craftRegion || 'Made in India'}
               {product.garmentType ? ` · ${product.garmentType}` : ''}
             </span>
             {product.batchNumber != null && product.batchTotal != null && (
-              <span>Ed. {product.batchNumber}/{product.batchTotal}</span>
+              <span className="shrink-0">Ed. {product.batchNumber}/{product.batchTotal}</span>
             )}
           </div>
 
-          <div className="flex justify-between items-start gap-2">
-            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors flex-1">
-              <h3 className="font-serif text-base sm:text-lg text-ink font-normal leading-snug">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
+            <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors flex-1 min-w-0">
+              <h3 className="font-serif text-[13px] sm:text-base lg:text-lg text-ink font-normal leading-snug line-clamp-2">
                 {product.name}
               </h3>
             </Link>
-            <div className="flex flex-col items-end shrink-0">
-              <span className="font-sans text-sm font-semibold text-ink whitespace-nowrap">
+            <div className="flex sm:flex-col items-baseline sm:items-end gap-1.5 sm:gap-0 shrink-0">
+              <span className="font-sans text-xs sm:text-sm font-semibold text-ink whitespace-nowrap">
                 {formatPrice(defaultVariant.priceCents)}
               </span>
               {compareAt && compareAt > defaultVariant.priceCents && (
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
+                  <span className="text-[10px] sm:text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
                   {isV2 && offPct > 0 && (
-                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5">
-                      ({offPct}% OFF)
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.2 sm:px-1.5 sm:py-0.5">
+                      ({offPct}%)
                     </span>
                   )}
                 </div>
               )}
             </div>
           </div>
-          <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2">
+          <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2 hidden sm:block">
             {product.subtitle}
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-wider text-ink-muted">
+          <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 text-[9px] sm:text-[10px] uppercase tracking-wider text-ink-muted">
             {expInfo && (
               <span className="font-sans font-medium text-accent">
                 ✦ {expInfo.name}
@@ -214,17 +214,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.collectionSlug && (
               <Link
                 to={`/collections/${product.collectionSlug}`}
-                className="font-medium text-ink hover:text-accent transition-colors underline decoration-stone/60 underline-offset-2"
+                className="font-medium text-ink hover:text-accent transition-colors underline decoration-stone/60 underline-offset-2 truncate max-w-[100px] sm:max-w-none"
                 onClick={(e) => e.stopPropagation()}
               >
                 {COLLECTIONS.find((c) => c.slug === product.collectionSlug)?.name || product.collectionSlug.replace(/-/g, ' ')}
               </Link>
             )}
             {!product.collectionSlug && product.artStyleSlug && (
-              <span className="font-medium">{product.artStyleSlug.replace(/-/g, ' ')}</span>
+              <span className="font-medium truncate max-w-[80px] sm:max-w-none">{product.artStyleSlug.replace(/-/g, ' ')}</span>
             )}
-            {(product.craftTechniques ?? []).slice(0, 2).map((t) => (
-              <span key={t} className="normal-case tracking-normal text-ink/70">
+            {(product.craftTechniques ?? []).slice(0, 1).map((t) => (
+              <span key={t} className="normal-case tracking-normal text-ink/70 hidden sm:inline">
                 {t.replace(/-/g, ' ')}
               </span>
             ))}
@@ -232,19 +232,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Footer Meta: Sizes & Embroidery Hours */}
-        <div className="mt-4 pt-3 border-t border-stone/40 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
-          {/* Available sizes (no colour option — one colour per piece) */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9px] text-ink-muted">
-              Sizes {Array.from(new Set(product.variants.map((v) => v.size))).slice(0, 5).join(' · ')}
+        <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-stone/40 flex justify-between items-center text-[9px] sm:text-[10px] text-ink-muted uppercase tracking-wider">
+          {/* Available sizes */}
+          <div className="flex items-center gap-1">
+            <span className="text-[8px] sm:text-[9px] text-ink-muted truncate max-w-[80px] sm:max-w-none">
+              Sizes {Array.from(new Set(product.variants.map((v) => v.size))).slice(0, 4).join('·')}
             </span>
-            <span className="text-[9px] text-ink-muted ml-0.5">({product.variants.length})</span>
           </div>
 
           {product.embroidery?.artisanHours && (
-            <span className="font-medium text-ink">
-              {product.embroidery.artisanHours}h embroidery
-              {product.handcrafted && <span className="text-gold-deep"> · Handcrafted</span>}
+            <span className="font-medium text-ink text-[8px] sm:text-[10px] shrink-0">
+              {product.embroidery.artisanHours}h <span className="hidden sm:inline">embroidery</span>
+              {product.handcrafted && <span className="text-gold-deep hidden sm:inline"> · Handcrafted</span>}
             </span>
           )}
         </div>

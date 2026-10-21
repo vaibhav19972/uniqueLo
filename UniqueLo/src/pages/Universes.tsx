@@ -52,17 +52,17 @@ export const Universes: React.FC = () => {
       </section>
 
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6 lg:grid-cols-4">
           {(universes ?? []).map((u) => {
             const count = counts[u.slug] ?? 0;
             return (
               <article
                 key={u.slug}
-                className="group relative flex flex-col overflow-hidden rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
+                className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
               >
                 {/* Artwork media preview */}
                 {u.emblem_src && (
-                  <div className="relative h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
+                  <div className="relative h-28 sm:h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
                     <img
                       src={u.emblem_src}
                       alt={`${u.name} universe artwork`}
@@ -74,30 +74,30 @@ export const Universes: React.FC = () => {
                 )}
 
                 {/* Editorial text stack */}
-                <div className="relative z-10 flex flex-1 flex-col p-6 min-h-[280px]">
+                <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
                   <div className="max-w-[92%]">
-                    <h2 className="font-serif text-2xl sm:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium">
+                    <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
                       {u.name}
                     </h2>
-                    <p className="font-sans text-[11px] uppercase tracking-label text-ink-muted mt-2">
+                    <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
                       {u.tagline}
                     </p>
-                    <span aria-hidden="true" className="mt-3.5 block h-px w-8 bg-ink/25" />
-                    <p className="font-serif text-[14px] text-ink/85 mt-3 leading-relaxed line-clamp-3">
+                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
+                    <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                       {u.lore}
                     </p>
                   </div>
 
-                  <div className="mt-auto pt-6">
+                  <div className="mt-auto pt-3 sm:pt-6">
                     <p className="leading-none">
-                      <span className="font-serif font-semibold text-2xl text-ink">{count}+ </span>
-                      <span className="font-sans text-[10px] uppercase tracking-widest text-ink-muted ml-1">
+                      <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{count}+ </span>
+                      <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                         Styles
                       </span>
                     </p>
                     <Link
                       to={`/universes/${u.slug}`}
-                      className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-7 py-3 font-serif text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                       aria-label={`Enter ${u.name}`}
                     >
                       Enter {u.name} <span aria-hidden="true">→</span>
@@ -110,9 +110,9 @@ export const Universes: React.FC = () => {
 
           {/* 4th Card — The Atelier portal */}
           <article
-            className="group relative flex flex-col overflow-hidden rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
+            className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
           >
-            <div className="relative h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
+            <div className="relative h-28 sm:h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
               <img
                 src="/images/campaigns/atelier-craft.jpg"
                 alt="The Atelier artwork"
@@ -121,31 +121,31 @@ export const Universes: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-paper/30 to-transparent" />
             </div>
-            <div className="relative z-10 flex flex-1 flex-col p-6 min-h-[280px]">
+            <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
               <div className="max-w-[92%]">
-                <h2 className="font-serif text-2xl sm:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium">
+                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
                   The Atelier
                 </h2>
-                <p className="font-sans text-[11px] uppercase tracking-label text-ink-muted mt-2">
+                <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
                   Pure craftsmanship, no theme
                 </p>
-                <span aria-hidden="true" className="mt-3.5 block h-px w-8 bg-ink/25" />
-                <p className="font-serif text-[14px] text-ink/85 mt-3 leading-relaxed line-clamp-3">
+                <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
+                <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                   The base line of the house: artisanal embroidery for its own sake — technique, textile, and construction above every story.
                 </p>
               </div>
 
-              <div className="mt-auto pt-6">
+              <div className="mt-auto pt-3 sm:pt-6">
                 <p className="leading-none">
-                  <span className="font-serif font-semibold text-2xl text-ink">{atelierCount}+ </span>
-                  <span className="font-sans text-[10px] uppercase tracking-widest text-ink-muted ml-1">
+                  <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{atelierCount}+ </span>
+                  <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                     Styles
                   </span>
                 </p>
                 <button
                   type="button"
                   onClick={enterAtelier}
-                  className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-7 py-3 font-serif text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                   aria-label="Enter The Atelier"
                 >
                   Enter The Atelier <span aria-hidden="true">→</span>
