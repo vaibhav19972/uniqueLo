@@ -94,7 +94,7 @@ ALTER TABLE IF EXISTS public.products
   ADD COLUMN IF NOT EXISTS moods text[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS intensity text NOT NULL DEFAULT 'balanced',
   ADD COLUMN IF NOT EXISTS expression_score smallint DEFAULT 3,
-  ADD COLUMN IF NOT EXISTS expression_slug text DEFAULT 'artistic',
+  ADD COLUMN IF NOT EXISTS expression_slug text DEFAULT 'cult',
   ADD COLUMN IF NOT EXISTS craft_techniques text[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS edits text[] DEFAULT '{}';
 
@@ -362,7 +362,7 @@ INSERT INTO public.products (
   ARRAY['high-relief-fill', 'satin-stitch'],
   ARRAY['cherry-blossom', 'street-atelier'],
   3,
-  'artistic',
+  'cult',
   ARRAY['aesthetic', 'expressive'],
   ARRAY['statement', 'poetic'],
   4.9,
@@ -466,7 +466,7 @@ INSERT INTO public.products (
   ARRAY['kantha-running-stitch', 'zari-relief'],
   ARRAY['heritage', 'quiet-luxury'],
   2,
-  'subtle-statements',
+  'understated',
   ARRAY['minimal', 'clean'],
   ARRAY['heritage', 'subtle'],
   5.0,

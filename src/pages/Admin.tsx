@@ -1336,7 +1336,7 @@ INSERT INTO public.embroidery_details (
                   <div className="sm:col-span-2">
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Embroidery Expression (1–5 Discovery Axis)
+                        Style & Embroidery (1–5 Discovery Axis)
                       </label>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-accent font-mono font-medium">
@@ -2376,7 +2376,7 @@ INSERT INTO public.embroidery_details (
                         </td>
                         <td className="py-3 px-3">
                           <span className="px-2 py-0.5 bg-paper border border-stone/40 text-[10px] uppercase tracking-wider text-accent font-medium whitespace-nowrap">
-                            ✦ L{product.expressionScore ?? 3} · {(product.expressionSlug || 'artistic').replace(/-/g, ' ')}
+                            ✦ L{product.expressionScore ?? 3} · {(product.expressionSlug || 'cult').replace(/-/g, ' ')}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-xs text-ink-muted">

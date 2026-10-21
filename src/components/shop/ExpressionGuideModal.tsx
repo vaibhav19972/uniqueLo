@@ -112,11 +112,11 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
                   </div>
 
                   <Link
-                    to={`/expression/${level.slug}`}
+                    to={`/styles/${level.slug}`}
                     onClick={onClose}
                     className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold whitespace-nowrap shrink-0 mt-1"
                   >
-                    View Tier →
+                    View Style →
                   </Link>
                 </div>
 

@@ -42,11 +42,11 @@ export const FindYourExpression: React.FC = () => {
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="The Signature Discovery Axis"
-          title="Find Your Expression"
+          title="Find Your Style"
           titleId="expression-gateway-heading"
           sub="How loud do you want your clothing to speak? From whisper-quiet micro-stitch to museum-grade tapestry coats."
-          linkTo="/expression"
-          linkLabel="Explore all 5 levels"
+          linkTo="/styles"
+          linkLabel="Explore all 5 styles"
         />
 
         {/* Level 1-to-5 Interactive Visual Selector Rail */}
@@ -183,14 +183,14 @@ export const FindYourExpression: React.FC = () => {
                   {/* Action Link */}
                   <div className="pt-2">
                     <Link
-                      to={`/expression/${level.slug}`}
+                      to={`/styles/${level.slug}`}
                       className={`w-full py-2 px-3 text-center text-[10px] uppercase tracking-widest font-semibold transition-colors block ${
                         isSelected
                           ? 'bg-accent text-cream hover:bg-accent-hover'
                           : 'bg-cream text-ink border border-stone/60 hover:bg-ink hover:text-cream hover:border-ink'
                       }`}
                     >
-                      Shop Tier ({count}) →
+                      Shop Style ({count}) →
                     </Link>
                   </div>
                 </div>
@@ -202,13 +202,13 @@ export const FindYourExpression: React.FC = () => {
         {/* Philosophy Footnote */}
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-ink-muted gap-2 pt-4 border-t border-stone/40">
           <p className="font-serif italic">
-            "Your level of expression should reflect your mood, the setting, and how much of your story you want the world to see."
+            "Your level of embroidery style should reflect your mood, the setting, and how much of your story you want the world to see."
           </p>
           <Link
-            to="/expression"
+            to="/styles"
             className="text-accent uppercase tracking-widest text-[10px] font-semibold hover:underline shrink-0"
           >
-            Read the Atelier Expression Manifesto →
+            Read the Atelier Style Guide →
           </Link>
         </div>
       </div>

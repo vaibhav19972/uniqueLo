@@ -8,7 +8,7 @@ import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalo
 import { prefersReducedMotion } from '../../lib/motion';
 import { AnnouncementBar } from './AnnouncementBar';
 
-type NavMenuKey = 'worlds' | 'expression' | 'clothing' | 'new-featured' | 'our-craft' | null;
+type NavMenuKey = 'worlds' | 'styles' | 'clothing' | 'new-featured' | 'our-craft' | null;
 
 export const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -105,7 +105,7 @@ export const Header: React.FC = () => {
 
   // Active path helpers
   const isWorldsActive = location.pathname.startsWith('/worlds') || location.pathname.startsWith('/universes');
-  const isExpressionActive = location.pathname.startsWith('/expression');
+  const isStylesActive = location.pathname.startsWith('/styles') || location.pathname.startsWith('/expression');
   const isClothingActive = location.pathname.startsWith('/clothing') || location.pathname.startsWith('/garments') || location.pathname === '/shop';
   const isNewActive = location.pathname.startsWith('/new-featured');
   const isCraftActive = location.pathname.startsWith('/our-craft') || location.pathname.startsWith('/atelier');
@@ -224,40 +224,40 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* 2. EXPRESSION (Signature System) */}
+          {/* 2. STYLES (Signature System) */}
           <div
             className="relative"
-            onMouseEnter={() => setActiveMenu('expression')}
+            onMouseEnter={() => setActiveMenu('styles')}
             onMouseLeave={() => setActiveMenu(null)}
           >
             <Link
-              to="/expression"
+              to="/styles"
               onClick={closeMenu}
               className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
-                isExpressionActive ? 'text-ink font-semibold' : 'text-ink-muted'
+                isStylesActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
-              Expression
-              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'expression' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              Styles
+              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'styles' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
-              {isExpressionActive && (
+              {isStylesActive && (
                 <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
               )}
             </Link>
 
-            {activeMenu === 'expression' && (
+            {activeMenu === 'styles' && (
               <div className="absolute top-full left-0 pt-3 w-88">
                 <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
                   <div className="px-5 py-2 border-b border-stone/40">
                     <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
-                      Embroidery Intensity (1–5)
+                      Embroidery Style & Density (1–5)
                     </span>
                   </div>
                   {(expressions ?? []).map((exp) => (
                     <Link
                       key={exp.slug}
-                      to={`/expression/${exp.slug}`}
+                      to={`/styles/${exp.slug}`}
                       onClick={closeMenu}
                       className="block px-5 py-2.5 hover:bg-cream transition-colors group"
                     >
@@ -275,11 +275,11 @@ export const Header: React.FC = () => {
                     </Link>
                   ))}
                   <Link
-                    to="/expression"
+                    to="/styles"
                     onClick={closeMenu}
                     className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
                   >
-                    Explore Expression Rubric →
+                    Explore All Styles →
                   </Link>
                 </div>
               </div>
@@ -613,21 +613,21 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* Expression Accordion */}
+          {/* Styles Accordion */}
           <div className="border-b border-stone/40 pb-2">
             <button
-              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'expression' ? null : 'expression')}
+              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'styles' ? null : 'styles')}
               className="w-full py-2.5 flex items-center justify-between text-left"
             >
-              <span className="font-serif text-2xl text-ink">Expression</span>
-              <span className="text-sm font-sans">{mobileExpandedSection === 'expression' ? '–' : '+'}</span>
+              <span className="font-serif text-2xl text-ink">Styles</span>
+              <span className="text-sm font-sans">{mobileExpandedSection === 'styles' ? '–' : '+'}</span>
             </button>
-            {mobileExpandedSection === 'expression' && (
+            {mobileExpandedSection === 'styles' && (
               <div className="pl-3 py-1 space-y-2">
                 {(expressions ?? []).map((exp) => (
                   <Link
                     key={exp.slug}
-                    to={`/expression/${exp.slug}`}
+                    to={`/styles/${exp.slug}`}
                     onClick={() => setMobileOpen(false)}
                     className="block py-1 text-sm font-serif text-ink"
                   >
@@ -635,11 +635,11 @@ export const Header: React.FC = () => {
                   </Link>
                 ))}
                 <Link
-                  to="/expression"
+                  to="/styles"
                   onClick={() => setMobileOpen(false)}
                   className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
                 >
-                  All Expressions →
+                  All Styles →
                 </Link>
               </div>
             )}

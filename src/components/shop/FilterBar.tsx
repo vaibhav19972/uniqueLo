@@ -190,8 +190,8 @@ export const FilterBar: React.FC = () => {
 
             {filters.expressionSlug && filters.expressionSlug !== 'all' && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
-                Expression: {filters.expressionSlug.replace(/-/g, ' ')}
-                <button onClick={() => setExpressionSlug('all')} aria-label="Clear expression filter" className="text-ink-muted hover:text-ink">✕</button>
+                Style: {filters.expressionSlug.replace(/-/g, ' ')}
+                <button onClick={() => setExpressionSlug('all')} aria-label="Clear style filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
@@ -269,10 +269,10 @@ export const FilterBar: React.FC = () => {
               </div>
             </div>
 
-            {/* 2. Expression (1-5 Scale) */}
+            {/* 2. Style (1-5 Scale) */}
             <div>
               <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
-                Embroidery Expression
+                Embroidery Style (1–5)
               </h4>
               <div className="flex flex-wrap gap-1.5">
                 {EXPRESSION_LEVELS.map((exp) => {

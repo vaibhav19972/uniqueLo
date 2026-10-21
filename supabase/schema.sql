@@ -116,7 +116,7 @@ create table if not exists public.products (
   craft_techniques text[] default '{}',
   edits text[] default '{}',
   expression_score smallint default 3 check (expression_score between 1 and 5),
-  expression_slug text default 'artistic',
+  expression_slug text default 'cult',
   rating numeric(3,1),
   review_count integer default 0,
   sold_count text,
