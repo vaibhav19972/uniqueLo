@@ -97,18 +97,11 @@ Snake_case columns map 1:1 to the camelCase TypeScript types via the adapter in
 ### `order_items`
 `id` (uuid, PK), `order_id` (FK → orders.id, cascade), `product_slug`, `variant_sku`, `product_name`, `color`, `size`, `quantity`, `price_cents`, `customization` (jsonb).
 
-> **Migration status (2026-10-11):** the universe schema has **landed** —
-> `universes` / `motifs` tables and the `products.universe_slug / garment_type /
-> gender / vibes / moods / motif_id / is_mock / handcrafted / foreign_tagline …`
-> columns are in `schema.sql`, with universe/motif assignments in `seed.sql`.
-> `seed.sql` still seeds only the 13-product legacy atelier line
-> (`is_mock = false`); the 14 mock SKUs remain bundled-only
-> (`src/data/mock-products.json`). The storefront feature-detects the schema
-> shape, but **does not yet filter `is_mock`** — so after running the migrated
-> `seed.sql`, the legacy 13 rows WILL be served to the storefront (they now
-> carry `universe_slug` and pass feature detection). Per docs/08 §03-2c the
-> planned behavior is `is_mock = true` filtering; `getProducts()` needs that
-> `.eq()` guard before the migrated seed is safe to apply in a mock-phase deploy.
+> **Database Architecture & Evolution:**
+> - `supabase/schema.sql` is 100% pure DDL (creates tables, foreign keys, indexes, RLS policies, storage).
+> - `supabase/production-seed.sql` seeds the full Master Taxonomy (Universes, Motifs, Categories, Garments, Collections) + 2 authentic showcase products.
+> - `supabase/seed.sql` seeds the development dataset (13 atelier products).
+> - For managing live database updates, adding new tables, or altering columns in production, refer to the [Database Migration Guide](../DATABASE_MIGRATION_GUIDE.md).
 
 ---
 

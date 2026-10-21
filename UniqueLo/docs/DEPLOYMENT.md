@@ -63,27 +63,29 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 1. Go to [Supabase](https://supabase.com) and create a new project (e.g. `uniquelo-db`).
 2. Note your database password and choose your nearest region.
 
-### Step 3.2 — Execute Database Schema
+### Step 3.2 — Execute Database Schema (Pure DDL)
 1. In the Supabase Dashboard, open **SQL Editor**.
 2. Click **New Query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and click **Run**.
 3. This creates:
-   - `categories`, `products`, `variants`, `product_images`, `embroidery_details`
-   - `newsletter_subscribers`, `reviews`, `orders`, `order_items`
-   - High-performance indexes and Row-Level Security (RLS) policies.
+   - All 13 relational tables: `universes`, `motifs`, `categories`, `garments`, `collections`, `products`, `variants`, `product_images`, `embroidery_details`, `newsletter_subscribers`, `reviews`, `orders`, `order_items`
+   - High-performance indexes, full Row-Level Security (RLS) policies, and the `product-images` storage bucket.
+   - Note: `schema.sql` is 100% pure DDL with zero data rows, guaranteeing error-free execution on clean databases.
 
 ### Step 3.3 — Seed Production Baseline Taxonomy & Flagship Products
 1. In the Supabase SQL Editor, open a **New Query**.
 2. Paste the contents of [`supabase/production-seed.sql`](../supabase/production-seed.sql) and click **Run**.
 3. This seeds:
-   - Complete Master Taxonomy: 3 Universes (`animeverse`, `heroverse`, `itihaas`), 7 Motifs, 5 Categories, 9 Garments, and 3 Collections.
+   - Complete Master Taxonomy: 3 Universes (`animeverse`, `heroverse`, `itihaas`), 7 Motifs, 5 Categories, 9 Garments, and 3 Collections (inserted in strict foreign-key dependency order).
    - Exactly 2 authentic, handcrafted showcase products (`sakura-ronin-hoodie` and `kantha-chore-jacket`) with real variants, disk images, and embroidery provenance.
-   - Initialized `product-images` storage bucket and public policies.
    - The database remains clean and unpolluted with dummy data, allowing you to upload real catalog items one-by-one via the **Admin Studio** (`/admin`).
 
 ### Step 3.4 — Copy API Keys
 In Supabase, navigate to **Project Settings** > **API**:
 - Copy **Project URL** -> `VITE_SUPABASE_URL`
 - Copy **anon public key** -> `VITE_SUPABASE_ANON_KEY`
+
+### Step 3.5 — Ongoing Database Management & Future Updates
+For instructions on adding new tables, columns, categories, silhouettes, or products to production without downtime or data loss, consult the official [Database Migration Guide](./DATABASE_MIGRATION_GUIDE.md).
 
 ---
 

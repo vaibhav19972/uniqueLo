@@ -445,7 +445,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, character_ids, art_style_slug, intensity, is_mock, handcrafted, craft_techniques, edits, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, intensity, is_mock, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -476,13 +476,15 @@ export async function getProducts(): Promise<Product[]> {
             foreignTagline: item.foreign_tagline,
             categorySlug: item.category_slug,
             universeSlug: item.universe_slug,
-            collectionSlug: item.collection_slug ?? item.art_style_slug,
+            collectionSlug: item.collection_slug,
             garmentType: item.garment_type,
             gender: item.gender ?? 'unisex',
             motifId: item.motif_id,
-            characterIds: item.character_ids ?? (item.motif_id ? [item.motif_id] : []),
-            artStyleSlug: item.collection_slug ?? item.art_style_slug,
+            characterIds: item.motif_id ? [item.motif_id] : [],
+            artStyleSlug: item.collection_slug,
             intensity: item.intensity ?? 'balanced',
+            expressionScore: item.expression_score ?? 3,
+            expressionSlug: item.expression_slug ?? 'artistic',
             isMock: item.is_mock ?? false,
             handcrafted: item.handcrafted ?? false,
             craftTechniques: item.craft_techniques ?? [],

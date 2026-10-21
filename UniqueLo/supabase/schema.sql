@@ -113,6 +113,8 @@ create table if not exists public.products (
   vibes text[] default '{}',
   moods text[] default '{}',
   intensity text default 'balanced' check (intensity in ('quiet', 'balanced', 'loud')),
+  craft_techniques text[] default '{}',
+  edits text[] default '{}',
   expression_score smallint default 3 check (expression_score between 1 and 5),
   expression_slug text default 'artistic',
   rating numeric(3,1),
@@ -266,53 +268,30 @@ create policy "Allow public submit review" on public.reviews for insert with che
 create policy "Allow public create orders" on public.orders for insert with check (true);
 create policy "Allow public create order items" on public.order_items for insert with check (true);
 
--- Allow in-app Admin Studio to insert/update catalog rows
+-- Allow in-app Admin Studio to insert/update/delete catalog rows
+create policy "Allow admin insert universes" on public.universes for insert with check (true);
+create policy "Allow admin update universes" on public.universes for update using (true);
+create policy "Allow admin insert motifs" on public.motifs for insert with check (true);
+create policy "Allow admin update motifs" on public.motifs for update using (true);
+create policy "Allow admin insert categories" on public.categories for insert with check (true);
+create policy "Allow admin update categories" on public.categories for update using (true);
 create policy "Allow admin insert garments" on public.garments for insert with check (true);
 create policy "Allow admin update garments" on public.garments for update using (true);
+create policy "Allow admin delete garments" on public.garments for delete using (true);
 create policy "Allow admin insert collections" on public.collections for insert with check (true);
 create policy "Allow admin update collections" on public.collections for update using (true);
+create policy "Allow admin delete collections" on public.collections for delete using (true);
 create policy "Allow admin insert products" on public.products for insert with check (true);
 create policy "Allow admin update products" on public.products for update using (true);
+create policy "Allow admin delete products" on public.products for delete using (true);
 create policy "Allow admin insert variants" on public.variants for insert with check (true);
 create policy "Allow admin update variants" on public.variants for update using (true);
+create policy "Allow admin delete variants" on public.variants for delete using (true);
 create policy "Allow admin insert product images" on public.product_images for insert with check (true);
 create policy "Allow admin delete product images" on public.product_images for delete using (true);
 create policy "Allow admin insert embroidery details" on public.embroidery_details for insert with check (true);
 create policy "Allow admin update embroidery details" on public.embroidery_details for update using (true);
-
--- ====================================================================
--- Initial Seed: Garment Silhouettes (Taxonomy Definition)
--- ====================================================================
-insert into public.garments (slug, name, category_slug, description, order_num) values
-  ('hoodie', 'Hoodies', 'tops', 'Heavyweight fleece hoodies with back-panel and crest embroidery.', 1),
-  ('tee', 'Tees', 'tops', 'Combed-cotton tees carrying chest and back threadwork.', 2),
-  ('shirt', 'Shirts', 'tops', 'Oxfords, poplins and band-collar tunics with monogram detail.', 3),
-  ('jacket', 'Jackets', 'outerwear', 'Chore jackets, capes and overcoats with procession-scale embroidery.', 4),
-  ('cardigan', 'Cardigans', 'knitwear', 'Cashmere cardigans with crewel relief.', 5),
-  ('vest', 'Vests', 'knitwear', 'Knit vests with sculpted knot texture.', 6),
-  ('pants', 'Pants', 'bottoms', 'Selvedge denim and work pants with structural stitching.', 7),
-  ('scarf', 'Scarves', 'accessories', 'Silk scarves with arch-jaal and flora borders.', 8),
-  ('tote', 'Totes', 'accessories', 'Raw-canvas totes with sun-disc and motif hits.', 9)
-on conflict (slug) do update set
-  name = excluded.name,
-  category_slug = excluded.category_slug,
-  description = excluded.description,
-  order_num = excluded.order_num;
-
--- ====================================================================
--- Initial Seed: Collections (Seasonal Drops & Thematic Capsules)
--- ====================================================================
-insert into public.collections (slug, name, tagline, description, universe_slug, featured, order_num) values
-  ('spring-sakura', 'Spring Sakura Collection', 'Japanese woodblock waves, blossom scatter, ink-line calm.', 'Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery.', 'animeverse', true, 1),
-  ('royal-heritage', 'Royal Heritage Collection', 'Arches, jaals and royal court processions in gold zardozi.', 'Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages.', 'itihaas', true, 2),
-  ('midnight-atelier', 'Midnight Atelier Collection', 'No world, just pure cloth, heroic crests, and tonal needlecraft.', 'Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing.', 'atelier', true, 3)
-on conflict (slug) do update set
-  name = excluded.name,
-  tagline = excluded.tagline,
-  description = excluded.description,
-  universe_slug = excluded.universe_slug,
-  featured = excluded.featured,
-  order_num = excluded.order_num;
+create policy "Allow admin delete embroidery details" on public.embroidery_details for delete using (true);
 
 -- ====================================================================
 -- Storage Bucket for Product Imagery (Media CDN)
@@ -326,3 +305,14 @@ for select using (bucket_id = 'product-images');
 
 create policy "Public Upload Product Images" on storage.objects 
 for insert with check (bucket_id = 'product-images');
+
+-- ====================================================================
+-- Seeding Instructions:
+-- ====================================================================
+-- This schema file is 100% pure DDL (tables, constraints, indexes, RLS, storage).
+-- To seed data, run one of the following scripts in the Supabase SQL Editor:
+--   1. Production Baseline: Run `supabase/production-seed.sql`
+--      (Seeds Master Taxonomy + 2 Flagship Reference Products)
+--   2. Local / Development: Run `supabase/seed.sql`
+--      (Seeds Master Taxonomy + 13 Full Catalog Products)
+-- ====================================================================
