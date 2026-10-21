@@ -203,7 +203,7 @@ export const Universe: React.FC = () => {
           <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 font-medium leading-display tracking-tight">
             {universe.lore_heading ?? 'More Than Characters.'}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-7">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-3 mt-7">
             {(motifs ?? []).map((m) => {
               const count = (allProducts ?? []).filter((p) =>
                 getCharacterIds(p).includes(m.id),
@@ -212,22 +212,24 @@ export const Universe: React.FC = () => {
                 <Link
                   key={m.id}
                   to={`/universes/${universe.slug}/characters/${m.id}`}
-                  className="group bg-parchment border border-stone/70 p-5 hover:border-ink transition-colors"
+                  className="group bg-parchment border border-stone/70 p-3 sm:p-5 hover:border-ink transition-colors flex flex-col justify-between"
                 >
-                  <div className="aspect-[16/9] bg-stone/30 mb-4" aria-hidden="true" />
-                  <h3 className="font-serif text-xl text-ink group-hover:text-accent transition-colors">
-                    {m.name}
-                  </h3>
-                  <p className="font-serif text-sm text-ink-muted mt-1.5 leading-relaxed">{m.meaning}</p>
-                  <span className="inline-flex items-center gap-1.5 mt-3 text-[11px] uppercase tracking-widest text-ink font-medium">
-                    Shop character · {count} <span aria-hidden="true">→</span>
+                  <div>
+                    <div className="aspect-[16/9] bg-stone/30 mb-2 sm:mb-4" aria-hidden="true" />
+                    <h3 className="font-serif text-base sm:text-xl text-ink group-hover:text-accent transition-colors truncate">
+                      {m.name}
+                    </h3>
+                    <p className="font-serif text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 leading-relaxed line-clamp-2">{m.meaning}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
+                    Shop · {count} <span aria-hidden="true">→</span>
                   </span>
                 </Link>
               );
             })}
             {(motifs ?? []).length > 0 && (motifs ?? []).length < 3 && (
-              <article className="border border-dashed border-stone/70 p-5 flex items-center">
-                <p className="font-serif text-sm text-ink-muted leading-relaxed">
+              <article className="border border-dashed border-stone/70 p-3 sm:p-5 flex items-center">
+                <p className="font-serif text-xs sm:text-sm text-ink-muted leading-relaxed">
                   More symbols join this row as the collection unfolds.
                 </p>
               </article>

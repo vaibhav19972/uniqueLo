@@ -84,7 +84,7 @@ export const ShopByGarment: React.FC = () => {
           linkLabel="Explore all silhouettes"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mt-10">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 mt-6 sm:mt-10">
           {FEATURED_GARMENTS.map((item) => {
             const count = counts[item.slug] ?? 0;
             // Find representative product image or use fallback
@@ -112,30 +112,30 @@ export const ShopByGarment: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
                   
                   {/* Eyebrow & Live Count Badge */}
-                  <div className="absolute top-3 left-3 bg-paper/95 text-ink text-[9px] uppercase tracking-widest font-sans font-semibold px-2.5 py-0.5 border border-stone/60">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-paper/95 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest font-sans font-semibold px-1.5 sm:px-2.5 py-0.5 border border-stone/60">
                     {item.eyebrow}
                   </div>
 
-                  <div className="absolute bottom-3 inset-x-3 text-cream flex items-end justify-between">
+                  <div className="absolute bottom-2 inset-x-2 sm:bottom-3 sm:inset-x-3 text-cream flex items-end justify-between gap-1">
                     <div>
-                      <h3 className="font-serif text-2xl leading-tight">
+                      <h3 className="font-serif text-sm sm:text-2xl leading-tight line-clamp-1">
                         {item.name}
                       </h3>
                     </div>
-                    <span className="font-mono text-xs uppercase bg-black/60 px-2 py-0.5 text-cream border border-white/20">
+                    <span className="font-mono text-[9px] sm:text-xs uppercase bg-black/60 px-1.5 py-0.5 sm:px-2 text-cream border border-white/20 shrink-0">
                       {count} {count === 1 ? 'Design' : 'Designs'}
                     </span>
                   </div>
                 </div>
 
                 {/* Body & Link */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <p className="text-xs text-ink-muted leading-relaxed font-light">
+                <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
+                  <p className="text-[11px] sm:text-xs text-ink-muted leading-relaxed font-light line-clamp-2">
                     {item.description}
                   </p>
                   
                   <div className="pt-2 border-t border-stone/30 flex items-center justify-between">
-                    <span className="font-sans text-[10px] uppercase tracking-widest text-accent font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
+                    <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-accent font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
                       Explore {item.name} <span aria-hidden="true">→</span>
                     </span>
                   </div>

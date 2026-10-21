@@ -1102,40 +1102,40 @@ export const ProductDetail: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
                 {universeProducts.map((rel) => {
                   const relVariant = getDefaultVariant(rel);
                   return (
                     <Link
                       key={rel.slug}
                       to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
                     >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
                         <img
                           src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
                           alt={rel.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
-                        <span className="absolute top-2 right-2 bg-paper/90 text-accent text-[9px] uppercase tracking-widest px-2 py-0.5 font-sans font-semibold">
+                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
                           ✦ L{getExpressionScore(rel)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                        <div className="min-w-0">
+                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
                             {rel.name}
                           </h4>
-                          <span className="font-sans text-[11px] text-ink-muted block mt-0.5">
+                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
                             {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
                           </span>
                         </div>
-                        <span className="font-sans text-xs font-semibold text-ink">
+                        <span className="font-sans text-xs font-semibold text-ink shrink-0">
                           {formatPrice(relVariant.priceCents)}
                         </span>
                       </div>
@@ -1169,40 +1169,40 @@ export const ProductDetail: React.FC = () => {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
                 {expressionProducts.map((rel) => {
                   const relVariant = getDefaultVariant(rel);
                   return (
                     <Link
                       key={rel.slug}
                       to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
                     >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
                         <img
                           src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
                           alt={rel.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
-                        <span className="absolute top-2 right-2 bg-paper/90 text-accent text-[9px] uppercase tracking-widest px-2 py-0.5 font-sans font-semibold">
+                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
                           ✦ L{getExpressionScore(rel)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                        <div className="min-w-0">
+                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
                             {rel.name}
                           </h4>
-                          <span className="font-sans text-[11px] text-ink-muted block mt-0.5">
+                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
                             {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
                           </span>
                         </div>
-                        <span className="font-sans text-xs font-semibold text-ink">
+                        <span className="font-sans text-xs font-semibold text-ink shrink-0">
                           {formatPrice(relVariant.priceCents)}
                         </span>
                       </div>
@@ -1225,32 +1225,37 @@ export const ProductDetail: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
                 {relatedProducts.map((rel) => {
                   const relVariant = getDefaultVariant(rel);
                   return (
                     <Link
                       key={rel.slug}
                       to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-3 hover:border-ink/50 transition-colors"
+                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
                     >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-3">
+                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
                         <img
                           src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
                           alt={rel.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-2 left-2 bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
                       </div>
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-serif text-sm text-ink group-hover:text-accent transition-colors">
-                          {rel.name}
-                        </h4>
-                        <span className="font-sans text-xs font-medium text-ink">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                        <div className="min-w-0">
+                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
+                            {rel.name}
+                          </h4>
+                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
+                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
+                          </span>
+                        </div>
+                        <span className="font-sans text-xs font-medium text-ink shrink-0">
                           {formatPrice(relVariant.priceCents)}
                         </span>
                       </div>

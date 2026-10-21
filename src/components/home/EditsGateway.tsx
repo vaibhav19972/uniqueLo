@@ -50,29 +50,29 @@ export const EditsGateway: React.FC = () => {
           linkLabel="View all edits"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 py-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4 py-4">
           {featured.map((e) => (
             <article
               key={e.slug}
               className="group relative rounded-sm overflow-hidden text-left transition-all duration-300 hover:z-10 hover:scale-[1.03] hover:ring-2 hover:ring-gold"
             >
-              <div className="relative aspect-[16/10] overflow-hidden bg-stone/30">
+              <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-stone/30">
                 <img
                   src={EDIT_IMAGE[e.slug]}
                   alt={`${e.title} — ${e.tagline}`}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/15 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-5 text-cream">
-                  <div className="flex items-end justify-between gap-3">
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5 text-cream">
+                  <div className="flex items-end justify-between gap-1.5 sm:gap-3">
                     <div>
-                      <h3 className="font-serif text-[22px] leading-tight">{e.title}</h3>
-                      <p className="font-serif italic text-[15px] text-cream/85 mt-1">{e.tagline}</p>
+                      <h3 className="font-serif text-sm sm:text-[22px] leading-tight line-clamp-1">{e.title}</h3>
+                      <p className="font-serif italic text-[11px] sm:text-[15px] text-cream/85 mt-0.5 sm:mt-1 line-clamp-1">{e.tagline}</p>
                     </div>
                     <span className="text-right leading-none shrink-0">
-                      <span className="block font-serif text-xl">{counts[e.slug] ?? 0}</span>
-                      <span className="block font-sans text-[9px] uppercase tracking-widest text-cream/80 mt-1">
+                      <span className="block font-serif text-sm sm:text-xl">{counts[e.slug] ?? 0}</span>
+                      <span className="block font-sans text-[8px] sm:text-[9px] uppercase tracking-widest text-cream/80 mt-0.5 sm:mt-1">
                         Styles
                       </span>
                     </span>

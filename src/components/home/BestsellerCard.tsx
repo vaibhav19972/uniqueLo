@@ -90,7 +90,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
 
   return (
     <div
-      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 w-[270px] sm:w-[300px] shrink-0 snap-start"
+      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 w-[220px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start"
     >
       {/* Visual */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">

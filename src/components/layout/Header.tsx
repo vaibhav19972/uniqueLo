@@ -463,14 +463,14 @@ export const Header: React.FC = () => {
             onClick={() => setSearchOpen((v) => !v)}
             aria-expanded={searchOpen}
             aria-label={searchOpen ? 'Close search' : 'Search the collection'}
-            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
+            className="flex p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] items-center justify-center cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
             </svg>
           </button>
 
-          {/* Account */}
+          {/* Account (desktop only) */}
           <button
             onClick={() =>
               showToast({
@@ -480,7 +480,7 @@ export const Header: React.FC = () => {
               })
             }
             aria-label="Account"
-            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center"
+            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
@@ -491,7 +491,7 @@ export const Header: React.FC = () => {
           <button
             onClick={handleWishlistClick}
             aria-label={`Wishlist with ${wishlistCount} items`}
-            className="hidden md:flex group relative items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[44px] min-h-[44px] justify-center"
+            className="flex group relative items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] justify-center cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -502,7 +502,7 @@ export const Header: React.FC = () => {
               />
             </svg>
             {wishlistCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
                 {wishlistCount}
               </span>
             )}
@@ -512,7 +512,7 @@ export const Header: React.FC = () => {
           <button
             onClick={openCart}
             aria-label={`Cart with ${totalItems} items`}
-            className="relative hidden md:flex items-center p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] justify-center"
+            className="relative flex items-center p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] justify-center cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -523,30 +523,21 @@ export const Header: React.FC = () => {
               />
             </svg>
             {totalItems > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
                 {totalItems}
               </span>
             )}
           </button>
-
-          {/* Mobile bag button */}
-          <button
-            onClick={openCart}
-            aria-label={`Cart with ${totalItems} items`}
-            className="inline-flex md:hidden items-center gap-2 px-3 py-2 text-xs uppercase tracking-widest text-ink border border-stone min-h-[44px]"
-          >
-            Bag · {totalItems}
-          </button>
         </div>
       </div>
 
-      {/* Expanding search overlay */}
+      {/* Expanding search overlay - Works on both mobile & desktop */}
       {searchOpen && (
-        <div className="hidden md:block border-t border-stone/60 bg-cream">
+        <div className="border-t border-stone/60 bg-cream animate-in fade-in duration-200">
           <form
             onSubmit={submitSearch}
             role="search"
-            className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-3 flex items-center gap-3"
+            className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3"
           >
             <svg className="w-5 h-5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
@@ -556,13 +547,13 @@ export const Header: React.FC = () => {
               type="search"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search for anime, heroes, history, garments…"
+              placeholder="Search anime, heroes, stitches, garments…"
               aria-label="Search the collection"
-              className="flex-1 bg-transparent font-serif text-lg text-ink placeholder:text-ink-muted/70 focus:outline-none min-h-[44px]"
+              className="flex-1 bg-transparent font-serif text-sm sm:text-lg text-ink placeholder:text-ink-muted/70 focus:outline-none min-h-[40px] sm:min-h-[44px] min-w-0"
             />
             <button
               type="submit"
-              className="px-5 py-2.5 bg-ink text-cream text-xs uppercase tracking-[0.18em] hover:bg-gold hover:text-on-gold transition-colors min-h-[44px]"
+              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-ink text-cream text-[10px] sm:text-xs uppercase tracking-[0.18em] hover:bg-gold hover:text-on-gold transition-colors min-h-[40px] sm:min-h-[44px] shrink-0"
             >
               Search
             </button>
@@ -570,7 +561,7 @@ export const Header: React.FC = () => {
               type="button"
               onClick={() => setSearchOpen(false)}
               aria-label="Close search"
-              className="p-2 text-ink-muted hover:text-ink min-w-[44px] min-h-[44px]"
+              className="p-1.5 sm:p-2 text-ink-muted hover:text-ink min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] flex items-center justify-center shrink-0"
             >
               ✕
             </button>

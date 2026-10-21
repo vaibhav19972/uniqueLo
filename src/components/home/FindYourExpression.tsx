@@ -70,8 +70,8 @@ export const FindYourExpression: React.FC = () => {
             </div>
           </div>
 
-          {/* 5-Step Segmented Bar */}
-          <div className="grid grid-cols-5 gap-2 sm:gap-3 mt-5">
+          {/* 5-Step Segmented Bar - Horizontal Rail on mobile, 5-col on desktop */}
+          <div className="flex sm:grid sm:grid-cols-5 gap-2.5 sm:gap-3 mt-4 sm:mt-5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none snap-x -mx-1 px-1 sm:mx-0 sm:px-0">
             {levelData.map(({ level, count }) => {
               const isSelected = level.score === selectedScore;
               return (
@@ -80,7 +80,7 @@ export const FindYourExpression: React.FC = () => {
                   type="button"
                   onClick={() => setSelectedScore(level.score)}
                   aria-pressed={isSelected}
-                  className={`group relative text-left p-3 sm:p-4 border transition-all cursor-pointer ${
+                  className={`group relative text-left p-3 sm:p-4 border transition-all cursor-pointer shrink-0 w-[135px] sm:w-auto snap-start ${
                     isSelected
                       ? 'border-ink bg-ink text-cream shadow-md -translate-y-0.5'
                       : 'border-stone/60 bg-paper hover:border-accent hover:bg-cream/40 text-ink'
@@ -123,8 +123,8 @@ export const FindYourExpression: React.FC = () => {
           </div>
         </div>
 
-        {/* 5 Visual Expression Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
+        {/* 5 Visual Expression Cards Grid - 2 cols on mobile */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
           {levelData.map(({ level, count, sampleProduct, sampleImage }) => {
             const isSelected = level.score === selectedScore;
             return (

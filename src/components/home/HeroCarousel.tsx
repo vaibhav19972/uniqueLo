@@ -264,7 +264,7 @@ export const HeroCarousel: React.FC = () => {
       onTouchEnd={handleTouchEnd}
       style={{
         // Full viewport minus the header bar, with responsive clamp
-        minHeight: 'clamp(580px, 86vh, 920px)',
+        minHeight: 'clamp(480px, 80vh, 920px)',
         height: 'calc(100vh - var(--header-height, 64px) - 2.2rem)',
       }}
     >
@@ -316,7 +316,7 @@ export const HeroCarousel: React.FC = () => {
       {/* ─────────────────────────────────────────────────────────────
           3. Centered Content Layer: Tagline, Title, CTA Button
           ───────────────────────────────────────────────────────────── */}
-      <div className="relative z-20 w-full h-full flex flex-col justify-end items-center text-center px-4 pb-12 sm:pb-16 lg:pb-20">
+      <div className="relative z-20 w-full h-full flex flex-col justify-end items-center text-center px-4 pb-8 sm:pb-16 lg:pb-20">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           {/* Subtitle / Kicker */}
           <p
@@ -329,7 +329,7 @@ export const HeroCarousel: React.FC = () => {
           {/* Main Collection Headline */}
           <h1
             key={`title-${activeIndex}`}
-            className="mt-3 sm:mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-2 duration-500"
+            className="mt-3 sm:mt-4 text-2xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-2 duration-500"
             style={{ fontFamily: "'Satoshi', var(--font-sans), sans-serif" }}
           >
             {currentSlide.title}
@@ -440,7 +440,7 @@ export const HeroCarousel: React.FC = () => {
         <div
           role="complementary"
           aria-label="Download mobile application"
-          className="absolute bottom-6 left-5 sm:bottom-8 sm:left-8 lg:left-12 z-30 flex items-center gap-3.5 bg-black/75 backdrop-blur-md border border-white/20 rounded-sm p-3 sm:p-3.5 shadow-2xl text-white max-w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-black/85 transition-colors"
+          className="hidden sm:flex absolute bottom-6 left-5 sm:bottom-8 sm:left-8 lg:left-12 z-30 items-center gap-3.5 bg-black/75 backdrop-blur-md border border-white/20 rounded-sm p-3 sm:p-3.5 shadow-2xl text-white max-w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-black/85 transition-colors"
         >
           {/* Close button with circular white badge */}
           <button

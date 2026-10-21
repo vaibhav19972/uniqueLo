@@ -91,8 +91,8 @@ export const UGCWall: React.FC = () => {
           linkLabel="See more stories"
         />
 
-        {/* Masonry wall — tall side tiles span 2 rows (render rhythm) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 auto-rows-[240px]">
+        {/* Masonry wall — 2 columns on mobile, 4 on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 auto-rows-[180px] sm:auto-rows-[240px]">
           {SAMPLE_STORIES.map((s) => (
             <figure
               key={s.name}
@@ -104,21 +104,21 @@ export const UGCWall: React.FC = () => {
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-              <figcaption className="absolute inset-x-0 bottom-0 p-4 text-cream">
-                <p className="font-serif text-[17px] leading-snug">“{s.quote}”</p>
-                <p className="font-sans text-[13px] mt-2 font-semibold flex items-center gap-1.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
+              <figcaption className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-cream">
+                <p className="font-serif text-xs sm:text-[17px] leading-snug line-clamp-2 sm:line-clamp-none">“{s.quote}”</p>
+                <p className="font-sans text-[11px] sm:text-[13px] mt-1.5 sm:mt-2 font-semibold flex items-center gap-1 sm:gap-1.5">
                   {s.name}
                   <span
                     aria-label="Verified customer"
-                    className="inline-flex w-4 h-4 rounded-full bg-gold items-center justify-center"
+                    className="inline-flex w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-gold items-center justify-center shrink-0"
                   >
-                    <svg className="w-2.5 h-2.5 text-on-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-on-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
                 </p>
-                <p className="font-sans text-[11px] text-cream/75">{s.detail}</p>
+                <p className="font-sans text-[9px] sm:text-[11px] text-cream/75 truncate">{s.detail}</p>
               </figcaption>
             </figure>
           ))}

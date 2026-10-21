@@ -36,38 +36,38 @@ export const Collections: React.FC = () => {
           </p>
         </div>
       </section>
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {(collections ?? []).map((col) => (
           <Link
             key={col.slug}
             to={`/collections/${col.slug}`}
-            className="group bg-paper border border-stone/70 p-6 sm:p-8 hover:border-ink transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+            className="group bg-paper border border-stone/70 p-3.5 sm:p-8 hover:border-ink transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
           >
             <div>
-              <div className="flex items-center justify-between text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium mb-3">
-                <span>{col.universeSlug ? `${col.universeSlug} Capsule` : 'Atelier Release'}</span>
+              <div className="flex flex-wrap items-center justify-between gap-1 text-[8px] sm:text-[10px] uppercase font-sans tracking-[0.15em] sm:tracking-[0.2em] text-accent font-medium mb-2 sm:mb-3">
+                <span className="truncate">{col.universeSlug ? `${col.universeSlug} Capsule` : 'Atelier Release'}</span>
                 {col.featured && (
-                  <span className="bg-gold/10 text-gold-deep px-2 py-0.5 border border-gold/20">
+                  <span className="bg-gold/10 text-gold-deep px-1.5 sm:px-2 py-0.5 border border-gold/20 shrink-0">
                     Active Drop
                   </span>
                 )}
               </div>
-              <h2 className="font-serif text-2xl sm:text-3xl text-ink group-hover:text-accent transition-colors">
+              <h2 className="font-serif text-base sm:text-2xl lg:text-3xl text-ink group-hover:text-accent transition-colors line-clamp-1">
                 {col.name}
               </h2>
-              <p className="font-serif italic text-sm text-ink-muted mt-1.5">
+              <p className="font-serif italic text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">
                 {col.tagline}
               </p>
-              <p className="text-xs text-ink-muted mt-3 font-light leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
                 {col.description}
               </p>
             </div>
-            <div className="pt-6 border-t border-stone/40 mt-6 flex items-center justify-between">
-              <span className="text-[11px] uppercase tracking-widest text-ink font-medium">
+            <div className="pt-3 sm:pt-6 border-t border-stone/40 mt-3 sm:mt-6 flex items-center justify-between">
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
                 {counts[col.slug] ?? 0} {counts[col.slug] === 1 ? 'Garment' : 'Garments'}
               </span>
-              <span className="text-xs text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true">
-                Explore Drop →
+              <span className="text-[10px] sm:text-xs text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true">
+                Explore →
               </span>
             </div>
           </Link>

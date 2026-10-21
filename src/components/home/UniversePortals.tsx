@@ -84,7 +84,7 @@ export const UniversePortals: React.FC = () => {
         />
 
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 py-4"
+          className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6 py-4"
           onMouseLeave={() => setActive(null)}
         >
           {portals.map((item) => {
@@ -99,7 +99,7 @@ export const UniversePortals: React.FC = () => {
                 onBlur={(e) => {
                   if (!e.currentTarget.contains(e.relatedTarget as Node)) setActive(null);
                 }}
-                className={`group relative flex flex-col overflow-hidden rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none ${
+                className={`group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none ${
                   isActive
                     ? 'z-10 -translate-y-2 scale-[1.03] ring-2 ring-ink shadow-float'
                     : isDimmed
@@ -109,7 +109,7 @@ export const UniversePortals: React.FC = () => {
               >
                 {/* Artwork media preview */}
                 {item.image && (
-                  <div className="relative h-44 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
+                  <div className="relative h-28 sm:h-44 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
                     <img
                       src={item.image}
                       alt={`${item.name} artwork`}
@@ -121,31 +121,31 @@ export const UniversePortals: React.FC = () => {
                 )}
 
                 {/* Editorial text stack */}
-                <div className="relative z-10 flex flex-1 flex-col p-6 min-h-[300px]">
-                  <div className="max-w-[92%]">
-                    <h3 className="font-serif text-2xl sm:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic">
+                <div className="relative z-10 flex flex-1 flex-col p-3.5 sm:p-6 min-h-[170px] sm:min-h-[300px]">
+                  <div className="max-w-[96%] sm:max-w-[92%]">
+                    <h3 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium">
                       {item.name}
                     </h3>
-                    <p className="font-sans text-[11px] uppercase tracking-label text-ink-muted mt-2">
+                    <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 line-clamp-1">
                       {item.tagline}
                     </p>
-                    <span aria-hidden="true" className="mt-3.5 block h-px w-8 bg-ink/25" />
-                    <p className="font-serif text-[14px] text-ink/85 mt-3 leading-relaxed line-clamp-3">
+                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
+                    <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3 hidden sm:block">
                       {item.lore}
                     </p>
                   </div>
 
-                  <div className="mt-auto pt-6">
+                  <div className="mt-auto pt-3 sm:pt-6">
                     <p className="leading-none">
-                      <span className="font-serif font-semibold text-2xl text-ink">{item.count}+ </span>
-                      <span className="font-sans text-[10px] uppercase tracking-widest text-ink-muted ml-1">
+                      <span className="font-serif font-semibold text-base sm:text-2xl text-ink">{item.count}+ </span>
+                      <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                         Styles
                       </span>
                     </p>
                     {item.to ? (
                       <Link
                         to={item.to}
-                        className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-7 py-3 font-serif text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[44px] transition-all group-hover:gap-3"
+                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3"
                         aria-label={`Enter ${item.name}`}
                       >
                         Enter {item.name} <span aria-hidden="true">→</span>
@@ -154,7 +154,7 @@ export const UniversePortals: React.FC = () => {
                       <button
                         type="button"
                         onClick={item.onEnter}
-                        className="mt-3.5 inline-flex w-fit items-center gap-2 rounded-md px-7 py-3 font-serif text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                         aria-label={`Enter ${item.name}`}
                       >
                         Enter {item.name} <span aria-hidden="true">→</span>
