@@ -19,7 +19,6 @@ import {
   GARMENTS,
   COLLECTIONS,
   type EditSlug,
-  type IntensityLevel,
   type ExpressionScore,
   type Gender,
   type EmbroideryTechnique,
@@ -311,10 +310,12 @@ const AdminStudio: React.FC = () => {
   const [tagsInput, setTagsInput] = useState('tops, embroidery, handcrafted');
   const [selectedMoods, setSelectedMoods] = useState<EditSlug[]>(['everyday', 'heritage']);
   const [selectedExpressionScore, setSelectedExpressionScore] = useState<ExpressionScore>(3);
-  const [selectedIntensity, setSelectedIntensity] = useState<IntensityLevel>('balanced');
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
   const [handcrafted, setHandcrafted] = useState(true);
+  const [rating, setRating] = useState<number>(5.0);
+  const [reviewCount, setReviewCount] = useState<number>(12);
+  const [soldCount, setSoldCount] = useState<string>('50+');
 
   const selectedExpression =
     EXPRESSION_LEVELS.find((e) => e.score === selectedExpressionScore) || EXPRESSION_LEVELS[2];
@@ -657,7 +658,7 @@ const AdminStudio: React.FC = () => {
   const generatedSQL = useMemo(() => {
     const finalSlug = slug || 'new-product-slug';
     const tagsArr = tagsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
-    const moodsArr = selectedMoods.map((m) => `'${m}'`).join(', ');
+    const editsArr = selectedMoods.map((m) => `'${m}'`).join(', ');
     const matArr = materialsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const careArr = careInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const placeArr = placementInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
@@ -670,7 +671,7 @@ const AdminStudio: React.FC = () => {
 -- 1. Insert Base Product
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  collection_slug, garment_type, gender, motif_id, is_mock, handcrafted, intensity, expression_score, expression_slug, edits,
+  collection_slug, garment_type, gender, motif_id, handcrafted, expression_score, expression_slug, edits,
   rating, review_count, sold_count, tags, featured, customizable,
   material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
 ) VALUES (
@@ -685,15 +686,13 @@ INSERT INTO public.products (
   '${garmentType.replace(/'/g, "''")}',
   '${gender}',
   ${motifId ? `'${motifId.replace(/'/g, "''")}'` : 'NULL'},
-  false,
   ${handcrafted},
-  '${selectedIntensity}',
   ${selectedExpressionScore},
   '${selectedExpressionSlug}',
-  ARRAY[${moodsArr}],
-  5.0,
-  12,
-  '50+',
+  ARRAY[${editsArr}],
+  ${rating},
+  ${reviewCount},
+  ${soldCount ? `'${soldCount.replace(/'/g, "''")}'` : 'NULL'},
   ARRAY[${tagsArr}],
   ${featured},
   ${customizable},
@@ -717,11 +716,15 @@ INSERT INTO public.products (
   gender = EXCLUDED.gender,
   motif_id = EXCLUDED.motif_id,
   handcrafted = EXCLUDED.handcrafted,
-  intensity = EXCLUDED.intensity,
   expression_score = EXCLUDED.expression_score,
   expression_slug = EXCLUDED.expression_slug,
   edits = EXCLUDED.edits,
-  featured = EXCLUDED.featured;
+  rating = EXCLUDED.rating,
+  review_count = EXCLUDED.review_count,
+  sold_count = EXCLUDED.sold_count,
+  tags = EXCLUDED.tags,
+  featured = EXCLUDED.featured,
+  customizable = EXCLUDED.customizable;
 
 -- 2. Insert Images (cleans previous slot allocations for this product)
 DELETE FROM public.product_images WHERE product_slug = '${finalSlug}';
@@ -782,7 +785,11 @@ INSERT INTO public.embroidery_details (
     motifId,
     handcrafted,
     selectedMoods,
-    selectedIntensity,
+    selectedExpressionScore,
+    selectedExpressionSlug,
+    rating,
+    reviewCount,
+    soldCount,
     tagsInput,
     featured,
     customizable,
@@ -819,15 +826,13 @@ INSERT INTO public.embroidery_details (
       garmentType,
       gender,
       motifId: motifId || undefined,
-      isMock: false,
       handcrafted,
-      intensity: selectedIntensity,
       expressionScore: selectedExpressionScore,
       expressionSlug: selectedExpressionSlug,
       edits: selectedMoods,
-      rating: 5.0,
-      reviewCount: 12,
-      soldCount: '50+',
+      rating,
+      reviewCount,
+      soldCount,
       tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
       variants: variants.map((v) => ({
         sku: v.sku,
@@ -879,7 +884,9 @@ INSERT INTO public.embroidery_details (
     selectedMoods,
     selectedExpressionScore,
     selectedExpressionSlug,
-    selectedIntensity,
+    rating,
+    reviewCount,
+    soldCount,
     tagsInput,
     variants,
     slotImages,
@@ -1356,9 +1363,6 @@ INSERT INTO public.embroidery_details (
                             type="button"
                             onClick={() => {
                               setSelectedExpressionScore(exp.score);
-                              if (exp.score <= 2) setSelectedIntensity('quiet');
-                              else if (exp.score === 3) setSelectedIntensity('balanced');
-                              else setSelectedIntensity('loud');
                             }}
                             aria-pressed={isSel}
                             title={exp.description}
@@ -1406,6 +1410,76 @@ INSERT INTO public.embroidery_details (
                           </span>
                         );
                       })}
+                    </div>
+                  </div>
+
+                  {/* Social Proof & Ratings (Stored on public.products) */}
+                  <div className="sm:col-span-2 pt-3 border-t border-stone/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Social Proof, Reviews & Sales Badge
+                        </span>
+                        <span className="text-[10px] text-accent font-serif italic">★ Public Display</span>
+                      </div>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (rating, review_count, sold_count)
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-cream/40 p-3.5 border border-stone/40">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
+                            Rating (1.0 – 5.0)
+                          </label>
+                          <span className="text-[10px] text-accent font-mono font-medium">★ {rating.toFixed(1)}</span>
+                        </div>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="1.0"
+                          max="5.0"
+                          value={rating}
+                          onChange={(e) => setRating(Math.min(5.0, Math.max(1.0, parseFloat(e.target.value) || 5.0)))}
+                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
+                        />
+                        <p className="text-[10px] text-ink-muted mt-1">Average star rating displayed across product cards and PDP</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
+                            Review Count
+                          </label>
+                          <span className="text-[10px] text-ink-muted font-mono">{reviewCount} reviews</span>
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={reviewCount}
+                          onChange={(e) => setReviewCount(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
+                        />
+                        <p className="text-[10px] text-ink-muted mt-1">Number of customer reviews displayed beside the star score</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
+                            Sold Count Badge
+                          </label>
+                          <span className="text-[10px] text-accent font-mono font-medium">{soldCount || 'None'}</span>
+                        </div>
+                        <input
+                          type="text"
+                          value={soldCount}
+                          onChange={(e) => setSoldCount(e.target.value)}
+                          placeholder="50+, 1.2K+, 400+"
+                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
+                        />
+                        <p className="text-[10px] text-ink-muted mt-1">Marketing badge displayed on PDP (e.g. | {soldCount || '50+'} sold)</p>
+                      </div>
                     </div>
                   </div>
 
@@ -2340,6 +2414,10 @@ INSERT INTO public.embroidery_details (
                         <div>Batch</div>
                         <span className="text-[9px] text-accent font-mono font-normal">batch_number</span>
                       </th>
+                      <th className="py-3 px-3">
+                        <div>Rating & Reviews</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">rating, review_count</span>
+                      </th>
                       <th className="py-3 px-3 text-right">View Live</th>
                     </tr>
                   </thead>
@@ -2390,6 +2468,15 @@ INSERT INTO public.embroidery_details (
                         </td>
                         <td className="py-3 px-3 text-[11px] text-ink-muted">
                           Run {product.batchNumber ?? 1} / {product.batchTotal ?? 50}
+                        </td>
+                        <td className="py-3 px-3 text-[11px] font-mono text-ink whitespace-nowrap">
+                          ★ {product.rating ? Number(product.rating).toFixed(1) : '5.0'}
+                          <span className="text-ink-muted ml-1">({product.reviewCount ?? 0})</span>
+                          {product.soldCount && (
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-accent/10 text-accent text-[9px] border border-accent/30 font-medium">
+                              {product.soldCount}
+                            </span>
+                          )}
                         </td>
                         <td className="py-3 px-3 text-right">
                           <Link
