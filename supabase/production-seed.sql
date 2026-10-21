@@ -12,11 +12,162 @@
 --      products one-by-one via the Admin Studio (/admin) or Supabase Table Editor.
 -- ====================================================================
 
--- 0. Schema Pre-flight: Ensure additive taxonomy columns exist
+-- 0. Schema Pre-flight: Ensure modern taxonomy tables & columns exist
+-- This guarantees execution succeeds even if running against an older database schema.
+CREATE TABLE IF NOT EXISTS public.universes (
+  slug text PRIMARY KEY,
+  name text NOT NULL,
+  tagline text NOT NULL,
+  lore text NOT NULL,
+  emblem_src text,
+  hero_image text,
+  drop_cadence text,
+  is_active boolean DEFAULT true,
+  order_num integer DEFAULT 0,
+  theme_tokens jsonb DEFAULT '{}'::jsonb,
+  portal_title_color text,
+  lore_heading text,
+  hero_headline text,
+  hero_headline_accent text,
+  hero_lead_color text,
+  hero_accent_color text,
+  hero_headline_case text,
+  hero_kicker text,
+  hero_ornament text,
+  hero_note text,
+  hero_vertical_text text,
+  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.motifs (
+  id text PRIMARY KEY,
+  universe_slug text REFERENCES public.universes(slug) ON DELETE CASCADE NOT NULL,
+  name text NOT NULL,
+  meaning text NOT NULL,
+  symbol_notes text,
+  ip_cleared boolean DEFAULT true,
+  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.categories (
+  slug text PRIMARY KEY,
+  name text NOT NULL,
+  label text NOT NULL,
+  description text NOT NULL,
+  image text,
+  order_num integer DEFAULT 0,
+  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.garments (
+  slug text PRIMARY KEY,
+  name text NOT NULL,
+  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,
+  description text NOT NULL,
+  order_num integer DEFAULT 0,
+  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.collections (
+  slug text PRIMARY KEY,
+  name text NOT NULL,
+  tagline text,
+  description text,
+  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,
+  cover_image text,
+  featured boolean DEFAULT true,
+  order_num integer DEFAULT 0,
+  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Ensure all modern columns exist on public.products
 ALTER TABLE IF EXISTS public.products
+  ADD COLUMN IF NOT EXISTS foreign_tagline text,
+  ADD COLUMN IF NOT EXISTS universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS collection_slug text REFERENCES public.collections(slug) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS garment_type text REFERENCES public.garments(slug) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS gender text DEFAULT 'unisex',
+  ADD COLUMN IF NOT EXISTS motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS is_mock boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS handcrafted boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS vibes text[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS moods text[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS intensity text NOT NULL DEFAULT 'balanced',
+  ADD COLUMN IF NOT EXISTS expression_score smallint DEFAULT 3,
+  ADD COLUMN IF NOT EXISTS expression_slug text DEFAULT 'artistic',
   ADD COLUMN IF NOT EXISTS craft_techniques text[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS edits text[] DEFAULT '{}';
+
+-- Ensure RLS and public read policies exist on all taxonomy tables
+ALTER TABLE IF EXISTS public.universes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.motifs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.garments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.collections ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+  -- 1. Public Read Policies
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'universes' AND policyname = 'Allow public read universes') THEN
+    CREATE POLICY "Allow public read universes" ON public.universes FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'motifs' AND policyname = 'Allow public read motifs') THEN
+    CREATE POLICY "Allow public read motifs" ON public.motifs FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'categories' AND policyname = 'Allow public read categories') THEN
+    CREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'garments' AND policyname = 'Allow public read garments') THEN
+    CREATE POLICY "Allow public read garments" ON public.garments FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'collections' AND policyname = 'Allow public read collections') THEN
+    CREATE POLICY "Allow public read collections" ON public.collections FOR SELECT USING (true);
+  END IF;
+
+  -- 2. Admin Studio Write Policies for taxonomy
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'universes' AND policyname = 'Allow admin insert universes') THEN
+    CREATE POLICY "Allow admin insert universes" ON public.universes FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'universes' AND policyname = 'Allow admin update universes') THEN
+    CREATE POLICY "Allow admin update universes" ON public.universes FOR UPDATE USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'motifs' AND policyname = 'Allow admin insert motifs') THEN
+    CREATE POLICY "Allow admin insert motifs" ON public.motifs FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'motifs' AND policyname = 'Allow admin update motifs') THEN
+    CREATE POLICY "Allow admin update motifs" ON public.motifs FOR UPDATE USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'categories' AND policyname = 'Allow admin insert categories') THEN
+    CREATE POLICY "Allow admin insert categories" ON public.categories FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'categories' AND policyname = 'Allow admin update categories') THEN
+    CREATE POLICY "Allow admin update categories" ON public.categories FOR UPDATE USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'garments' AND policyname = 'Allow admin insert garments') THEN
+    CREATE POLICY "Allow admin insert garments" ON public.garments FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'garments' AND policyname = 'Allow admin update garments') THEN
+    CREATE POLICY "Allow admin update garments" ON public.garments FOR UPDATE USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'collections' AND policyname = 'Allow admin insert collections') THEN
+    CREATE POLICY "Allow admin insert collections" ON public.collections FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'collections' AND policyname = 'Allow admin update collections') THEN
+    CREATE POLICY "Allow admin update collections" ON public.collections FOR UPDATE USING (true);
+  END IF;
+
+  -- 3. Safely link garment_type to garments table if not already linked
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'products_garment_type_fkey') THEN
+    BEGIN
+      ALTER TABLE public.products
+        ADD CONSTRAINT products_garment_type_fkey
+        FOREIGN KEY (garment_type) REFERENCES public.garments(slug) ON DELETE SET NULL NOT VALID;
+    EXCEPTION
+      WHEN others THEN NULL;
+    END;
+  END IF;
+END $$;
+
 
 -- --------------------------------------------------------------------
 -- 1. Master Universes (Brand Pillars & Thematic Worlds)
@@ -315,7 +466,7 @@ INSERT INTO public.products (
   ARRAY['kantha-running-stitch', 'zari-relief'],
   ARRAY['heritage', 'quiet-luxury'],
   2,
-  'poetic',
+  'subtle-statements',
   ARRAY['minimal', 'clean'],
   ARRAY['heritage', 'subtle'],
   5.0,

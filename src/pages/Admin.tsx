@@ -1,7 +1,16 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { useProducts, useUniverses, useMotifsByUniverse } from '../hooks/useCatalog';
+import {
+  useProducts,
+  useUniverses,
+  useMotifsByUniverse,
+  useCategories,
+  useGarments,
+  useCollections,
+  catalogKeys,
+} from '../hooks/useCatalog';
 import { useToastStore } from '../stores/toast';
 import {
   formatPrice,
@@ -120,11 +129,171 @@ const PRESET_IMAGES = [
 ];
 
 const AdminStudio: React.FC = () => {
-
+  const queryClient = useQueryClient();
   const showToast = useToastStore((s) => s.showToast);
   const { data: existingProducts, isLoading } = useProducts();
+  const { data: categories } = useCategories();
+  const { data: dbGarments } = useGarments();
+  const { data: dbCollections } = useCollections();
 
   const [activeTab, setActiveTab] = useState<'create' | 'catalog' | 'sql-help'>('create');
+
+  // Available categories: dynamic from public.categories via Supabase, with robust fallback
+  const availableCategories = useMemo(() => {
+    if (categories && categories.length > 0) return categories;
+    return [
+      { slug: 'tops', name: 'Tops & Shirts', label: 'Tops', description: 'Heavyweight organic cotton box tees, silk-floss oxfords, and band-collar tunics.' },
+      { slug: 'outerwear', name: 'Outerwear & Jackets', label: 'Outerwear', description: 'Tailored chore jackets, kimono overcoats, and embroidered denim outerwear.' },
+      { slug: 'knitwear', name: 'Knitwear & Cashmere', label: 'Knitwear', description: 'Pure cashmere cardigans, merino sweaters, and chain-stitched crewnecks.' },
+      { slug: 'bottoms', name: 'Bottoms & Trousers', label: 'Bottoms', description: 'Pleated wide-leg trousers, raw selvedge denim, and kantha-embroidered work pants.' },
+      { slug: 'accessories', name: 'Accessories', label: 'Accessories', description: 'Embroidered silk scarves, raw canvas tote bags, and heirloom monogram badges.' },
+    ];
+  }, [categories]);
+
+  // Available garments: dynamic from public.garments via Supabase, with fallback to local taxonomy
+  const availableGarments = useMemo(() => {
+    if (dbGarments && dbGarments.length > 0) return dbGarments;
+    return GARMENTS;
+  }, [dbGarments]);
+
+  // Available collections: dynamic from public.collections via Supabase, with fallback to local taxonomy
+  const availableCollections = useMemo(() => {
+    if (dbCollections && dbCollections.length > 0) return dbCollections;
+    return COLLECTIONS;
+  }, [dbCollections]);
+
+  // Quick Taxonomy Creation Modals
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const [showAddGarmentModal, setShowAddGarmentModal] = useState(false);
+  const [showAddCollectionModal, setShowAddCollectionModal] = useState(false);
+
+  // New Category State
+  const [newCatSlug, setNewCatSlug] = useState('');
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatLabel, setNewCatLabel] = useState('');
+  const [newCatDesc, setNewCatDesc] = useState('');
+
+  // New Garment State
+  const [newGarmentSlug, setNewGarmentSlug] = useState('');
+  const [newGarmentName, setNewGarmentName] = useState('');
+  const [newGarmentCategory, setNewGarmentCategory] = useState('tops');
+  const [newGarmentDesc, setNewGarmentDesc] = useState('');
+
+  // New Collection State
+  const [newColSlug, setNewColSlug] = useState('');
+  const [newColName, setNewColName] = useState('');
+  const [newColTagline, setNewColTagline] = useState('');
+  const [newColDesc, setNewColDesc] = useState('');
+  const [newColUniverse, setNewColUniverse] = useState('');
+
+  const [isSavingTaxonomy, setIsSavingTaxonomy] = useState(false);
+
+  const handleSaveNewCategory = async () => {
+    if (!newCatName.trim() || !newCatSlug.trim()) {
+      showToast({ title: 'Validation Error', description: 'Category Name and Slug are required.', type: 'info' });
+      return;
+    }
+    setIsSavingTaxonomy(true);
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        const { error } = await supabase.from('categories').upsert({
+          slug: newCatSlug.trim().toLowerCase(),
+          name: newCatName.trim(),
+          label: newCatLabel.trim() || newCatName.trim(),
+          description: newCatDesc.trim() || `${newCatName.trim()} collection.`,
+          order_num: availableCategories.length + 1,
+        });
+        if (error) throw error;
+        await queryClient.invalidateQueries({ queryKey: catalogKeys.categories });
+        setCategorySlug(newCatSlug.trim().toLowerCase());
+        showToast({ title: 'Category Saved', description: `Category "${newCatName}" saved to public.categories!`, type: 'success' });
+        setShowAddCategoryModal(false);
+        setNewCatSlug('');
+        setNewCatName('');
+        setNewCatLabel('');
+        setNewCatDesc('');
+      } else {
+        showToast({ title: 'Database Offline', description: 'Supabase is not configured in this environment.', type: 'info' });
+      }
+    } catch (err: any) {
+      showToast({ title: 'Save Failed', description: err.message || 'Failed to save category to database.', type: 'info' });
+    } finally {
+      setIsSavingTaxonomy(false);
+    }
+  };
+
+  const handleSaveNewGarment = async () => {
+    if (!newGarmentName.trim() || !newGarmentSlug.trim()) {
+      showToast({ title: 'Validation Error', description: 'Garment Name and Slug are required.', type: 'info' });
+      return;
+    }
+    setIsSavingTaxonomy(true);
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        const { error } = await supabase.from('garments').upsert({
+          slug: newGarmentSlug.trim().toLowerCase(),
+          name: newGarmentName.trim(),
+          category_slug: newGarmentCategory,
+          description: newGarmentDesc.trim() || `${newGarmentName.trim()} silhouette.`,
+          order_num: availableGarments.length + 1,
+        });
+        if (error) throw error;
+        await queryClient.invalidateQueries({ queryKey: catalogKeys.garments });
+        setGarmentType(newGarmentSlug.trim().toLowerCase());
+        setCategorySlug(newGarmentCategory as any);
+        showToast({ title: 'Garment Saved', description: `Garment "${newGarmentName}" saved to public.garments!`, type: 'success' });
+        setShowAddGarmentModal(false);
+        setNewGarmentSlug('');
+        setNewGarmentName('');
+        setNewGarmentDesc('');
+      } else {
+        showToast({ title: 'Database Offline', description: 'Supabase is not configured in this environment.', type: 'info' });
+      }
+    } catch (err: any) {
+      showToast({ title: 'Save Failed', description: err.message || 'Failed to save garment to database.', type: 'info' });
+    } finally {
+      setIsSavingTaxonomy(false);
+    }
+  };
+
+  const handleSaveNewCollection = async () => {
+    if (!newColName.trim() || !newColSlug.trim()) {
+      showToast({ title: 'Validation Error', description: 'Collection Name and Slug are required.', type: 'info' });
+      return;
+    }
+    setIsSavingTaxonomy(true);
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        const { error } = await supabase.from('collections').upsert({
+          slug: newColSlug.trim().toLowerCase(),
+          name: newColName.trim(),
+          tagline: newColTagline.trim() || null,
+          description: newColDesc.trim() || null,
+          universe_slug: newColUniverse.trim() || null,
+          featured: true,
+          order_num: availableCollections.length + 1,
+        });
+        if (error) throw error;
+        await queryClient.invalidateQueries({ queryKey: catalogKeys.collections });
+        setCollectionSlug(newColSlug.trim().toLowerCase());
+        if (newColUniverse) {
+          setUniverseSlug(newColUniverse as any);
+        }
+        showToast({ title: 'Collection Saved', description: `Collection "${newColName}" saved to public.collections!`, type: 'success' });
+        setShowAddCollectionModal(false);
+        setNewColSlug('');
+        setNewColName('');
+        setNewColTagline('');
+        setNewColDesc('');
+      } else {
+        showToast({ title: 'Database Offline', description: 'Supabase is not configured in this environment.', type: 'info' });
+      }
+    } catch (err: any) {
+      showToast({ title: 'Save Failed', description: err.message || 'Failed to save collection to database.', type: 'info' });
+    } finally {
+      setIsSavingTaxonomy(false);
+    }
+  };
 
   // Form State
   const [name, setName] = useState('');
@@ -133,7 +302,7 @@ const AdminStudio: React.FC = () => {
   const [subtitle, setSubtitle] = useState('');
   const [foreignTagline, setForeignTagline] = useState('');
   const [description, setDescription] = useState('');
-  const [categorySlug, setCategorySlug] = useState<'outerwear' | 'knitwear' | 'tops' | 'bottoms' | 'accessories'>('tops');
+  const [categorySlug, setCategorySlug] = useState<string>('tops');
   const [universeSlug, setUniverseSlug] = useState<'animeverse' | 'heroverse' | 'itihaas'>('itihaas');
   const [gender, setGender] = useState<Gender>('unisex');
   const [collectionSlug, setCollectionSlug] = useState('spring-sakura');
@@ -554,7 +723,8 @@ INSERT INTO public.products (
   edits = EXCLUDED.edits,
   featured = EXCLUDED.featured;
 
--- 2. Insert Images (six catalog slots, sort_order 0–5)
+-- 2. Insert Images (cleans previous slot allocations for this product)
+DELETE FROM public.product_images WHERE product_slug = '${finalSlug}';
 INSERT INTO public.product_images (product_slug, src, alt, color, sort_order) 
 VALUES 
 ${slotImages
@@ -564,7 +734,7 @@ ${slotImages
   )
   .join(',\n')};
 
--- 3. Insert Variants
+-- 3. Insert or Update Variants
 INSERT INTO public.variants (sku, product_slug, color, color_hex, size, price_cents, status, quantity) 
 VALUES 
 ${variants
@@ -573,7 +743,13 @@ ${variants
       `  ('${v.sku}', '${finalSlug}', '${v.color}', '${v.colorHex}', '${v.size}', ${Math.round(v.price * 100)}, '${v.status}', ${v.quantity})`
   )
   .join(',\n')}
-ON CONFLICT (sku) DO NOTHING;
+ON CONFLICT (sku) DO UPDATE SET
+  color = EXCLUDED.color,
+  color_hex = EXCLUDED.color_hex,
+  size = EXCLUDED.size,
+  price_cents = EXCLUDED.price_cents,
+  status = EXCLUDED.status,
+  quantity = EXCLUDED.quantity;
 
 -- 4. Insert Craft & Embroidery Provenance
 INSERT INTO public.embroidery_details (
@@ -817,16 +993,24 @@ INSERT INTO public.embroidery_details (
             <div className="lg:col-span-8 space-y-8">
               {/* Card 1: Core Identification */}
               <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
-                <div className="border-b border-stone/30 pb-3">
-                  <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 1</span>
-                  <h2 className="font-serif text-xl text-ink mt-0.5">Core Product Identity</h2>
+                <div className="border-b border-stone/30 pb-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 1</span>
+                    <h2 className="font-serif text-xl text-ink mt-0.5">Core Product Identity</h2>
+                  </div>
+                  <span className="text-[10px] text-accent font-mono font-medium">public.products</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Product Name *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Product Name *
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (name)
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={name}
@@ -841,13 +1025,18 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         URL Slug *
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => setAutoSlug(!autoSlug)}
-                        className="text-[10px] text-accent hover:underline uppercase tracking-wider"
-                      >
-                        {autoSlug ? '🔒 Auto-Generating' : '🔓 Custom Edit'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          public.products (slug PK)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setAutoSlug(!autoSlug)}
+                          className="text-[10px] text-accent hover:underline uppercase tracking-wider"
+                        >
+                          {autoSlug ? '🔒 Auto-Generating' : '🔓 Custom Edit'}
+                        </button>
+                      </div>
                     </div>
                     <input
                       type="text"
@@ -862,26 +1051,49 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Category *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Category *
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCategoryModal(true)}
+                          className="text-[10px] text-accent hover:underline font-mono"
+                          title="Add a new category to public.categories"
+                        >
+                          + New
+                        </button>
+                      </div>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.categories
+                      </span>
+                    </div>
                     <select
                       value={categorySlug}
-                      onChange={(e) => setCategorySlug(e.target.value as any)}
+                      onChange={(e) => setCategorySlug(e.target.value)}
                       className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize"
                     >
-                      <option value="tops">Tops & Shirts</option>
-                      <option value="outerwear">Outerwear & Jackets</option>
-                      <option value="knitwear">Knitwear & Cashmere</option>
-                      <option value="bottoms">Bottoms & Trousers</option>
-                      <option value="accessories">Accessories</option>
+                      {availableCategories.map((c) => (
+                        <option key={c.slug} value={c.slug}>
+                          {c.name || c.label} ({c.slug})
+                        </option>
+                      ))}
                     </select>
+                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                      Maps to /category/{categorySlug} discovery door and database foreign key.
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Universe (World) *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Universe (World) *
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.universes
+                      </span>
+                    </div>
                     <select
                       value={universeSlug}
                       onChange={(e) => setUniverseSlug(e.target.value as any)}
@@ -897,12 +1109,20 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
+                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                      Maps to /universe/{universeSlug} portal and database foreign key.
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Gender Facet *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Gender Facet *
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (gender)
+                      </span>
+                    </div>
                     <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value as Gender)}
@@ -912,13 +1132,26 @@ INSERT INTO public.embroidery_details (
                       <option value="men">Men Only</option>
                       <option value="women">Women Only</option>
                     </select>
+                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                      Maps to /men and /women discovery doorways. Check constraint: ('men', 'women', 'unisex').
+                    </p>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Collection (Seasonal Drop) *
-                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Collection (Seasonal Drop) *
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCollectionModal(true)}
+                          className="text-[10px] text-accent hover:underline font-mono"
+                          title="Add a new collection to public.collections"
+                        >
+                          + New
+                        </button>
+                      </div>
                       <span className="text-[10px] text-accent font-mono font-medium">
                         public.collections
                       </span>
@@ -928,7 +1161,7 @@ INSERT INTO public.embroidery_details (
                       onChange={(e) => setCollectionSlug(e.target.value)}
                       className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize cursor-pointer font-medium"
                     >
-                      {COLLECTIONS.map((c) => (
+                      {availableCollections.map((c) => (
                         <option key={c.slug} value={c.slug}>
                           {c.name} ({c.slug}) {c.universeSlug ? `— ${c.universeSlug}` : ''}
                         </option>
@@ -941,9 +1174,19 @@ INSERT INTO public.embroidery_details (
 
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Garment Silhouette (Type) *
-                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Garment Silhouette (Type) *
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddGarmentModal(true)}
+                          className="text-[10px] text-accent hover:underline font-mono"
+                          title="Add a new silhouette to public.garments"
+                        >
+                          + New
+                        </button>
+                      </div>
                       <span className="text-[10px] text-accent font-mono font-medium">
                         public.garments
                       </span>
@@ -953,14 +1196,14 @@ INSERT INTO public.embroidery_details (
                       onChange={(e) => {
                         const val = e.target.value;
                         setGarmentType(val);
-                        const matching = GARMENTS.find((g) => g.slug === val);
+                        const matching = availableGarments.find((g) => g.slug === val);
                         if (matching && matching.categorySlug) {
                           setCategorySlug(matching.categorySlug as any);
                         }
                       }}
                       className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize cursor-pointer font-medium"
                     >
-                      {GARMENTS.map((g) => (
+                      {availableGarments.map((g) => (
                         <option key={g.slug} value={g.slug}>
                           {g.name} ({g.slug}) — {g.categorySlug}
                         </option>
@@ -972,9 +1215,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Foreign Script Tagline
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Foreign Script Tagline
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (foreign_tagline)
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={foreignTagline}
@@ -985,9 +1233,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Lore Motif (Optional)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Lore Motif (Optional)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.motifs
+                      </span>
+                    </div>
                     <select
                       value={motifId}
                       onChange={(e) => setMotifId(e.target.value)}
@@ -1000,12 +1253,20 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
+                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                      Maps to IP-cleared motif heraldry and foreign key public.motifs.id.
+                    </p>
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Editorial Subtitle
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Editorial Subtitle
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (subtitle)
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={subtitle}
@@ -1016,9 +1277,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Story & Atelier Description
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Story & Atelier Description
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (description)
+                      </span>
+                    </div>
                     <textarea
                       rows={3}
                       value={description}
@@ -1030,9 +1296,14 @@ INSERT INTO public.embroidery_details (
 
                   {/* Edits Selector — curated collections (powers Explore-by-Edit Gateway) */}
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-medium">
-                      Edits — Curated Collections (powers Explore-by-Edit Gateway)
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Edits — Curated Collections (Explore Gateways)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (edits text[])
+                      </span>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {EDITS.map((e) => {
                         const isSel = selectedMoods.includes(e.slug);
@@ -1067,9 +1338,14 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Embroidery Expression (1–5 Discovery Axis)
                       </label>
-                      <span className="text-[10px] font-sans text-accent font-semibold uppercase tracking-widest">
-                        Level {selectedExpressionScore}: {selectedExpression.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          public.products (expression_score, expression_slug)
+                        </span>
+                        <span className="text-[10px] font-sans text-accent font-semibold uppercase tracking-widest">
+                          Level {selectedExpressionScore}: {selectedExpression.name}
+                        </span>
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
                       {EXPRESSION_LEVELS.map((exp) => {
@@ -1105,9 +1381,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Tags (Comma separated)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Tags (Comma separated)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (tags text[])
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={tagsInput}
@@ -1128,36 +1409,41 @@ INSERT INTO public.embroidery_details (
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-6 sm:col-span-2 pt-2 border-t border-stone/20">
-                    <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={featured}
-                        onChange={(e) => setFeatured(e.target.checked)}
-                        className="w-4 h-4 accent-accent cursor-pointer"
-                      />
-                      <span className="font-medium">Featured Product (Highlight on Homepage Reel)</span>
-                    </label>
+                  <div className="flex flex-wrap items-center justify-between gap-4 sm:col-span-2 pt-2 border-t border-stone/20">
+                    <div className="flex flex-wrap items-center gap-6">
+                      <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={featured}
+                          onChange={(e) => setFeatured(e.target.checked)}
+                          className="w-4 h-4 accent-accent cursor-pointer"
+                        />
+                        <span className="font-medium">Featured (Homepage Reel)</span>
+                      </label>
 
-                    <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={customizable}
-                        onChange={(e) => setCustomizable(e.target.checked)}
-                        className="w-4 h-4 accent-accent cursor-pointer"
-                      />
-                      <span className="font-medium">Enable Bespoke Monogram Customizer</span>
-                    </label>
+                      <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={customizable}
+                          onChange={(e) => setCustomizable(e.target.checked)}
+                          className="w-4 h-4 accent-accent cursor-pointer"
+                        />
+                        <span className="font-medium">Bespoke Monogram</span>
+                      </label>
 
-                    <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={handcrafted}
-                        onChange={(e) => setHandcrafted(e.target.checked)}
-                        className="w-4 h-4 accent-accent cursor-pointer"
-                      />
-                      <span className="font-medium text-accent">✦ Authentic Handcrafted Piece (Enables Luxury Tag)</span>
-                    </label>
+                      <label className="flex items-center gap-2.5 text-xs text-ink cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={handcrafted}
+                          onChange={(e) => setHandcrafted(e.target.checked)}
+                          className="w-4 h-4 accent-accent cursor-pointer"
+                        />
+                        <span className="font-medium text-accent">✦ Authentic Handcrafted</span>
+                      </label>
+                    </div>
+                    <span className="text-[10px] text-accent font-mono font-medium">
+                      public.products (featured, customizable, handcrafted)
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1169,14 +1455,22 @@ INSERT INTO public.embroidery_details (
                     <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 2</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Embroidery & Craft Provenance</h2>
                   </div>
-                  <span className="text-xs text-ink-muted font-serif italic">Indian Atelier Heritage</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] text-accent font-mono font-medium">public.embroidery_details</span>
+                    <span className="text-xs text-ink-muted font-serif italic hidden sm:inline">Indian Atelier Heritage</span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Craft Technique *
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Craft Technique *
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.technique
+                      </span>
+                    </div>
                     <select
                       value={technique}
                       onChange={(e) => handleTechniqueChange(e.target.value as any)}
@@ -1188,12 +1482,20 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
+                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                      Maps to heritage needlecraft method in public.embroidery_details.
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Artisan Hand Hours
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Artisan Hand Hours
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.artisan_hours
+                      </span>
+                    </div>
                     <input
                       type="number"
                       min="1"
@@ -1204,9 +1506,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Technique Display Label
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Technique Display Label
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.technique_label
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={techniqueLabel}
@@ -1216,9 +1523,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Thread Composition
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Thread Composition
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.thread_composition
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={threadComposition}
@@ -1229,9 +1541,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Stitch Placements (Comma separated)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Stitch Placements (Comma separated)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.placement
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={placementInput}
@@ -1242,9 +1559,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Motif Story
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Motif Story
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.embroidery_details.motif_story
+                      </span>
+                    </div>
                     <textarea
                       rows={2}
                       value={motifStory}
@@ -1262,13 +1584,21 @@ INSERT INTO public.embroidery_details (
                     <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 3</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Textile & Workshop Batch</h2>
                   </div>
+                  <span className="text-[10px] text-accent font-mono font-medium">
+                    public.products (batch & textile)
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Quick Preset Regional Cluster
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Quick Preset Regional Cluster
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products.craft_region
+                      </span>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {PRESET_REGIONS.map((preset, idx) => (
                         <button
@@ -1291,9 +1621,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Craft Region
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Craft Region
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products.craft_region
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={craftRegion}
@@ -1303,9 +1638,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Craft Cluster / Guild
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Craft Cluster / Guild
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products.craft_cluster
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={craftCluster}
@@ -1315,9 +1655,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Fabric Weight / GSM
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Fabric Weight / GSM
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products.fabric_gsm
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={fabricGsm}
@@ -1329,9 +1674,14 @@ INSERT INTO public.embroidery_details (
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                        Batch Run #
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Batch Run #
+                        </label>
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          batch_number
+                        </span>
+                      </div>
                       <input
                         type="number"
                         min="1"
@@ -1341,9 +1691,14 @@ INSERT INTO public.embroidery_details (
                       />
                     </div>
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                        Total In Run
-                      </label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Total In Run
+                        </label>
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          batch_total
+                        </span>
+                      </div>
                       <input
                         type="number"
                         min="1"
@@ -1355,9 +1710,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Materials Composition (Comma separated)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Materials Composition (Comma separated)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (material text[])
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={materialsInput}
@@ -1368,9 +1728,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Care Guidelines (Comma separated)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Care Guidelines (Comma separated)
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (care text[])
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={careInput}
@@ -1381,9 +1746,14 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1.5 font-medium">
-                      Garment Fit Description
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                        Garment Fit Description
+                      </label>
+                      <span className="text-[10px] text-accent font-mono font-medium">
+                        public.products (fit)
+                      </span>
+                    </div>
                     <input
                       type="text"
                       value={fit}
@@ -1402,14 +1772,22 @@ INSERT INTO public.embroidery_details (
                     <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 4</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Variant Matrix & Pricing</h2>
                   </div>
-                  <span className="text-xs text-ink-muted font-mono">{variants.length} Variants</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] text-accent font-mono font-medium">public.variants</span>
+                    <span className="text-xs text-ink-muted font-mono">{variants.length} Variants</span>
+                  </div>
                 </div>
 
                 {/* Generator Controls */}
                 <div className="p-4 bg-cream border border-stone/40 space-y-4">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-ink block">
-                    Quick Variant Generator
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-ink block">
+                      Quick Variant Generator
+                    </span>
+                    <span className="text-[10px] text-accent font-mono font-medium">
+                      public.variants (sku, color, size, price_cents, status, quantity)
+                    </span>
+                  </div>
 
                   <div>
                     <label className="block text-[11px] text-ink-muted uppercase tracking-wider mb-2">
@@ -1479,6 +1857,7 @@ INSERT INTO public.embroidery_details (
                         onChange={(e) => setDefaultPrice(parseFloat(e.target.value) || 0)}
                         className="w-24 bg-paper border border-stone/60 px-2 py-1 text-xs font-mono font-bold text-ink"
                       />
+                      <span className="text-[10px] text-accent font-mono">public.variants.price_cents</span>
                     </div>
                     <button
                       type="button"
@@ -1495,12 +1874,30 @@ INSERT INTO public.embroidery_details (
                   <table className="w-full text-left text-xs font-sans">
                     <thead className="bg-cream border-y border-stone/30 text-[10px] uppercase tracking-widest text-ink-muted font-medium">
                       <tr>
-                        <th className="py-2.5 px-3">SKU</th>
-                        <th className="py-2.5 px-3">Color</th>
-                        <th className="py-2.5 px-3">Size</th>
-                        <th className="py-2.5 px-3">Price</th>
-                        <th className="py-2.5 px-3">Status</th>
-                        <th className="py-2.5 px-3">Qty</th>
+                        <th className="py-2.5 px-3">
+                          <div>SKU</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">sku PK</div>
+                        </th>
+                        <th className="py-2.5 px-3">
+                          <div>Color</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">color_hex</div>
+                        </th>
+                        <th className="py-2.5 px-3">
+                          <div>Size</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">size</div>
+                        </th>
+                        <th className="py-2.5 px-3">
+                          <div>Price</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">price_cents</div>
+                        </th>
+                        <th className="py-2.5 px-3">
+                          <div>Status</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">public.variants.status</div>
+                        </th>
+                        <th className="py-2.5 px-3">
+                          <div>Qty</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">quantity</div>
+                        </th>
                         <th className="py-2.5 px-3 text-right">Action</th>
                       </tr>
                     </thead>
@@ -1550,6 +1947,7 @@ INSERT INTO public.embroidery_details (
                                 setVariants(copy);
                               }}
                               className="bg-transparent border border-stone/40 px-1.5 py-0.5 text-[11px]"
+                              title="public.variants (status)"
                             >
                               <option value="in-stock">In Stock</option>
                               <option value="low-stock">Low Stock</option>
@@ -1595,9 +1993,14 @@ INSERT INTO public.embroidery_details (
                     <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Visuals</span>
                     <h3 className="font-serif text-lg text-ink">Product Imagery & Upload</h3>
                   </div>
-                  <span className="text-[10px] text-ink-muted uppercase tracking-wider font-mono">
-                    CDN Linked
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-accent font-mono font-medium">
+                      public.product_images
+                    </span>
+                    <span className="text-[10px] text-ink-muted uppercase tracking-wider font-mono">
+                      CDN Linked
+                    </span>
+                  </div>
                 </div>
 
                 {/* All-in-One Spec Board Intake (v1: one 3×2 board → six slots) */}
@@ -1901,15 +2304,42 @@ INSERT INTO public.embroidery_details (
                 <table className="w-full text-left text-xs font-sans">
                   <thead className="bg-cream border-y border-stone/30 text-[10px] uppercase tracking-widest text-ink-muted font-medium">
                     <tr>
-                      <th className="py-3 px-3">Product</th>
-                      <th className="py-3 px-3">Category</th>
-                      <th className="py-3 px-3">Garment</th>
-                      <th className="py-3 px-3">Collection</th>
-                      <th className="py-3 px-3">Expression</th>
-                      <th className="py-3 px-3">Technique</th>
-                      <th className="py-3 px-3">Price</th>
-                      <th className="py-3 px-3">Variants</th>
-                      <th className="py-3 px-3">Batch</th>
+                      <th className="py-3 px-3">
+                        <div>Product</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.products</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Category</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.categories</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Garment</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.garments</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Collection</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.collections</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Expression</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">expression_score</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Technique</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.embroidery_details</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Price</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">price_cents</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Variants</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">public.variants</span>
+                      </th>
+                      <th className="py-3 px-3">
+                        <div>Batch</div>
+                        <span className="text-[9px] text-accent font-mono font-normal">batch_number</span>
+                      </th>
                       <th className="py-3 px-3 text-right">View Live</th>
                     </tr>
                   </thead>
@@ -1983,62 +2413,30 @@ INSERT INTO public.embroidery_details (
           <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-8">
             {/* Header */}
             <div className="border-b border-stone/30 pb-4">
-              <div className="flex items-center gap-2 text-[10px] font-sans tracking-[0.2em] text-accent font-semibold uppercase">
-                Database Redeployment & Schema Sync
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[10px] font-sans tracking-[0.2em] text-accent font-semibold uppercase">
+                  Production Database Schema & Incremental Migration Hub
+                </div>
+                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-semibold rounded">
+                  ✦ Production Protected (Zero Wipes)
+                </span>
               </div>
               <h2 className="font-serif text-2xl text-ink mt-1">
-                Supabase Full Database Initialization & Seeding Guide
+                Additive Migration & Master Taxonomy Manager
               </h2>
               <p className="text-xs text-ink-muted mt-1 leading-relaxed max-w-3xl">
-                Use the queries below to cleanly erase the previous database schema, create the updated relational architecture (including Universes, Motifs, Gender, and Craft taxonomies), and seed the 13 authentic atelier products with zero mock data.
+                The UniqueLo production database is live. Never execute <code className="bg-stone/20 px-1 py-0.5 font-mono text-ink">DROP TABLE</code> in production as this erases customer orders, inventory stock, and atelier reviews. All schema evolution is <strong>additive and non-destructive</strong> using <code className="bg-stone/20 px-1 py-0.5 font-mono text-ink">ON CONFLICT DO UPDATE</code>.
               </p>
             </div>
 
-            {/* Step 1: Wipe & Schema Creation */}
-            <div className="space-y-3">
+            {/* Step 1: Add New Taxonomy Row (Interactive Snippets) */}
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Step 1</span>
-                  <h3 className="font-serif text-base text-ink font-semibold">1. Complete Schema Wipe & Re-initialization (`supabase/schema.sql`)</h3>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Workflow 1</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">Add New Master Taxonomy (Categories, Silhouettes, Capsules)</h3>
                   <p className="text-[11px] text-ink-muted">
-                    Drops previous deprecated tables and recreates the unified schema with all current columns, indexes, and RLS policies.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    copyToClipboard(
-                      `-- 1. Wipe Previous Tables\nDROP TABLE IF EXISTS public.order_items CASCADE;\nDROP TABLE IF EXISTS public.orders CASCADE;\nDROP TABLE IF EXISTS public.reviews CASCADE;\nDROP TABLE IF EXISTS public.newsletter_subscribers CASCADE;\nDROP TABLE IF EXISTS public.embroidery_details CASCADE;\nDROP TABLE IF EXISTS public.product_images CASCADE;\nDROP TABLE IF EXISTS public.variants CASCADE;\nDROP TABLE IF EXISTS public.products CASCADE;\nDROP TABLE IF EXISTS public.garments CASCADE;\nDROP TABLE IF EXISTS public.collections CASCADE;\nDROP TABLE IF EXISTS public.motifs CASCADE;\nDROP TABLE IF EXISTS public.universes CASCADE;\nDROP TABLE IF EXISTS public.categories CASCADE;\n\n-- 2. Enable UUID Extension\nCREATE EXTENSION IF NOT EXISTS "uuid-ossp";\n\n-- 3. Universes Table\nCREATE TABLE public.universes (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  tagline text NOT NULL,\n  lore text NOT NULL,\n  emblem_src text,\n  hero_image text,\n  drop_cadence text,\n  is_active boolean DEFAULT true,\n  order_num integer DEFAULT 0,\n  theme_tokens jsonb DEFAULT '{}'::jsonb,\n  portal_title_color text,\n  lore_heading text,\n  hero_headline text,\n  hero_headline_accent text,\n  hero_lead_color text,\n  hero_accent_color text,\n  hero_headline_case text,\n  hero_kicker text,\n  hero_ornament text,\n  hero_note text,\n  hero_vertical_text text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 4. Motifs Table\nCREATE TABLE public.motifs (\n  id text PRIMARY KEY,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE CASCADE NOT NULL,\n  name text NOT NULL,\n  meaning text NOT NULL,\n  symbol_notes text,\n  ip_cleared boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5. Categories Table\nCREATE TABLE public.categories (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  label text NOT NULL,\n  description text NOT NULL,\n  image text,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5b. Garments Table (Silhouette Taxonomy)\nCREATE TABLE public.garments (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,\n  description text NOT NULL,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 5c. Collections Table (Seasonal Drops & Thematic Capsules)\nCREATE TABLE public.collections (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  tagline text,\n  description text,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,\n  cover_image text,\n  featured boolean DEFAULT true,\n  order_num integer DEFAULT 0,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 6. Products Table\nCREATE TABLE public.products (\n  slug text PRIMARY KEY,\n  name text NOT NULL,\n  subtitle text NOT NULL,\n  foreign_tagline text,\n  description text NOT NULL,\n  category_slug text REFERENCES public.categories(slug) ON DELETE SET NULL,\n  universe_slug text REFERENCES public.universes(slug) ON DELETE SET NULL,\n  collection_slug text REFERENCES public.collections(slug) ON DELETE SET NULL,\n  garment_type text REFERENCES public.garments(slug) ON DELETE SET NULL,\n  gender text DEFAULT 'unisex' CHECK (gender in ('men', 'women', 'unisex')),\n  motif_id text REFERENCES public.motifs(id) ON DELETE SET NULL,\n  is_mock boolean DEFAULT false,\n  handcrafted boolean DEFAULT false,\n  vibes text[] DEFAULT '{}',\n  moods text[] DEFAULT '{}',\n  intensity text DEFAULT 'balanced' CHECK (intensity in ('quiet', 'balanced', 'loud')),\n  expression_score smallint DEFAULT 3 CHECK (expression_score between 1 and 5),\n  expression_slug text DEFAULT 'artistic',\n  rating numeric(3,1),\n  review_count integer DEFAULT 0,\n  sold_count text,\n  tags text[] DEFAULT '{}',\n  featured boolean DEFAULT false,\n  customizable boolean DEFAULT false,\n  material text[] DEFAULT '{}',\n  care text[] DEFAULT '{}',\n  fit text,\n  batch_number integer DEFAULT 1,\n  batch_total integer DEFAULT 50,\n  craft_region text,\n  craft_cluster text,\n  fabric_gsm text,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 7. Variants Table\nCREATE TABLE public.variants (\n  sku text PRIMARY KEY,\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  color text NOT NULL,\n  color_hex text NOT NULL,\n  size text NOT NULL,\n  price_cents integer NOT NULL,\n  compare_at_price_cents integer,\n  status text DEFAULT 'in-stock' CHECK (status in ('in-stock', 'low-stock', 'out-of-stock')),\n  quantity integer DEFAULT 10,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 8. Product Images Table\nCREATE TABLE public.product_images (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  src text NOT NULL,\n  alt text NOT NULL,\n  color text,\n  sort_order integer DEFAULT 0\n);\n\n-- 9. Embroidery Details Table\nCREATE TABLE public.embroidery_details (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL UNIQUE,\n  technique text NOT NULL,\n  technique_label text NOT NULL,\n  artisan_hours integer DEFAULT 0,\n  placement text[] DEFAULT '{}',\n  thread_composition text NOT NULL,\n  motif_story text NOT NULL,\n  macro_image_src text,\n  macro_image_alt text\n);\n\n-- 10. Reviews Table\nCREATE TABLE public.reviews (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  product_slug text REFERENCES public.products(slug) ON DELETE CASCADE NOT NULL,\n  author text NOT NULL,\n  rating integer CHECK (rating >= 1 and rating <= 5) NOT NULL,\n  title text NOT NULL,\n  comment text NOT NULL,\n  verified boolean DEFAULT true,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 11. Newsletter Subscribers Table\nCREATE TABLE public.newsletter_subscribers (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  email text UNIQUE NOT NULL,\n  subscribed_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\n-- 12. Orders & Order Items Table\nCREATE TABLE public.orders (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  customer_name text NOT NULL,\n  customer_email text NOT NULL,\n  status text DEFAULT 'confirmed',\n  subtotal_cents integer NOT NULL,\n  discount_cents integer DEFAULT 0,\n  shipping_cents integer DEFAULT 0,\n  total_cents integer NOT NULL,\n  coupon_code text,\n  gift_note text,\n  shipping_address jsonb,\n  created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL\n);\n\nCREATE TABLE public.order_items (\n  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),\n  order_id uuid REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,\n  product_slug text NOT NULL,\n  variant_sku text NOT NULL,\n  product_name text NOT NULL,\n  color text NOT NULL,\n  size text NOT NULL,\n  quantity integer NOT NULL,\n  price_cents integer NOT NULL,\n  customization jsonb\n);\n\n-- 13. Enable Row Level Security (RLS)\nALTER TABLE public.universes ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.motifs ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.garments ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.collections ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.products ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.variants ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.embroidery_details ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;\n\n-- Public READ Policies\nCREATE POLICY "Allow public read universes" ON public.universes FOR SELECT USING (true);\nCREATE POLICY "Allow public read motifs" ON public.motifs FOR SELECT USING (true);\nCREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USING (true);\nCREATE POLICY "Allow public read garments" ON public.garments FOR SELECT USING (true);\nCREATE POLICY "Allow public read collections" ON public.collections FOR SELECT USING (true);\nCREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);\nCREATE POLICY "Allow public read variants" ON public.variants FOR SELECT USING (true);\nCREATE POLICY "Allow public read product images" ON public.product_images FOR SELECT USING (true);\nCREATE POLICY "Allow public read embroidery details" ON public.embroidery_details FOR SELECT USING (true);\nCREATE POLICY "Allow public read reviews" ON public.reviews FOR SELECT USING (true);\n\n-- Public WRITE Policies\nCREATE POLICY "Allow public newsletter subscribe" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public submit review" ON public.reviews FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create orders" ON public.orders FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow public create order items" on public.order_items FOR INSERT WITH CHECK (true);\n\n-- Admin Studio Policies\nCREATE POLICY "Allow admin insert garments" ON public.garments FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update garments" ON public.garments FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert collections" ON public.collections FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update collections" ON public.collections FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert products" ON public.products FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update products" ON public.products FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert variants" ON public.variants FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update variants" ON public.variants FOR UPDATE USING (true);\nCREATE POLICY "Allow admin insert product images" ON public.product_images FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin delete product images" ON public.product_images FOR DELETE USING (true);\nCREATE POLICY "Allow admin insert embroidery details" ON public.embroidery_details FOR INSERT WITH CHECK (true);\nCREATE POLICY "Allow admin update embroidery details" ON public.embroidery_details FOR UPDATE USING (true);\n\n-- Storage Setup\nINSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true) ON CONFLICT (id) DO NOTHING;\nCREATE POLICY "Public Read Product Images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');\nCREATE POLICY "Public Upload Product Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');`,
-                      'Full Schema Wipe & Re-initialization SQL'
-                    )
-                  }
-                  className="px-3.5 py-1.5 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
-                >
-                  📋 Copy Full Schema SQL
-                </button>
-              </div>
-
-              <div className="relative">
-                <pre className="bg-ink text-cream p-4 text-[11px] font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed max-h-64">
-{`-- Wipe Previous Tables & Re-initialize:
-DROP TABLE IF EXISTS public.order_items, public.orders, public.reviews, public.newsletter_subscribers,
-  public.embroidery_details, public.product_images, public.variants, public.products,
-  public.motifs, public.universes, public.categories CASCADE;
-
--- Enables UUID & Re-creates 12 relational tables with full universe & craft attributes.
--- Click 'Copy Full Schema SQL' above to copy the ready-to-run DDL.`}
-                </pre>
-              </div>
-            </div>
-
-            {/* Step 2: Seed Original Products */}
-            <div className="space-y-3 pt-4 border-t border-stone/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Step 2</span>
-                  <h3 className="font-serif text-base text-ink font-semibold">2. Seed Original Products (`supabase/seed.sql`)</h3>
-                  <p className="text-[11px] text-ink-muted">
-                    Seeds Universes (Animeverse, Heroverse, Itihaas), Motifs, Categories, and the 13 authentic handcrafted atelier products (`is_mock = false`, `handcrafted = true`).
+                    Idempotent upsert queries that add new taxonomies or update existing descriptions without foreign key constraint violations.
                   </p>
                 </div>
                 <a
@@ -2051,13 +2449,633 @@ DROP TABLE IF EXISTS public.order_items, public.orders, public.reviews, public.n
                 </a>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1. Add Category */}
+                <div className="p-4 bg-cream border border-stone/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-ink">1. Add New Category</span>
+                    <span className="text-[10px] text-accent font-mono font-medium">public.categories</span>
+                  </div>
+                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+{`INSERT INTO public.categories (slug, name, label, description, image, order_num)
+VALUES (
+  'kimonos', 'Kimonos & Haori', 'Kimonos',
+  'Structured artisanal haori jackets and silk kimono overcoats.',
+  '/images/categories/outerwear.jpg', 6
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, label = EXCLUDED.label,
+  description = EXCLUDED.description, order_num = EXCLUDED.order_num;`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(
+                        `INSERT INTO public.categories (slug, name, label, description, image, order_num)
+VALUES (
+  'kimonos', 'Kimonos & Haori', 'Kimonos',
+  'Structured artisanal haori jackets and silk kimono overcoats.',
+  '/images/categories/outerwear.jpg', 6
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, label = EXCLUDED.label,
+  description = EXCLUDED.description, order_num = EXCLUDED.order_num;`,
+                        'Add Category SQL'
+                      )
+                    }
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                  >
+                    📋 Copy Add Category SQL
+                  </button>
+                </div>
+
+                {/* 2. Add Garment Silhouette */}
+                <div className="p-4 bg-cream border border-stone/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-ink">2. Add Garment Silhouette</span>
+                    <span className="text-[10px] text-accent font-mono font-medium">public.garments</span>
+                  </div>
+                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+{`INSERT INTO public.garments (slug, name, category_slug, description, order_num)
+VALUES (
+  'haori', 'Haori Jackets', 'outerwear',
+  'Traditional wide-sleeve kimono jackets carrying bold back-panel needlework.', 10
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, category_slug = EXCLUDED.category_slug,
+  description = EXCLUDED.description, order_num = EXCLUDED.order_num;`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(
+                        `INSERT INTO public.garments (slug, name, category_slug, description, order_num)
+VALUES (
+  'haori', 'Haori Jackets', 'outerwear',
+  'Traditional wide-sleeve kimono jackets carrying bold back-panel needlework.', 10
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, category_slug = EXCLUDED.category_slug,
+  description = EXCLUDED.description, order_num = EXCLUDED.order_num;`,
+                        'Add Garment Silhouette SQL'
+                      )
+                    }
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                  >
+                    📋 Copy Add Garment SQL
+                  </button>
+                </div>
+
+                {/* 3. Add Collection */}
+                <div className="p-4 bg-cream border border-stone/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-ink">3. Add Seasonal Drop</span>
+                    <span className="text-[10px] text-accent font-mono font-medium">public.collections</span>
+                  </div>
+                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+{`INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num)
+VALUES (
+  'samurai-twilight', 'Samurai Twilight Collection',
+  'Indigo shadows, katana arcs, and silver bullion embroidery.',
+  'Night-toned apparel inspired by classic ronin epics.',
+  'animeverse', true, 4
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, tagline = EXCLUDED.tagline,
+  universe_slug = EXCLUDED.universe_slug, featured = EXCLUDED.featured;`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(
+                        `INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num)
+VALUES (
+  'samurai-twilight', 'Samurai Twilight Collection',
+  'Indigo shadows, katana arcs, and silver bullion embroidery.',
+  'Night-toned apparel inspired by classic ronin epics.',
+  'animeverse', true, 4
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, tagline = EXCLUDED.tagline,
+  universe_slug = EXCLUDED.universe_slug, featured = EXCLUDED.featured;`,
+                        'Add Collection SQL'
+                      )
+                    }
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                  >
+                    📋 Copy Add Collection SQL
+                  </button>
+                </div>
+
+                {/* 4. Add Motif */}
+                <div className="p-4 bg-cream border border-stone/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-ink">4. Add Lore Motif</span>
+                    <span className="text-[10px] text-accent font-mono font-medium">public.motifs</span>
+                  </div>
+                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+{`INSERT INTO public.motifs (id, universe_slug, name, meaning, symbol_notes, ip_cleared)
+VALUES (
+  'katana-arc', 'animeverse', 'Katana Arc Blade',
+  'The disciplined curve of the lone swordsman weapon.',
+  'Geometric blade curvature with subtle cherry blossom drifting.', true
+)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name, meaning = EXCLUDED.meaning, symbol_notes = EXCLUDED.symbol_notes;`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(
+                        `INSERT INTO public.motifs (id, universe_slug, name, meaning, symbol_notes, ip_cleared)
+VALUES (
+  'katana-arc', 'animeverse', 'Katana Arc Blade',
+  'The disciplined curve of the lone swordsman weapon.',
+  'Geometric blade curvature with subtle cherry blossom drifting.', true
+)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name, meaning = EXCLUDED.meaning, symbol_notes = EXCLUDED.symbol_notes;`,
+                        'Add Motif SQL'
+                      )
+                    }
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                  >
+                    📋 Copy Add Motif SQL
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Database Health Diagnostics */}
+            <div className="space-y-3 pt-4 border-t border-stone/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Workflow 2</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">Database Integrity & Row Count Diagnostics</h3>
+                  <p className="text-[11px] text-ink-muted">
+                    Run these queries in Supabase SQL editor to inspect row counts across all 9 catalog tables and verify zero orphan records.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      `-- 1. Check Row Counts across all catalog tables
+SELECT 'universes' as table_name, count(*) as count FROM public.universes
+UNION ALL
+SELECT 'motifs', count(*) FROM public.motifs
+UNION ALL
+SELECT 'categories', count(*) FROM public.categories
+UNION ALL
+SELECT 'garments', count(*) FROM public.garments
+UNION ALL
+SELECT 'collections', count(*) FROM public.collections
+UNION ALL
+SELECT 'products', count(*) FROM public.products
+UNION ALL
+SELECT 'variants', count(*) FROM public.variants
+UNION ALL
+SELECT 'product_images', count(*) FROM public.product_images
+UNION ALL
+SELECT 'embroidery_details', count(*) FROM public.embroidery_details;
+
+-- 2. Verify Relational Integrity (Must return 0 orphan rows)
+SELECT p.slug, p.name 
+FROM public.products p
+LEFT JOIN public.categories c ON p.category_slug = c.slug
+WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;
+
+-- 3. Verify Row Level Security (RLS) is active
+SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public';`,
+                      'Health Diagnostic SQL Queries'
+                    )
+                  }
+                  className="px-3.5 py-1.5 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
+                >
+                  📋 Copy Health Check Queries
+                </button>
+              </div>
+
+              <pre className="bg-ink text-cream p-4 text-[11px] font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed max-h-48">
+{`-- Row Counts:
+SELECT 'universes' as tbl, count(*) FROM public.universes UNION ALL
+SELECT 'motifs', count(*) FROM public.motifs UNION ALL
+SELECT 'categories', count(*) FROM public.categories UNION ALL
+SELECT 'garments', count(*) FROM public.garments UNION ALL
+SELECT 'collections', count(*) FROM public.collections UNION ALL
+SELECT 'products', count(*) FROM public.products UNION ALL
+SELECT 'variants', count(*) FROM public.variants;
+
+-- Check Orphan Products (Must return 0 rows):
+SELECT p.slug, p.name FROM public.products p
+LEFT JOIN public.categories c ON p.category_slug = c.slug
+WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
+              </pre>
+            </div>
+
+            {/* Step 3: Complete Schema Migration Documentation */}
+            <div className="space-y-3 pt-4 border-t border-stone/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Documentation</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">Official Database Migration Guide</h3>
+                  <p className="text-[11px] text-ink-muted">
+                    Full architectural manual on adding columns, creating new tables, zero-downtime migrations, and RLS security policies.
+                  </p>
+                </div>
+              </div>
+
               <div className="p-4 bg-cream border border-stone/40 text-xs text-ink space-y-2">
-                <span className="font-semibold block">✦ Ready on Disk:</span>
-                <p className="text-ink-muted">
-                  The complete seed statement is synchronized in your repository at <code className="bg-stone/20 px-1.5 py-0.5 font-mono text-[11px]">supabase/seed.sql</code>. It contains all 13 authentic products with multi-size variants, dual imagery, embroidery stories, and universe/gender routing.
+                <span className="font-semibold block">✦ Synchronized in Repository:</span>
+                <p className="text-ink-muted leading-relaxed">
+                  Refer to <code className="bg-stone/20 px-1.5 py-0.5 font-mono text-[11px]">docs/DATABASE_MIGRATION_GUIDE.md</code> for the complete step-by-step operating runbook, 4-level topological foreign key dependency graphs, and TypeScript synchronization checklists.
                 </p>
-                <div className="pt-2 flex items-center gap-3">
-                  <span className="text-[11px] font-mono text-ink-muted">File: supabase/seed.sql (48 KB)</span>
+                <div className="pt-2 flex items-center gap-4 text-[11px] font-mono text-ink-muted">
+                  <span>File: docs/DATABASE_MIGRATION_GUIDE.md (19 KB)</span>
+                  <span>DDL Blueprint: supabase/schema.sql (14 KB)</span>
+                  <span>Baseline Seed: supabase/production-seed.sql (28 KB)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 1: Add New Category */}
+        {showAddCategoryModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+            <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+              <div className="flex items-center justify-between border-b border-stone/30 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <h3 className="font-serif text-lg text-ink font-semibold">Add New Category</h3>
+                </div>
+                <span className="text-[10px] text-accent font-mono font-medium">public.categories</span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Category Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newCatName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewCatName(val);
+                      if (!newCatSlug || newCatSlug === newCatName.toLowerCase().replace(/[^a-z0-9]+/g, '-')) {
+                        setNewCatSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                      }
+                      if (!newCatLabel) {
+                        setNewCatLabel(val);
+                      }
+                    }}
+                    placeholder="e.g. Kimonos & Robes"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Slug (Primary Key) *
+                    </label>
+                    <input
+                      type="text"
+                      value={newCatSlug}
+                      onChange={(e) => setNewCatSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
+                      placeholder="e.g. kimonos"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 font-mono text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Short Label
+                    </label>
+                    <input
+                      type="text"
+                      value={newCatLabel}
+                      onChange={(e) => setNewCatLabel(e.target.value)}
+                      placeholder="e.g. Kimonos"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newCatDesc}
+                    onChange={(e) => setNewCatDesc(e.target.value)}
+                    placeholder="e.g. Artisanal silk kimono overcoats and haori jackets."
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                  <span className="font-semibold text-ink block">✦ Target Database Table:</span>
+                  <p>
+                    Inserts into <code className="font-mono text-accent">public.categories</code> via authenticated client. Immediately available in Admin Studio and navigation doors without wiping or rebuilding the database.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-stone/30">
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      `INSERT INTO public.categories (slug, name, label, description, order_num)
+VALUES ('${newCatSlug || 'category-slug'}', '${newCatName || 'Category Name'}', '${newCatLabel || newCatName || 'Category'}', '${newCatDesc || 'Description'}', ${availableCategories.length + 1})
+ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, description = EXCLUDED.description;`,
+                      'Idempotent Category SQL'
+                    )
+                  }
+                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                >
+                  📋 Copy SQL
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCategoryModal(false)}
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveNewCategory}
+                    disabled={isSavingTaxonomy}
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                  >
+                    {isSavingTaxonomy ? 'Saving...' : 'Save to public.categories'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 2: Add New Garment Silhouette */}
+        {showAddGarmentModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+            <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+              <div className="flex items-center justify-between border-b border-stone/30 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <h3 className="font-serif text-lg text-ink font-semibold">Add Garment Silhouette</h3>
+                </div>
+                <span className="text-[10px] text-accent font-mono font-medium">public.garments</span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Silhouette Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newGarmentName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewGarmentName(val);
+                      if (!newGarmentSlug || newGarmentSlug === newGarmentName.toLowerCase().replace(/[^a-z0-9]+/g, '-')) {
+                        setNewGarmentSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                      }
+                    }}
+                    placeholder="e.g. Haori Jackets"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Slug (Primary Key) *
+                    </label>
+                    <input
+                      type="text"
+                      value={newGarmentSlug}
+                      onChange={(e) => setNewGarmentSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
+                      placeholder="e.g. haori"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 font-mono text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium">
+                        Category *
+                      </label>
+                      <span className="text-[9px] text-accent font-mono">FK public.categories</span>
+                    </div>
+                    <select
+                      value={newGarmentCategory}
+                      onChange={(e) => setNewGarmentCategory(e.target.value)}
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent capitalize"
+                    >
+                      {availableCategories.map((c) => (
+                        <option key={c.slug} value={c.slug}>
+                          {c.name || c.label} ({c.slug})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newGarmentDesc}
+                    onChange={(e) => setNewGarmentDesc(e.target.value)}
+                    placeholder="e.g. Traditional wide-sleeve kimono jackets carrying bold back-panel needlework."
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                  <span className="font-semibold text-ink block">✦ Target Database Table:</span>
+                  <p>
+                    Inserts into <code className="font-mono text-accent">public.garments</code> with foreign key link to <code className="font-mono text-accent">category_slug = '{newGarmentCategory}'</code>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-stone/30">
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      `INSERT INTO public.garments (slug, name, category_slug, description, order_num)
+VALUES ('${newGarmentSlug || 'garment-slug'}', '${newGarmentName || 'Garment Name'}', '${newGarmentCategory}', '${newGarmentDesc || 'Description'}', ${availableGarments.length + 1})
+ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.category_slug, description = EXCLUDED.description;`,
+                      'Idempotent Garment SQL'
+                    )
+                  }
+                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                >
+                  📋 Copy SQL
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddGarmentModal(false)}
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveNewGarment}
+                    disabled={isSavingTaxonomy}
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                  >
+                    {isSavingTaxonomy ? 'Saving...' : 'Save to public.garments'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 3: Add New Collection */}
+        {showAddCollectionModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+            <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+              <div className="flex items-center justify-between border-b border-stone/30 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <h3 className="font-serif text-lg text-ink font-semibold">Add Collection / Drop</h3>
+                </div>
+                <span className="text-[10px] text-accent font-mono font-medium">public.collections</span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Collection Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={newColName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewColName(val);
+                      if (!newColSlug || newColSlug === newColName.toLowerCase().replace(/[^a-z0-9]+/g, '-')) {
+                        setNewColSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                      }
+                    }}
+                    placeholder="e.g. Samurai Twilight Collection"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Slug (Primary Key) *
+                    </label>
+                    <input
+                      type="text"
+                      value={newColSlug}
+                      onChange={(e) => setNewColSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
+                      placeholder="e.g. samurai-twilight"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 font-mono text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium">
+                        Universe
+                      </label>
+                      <span className="text-[9px] text-accent font-mono">FK public.universes</span>
+                    </div>
+                    <select
+                      value={newColUniverse}
+                      onChange={(e) => setNewColUniverse(e.target.value)}
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent capitalize"
+                    >
+                      <option value="">None (Universe-Neutral)</option>
+                      {(universes ?? []).map((u) => (
+                        <option key={u.slug} value={u.slug}>
+                          {u.name} ({u.slug})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={newColTagline}
+                    onChange={(e) => setNewColTagline(e.target.value)}
+                    placeholder="e.g. Indigo shadows, katana arcs, and silver bullion embroidery."
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newColDesc}
+                    onChange={(e) => setNewColDesc(e.target.value)}
+                    placeholder="e.g. Night-toned apparel inspired by classic ronin epics with dense silver bullion threadwork."
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                  <span className="font-semibold text-ink block">✦ Target Database Table:</span>
+                  <p>
+                    Inserts into <code className="font-mono text-accent">public.collections</code> with optional foreign key to <code className="font-mono text-accent">universe_slug</code>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-stone/30">
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      `INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num)
+VALUES ('${newColSlug || 'col-slug'}', '${newColName || 'Collection Name'}', ${newColTagline ? `'${newColTagline}'` : 'NULL'}, ${newColDesc ? `'${newColDesc}'` : 'NULL'}, ${newColUniverse ? `'${newColUniverse}'` : 'NULL'}, true, ${availableCollections.length + 1})
+ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, tagline = EXCLUDED.tagline, description = EXCLUDED.description, universe_slug = EXCLUDED.universe_slug;`,
+                      'Idempotent Collection SQL'
+                    )
+                  }
+                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                >
+                  📋 Copy SQL
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCollectionModal(false)}
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveNewCollection}
+                    disabled={isSavingTaxonomy}
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                  >
+                    {isSavingTaxonomy ? 'Saving...' : 'Save to public.collections'}
+                  </button>
                 </div>
               </div>
             </div>

@@ -188,7 +188,7 @@ ON CONFLICT (slug) DO UPDATE SET
 INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num) VALUES
   ('spring-sakura', 'Spring Sakura Collection', 'Japanese woodblock waves, blossom scatter, ink-line calm.', 'Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery.', 'animeverse', true, 1),
   ('royal-heritage', 'Royal Heritage Collection', 'Arches, jaals and royal court processions in gold zardozi.', 'Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages.', 'itihaas', true, 2),
-  ('midnight-atelier', 'Midnight Atelier Collection', 'No world, just pure cloth, heroic crests, and tonal needlecraft.', 'Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing.', 'atelier', true, 3)
+  ('midnight-atelier', 'Midnight Atelier Collection', 'No world, just pure cloth, heroic crests, and tonal needlecraft.', 'Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing.', NULL, true, 3)
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   tagline = EXCLUDED.tagline,
@@ -284,7 +284,7 @@ INSERT INTO public.products (
   'A tailored single-breasted overcoat accented with historic Zardozi wire embroidery depicting constellations and celestial geometry along the notched lapels and sleeve cuffs.',
   'outerwear',
   'heroverse',
-  'coat',
+  'jacket',
   'unisex',
   'ascendant-crest',
   false,
@@ -496,7 +496,7 @@ INSERT INTO public.products (
   'Seamless knit turtleneck adorned with hundreds of hand-twisted French knots across the yoke, creating a subtle tactile relief reminiscent of morning dew.',
   'knitwear',
   'animeverse',
-  'sweater',
+  'cardigan',
   'unisex',
   'sakura',
   false,
@@ -709,7 +709,7 @@ INSERT INTO public.products (
   'Woven on vintage Toyoda shuttle looms in Okayama and finished with geometric Sashiko stitching across the front thighs and back yoke for enhanced structural resilience.',
   'bottoms',
   'animeverse',
-  'denim',
+  'pants',
   'unisex',
   'red-sun',
   false,
@@ -779,7 +779,7 @@ INSERT INTO public.products (
   'Double-pleated tailored trousers featuring an artisanal side-seam galon hand-embroidered in antique copper and gold metallic zari floss.',
   'bottoms',
   'itihaas',
-  'trousers',
+  'pants',
   'unisex',
   'arch-jaal',
   false,
