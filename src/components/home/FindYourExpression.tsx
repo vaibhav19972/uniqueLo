@@ -24,15 +24,12 @@ export const FindYourExpression: React.FC = () => {
         count: matching.length,
         sampleProduct: sample,
         sampleImage:
-          sample?.images[1]?.src ||
           sample?.images[0]?.src ||
+          sample?.images[1]?.src ||
           '/images/campaigns/atelier-craft.jpg',
       };
     });
   }, [products]);
-
-  const activeLevel =
-    levelData.find((d) => d.level.score === selectedScore) || levelData[2];
 
   return (
     <section
@@ -49,91 +46,27 @@ export const FindYourExpression: React.FC = () => {
           linkLabel="Explore all 5 styles"
         />
 
-        {/* Level 1-to-5 Interactive Visual Selector Rail */}
-        <div className="mt-8 mb-10 bg-paper border border-stone/60 p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-stone/30">
-            <div>
-              <span className="text-[10px] uppercase font-sans tracking-[0.25em] text-accent font-semibold block">
-                Intensity Spectrum Selector
-              </span>
-              <p className="font-serif text-lg text-ink mt-0.5">
-                Select your desired level of visual presence
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-sans text-[11px] text-ink-muted uppercase tracking-wider">
-                Active Tier:
-              </span>
-              <span className="px-2.5 py-1 bg-cream border border-stone/80 font-serif text-xs font-semibold text-accent">
-                Level {activeLevel.level.score} / 5 · {activeLevel.level.name}
-              </span>
-            </div>
-          </div>
-
-          {/* 5-Step Segmented Bar - Horizontal Rail on mobile, 5-col on desktop */}
-          <div className="flex sm:grid sm:grid-cols-5 gap-2.5 sm:gap-3 mt-4 sm:mt-5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none snap-x -mx-1 px-1 sm:mx-0 sm:px-0">
-            {levelData.map(({ level, count }) => {
-              const isSelected = level.score === selectedScore;
-              return (
-                <button
-                  key={level.score}
-                  type="button"
-                  onClick={() => setSelectedScore(level.score)}
-                  aria-pressed={isSelected}
-                  className={`group relative text-left p-3 sm:p-4 border transition-all cursor-pointer shrink-0 w-[135px] sm:w-auto snap-start ${
-                    isSelected
-                      ? 'border-ink bg-ink text-cream shadow-md -translate-y-0.5'
-                      : 'border-stone/60 bg-paper hover:border-accent hover:bg-cream/40 text-ink'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`font-mono text-xs font-bold ${
-                        isSelected ? 'text-gold-zari' : 'text-accent'
-                      }`}
-                    >
-                      0{level.score}
-                    </span>
-                    <span
-                      className={`text-[9px] uppercase tracking-widest font-sans ${
-                        isSelected ? 'text-cream/70' : 'text-ink-muted'
-                      }`}
-                    >
-                      {count} {count === 1 ? 'piece' : 'pieces'}
-                    </span>
-                  </div>
-                  <h4
-                    className={`font-serif text-xs sm:text-sm font-semibold mt-2 truncate ${
-                      isSelected ? 'text-cream' : 'text-ink'
-                    }`}
-                  >
-                    {level.name}
-                  </h4>
-                  <div className="mt-2.5 w-full bg-stone/30 h-1 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-300 ${
-                        isSelected ? 'bg-accent' : 'bg-stone/60 group-hover:bg-accent/70'
-                      }`}
-                      style={{ width: `${level.score * 20}%` }}
-                    />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 5 Visual Expression Cards Grid - 2 cols on mobile */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+        {/* 5 Visual Style Cards Grid — all five selectable */}
+        <div className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
           {levelData.map(({ level, count, sampleProduct, sampleImage }) => {
             const isSelected = level.score === selectedScore;
             return (
               <article
                 key={level.score}
-                className={`group flex flex-col bg-paper border transition-all duration-300 relative ${
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedScore(level.score)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedScore(level.score);
+                  }
+                }}
+                className={`group flex flex-col bg-paper border transition-all duration-300 relative cursor-pointer select-none text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   isSelected
-                    ? 'border-ink ring-2 ring-ink/80 shadow-md'
-                    : 'border-stone/60 hover:border-accent hover:shadow-sm'
+                    ? 'border-ink ring-2 ring-ink shadow-lg -translate-y-1'
+                    : 'border-stone/60 hover:border-accent hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
                 {/* Visual Imagery / Macro Detail */}
@@ -146,10 +79,13 @@ export const FindYourExpression: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
                   
-                  {/* Top Level Pill */}
-                  <div className="absolute top-3 left-3 bg-paper/95 text-ink text-[9px] uppercase tracking-widest font-sans font-semibold px-2 py-0.5 border border-stone/60">
-                    Level {level.score}
-                  </div>
+                  {/* Active Selection Badge (replaces Level pill) */}
+                  {isSelected && (
+                    <div className="absolute top-3 left-3 bg-ink/95 text-gold-zari text-[9px] uppercase tracking-widest font-sans font-semibold px-2 py-0.5 border border-gold-zari/40 shadow-sm flex items-center gap-1.5 animate-fadeIn">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gold-zari animate-pulse" />
+                      Active
+                    </div>
+                  )}
 
                   {/* Bottom Image Overlay Details */}
                   <div className="absolute bottom-3 inset-x-3 text-cream">
@@ -171,7 +107,7 @@ export const FindYourExpression: React.FC = () => {
                     {sampleProduct && (
                       <div className="mt-3 pt-2.5 border-t border-stone/30 text-[10px] text-ink-muted">
                         <span className="uppercase tracking-widest text-ink/70 block">
-                          Featured in this tier:
+                          Featured in this style:
                         </span>
                         <span className="font-serif text-ink font-medium truncate block mt-0.5">
                           {sampleProduct.name}
@@ -184,6 +120,7 @@ export const FindYourExpression: React.FC = () => {
                   <div className="pt-2">
                     <Link
                       to={`/styles/${level.slug}`}
+                      onClick={(e) => e.stopPropagation()}
                       className={`w-full py-2 px-3 text-center text-[10px] uppercase tracking-widest font-semibold transition-colors block ${
                         isSelected
                           ? 'bg-accent text-cream hover:bg-accent-hover'
@@ -202,7 +139,7 @@ export const FindYourExpression: React.FC = () => {
         {/* Philosophy Footnote */}
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-ink-muted gap-2 pt-4 border-t border-stone/40">
           <p className="font-serif italic">
-            "Your level of embroidery style should reflect your mood, the setting, and how much of your story you want the world to see."
+            "Your embroidery style should reflect your mood, the setting, and how much of your story you want the world to see."
           </p>
           <Link
             to="/styles"
