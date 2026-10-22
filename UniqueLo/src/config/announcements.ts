@@ -67,7 +67,7 @@ export interface AnnouncementConfig {
    */
   defaultMode: 'marquee' | 'spotlight';
   /**
-   * Initial priority filter threshold: 'all' to show all 8 items, or number for max priority.
+   * Initial priority filter threshold: 'all' to show all items, or number for max priority.
    */
   priorityFilter: 'all' | 'top-priority';
 }
@@ -81,22 +81,21 @@ export const ANNOUNCEMENT_CONFIG: AnnouncementConfig = {
 };
 
 /**
- * 8 Core Announcements requested by user, ordered with flexible priority from top:
+ * 7 Core Announcements requested by user, ordered with flexible priority from top:
  * 1. FREE SHIPPING!! ON ORDERS ABOVE ₹999
  * 2. COD AVAILABLE! PAN INDIA!!
  * 3. SECURE CHECKOUT. A SEAMLESS EXPERIENCE.
- * 4. TRACK YOUR ORDER AT EVERY STEP.
- * 5. MADE TO BE WORN. DESIGNED TO BE KEPT.
- * 6. YOUR FIRST ORDER, WITH A EXTRA GIFT
- * 7. NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.
- * 8. LIMITED DROP. WHEN IT'S GONE, IT'S GONE.
+ * 4. MADE TO BE WORN. DESIGNED TO BE KEPT.
+ * 5. YOUR FIRST ORDER, WITH A EXTRA GIFT
+ * 6. NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.
+ * 7. LIMITED DROP. WHEN IT'S GONE, IT'S GONE.
  */
 export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'free-shipping-999',
     text: 'FREE SHIPPING!! ON ORDERS ABOVE ₹999',
     priority: 1, // Highest top priority
-    badge: '⚡ FLASH DEAL',
+    badge: 'FLASH DEAL',
     badgeStyle: 'emerald',
     isFlashing: true,
     flashingStyle: 'badge',
@@ -110,7 +109,7 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
     id: 'cod-pan-india',
     text: 'COD AVAILABLE! PAN INDIA!!',
     priority: 2,
-    badge: '📦 ZERO RISK',
+    badge: 'ZERO RISK',
     badgeStyle: 'cyan',
     isFlashing: true,
     flashingStyle: 'beacon',
@@ -132,23 +131,10 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
     ariaLabel: 'Secure encrypted checkout and seamless shopping experience',
   },
   {
-    id: 'order-tracking',
-    text: 'TRACK YOUR ORDER AT EVERY STEP.',
-    priority: 4,
-    badge: '📍 LIVE RADAR',
-    badgeStyle: 'cyan',
-    isFlashing: true,
-    flashingStyle: 'beacon',
-    beaconColor: '#38bdf8',
-    icon: 'tracking',
-    link: '/shop',
-    ariaLabel: 'Real time order tracking at every single step',
-  },
-  {
     id: 'made-to-be-worn',
     text: 'MADE TO BE WORN. DESIGNED TO BE KEPT.',
-    priority: 5,
-    badge: '✦ ATELIER CRAFT',
+    priority: 4,
+    badge: 'ATELIER CRAFT',
     badgeStyle: 'gold',
     isFlashing: false,
     icon: 'craft',
@@ -158,8 +144,8 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'first-order-gift',
     text: 'YOUR FIRST ORDER, WITH A EXTRA GIFT',
-    priority: 6,
-    badge: '🎁 WELCOME PERK',
+    priority: 5,
+    badge: ' WELCOME',
     badgeStyle: 'purple',
     isFlashing: true,
     flashingStyle: 'badge',
@@ -172,8 +158,8 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'new-arrivals',
     text: 'NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.',
-    priority: 7,
-    badge: '🔥 HOT DROP',
+    priority: 6,
+    badge: ' HOT DROP',
     badgeStyle: 'amber',
     isFlashing: true,
     flashingStyle: 'badge',
@@ -186,8 +172,8 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'limited-drop',
     text: "LIMITED DROP. WHEN IT'S GONE, IT'S GONE.",
-    priority: 8,
-    badge: '⏳ RARE PIECES',
+    priority: 7,
+    badge: '',
     badgeStyle: 'crimson',
     isFlashing: true,
     flashingStyle: 'urgent',
