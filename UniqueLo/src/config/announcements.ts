@@ -81,21 +81,36 @@ export const ANNOUNCEMENT_CONFIG: AnnouncementConfig = {
 };
 
 /**
- * 7 Core Announcements requested by user, ordered with flexible priority from top:
- * 1. FREE SHIPPING!! ON ORDERS ABOVE ₹999
- * 2. COD AVAILABLE! PAN INDIA!!
- * 3. SECURE CHECKOUT. A SEAMLESS EXPERIENCE.
- * 4. MADE TO BE WORN. DESIGNED TO BE KEPT.
- * 5. YOUR FIRST ORDER, WITH A EXTRA GIFT
- * 6. NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.
- * 7. LIMITED DROP. WHEN IT'S GONE, IT'S GONE.
+ * 8 Core Announcements requested by user, ordered with flexible priority from top:
+ * 1. 1ST ANNIVERSARY LAUNCH OFFER! 50% OFF ON ALL ARTICLES
+ * 2. FREE SHIPPING!! ON ORDERS ABOVE ₹999
+ * 3. COD AVAILABLE! PAN INDIA!!
+ * 4. SECURE CHECKOUT. A SEAMLESS EXPERIENCE.
+ * 5. MADE TO BE WORN. DESIGNED TO BE KEPT.
+ * 6. YOUR FIRST ORDER, WITH A EXTRA GIFT
+ * 7. NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.
+ * 8. LIMITED DROP. WHEN IT'S GONE, IT'S GONE.
  */
 export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
+    id: 'anniversary-launch-offer',
+    text: 'ANNIVERSARY LAUNCH OFFER! 50% OFF',
+    priority: 1, // Highest top priority
+    badge: 'ALL ARTICLES',
+    badgeStyle: 'crimson',
+    isFlashing: true,
+    flashingStyle: 'badge',
+    beaconColor: '#f43f5e',
+    icon: 'flame',
+    link: '/shop',
+    highlightWords: '50% OFF',
+    ariaLabel: '1st Anniversary Launch Offer: 50% off on all articles',
+  },
+  {
     id: 'free-shipping-999',
     text: 'FREE SHIPPING!! ON ORDERS ABOVE ₹999',
-    priority: 1, // Highest top priority
-    badge: 'FLASH DEAL',
+    priority: 2,
+    badge: '',
     badgeStyle: 'emerald',
     isFlashing: true,
     flashingStyle: 'badge',
@@ -108,8 +123,8 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'cod-pan-india',
     text: 'COD AVAILABLE! PAN INDIA!!',
-    priority: 2,
-    badge: 'ZERO RISK',
+    priority: 3,
+    badge: ' ',
     badgeStyle: 'cyan',
     isFlashing: true,
     flashingStyle: 'beacon',
@@ -122,7 +137,7 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'secure-checkout',
     text: 'SECURE CHECKOUT. A SEAMLESS EXPERIENCE.',
-    priority: 3,
+    priority: 4,
     badge: '🔒 100% SECURE',
     badgeStyle: 'default',
     isFlashing: false,
@@ -133,9 +148,9 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'made-to-be-worn',
     text: 'MADE TO BE WORN. DESIGNED TO BE KEPT.',
-    priority: 4,
-    badge: 'ATELIER CRAFT',
-    badgeStyle: 'gold',
+    priority: 5,
+    badge: 'Evergreen',
+    badgeStyle: 'emerald',
     isFlashing: false,
     icon: 'craft',
     link: '/our-craft',
@@ -144,8 +159,8 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'first-order-gift',
     text: 'YOUR FIRST ORDER, WITH A EXTRA GIFT',
-    priority: 5,
-    badge: ' WELCOME',
+    priority: 6,
+    badge: '',
     badgeStyle: 'purple',
     isFlashing: true,
     flashingStyle: 'badge',
@@ -158,7 +173,7 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'new-arrivals',
     text: 'NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.',
-    priority: 6,
+    priority: 7,
     badge: ' HOT DROP',
     badgeStyle: 'amber',
     isFlashing: true,
@@ -172,7 +187,7 @@ export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
     id: 'limited-drop',
     text: "LIMITED DROP. WHEN IT'S GONE, IT'S GONE.",
-    priority: 7,
+    priority: 8,
     badge: '',
     badgeStyle: 'crimson',
     isFlashing: true,
