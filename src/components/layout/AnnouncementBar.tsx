@@ -228,7 +228,7 @@ const AnnouncementCard: React.FC<{
  * Revamped AnnouncementBar Component
  *
  * Clean, seamless e-commerce rolling announcement bar:
- * • Smooth continuous rolling animation in priority order from top to bottom (1 to 8).
+ * • Smooth continuous rolling animation in priority order from top to bottom.
  * • Flashing beacon dots and glowing badges on high-priority items.
  * • Natural pause-on-hover: hovering pauses scrolling so shoppers can comfortably read/click.
  * • Clean dismiss button (✕) on the right.
@@ -241,7 +241,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
   const isV2 = useIsThemeV2();
   const [isDismissed, setIsDismissed] = useState(false);
 
-  // Announcements ordered with flexible priority from top (1 down to 8)
+  // Announcements ordered with flexible priority from top
   const announcements = useMemo(() => {
     return getPrioritizedAnnouncements(customItems || DEFAULT_ANNOUNCEMENTS, 'all');
   }, [customItems]);
