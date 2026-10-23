@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -23,7 +23,6 @@ import {
   type Gender,
   type EmbroideryTechnique,
 } from '../lib/data';
-import { NotFound } from './NotFound';
 import {
   SPEC_BOARD_SLOTS,
   cropSpecBoard,
@@ -3173,18 +3172,174 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, tagline = EXCLUDED.taglin
   );
 };
 
-export const Admin: React.FC = () => {
-  // Security Guard: Restrict access strictly to local environment
-  const isLocalEnvironment =
-    import.meta.env.DEV ||
-    (typeof window !== 'undefined' &&
-      (window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname === '0.0.0.0'));
+const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  if (!isLocalEnvironment) {
-    return <NotFound />;
+  useEffect(() => {
+    if (!isSupabaseConfigured() || !supabase) {
+      setLoading(false);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase || !email.trim() || !password) return;
+    setIsSubmitting(true);
+    setAuthError(null);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) throw error;
+      setSession(data.session);
+    } catch (err: any) {
+      setAuthError(err?.message || 'Authentication failed. Please verify credentials.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+      setSession(null);
+    }
+  };
+
+  if (!isSupabaseConfigured() || !supabase) {
+    // Local / offline fallback
+    return <>{children}</>;
   }
 
-  return <AdminStudio />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center text-ink p-4">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="font-serif text-lg text-ink-muted">Verifying Atelier Security Credentials…</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-paper border border-stone/50 p-8 sm:p-10 shadow-sm text-ink">
+          <div className="text-center mb-8">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent font-medium block">
+              UniqueLo Atelier Studio
+            </span>
+            <h1 className="font-serif text-3xl font-normal text-ink mt-2">Staff Portal</h1>
+            <p className="text-xs text-ink-muted mt-2 font-sans leading-relaxed">
+              Authenticate with your verified Supabase admin credentials to unlock catalog publishing and CDN media uploads.
+            </p>
+          </div>
+
+          {authError && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-mono">
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1.5">
+                Staff Email
+              </label>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="admin@uniquelo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-cream border border-stone/60 text-xs text-ink font-mono focus:outline-none focus:border-ink"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-cream border border-stone/60 text-xs text-ink font-mono focus:outline-none focus:border-ink"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-2.5 bg-ink text-cream hover:bg-ink-light text-xs font-mono uppercase tracking-widest transition-colors disabled:opacity-50 mt-2"
+            >
+              {isSubmitting ? 'Verifying Credentials…' : 'Enter Atelier Studio →'}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-stone/30 text-center">
+            <Link
+              to="/"
+              className="text-[11px] font-mono text-ink-muted hover:text-ink transition-colors uppercase tracking-wider"
+            >
+              ← Return to Public Storefront
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Authenticated Staff Top Bar */}
+      <div className="bg-ink text-cream px-4 sm:px-6 py-2 text-[11px] font-mono flex items-center justify-between border-b border-stone/30">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Atelier Session: <strong className="text-white font-medium">{session.user.email}</strong></span>
+          <span className="text-stone-400 text-[10px] hidden sm:inline">• Authenticated Admin Active</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="text-stone-300 hover:text-white underline underline-offset-2 transition-colors uppercase tracking-wider text-[10px]"
+        >
+          Sign Out ↗
+        </button>
+      </div>
+      {children}
+    </div>
+  );
+};
+
+export const Admin: React.FC = () => {
+  return (
+    <AdminAuthGate>
+      <AdminStudio />
+    </AdminAuthGate>
+  );
 };
