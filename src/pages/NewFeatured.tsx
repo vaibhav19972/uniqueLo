@@ -68,8 +68,17 @@ export const NewFeatured: React.FC = () => {
     const list = allProducts ?? [];
     switch (activeTabKey) {
       case 'new-arrivals':
-        // Featured or recent
-        return list.filter((p) => p.featured || p.tags.includes('new') || p.tags.includes('animeverse'));
+        // Sort by newest createdAt timestamp descending, including all newly landed products
+        return [...list]
+          .sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+            if (b.createdAt) return 1;
+            if (a.createdAt) return -1;
+            return 0;
+          })
+          .filter((p) => p.featured || p.tags.includes('new') || Boolean(p.createdAt));
       case 'bestsellers':
         return list.filter((p) => p.tags.includes('bestseller') || (p.rating && p.rating >= 4.7));
       case 'limited-editions':

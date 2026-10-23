@@ -39,8 +39,17 @@ export const NewAndFeaturedSection: React.FC = () => {
   const productsForTab = useMemo(() => {
     const list = allProducts ?? [];
     if (activeTab === 'new-arrivals') {
-      // Sort by newest batch or reverse catalog order
-      return [...list].reverse().slice(0, 4);
+      // Sort by newest createdAt timestamp descending, fallback to original order
+      return [...list]
+        .sort((a, b) => {
+          if (a.createdAt && b.createdAt) {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }
+          if (b.createdAt) return 1;
+          if (a.createdAt) return -1;
+          return 0;
+        })
+        .slice(0, 4);
     }
     if (activeTab === 'limited-editions') {
       return list

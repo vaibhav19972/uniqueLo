@@ -277,6 +277,7 @@ export interface Product {
   craftRegion?: string;
   craftCluster?: string;
   fabricGsm?: string;
+  createdAt?: string;
 }
 
 export interface Category {
@@ -469,11 +470,12 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm, created_at,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
-        `); // live catalog query (serves production seed & admin uploaded items)
+        `)
+        .order('created_at', { ascending: false }); // live catalog query (serves production seed & admin uploaded items)
 
       if (error) {
         console.warn('[UniqueLo] Supabase getProducts returned an error; using fallback seed data:', error);
@@ -527,6 +529,7 @@ export async function getProducts(): Promise<Product[]> {
             craftRegion: item.craft_region,
             craftCluster: item.craft_cluster,
             fabricGsm: item.fabric_gsm,
+            createdAt: item.created_at,
             variants: (item.variants || []).map((v: any) => ({
               sku: v.sku,
               color: v.color,
@@ -1091,54 +1094,104 @@ export interface CreateOrderInput {
 export async function createOrder(input: CreateOrderInput): Promise<{ success: boolean; orderId?: string; message: string }> {
   if (isSupabaseConfigured() && supabase) {
     try {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          customer_name: input.customerName,
-          customer_email: input.customerEmail,
-          status: input.paymentMethod === 'cod' ? 'confirmed-cod' : 'confirmed',
-          subtotal_cents: input.subtotalCents,
-          discount_cents: input.discountCents,
-          shipping_cents: input.shippingCents,
-          total_cents: input.totalCents,
-          coupon_code: input.couponCode || null,
-          gift_note: input.giftNote || null,
-          shipping_address: {
-            address: input.shippingAddress,
-            phone: input.customerPhone || null,
-            pincode: input.pincode || null,
-            payment_method: input.paymentMethod,
-          },
-        })
-        .select('id')
-        .single();
+      // 1. Generate client-side UUID for idempotency
+      const orderId =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+              const r = (Math.random() * 16) | 0;
+              const v = c === 'x' ? r : (r & 0x3) | 0x8;
+              return v.toString(16);
+            });
+
+      const p_order = {
+        id: orderId,
+        customer_name: input.customerName,
+        customer_email: input.customerEmail,
+        status: input.paymentMethod === 'cod' ? 'confirmed-cod' : 'confirmed',
+        subtotal_cents: input.subtotalCents,
+        discount_cents: input.discountCents,
+        shipping_cents: input.shippingCents,
+        total_cents: input.totalCents,
+        coupon_code: input.couponCode || null,
+        gift_note: input.giftNote || null,
+        shipping_address: {
+          address: input.shippingAddress,
+          phone: input.customerPhone || null,
+          pincode: input.pincode || null,
+          payment_method: input.paymentMethod,
+        },
+      };
+
+      const p_items = input.lines.map((l) => ({
+        product_slug: l.productSlug,
+        variant_sku: l.variantSku,
+        product_name: l.productName,
+        color: l.color,
+        size: l.size,
+        quantity: l.quantity,
+        price_cents: l.priceCents,
+        customization: l.customization || null,
+      }));
+
+      // Call transactional RPC
+      const { data: rpcData, error: rpcError } = await supabase.rpc('place_order', {
+        p_order,
+        p_items,
+      });
+
+      if (!rpcError && rpcData) {
+        const confirmedId = (rpcData as any).id || orderId;
+        return { success: true, orderId: confirmedId, message: 'Order placed successfully.' };
+      }
+
+      if (rpcError) {
+        console.warn('[UniqueLo] place_order RPC failed, trying fallback insert:', rpcError);
+      }
+
+      // Fallback: direct insert with client-supplied orderId and return=minimal to avoid RLS SELECT 42501
+      const { error: orderError } = await supabase.from('orders').insert(p_order);
+
       if (orderError) throw orderError;
-      const orderId = (order as { id: string }).id;
+
       if (input.lines.length > 0) {
         const { error: itemsError } = await supabase.from('order_items').insert(
-          input.lines.map((l) => ({
+          p_items.map((item) => ({
+            ...item,
             order_id: orderId,
-            product_slug: l.productSlug,
-            variant_sku: l.variantSku,
-            product_name: l.productName,
-            color: l.color,
-            size: l.size,
-            quantity: l.quantity,
-            price_cents: l.priceCents,
-            customization: l.customization || null,
           }))
         );
         if (itemsError) throw itemsError;
       }
+
       return { success: true, orderId, message: 'Order placed successfully.' };
-    } catch (err) {
+    } catch (err: any) {
       console.warn('[UniqueLo] createOrder failed:', err);
-      return { success: false, message: 'Could not save order. Please try again or choose COD.' };
+      return { success: false, message: err?.message || 'Could not save order. Please try again or choose COD.' };
     }
   }
   // Dev fallback — no Supabase configured
   await new Promise((r) => setTimeout(r, 600));
   return { success: true, orderId: `local-${Date.now()}`, message: 'Order confirmed (local mode).' };
+}
+
+export async function getOrderDetails(
+  orderId: string,
+  email: string
+): Promise<{ success: boolean; data?: any; message?: string }> {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const { data, error } = await supabase.rpc('get_order_details', {
+        p_order_id: orderId,
+        p_email: email,
+      });
+      if (error) throw error;
+      return { success: true, data };
+    } catch (err: any) {
+      return { success: false, message: err?.message || 'Could not retrieve order details.' };
+    }
+  }
+  return { success: false, message: 'Supabase is not configured in this environment.' };
 }
 
 // ─────────────────────────────────────────────────────────────────────

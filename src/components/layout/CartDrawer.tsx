@@ -1134,8 +1134,36 @@ export const CartDrawer: React.FC = () => {
                 {placedOrderId && (
                   <p className="text-[11px] font-mono text-ink-muted mt-2">Order ID: {placedOrderId}</p>
                 )}
-                <div className="mt-6">
-                  <Button variant="primary" size="sm" onClick={() => { setCheckoutStep('details'); setPlacedOrderId(''); setCustomerName(''); setCustomerEmail(''); setCustomerPhone(''); setCustomerPincode(''); setShippingAddress(''); setGiftNoteText(''); setHasGiftNote(false); setIsCheckoutOpen(false); closeCart(); }}>
+                <div className="mt-6 flex flex-col sm:flex-row gap-2 justify-center">
+                  {placedOrderId && (
+                    <Link
+                      to={`/order-confirmation/${placedOrderId}?email=${encodeURIComponent(customerEmail)}`}
+                      onClick={() => {
+                        setIsCheckoutOpen(false);
+                        closeCart();
+                      }}
+                      className="inline-flex items-center justify-center px-4 py-2 text-xs font-mono uppercase tracking-wider bg-ink text-cream hover:bg-ink-light transition-colors"
+                    >
+                      View Archival Receipt & Tracking ↗
+                    </Link>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setCheckoutStep('details');
+                      setPlacedOrderId('');
+                      setCustomerName('');
+                      setCustomerEmail('');
+                      setCustomerPhone('');
+                      setCustomerPincode('');
+                      setShippingAddress('');
+                      setGiftNoteText('');
+                      setHasGiftNote(false);
+                      setIsCheckoutOpen(false);
+                      closeCart();
+                    }}
+                  >
                     Return to Atelier
                   </Button>
                 </div>
