@@ -26,6 +26,17 @@ dist-ssr
 *.sln
 *.sw?
 
+# ── Generated product imagery ───────────────────────────────────────────────
+# These are pipeline OUTPUT, not source: export_images.py renders them from the
+# PNG masters in products/<slug>/01-angles/ and uploads them to the Supabase
+# `product-images` bucket. The database stores absolute CDN URLs, so nothing
+# reads this directory in production -- git does not need to carry it.
+#
+# Ignored per-directory rather than as a blanket `/public`, which also swallowed
+# the fonts and category/campaign images the storefront genuinely serves from the
+# bundle.
+/public/images/products
+
 # Local-only ChatGPT design reference renders (large binaries, never push)
 sketches/design-renders/chatgpt-v2/
 
