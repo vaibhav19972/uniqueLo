@@ -1,43 +1,59 @@
 # 09 — Reference Redesign from Competitors
 
 > **Competitor-inspired redesign dock.**
-> Purpose: study what mass-market leaders do well (conversion, trust, retention),
-> then adapt — never copy — into UniqueLo's quiet-luxury embroidery flagship.
+> Purpose: study what other apparel businesses do well (conversion, trust,
+> retention, discovery), then adapt — never copy — into UniqueLo's India-first
+> mass-premium embroidered catalogue.
 > First reference: **The Souled Store (thesouledstore.com)** — India's largest
 > pop-culture apparel brand. Men's / women's tops & bottoms, hoodies, t-shirts,
 > shirts, sweatshirts, pullovers, tops, skirts, bottoms.
 
 ## Why this dock exists
 
-UniqueLo is positioned opposite to The Souled Store:
+UniqueLo sits **in the same price conversation** as The Souled Store, not apart
+from it. That is the correction this dock now reflects (see `00`).
 
 | Dimension | The Souled Store | UniqueLo (our lane) |
 |---|---|---|
-| Promise | Fun, fandom, affordable self-expression | Haute-craft embroidery, heirloom garments |
+| Promise | Fun, fandom, affordable self-expression | Original embroidery craft + fandom storytelling |
 | IP | Official licensed merch (Marvel, Disney, HP…) | **Original inspired-by only — no unlicensed IP** |
-| Visual energy | Loud, dense, discount-stickered | Refined Editorial Minimal, one accent per viewport |
-| Price logic | ₹499–₹1,699, constant %OFF | Atelier pricing, honest compare-at, certificate included |
+| Visual energy | Loud, dense, discount-stickered | Craft-forward, denser than luxury, no fake discount pressure |
+| Price logic | ₹499–₹1,699, constant %OFF | **₹699–₹3,999, median ₹1,200–1,400**, honest compare-at only |
 
-We study them for **mechanics** (PDP anatomy, trust, loyalty, sizing, retention),
-not for **aesthetic**. Every adoption below is re-voiced into atelier language
-and gated by `PRODUCT.md` principles + `02-design-system` restraint rules.
+We study them for **mechanics** (PDP anatomy, trust, loyalty, sizing, retention,
+filter model), not for **aesthetic**. Every adoption below is re-voiced into
+UniqueLo's own language and gated by `PRODUCT.md` + `02-design-system`.
+
+The distinction that still holds: we reject their **discount-sticker density and
+licensed IP**, not their price band.
 
 ## Contents
 
 | File | What it covers |
 |---|---|
+| [00 — Positioning reframe](./00-positioning-reframe.md) | **Read first.** Measured ₹1,799–5,499 catalog vs stated ₹500–3,000 target; real buyer tiers; what competitor study is now for |
 | [01 — Souled Store teardown](./01-thesouledstore-teardown.md) | Design philosophy, IA, homepage/PLP/PDP, commerce & retention engine |
 | [02 — Article presentation analysis](./02-article-presentation-pdp-plp.md) | How they present a single article (garment), block by block, with screenshots-as-text |
 | [03 — Pick-and-place for UniqueLo](./03-pick-and-place-for-uniquelo.md) | What's worth borrowing, what to deliberately reject, luxury-adapted patterns |
 | [04 — Implementation roadmap](./04-implementation-roadmap.md) | Phased plan: quick wins → loyalty/membership → UGC/social proof, with acceptance gates |
+| [05 — Myntra teardown](./05-myntra-teardown.md) | PLP density, filter model, size guidance, trust surfaces — **skeleton, awaiting screenshots** |
+| [06 — Capture → schema workflow](./06-capture-to-schema-workflow.md) | How to turn screenshots into block order + data fields (the template to use for 05 and beyond) |
 
 ## How to use this dock
 
-1. Read 01 → 02 for evidence.
-2. 03 is the decision log — `Adopt / Adapt / Reject` per pattern.
-3. 04 turns Adopt/Adapt items into build tasks. Nothing builds until it passes
+1. **Read 00 first.** It records the pivot away from quiet-luxury and the
+   confirmed band (**₹600–700 entry, ₹1,200–1,400 median, ₹3,000–4,000
+   ceiling**). `STAR_GOAL.md` and `docs/02` have already been amended to match,
+   so any conclusion in 01–04 that assumed atelier luxury must be re-checked
+   against the new band before it is built.
+2. Read 01 → 02 for evidence.
+3. 03 is the decision log — `Adopt / Adapt / Reject` per pattern.
+4. 04 turns Adopt/Adapt items into build tasks. Nothing builds until it passes
    the quality checklist in `docs/README.md §4` (tokens, `data.ts`, a11y, build green).
-4. New competitors get `05-<name>-teardown.md` + rows in 03/04 — same format.
+5. New competitors get `05-<name>-teardown.md` + rows in 03/04 — same format.
+6. **Pick the instrument deliberately** (00 §6): screenshots for structure and
+   schema, decompilation only for logic that screenshots cannot reveal. Never
+   decompile for visual design.
 
 ## Sources (Oct 2026)
 

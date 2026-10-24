@@ -5,11 +5,36 @@
 
 ---
 
-## 1. Brand Direction: "Refined Editorial Minimal"
+## 1. Brand Direction: "Mass-Premium Craft" (India-first)
 
-A premium, quiet palette inspired by Aesop and Bottega Veneta: generous whitespace, warm neutrals, and one restrained accent. Type is confident and large. Imagery is the hero; UI gets out of the way.
+> **Revised 2026-10-24.** The previous direction here was "Refined Editorial
+> Minimal — inspired by Aesop and Bottega Veneta". That was written for a
+> ₹3,500+ luxury band. The confirmed band is **₹600–700 entry, ₹1,200–1,400
+> median, ₹3,000–4,000 ceiling** (see `STAR_GOAL.md` §1). The tokens below still
+> work — the *posture* changes, not the palette.
 
-This is the default direction. If the brand pivots to bold/editorial or streetwear later, update this file first, then rebuild `tokens.css` and the components.
+**Direction:** warm, craft-forward and **dense enough to be trusted**. Generous
+whitespace is a luxury affordance; at ₹1,399 the first-time tier-3 buyer needs
+information density — price, rating, fit, COD — visible without scrolling.
+Restraint is still the rule, but restraint in *colour*, not in *proof*.
+
+**Two themes ship in code.** `USE_THEME_V2` selects between:
+
+- **v2 — Modern D2C Streetwear (default for the mass-premium band).** Cool slate
+  canvas, sans-led type, emerald savings accents. Closer to the confirmed
+  positioning.
+- **v1 — The Atelier (halo / brand-story pages).** Warm cream, Playfair display,
+  quiet-luxury editorial. Appropriate for the ₹3,000–4,000 halo tier and the
+  craft narrative — **not** for the median PLP.
+
+Do not make v1 the default again without re-reading `STAR_GOAL.md` §3.
+
+**Type consequence:** the sans (Satoshi) carries body, nav and CTAs in v2. Playfair
+moves to a display accent. A serif-dominant interface reads "boutique-at-₹4,000"
+and fights the median price point.
+
+**When the brand direction changes again:** update this file first, then
+`tokens.css`, then the components. Never the reverse.
 
 ---
 

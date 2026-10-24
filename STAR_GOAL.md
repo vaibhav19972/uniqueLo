@@ -1,227 +1,238 @@
-# UniqueLo — North Star Vision & Engineering Blueprint (STAR_GOAL.md)
+# UniqueLo — North Star
 
-> **"Where Haute-Couture Needlecraft Meets State-of-the-Art Web Architecture."**  
-> **Mission:** Establish UniqueLo as the definitive global benchmark for digital embroidery fashion e-commerce—delivering an ethereal, tactile, and frictionless digital atelier that sets new standards across luxury fashion, interaction design, and modern frontend engineering.
-
----
-
-## 1. Executive Summary & North Star Vision
-
-In high-end fashion e-commerce, flat photography treats embroidered apparel like printed tees. This fails to convey what makes embroidery precious: **three-dimensional thread relief, the dynamic luster of silk and metallic yarns, the tactile tension of handcrafted stitches, and the artisanal hours poured into every garment.**
-
-**UniqueLo’s Star Goal** is to bridge this physical-digital divide. By orchestrating cinema-grade motion, ultra-responsive client-side architecture, and an editorial aesthetic inspired by *Bottega Veneta*, *Bode*, *Story mfg.*, and *SSENSE*, UniqueLo will deliver an interactive shopping experience that doesn't just sell clothes—it honors the craft of embroidery and makes digital luxury tangible.
-
-```
-       ┌─────────────────────────────────────────────────────────────┐
-       │                   THE UNIQUELO TRIAD                        │
-       ├──────────────────────────────┬──────────────────────────────┤
-       │   ARTISANAL EMBROIDERY       │    CUTTING-EDGE FRONTEND     │
-       │   • Hand & Machine Stitches  │    • Vite + React 19 + TS    │
-       │   • Silk, Zari, Cotton Yarns │    • 120 FPS Inertia (Lenis) │
-       │   • Provenance & Craft Story │    • GSAP Scrubbed Parallax  │
-       │   • Bespoke Personalization  │    • Sub-50ms Micro-Interactions
-       ├──────────────────────────────┴──────────────────────────────┤
-       │                 REFINED EDITORIAL AESTHETIC                 │
-       │   • Warm Mineral & Cream Palette (`#f7f5f0` / `#141414`)    │
-       │   • Playfair Display (Haute Serif) × Satoshi (Eyebrows)   │
-       │   • Generous Negative Space & Quiet Luxury Restraint        │
-       └─────────────────────────────────────────────────────────────┘
-```
+> **Status:** authoritative. Supersedes all earlier versions of this file.
+> Revised 2026-10-24 to replace the original quiet-luxury framing, which was
+> built on initial assumptions rather than confirmed constraints.
+>
+> **Priorities are ordered. Where two goals conflict, the lower number wins.**
 
 ---
 
-## 2. The S.T.A.R. Framework Breakdown
+## 0. What this document is for
 
-### S — Situation (The Market Landscape & Opportunity)
-* **The Fast-Fashion Fatigue:** Consumers are overwhelmed by synthetic, disposable clothing. There is a booming resurgence in artisanal, embroidered, textured, and heirloom garments (championed by brands like *Bode*, *Story mfg.*, *Kapital*, and *Kith*).
-* **The Digital Gap:** Most e-commerce stores fail to show embroidery quality. Customers cannot see the stitch density, backing, thread sheen, or reverse craftsmanship, leading to hesitation and elevated return rates.
-* **The Benchmark:** Legacy luxury sites (*Gucci*, *Ralph Lauren*) offer custom monograms via clunky Flash-era 2D text overlays; indie artisanal brands often have slow, clunky Shopify templates with poor mobile ergonomics. UniqueLo seizes this void by merging haute-couture craft with Silicon Valley performance standards.
+Every agent and engineer reads this before making a design, pricing or
+architecture decision. When this file and any other doc disagree, **this file
+wins** — then fix the other doc in the same change.
 
----
+### What changed, and why
 
-### T — Target (Measurable Star Objectives & KPIs)
+The original version positioned UniqueLo against Bottega Veneta, Bode and SSENSE
+and set targets (Lighthouse 98+, 120 FPS, macro-stitch inspection on every card)
+appropriate to a luxury house. That framing produced a catalog floor of ₹1,799
+and a median variant price of ₹3,999 — roughly **2–4× above the actual
+business**.
 
-UniqueLo is engineered to satisfy strict, non-negotiable quantitative and qualitative metrics:
-
-#### Technical & Performance Targets
-| Metric | Benchmark Target | Industry Average | Why It Matters |
-| :--- | :--- | :--- | :--- |
-| **Lighthouse Score** | **98 – 100** (Performance, A11y, Best Practices, SEO) | 62 / 100 | Uncompromising speed builds luxury trust. |
-| **First Contentful Paint (FCP)** | **< 0.8s** | 2.5s | Instant visual arrival; no white-screen lag. |
-| **Largest Contentful Paint (LCP)** | **< 1.2s** | 3.8s | Editorial campaign imagery renders immediately. |
-| **Cumulative Layout Shift (CLS)** | **0.000** | 0.18 | Zero jitter during image load or font hydration. |
-| **Interaction to Next Paint (INP)** | **< 50ms** | 180ms | Cart drawers, filters, and swatches respond instantaneously. |
-| **Scroll Rendering Frame Rate** | **Stable 60–120 FPS** | 35–45 FPS | Smooth Lenis inertia and GSAP pinning without dropped frames. |
-| **TypeScript Strictness** | **100% Zero-Error Compilation** | N/A | Total type safety across cart, catalog, and motion contracts. |
-
-#### Design & Experience Targets
-* **Tactile Thread Inspection:** 100% of products feature macro-photography or interactive high-definition stitch inspection (minimum 2000px zoom level).
-* **Zero Layout Clutter:** Strict adherence to the 8pt token grid and Refined Editorial Minimal direction. Zero unstyled or generic elements.
-* **Flawless Motion Hierarchy:** Transform-and-opacity only, complete `prefers-reduced-motion` compliance, and seamless crossfade page transitions.
-* **Frictionless Atelier Cart:** Cart drawer opens within 16ms of trigger; subtotal updates instantly; zero cumulative layout shifts.
+The reference set was aspirational, not operational. It has been replaced. The
+craft narrative survives; the luxury posture does not.
 
 ---
 
-### A — Architecture & Tech-Design Synthesis
+## 1. The business
 
-The tech stack is purpose-built to deliver raw speed, rock-solid stability, and cinematic storytelling.
+**UniqueLo sells original embroidered apparel to India-first, mass-premium
+buyers.** Not luxury. Not fast fashion. The band where craft is affordable enough
+to be worn and expensive enough to be worth keeping.
 
-```
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                              APPLICATION ARCHITECTURE                         │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                               │
-│  [ React Router v7 ] ─── [ Layout Shell & Page Transitions (Framer Motion) ]   │
-│         │                                                                     │
-│         ├─► [ / (Home) ] ────► Hero, Pinned Featured Reel, Editorial Split,   │
-│         │                      Embroidery Craft Narrative, Lookbook Carousel  │
-│         │                                                                     │
-│         ├─► [ /shop ] ───────► Category Tabs, Multi-Facet Embroidery Filters, │
-│         │                      Interactive Stitch Cards, Quick-Add Drawer     │
-│         │                                                                     │
-│         └─► [ /product/:slug ] ► Macro Stitch Inspector, Thread Color Customizer,│
-│                                Artisanal Provenance & Fit Architecture        │
-│                                                                               │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                             INTERACTION ENGINES                               │
-├───────────────────────────────────────────────────────────────────────────────┤
-│  • Smooth Inertia Scroll  : Lenis (1.2s inertia, cubic bezier, rAF sync)       │
-│  • Pinned Scroll & Scrub  : GSAP 3 + ScrollTrigger + @gsap/react              │
-│  • UI & Micro-Interactions: Motion (Framer Motion v12)                        │
-│  • State Architecture     : Zustand (CartStore + FilterStore + CustomizerStore)│
-│  • Styling System         : Tailwind CSS v4 + Native CSS Custom Properties    │
-│  • Data Access Layer      : src/lib/data.ts (Decoupled JSON ➔ Headless ready)  │
-└───────────────────────────────────────────────────────────────────────────────┘
-```
+| Constraint | Value | Status |
+|---|---|---|
+| Entry price | **₹699** | confirmed |
+| Median price | **₹1,200–1,400** | confirmed |
+| Ceiling | **₹3,000–4,000** | confirmed |
+| Primary market | India | confirmed |
+| Buyer | Tier 1, 2 and 3 | confirmed |
+| Differentiator | Original embroidery + original universe storytelling | confirmed |
+| Legal constraint | No unlicensed IP — inspired-by only | confirmed |
 
-#### Why This Stack Beats Traditional E-Commerce Stacks
-1. **Vite + React 19 + TypeScript**: Instant HMR, zero build bloat, modern React 19 compiler optimizations, and airtight type checking.
-2. **Tailwind CSS v4 + CSS Token Variables**: Zero runtime CSS overhead. Token variables allow real-time theme swapping (light atelier mode / nocturnal runway mode) without re-renders.
-3. **Lenis + GSAP**: The dual-engine setup powers luxury-grade scroll momentum. Lenis handles the physical inertia of the viewport, while GSAP ScrollTrigger orchestrates masked typography reveals, pinned horizontal rails, and parallax layers.
-4. **Decoupled Data Architecture (`src/lib/data.ts`)**: Today, products live in typed JSON. Tomorrow, swapping to **Shopify Storefront GraphQL** or **MedusaJS** requires changing only a single file without rewriting any UI component.
+### The price ladder this implies
 
----
+13 SKUs. This is the target shape of the catalog, not a wish list:
 
-### R — Results & Competitive Benchmarks
+| Band | SKUs | Share | Role |
+|---|---|---|---|
+| ₹600–899 | 3 | 23% | Entry. First order, gifting, trial. |
+| ₹900–1,399 | 4 | 31% | **Core. Where the median lives and most volume must come from.** |
+| ₹1,400–1,999 | 2 | 15% | Step-up. Repeat buyer. |
+| ₹2,000–2,999 | 2 | 15% | Premium. Statement pieces. |
+| ₹3,000–4,000 | 2 | 15% | Halo. Craft showcase, low volume, brand credibility. |
 
-How UniqueLo outperforms industry leaders:
+Median across the ladder: **₹1,399**. 54% of SKUs sit inside ₹600–1,400.
 
-| Feature Dimension | Fast Fashion (Zara / ASOS) | High-Street (COS / Arket) | Luxury Artisanal (Bode / Story mfg.) | **UniqueLo (Our Star Goal)** |
-| :--- | :--- | :--- | :--- | :--- |
-| **Visual Pace** | Frantic, crowded banners | Clean but sterile grid | Nostalgic but basic Shopify blog | **Cinematic Editorial Atelier** |
-| **Embroidery Display** | 1 flat photo, zoomed out | None / basic knit close-up | Flat product grid with vintage tone | **Macro Stitch Engine & 4K Texture Zoom** |
-| **Personalization** | None | None | Manual email custom order | **Real-time Live Embroidery Customizer** |
-| **Scroll Experience** | Native jerky browser scroll | Native browser scroll | Standard slow Shopify scroll | **Silky Lenis Inertia + GSAP Scrubbing** |
-| **Performance** | Bloated tag managers (Lighthouse < 45) | Mediocre (Lighthouse ~ 65) | Heavy unoptimized assets (~50) | **Zero-bloat Lighthouse 98+** |
-| **Motion Polish** | Abrupt popups & spinners | Minimal transitions | Jarring page reloads | **Choreographed Framer Motion & GSAP** |
+> **The rule that matters most:** expression must exist at every price.
+> `loud` (full-panel artwork) starts at **₹1,399**, not ₹3,499. A ₹699 tee with a
+> quiet tonal crest and a ₹1,399 tee with full universe artwork are the same
+> customer at different moments. If expression is only affordable at ₹3,500, the
+> brand's whole pitch is priced away from the median buyer.
 
----
+### What is *not* confirmed
 
-## 3. The 5 Core Pillars of the UniqueLo Experience
+Recorded honestly so no agent treats these as settled:
 
-### Pillar 1: The Macro Stitch Engine (Tactile Embroidery Zoom)
-* **The Problem:** Embroidery cannot be evaluated from 400px product thumbnails. Thread ply, tension, backing, and stitch luster determine value.
-* **The Solution:** Every product card and detail view features a dual-state image swap with micro-zoom:
-  - **State A:** Full silhouette on model (fit, drape, styling).
-  - **State B (Hover/Inspect):** High-resolution macro close-up of the focal embroidery zone (e.g. botanical chain stitch on collar, gold zari thread on chest pocket).
-  - **Magnifier Lens:** Smooth cursor-following loupe rendering 3x optical magnification with simulated fabric grain.
-
-### Pillar 2: The Bespoke Embroidery Customizer & Monogram Studio
-* **The Dream:** Customers can personalize select pieces with bespoke needlework.
-* **Interactive Customizer Capabilities:**
-  - **Placement Selection:** Left chest, sleeve cuff, back neck yoke, or hemline.
-  - **Thread Colorways:** Curated palette (Ecru Silk, Vintage Ochre, Burnt Terracotta, French Navy, 24K Gold Zari, Deep Forest).
-  - **Typeface & Motif Library:** Serif Monogram, Botanical Needlepoint, Heritage Crest, or Contemporary Minimal.
-  - **Live Preview:** Instant SVG-based stitch-textured rendering on the garment canvas.
-
-### Pillar 3: Editorial Craft Storytelling (The Atelier Journal)
-* **Artisanal Transparency:** In-depth product metadata:
-  - Stitch Technique (Hand Zardozi, Kantha, Crewel, Fine Satin Stitch).
-  - Artisan Labor (e.g., *"14 hours of continuous needlework by master craftspeople"*).
-  - Fabric Foundation (100% GOTS Organic Heavyweight Cotton, Japanese Raw Denim, Pure Silk Crepe).
-* **Editorial Split & Parallax Lookbook:** Full-bleed storytelling connecting the garment to the hands that stitched it.
-
-### Pillar 4: The Frictionless Atelier Cart & Micro-Interactions
-* **Quick-Add Flyout:** Hover over any card to reveal subtle size selectors and instant add-to-cart.
-* **Slide-over Cart Drawer:** 
-  - Spring-animated slide-in with frosted glass backdrop blur.
-  - Line items display garment thumbnail, size, thread option, and quantity controls.
-  - Free shipping progress bar and complimentary gift embroidery threshold.
-  - Sub-100ms item removal and updates via Zustand persistence.
-
-### Pillar 5: Radical Accessibility & Universal Performance
-* **Inclusive Luxury:** High design should never exclude users.
-* **WCAG 2.1 AA Compliance:** Minimum 4.5:1 text contrast ratios, 44px touch targets, visible focus indicators in terracotta accent (`--color-accent`, currently `#d95d39`).
-* **Motion Sensitivity:** Flawless fallback for users with `prefers-reduced-motion`—all parallax, pinned scrolling, and zooms gracefully convert into clean, static, non-vestibular layouts.
+- **COGS and margin.** Nothing in the repo. The ladder above is a pricing
+  intention, not a validated margin model. If ₹699 cannot carry real embroidery,
+  the entry tier must be a genuinely different garment (print-on-demand, minimal
+  stitch, accessory), not a cheaper cut of the same piece.
+- **Tier mix.** "India-first" is a position, not yet a segmentation. No city
+  targets, no tier-2/3 share, no AOV goal.
+- **Return rate.** The most dangerous unknown at this price band. A 30% return
+  rate on embroidered apparel destroys a ₹1,399 unit's margin.
+- **Discount dependence.** Whether this business can hold price, or whether the
+  Indian D2C market forces perpetual 40%-off framing. This decision changes the
+  entire design.
 
 ---
 
-## 4. Upgraded Data Model for Embroidery Apparel
+## 2. The buyer
 
-To support this Star Goal, the data contracts in `src/lib/data.ts` are enriched to support embroidery attributes:
+Three tiers, one checkout. They differ in what stops them, not in what they want.
 
-```typescript
-// Core domain extension for UniqueLo Embroidery Fashion
-// (synced to src/lib/data.ts — docs/03 is the full contract)
-export type EmbroideryTechnique =
-  | 'hand-zardozi'
-  | 'french-knot'
-  | 'satin-stitch'
-  | 'crewel-needlework'
-  | 'kantha-quilt'
-  | 'metallic-zari'
-  | 'botanical-chain'
-  | 'sashiko-selvedge'
-  | 'monogram-bespoke';
+| | Tier 1 — Metro | Tier 2 — Large town | Tier 3 — Everywhere else |
+|---|---|---|---|
+| **Cities** | Mumbai, Delhi NCR, Bengaluru, Hyderabad, Pune, Chennai | Jaipur, Indore, Lucknow, Chandigarh, Kochi, Coimbatore | Rest of India |
+| **Price sensitivity** | Moderate | Moderate–high | High |
+| **Wins the order** | Originality, fit, story, speed | Reviews, COD, returns | **Trust**, price clarity, COD, delivery certainty |
+| **Kills the order** | Slow site, bad photography | No reviews, no COD | Prepaid-only, no return policy, vague delivery |
+| **Device** | iPhone-heavy | Mixed | **Android, mid-range, 4G** |
 
-export interface EmbroideryDetail {
-  technique: EmbroideryTechnique;
-  techniqueLabel: string;
-  artisanHours?: number;       // rendered only when present (no fabricated scarcity)
-  placement: string[];         // e.g. ["Left Chest", "Back Yoke", "Cuffs"]
-  threadComposition: string;   // e.g. "100% Spun Silk Floss & Metallic Thread"
-  motifStory: string;
-  macroImage?: ProductImage;
-}
+### What this means for engineering
 
-export interface CartCustomization {
-  monogramText?: string;
-  threadColor?: string;
-  placement?: string;
-}
-```
+Tier 3 is the margin. It is also the tier that runs on a ₹15,000 Android phone on
+patchy 4G. **A site that is beautiful on an M-series Mac and slow on that phone
+has optimised for the wrong user.** Mobile Android performance is a P0
+constraint, not a polish item.
+
+The universal first-order blockers — **COD availability, a real delivery date, a
+stated return window, visible review counts, WhatsApp support** — are absent from
+the current build's data contract entirely. They outrank every visual decision.
 
 ---
 
-## 5. Star Execution Matrix & Quality Gates
+## 3. Priorities
 
-To achieve this ambitious standard, every build phase in `docs/05-phases` must pass these strict Quality Gates:
+Ordered. When two conflict, the lower number wins.
 
-```
-[Phase 0: Foundation] ────► Zero-warn Vite 6 + React 19 + Tailwind v4 + TS strict build
-        │
-[Phase 1: Shell & Data] ──► CSS tokens active, pure data layer with embroidery schema, Lenis running
-        │
-[Phase 2: Editorial Home] ► Masked typography reveal, GSAP pinned showcase, macro hover loops
-        │
-[Phase 3: Shop & Catalog] ► Staggered grid reveals, filter by embroidery technique, image-swap cards
-        │
-[Phase 4: Cart & Studio] ─► Zustand cart drawer, monogram preview, quick-add animations
-        │
-[Phase 5: Audits & Polish]► Lighthouse 98+, 60fps scroll audit, complete WCAG AA pass
-```
-
-### The Non-Negotiable "Atelier Standard" Checklist
-1. **Never use generic placeholders.** If product photography is pending, use warm, noise-textured editorial color blocks that harmonize with the cream/stone/terracotta palette.
-2. **Never break typography rhythm.** Playfair Display (primary — display, nav, body, CTAs), Satoshi (eyebrows/micro-labels only), and Melodrama (fallback) must be loaded with `font-display: swap` and zero Flash of Unstyled Text (FOUT).
-3. **No janky layout jumps.** All image containers must maintain strict aspect ratios (`3:4` for products, `4:5` for editorial, `16:9` for lookbook).
-4. **All price calculations in cents.** Zero floating-point rounding errors on discounts or taxes.
-5. **Production verification on every commit.** `npm run build` must run clean without any lint or type warnings.
+1. **Trust before beauty.** A first-time tier-3 buyer must never wonder: is this
+   real, will it come, can I return it, can I pay on delivery.
+2. **Mobile Android performance.** Sub-2s LCP on a mid-range Android over 4G.
+   The cleverest GSAP work is worthless if the PLP takes 6s to paint.
+3. **Price clarity.** MRP, selling price, and honest compare-at on the card.
+   Never a fabricated discount, never a countdown timer.
+4. **Craft as the reason to pay.** The embroidery story justifies ₹1,399 over
+   ₹799. It is the margin.
+5. **Original universe storytelling.** The brand's emotional hook and what makes
+   it not-a-generic-tee-site.
+6. **Editorial polish.** Real, but last. A gorgeous site nobody trusts sells
+   nothing.
 
 ---
 
-## 6. Vision Manifesto
+## 4. Experience pillars
 
-> UniqueLo is not another generic drop-shipping portal or template-driven boutique.  
-> It is a digital sanctuary for modern needlework—where every thread, every interaction, and every frame of motion is crafted with the same obsessive precision as a couture embroidery needle.  
-> **This document is our benchmark. We build to exceed it.**
+### Pillar 1 — Craft you can see (revised)
+
+Embroidery is what justifies the price, so the product must prove it visually —
+but **within a mobile performance budget**, not as a desktop showpiece.
+
+- Two-state card: silhouette on model → macro embroidery detail on interaction.
+- Macro zoom with a **capped budget**: one hero image per SKU at ~2000px, served
+  responsively. Not a 4K pan-and-zoom engine on every card.
+- Craft provenance on PDP (`fabricGsm`, `craftCluster`, `handcrafted` are already
+  in the catalog and already rendered — keep and sharpen).
+- `prefers-reduced-motion` is a hard requirement, not an enhancement.
+
+### Pillar 2 — Personalisation that must pay for itself (revised)
+
+Monogramming is a **margin tool**, not a toy. Each personalised order carries a
+premium and is inherently non-returnable.
+
+- Placement, thread colourway, motif.
+- Live preview must be genuinely WYSIWYG — a preview that doesn't match the
+  delivered stitch is a return, and returns are fatal at this band.
+- Gate: only ship this when the preview can be trusted.
+
+### Pillar 3 — Honest commerce (new — highest priority)
+
+The trust surface that decides whether a tier-3 buyer completes at all.
+
+- COD availability, stated on the PDP above the fold.
+- A **real delivery date**, not "5–7 days".
+- A stated return/exchange window with plain conditions.
+- Visible review counts (the fields exist: `rating`, `reviewCount`, `soldCount`).
+- WhatsApp support, not a contact form.
+- Size guidance that assumes no tape measure.
+
+### Pillar 4 — Universe storytelling
+
+Animeverse, Heroverse, Itihaas, plus the neutral Atelier door. Data-driven and
+extensible. Original artwork and atmospheres, **never unlicensed IP** — this is a
+legal constraint as much as a brand one.
+
+Note: 8 of 13 current products sit in a universe; 5 carry none. The Atelier door
+is under-built relative to its share of the catalog.
+
+### Pillar 5 — Fandom as a reason to buy
+
+The intensity taxonomy (Quiet / Balanced / Loud) is the mechanism by which one
+customer buys a ₹699 quiet tee today and a ₹1,399 loud one next month. It only
+works if every intensity exists at an affordable price. Today it does not.
+
+---
+
+## 5. Removed from the goals
+
+Explicitly retired, so they stop driving decisions:
+
+| Retired | Why |
+|---|---|
+| Lighthouse 98–100 across all four categories | Vanity target. A 92 with fast LCP and working COD outsells a 100 nobody trusts. **Keep** the performance intent, drop the score. |
+| CLS 0.000, INP <50ms, 120 FPS | Measurements from a luxury brief. Replaced by "sub-2s LCP on mid-range Android / 4G". |
+| Aesop, Bottega, Bode, SSENSE as design references | Wrong price band and wrong market. |
+| Playfair Display as the dominant typeface | Reads boutique-at-₹4,000. The `USE_THEME_V2` sans-led theme is the closer fit. |
+| One accent per viewport / extreme whitespace | Restraint reads as *risky* to a tier-3 first-time buyer, not premium. |
+| Lenis + GSAP scrubbed parallax as a site-wide system | Home page only. PLP and PDP must be instant. Motion is a luxury on the landing page, a tax on browsing. |
+
+---
+
+## 6. Non-negotiables
+
+1. **No fabricated urgency.** No countdowns, no fake "only 2 left", no invented
+   review counts. Stock, reviews and craft specs are truthful or absent.
+2. **No unlicensed IP.** Inspired-by aesthetics only. No franchise marks, logos
+   or protected characters.
+3. **Prices in integer paise/cents.** Zero floating-point money.
+4. **All data via `src/lib/data.ts`.** No component reads JSON directly.
+5. **Every commit builds clean.** `npm run build` with zero type errors.
+6. **No hardcoded design values.** Tokens only, via `src/styles/tokens.css`.
+
+---
+
+## 7. Honest state of the build
+
+| Area | State |
+|---|---|
+| Web storefront | Built. React 19 + Vite + TS + Tailwind v4, 13 SKUs / 121 variants. |
+| Backend | Supabase live — orders, newsletter, admin catalogue, RLS locked to authenticated admin. |
+| Mobile | KMP Compose, Phase 3 design-complete, 47 tests, iOS target green. |
+| Catalog price band | **Misaligned.** Currently ₹1,799–5,499, median ₹3,999. Target is ₹699–3,999, median ₹1,200–1,400. |
+| Trust surfaces | **Missing.** No COD, delivery date, or return window in the contract. |
+| Entry tier | **Missing.** No SKU below ₹1,799. |
+| Photography | Placeholder tonal blocks. Not shot. |
+| Payments | Undecided. |
+| Test coverage | Layer 1 (Vitest+RTL) and Layer 2 (E2E) both unimplemented. |
+
+The gap between "what is built" and "what this document says" is concentrated in
+**pricing and trust**, not in code quality. The codebase is in good shape; the
+catalog and the trust layer are the work.
+
+---
+
+## 8. What success looks like
+
+Not a Lighthouse score. These:
+
+- A tier-3 first-time buyer completes a COD order without hesitation.
+- The median product sells at ₹1,399 and the customer does not feel overcharged.
+- Returns stay low enough that a ₹1,399 unit is profitable.
+- The embroidery is visibly the reason the price is what it is.
+- The site is fast on a mid-range Android on 4G.
+
+Everything else is in service of those five.

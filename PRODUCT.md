@@ -14,12 +14,12 @@ web
 
 ## Product Purpose
 
-- UniqueLo is a luxury embroidery e-commerce flagship built as an **artisanal editorial base** (the quiet-luxury atelier) with **Themed Micro-Stores** layered on top — immersive universe capsules (Animeverse, Heroverse, Itihaas; the set is intentionally open and extensible, including future creator collaborations). The Atelier is the neutral 4th door for products outside any universe.
+- UniqueLo is an **India-first, mass-premium** embroidery e-commerce flagship (median ₹1,200–1,400, ceiling ₹3,000–4,000 — see `STAR_GOAL.md` §1) built as an **artisanal editorial base** with **Themed Micro-Stores** layered on top — immersive universe capsules (Animeverse, Heroverse, Itihaas; the set is intentionally open and extensible, including future creator collaborations). The Atelier is the neutral 4th door for products outside any universe.
 - Success means delivering a chameleonic shopping experience where entering a theme immerses the customer in that universe's atmosphere (dynamic backgrounds, evocative colorways, interactive cues) while maintaining rock-solid, ultra-fast e-commerce ergonomics — and where every product, in or out of a universe, is genuine artisanal embroidery.
 
 ## Positioning
 
-- **Where Haute Couture Meets Cult Aesthetics:** Unlike mass-market graphic tee sites (e.g. Redbubble, generic merch stores) or single-franchise boutiques, UniqueLo positions fandom-adjacent fashion as premium designer wear.
+- **Where Craft Meets Cult Aesthetics:** Unlike mass-market graphic tee sites (e.g. Redbubble, generic merch stores) or single-franchise boutiques, UniqueLo positions fandom-adjacent fashion as **craft you can afford to own** — the same price conversation as India's leading pop-culture apparel brands, differentiated by real embroidery and original universes rather than licensed IP.
 - **Original, Inspired-By Artwork Only:** Universes are expressed through **original artwork and atmospheres inspired by genres and aesthetics** (anime icons and emotion, cosmic heroics, Indian royal heritage), never through unlicensed trademarked IP. The universe roster is deliberately flexible — new capsules can be added without restructuring the product.
 - **Intensity + Edits Taxonomy (2026-10-13):** Each piece answers one question per facet — Universe is where you are, garment type is what kind of thing, **Intensity (Quiet / Balanced / Loud)** is how loudly you wear it, craft technique is how it was made (provenance, 9 techniques), and **Edits** are curated shoppable collections by buyer intent (6 slugs in `src/data/edits.json`).
 - **Unified Editorial Base, Themed Capsules:** Each universe is an artisanal capsule over a unified design base (The Atelier in v1, or Modern D2C Streetwear in v2 via `USE_THEME_V2`). Navigating between universes shifts editorial lore, ornament icons, and capsule collections without fragmenting the site's unified chrome, surface styling, or checkout.
@@ -59,10 +59,10 @@ web
 
 ## Product Principles
 
-1. **Fandom Aesthetics as High Fashion:** Treat beloved genre moods with editorial sophistication—elevated typography, artisanal textures, and bespoke detailing over loud novelty slogans.
+1. **Fandom Aesthetics as Considered Design:** Treat genre moods with real design intent — original artwork, quality fabric, honest craft — rather than loud novelty slogans. Editorial sophistication is applied where it earns its cost, not everywhere.
 2. **Atmospheric Immersion without Friction:** Themed environments should feel cinematic and alive, but core shopping mechanics (sizing, cart, pricing, checkout) must remain crystal clear and immediate.
 3. **Aesthetic Polarity:** Provide clear, intentional navigation across design volume — from Quiet tone-on-tone pieces through Balanced storytelling to Loud show-stopping centerpieces.
-4. **Performance is Luxury:** Theme transitions, smooth scrolling, and interactive cards must render at 60–120 FPS with zero lag or frame drops.
+4. **Performance is Trust:** Theme transitions, smooth scrolling, and interactive cards must stay smooth on a **mid-range Android over 4G** — not merely on a desktop Mac. Target sub-2s LCP; motion is confined to Home so PLP and PDP pay no scroll-tax.
 5. **The Craft Never Dilutes:** Whatever universe a garment belongs to, it remains genuine artisanal embroidery with honest provenance — the theme changes the world, never the craft standard.
 
 ## Accessibility & Inclusion
