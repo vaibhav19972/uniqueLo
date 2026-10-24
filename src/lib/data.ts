@@ -183,6 +183,8 @@ export interface ProductVariant {
   compareAtPriceCents?: number;
   status: ProductStatus;
   quantity?: number;
+  /** Physical scannable identifier (EAN). Unique across variants; null until assigned. */
+  barcode?: string;
 }
 
 export type EmbroideryTechnique =
@@ -290,6 +292,18 @@ export interface Product {
   weightGrams?: number;
   hsnCode?: string;
   sizeChart?: Record<string, unknown>;
+
+  // ---- Marketplace parity (docs/11/03) ----
+  /** Design-family identifier. Unique across products; sizes/colours are variants. */
+  styleCode?: string;
+  /** Category-scoped attributes, keyed by attribute_definitions.key in the DB. */
+  attributes?: Record<string, string | number | boolean>;
+  fitNotes?: string;
+  modelHeightCm?: number;
+  modelWornSize?: string;
+  packageLengthMm?: number;
+  packageWidthMm?: number;
+  packageHeightMm?: number;
 }
 
 export interface Category {
@@ -365,7 +379,9 @@ export interface Review {
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
 // NOTE: the old src/data/products.json (original 13) was deleted 2026-10-12.
 // The storefront runs on mock-products.json until real SKUs land.
-const mockProducts: Product[] = (rawMockProducts as { products: Product[] }).products;
+// `unknown` first: the JSON's inferred attribute value union is wider than
+// Record<string, string|number|boolean>, so a direct cast is unsafe by design.
+const mockProducts: Product[] = (rawMockProducts as unknown as { products: Product[] }).products;
 const seedUniverses: Universe[] = (rawUniverses as { universes: Universe[] }).universes;
 const seedMotifs: Motif[] = (rawMotifs as { motifs: Motif[] }).motifs;
 
@@ -482,8 +498,8 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, rating, review_count, tags, featured, customizable, material, care, fit, fabric_gsm, created_at, country_of_origin, manufacturer_name, manufacturer_address, packed_by, cod_available, delivery_days_min, delivery_days_max, return_window_days, weight_grams, hsn_code, size_chart,
-          variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, rating, review_count, tags, featured, customizable, material, care, fit, fabric_gsm, created_at, country_of_origin, manufacturer_name, manufacturer_address, packed_by, cod_available, delivery_days_min, delivery_days_max, return_window_days, weight_grams, hsn_code, size_chart, style_code, attributes, fit_notes, model_height_cm, model_worn_size, package_length_mm, package_width_mm, package_height_mm,
+          variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity, barcode),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
         `)
@@ -547,6 +563,14 @@ export async function getProducts(): Promise<Product[]> {
             weightGrams: item.weight_grams ?? undefined,
             hsnCode: item.hsn_code ?? undefined,
             sizeChart: item.size_chart ?? undefined,
+            styleCode: item.style_code ?? undefined,
+            attributes: item.attributes ?? {},
+            fitNotes: item.fit_notes ?? undefined,
+            modelHeightCm: item.model_height_cm ?? undefined,
+            modelWornSize: item.model_worn_size ?? undefined,
+            packageLengthMm: item.package_length_mm ?? undefined,
+            packageWidthMm: item.package_width_mm ?? undefined,
+            packageHeightMm: item.package_height_mm ?? undefined,
             fabricGsm: item.fabric_gsm,
             createdAt: item.created_at,
             variants: (item.variants || []).map((v: any) => ({

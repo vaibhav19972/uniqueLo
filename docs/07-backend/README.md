@@ -22,11 +22,11 @@
 | Requirement | How Supabase + Vercel covers it |
 |---|---|
 | Immediate cloud deployment | Vercel provides instant zero-config preview & production deployments with SPA routing (`vercel.json`) |
-| Relational data model | Full PostgreSQL schema (`supabase/schema.sql`) for products, variants, craft taxonomy, reviews, and orders |
+| Relational data model | Full PostgreSQL schema (`backend/schema.sql`) for products, variants, craft taxonomy, reviews, and orders |
 | Role-Based Security & Permissions | PostgreSQL Row Level Security (RLS) policies enforce public read access and secured admin/order writes |
-| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`src/data/mock-products.json`) if keys are unset, rows predate the universe schema, or legacy mock rows would leak (no `is_mock` filter yet — see §3). Localhost can force the JSON path for READS via `VITE_DATA_SOURCE=local` (writes stay live) |
+| Fast catalog browsing & fail-safe | Frontend queries Supabase via `@supabase/supabase-js`, falling back seamlessly to bundled JSON (`src/data/mock-products.json`) if keys are unset, rows predate the universe schema, or legacy mock rows would leak (the `is_mock` column does not exist in `schema.sql`; the guard described in `audit.md` cannot be reproduced as written — see `docs/11-data-model`). Localhost can force the JSON path for READS via `VITE_DATA_SOURCE=local` (writes stay live) |
 | Inventory & Variant Tracking | `variants` table (keyed by `sku`, linked via `product_slug`) tracks size, colorway, cents price, quantity, and stock status |
-| Craft Provenance & Macro Media | `embroidery_details` table stores artisan hours, guild clusters, regions, stitch types, and thread compositions |
+| Craft Provenance & Macro Media | `embroidery_details` stores artisan hours, stitch types, thread composition and macro media. Region/guild-cluster are **not** free-text product fields — they are `suppliers` rows linked via `product_suppliers`, so a named workshop has a GSTIN and a `verified_at` date |
 | Production Server Containerization | Multi-stage `Dockerfile` with optimized Alpine Nginx reverse proxy + `docker-compose.prod.yml` |
 
 ---
@@ -59,11 +59,11 @@
     against local data while Admin keeps its live client for uploads. Writes
     (review submit, newsletter, orders, storage) always use the live client
     when configured — they are not gated by this flag.
-  - Fallback mode: If environment variables are empty, Supabase is unreachable, or the seeded rows predate the universe schema (feature detection on `universe_slug`), the store operates without error using local static JSON (`mock-products.json`). Note: rows seeded with the migrated schema DO pass detection — `is_mock` filtering is still pending (§3), so the migrated legacy seed would be served until that guard lands.
+  - Fallback mode: If environment variables are empty, Supabase is unreachable, or the seeded rows predate the universe schema (feature detection on `universe_slug`), the store operates without error using local static JSON (`mock-products.json`). Rows coming from the generated seed pass feature detection by design: they carry `universe_slug` because they are the real catalog. There is no `is_mock` distinction to make any more — the fabricated/legacy rows are gone, and the seed is regenerated from the catalog rather than hand-maintained.
 
 ---
 
-## 3. Database Schema (`supabase/schema.sql`)
+## 3. Database Schema (`backend/schema.sql`)
 
 Catalog tables are **slug/sku-keyed** (no surrogate uuid ids on catalog rows);
 uuid primary keys are used only for append-only rows (reviews, orders, images).
@@ -74,7 +74,31 @@ Snake_case columns map 1:1 to the camelCase TypeScript types via the adapter in
 `slug` (text, PK), `name`, `label`, `description`, `image`, `order_num` (int), `created_at`.
 
 ### `products`
-`slug` (text, PK), `name`, `subtitle`, `description`, `category_slug` (FK → categories.slug), `tags` (text[]), `featured` (bool), `customizable` (bool), `material` (text[]), `care` (text[]), `fit`, `batch_number` (int), `batch_total` (int), `craft_region`, `craft_cluster`, `fabric_gsm`, `created_at`.
+`slug` (text, PK), `name`, `subtitle`, `description`, `category_slug` (FK → categories.slug), `tags` (text[]), `featured` (bool), `customizable` (bool), `material` (text[]), `care` (text[]), `fit`, `fabric_gsm`, `created_at`, plus the taxonomy and trust columns below.
+
+**Retired 2026-10-24** by `migrations/20261024_data_model_trust_fields.sql`:
+`craft_region`, `craft_cluster` (invented provenance — see
+[docs/11](../11-data-model/README.md)), `batch_number`, `batch_total`,
+`expression_slug` (a 1:1 rename of `expression_score`), `sold_count`. `craftCluster`
+returns as a real FK to `product_suppliers` once the named collectives are
+confirmed as actual vendors.
+
+**Trust & disclosure** — the fields a ₹699–3,999 India-first buyer checks before
+adding to bag:
+`country_of_origin` (char(2) ISO-3166-1, default `IN`, check `^[A-Z]{2}$`) —
+legally required, and distinct from craft tradition; `manufacturer_name`,
+`manufacturer_address`, `packed_by` (Legal Metrology); `cod_available` (bool,
+no default, so every SKU must state its policy); `delivery_days_min` /
+`delivery_days_max` (smallint, max ≥ min); `return_window_days` (smallint, `0` =
+non-returnable, the honest value for personalised pieces); `weight_grams`;
+`hsn_code` (check `^[0-9]{4,8}$`); `size_chart` (jsonb).
+
+### `suppliers` / `product_suppliers`
+Real manufacturing partners: `slug`, `name`, `city`, `state`, `country_code`,
+`gstin` (format-checked), contact fields, `verified_at` (null until someone has
+actually visited), `is_active`. Joined to products through `product_suppliers`
+with a `role` of `manufacturer` / `embroiderer` / `packer` / `dyer`, because one
+SKU can involve more than one workshop. RLS enabled, public read on active rows.
 
 ### `variants`
 `sku` (text, PK), `product_slug` (FK → products.slug, cascade), `color`, `color_hex`, `size`, `price_cents` (int), `compare_at_price_cents` (int), `status` (check: `in-stock` | `low-stock` | `out-of-stock`), `quantity` (int), `created_at`.
@@ -98,9 +122,14 @@ Snake_case columns map 1:1 to the camelCase TypeScript types via the adapter in
 `id` (uuid, PK), `order_id` (FK → orders.id, cascade), `product_slug`, `variant_sku`, `product_name`, `color`, `size`, `quantity`, `price_cents`, `customization` (jsonb).
 
 > **Database Architecture & Evolution:**
-> - `supabase/schema.sql` is 100% pure DDL (creates tables, foreign keys, indexes, RLS policies, storage).
-> - `supabase/production-seed.sql` seeds the full Master Taxonomy (Universes, Motifs, Categories, Garments, Collections) + 2 authentic showcase products.
-> - `supabase/seed.sql` seeds the development dataset (13 atelier products).
+> - `backend/schema.sql` is 100% pure DDL (tables, foreign keys, indexes, RLS policies, storage).
+> - `backend/production-seed.sql` is **generated** by `backend/scripts/gen-seed.mjs` from
+>   `web/src/data/mock-products.json`, and seeds the full Master Taxonomy plus the
+>   current product set (3 products / 25 variants as of 2026-10-24). Never edit it by
+>   hand — run `npm run seed:gen`, and `npm run seed:check` fails CI when it is stale.
+> - `backend/seed.sql` is **stale and cannot run**: it references `is_mock`, `vibes`
+>   and `moods`, none of which `schema.sql` defines. It is not a 13-product dev seed
+>   (it seeds 0 rows) and should be deleted or regenerated.
 > - For managing live database updates, adding new tables, or altering columns in production, refer to the [Database Migration Guide](../DATABASE_MIGRATION_GUIDE.md).
 
 ---
@@ -114,7 +143,7 @@ Snake_case columns map 1:1 to the camelCase TypeScript types via the adapter in
 - Image upload to the Supabase Storage bucket **`product-images`** (public reads); the admin's SQL tab includes the `storage.buckets` creation + public-read policy statements.
 - Craft/region/cluster/GSM provenance fields per product.
 
-Auth gating of `/admin` is planned for Phase 9 (Supabase Auth + role policies); today the route is open in dev.
+`/admin` is gated by `AdminAuthGate` (`Admin.tsx`), which reads `supabase.auth.getSession()` and subscribes to `onAuthStateChange`. Shipped — this previously read "planned for Phase 9".
 
 ---
 
@@ -140,7 +169,7 @@ Supabase applies fine-grained Row Level Security (RLS) on each table:
 All database queries pass through `src/lib/supabase.ts` into `src/lib/data.ts`.
 Components use TanStack Query hooks (`useProducts()`, `useProduct(slug)`, `useCategories()` in `src/hooks/useCatalog.ts`).
 
-- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, unreachable, or the catalog rows predate the universe schema, `src/lib/data.ts` falls back to bundled `src/data/mock-products.json` (5 curated products, 31 variants; the old `products.json` was deleted 2026-10-12 as stale). Setting `VITE_DATA_SOURCE=local` forces this JSON path for READS unconditionally (localhost testing); writes are unaffected. Migrated-seed legacy rows still pass feature detection until the `is_mock` filter lands — see §3.
+- **Fail-Safe Fallback:** If `VITE_SUPABASE_URL` is omitted, unreachable, or the catalog rows predate the universe schema, `src/lib/data.ts` falls back to bundled `src/data/mock-products.json` (3 curated products, 25 variants as of 2026-10-24; the old `products.json` was deleted 2026-10-12 as stale). Setting `VITE_DATA_SOURCE=local` forces this JSON path for READS unconditionally (localhost testing); writes are unaffected. The catalog is now generated into the seed by `backend/scripts/gen-seed.mjs`, so a database and a fresh checkout cannot disagree about what exists.
 - **Image URL Resolution:** `resolveImageUrl()` supports both relative local assets (`/images/products/...`) and Supabase Storage URLs (`product-images` bucket).
 - **Stock Status:** `variants.status` is stored explicitly in JSON/Supabase and is the badge source (`in-stock` / `low-stock` / `out-of-stock`) — there is no quantity→status derivation. `getDefaultVariant()` prefers `in-stock` → `low-stock` → non-`out-of-stock` (`src/lib/data.ts`). Cart operations additionally clamp to the live `quantity` value — cart clamping wins over the badge.
 

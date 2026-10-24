@@ -902,9 +902,40 @@ export const ProductDetail: React.FC = () => {
                   <span className="text-sm">{activeAccordion === 'fit' ? '–' : '+'}</span>
                 </button>
                 {activeAccordion === 'fit' && (
-                  <div className="pb-5 text-xs text-ink-muted space-y-2 font-light leading-relaxed">
-                    <p className="text-ink font-medium">{product.fit || 'Atelier tailored relaxed silhouette.'}</p>
-                    <p>Designed to drape naturally over heirloom garments without restriction.</p>
+                  <div className="pb-5 text-xs text-ink-muted space-y-3 font-light leading-relaxed">
+                    {product.fitNotes && (
+                      <p className="text-ink font-medium">{product.fitNotes}</p>
+                    )}
+                    {product.fit && !product.fitNotes && (
+                      <p className="text-ink font-medium">{product.fit}</p>
+                    )}
+                    {(product.modelHeightCm || product.modelWornSize) && (
+                      <p>
+                        {product.modelHeightCm ? `Model is ${product.modelHeightCm} cm` : 'Model'}
+                        {product.modelWornSize ? ` and wears size ${product.modelWornSize}.` : '.'}
+                      </p>
+                    )}
+
+                    {/* Category-scoped attributes, as a marketplace-style spec table.
+                        Which rows appear depends on garment type: a scarf has no
+                        neck or sleeve, a trouser has rise. Sourced from
+                        products.attributes validated against attribute_definitions. */}
+                    {product.attributes && Object.keys(product.attributes).length > 0 && (
+                      <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-2 border-t border-stone/40">
+                        {Object.entries(product.attributes).map(([k, v]) => (
+                          <div key={k} className="contents">
+                            <dt className="text-ink-muted">{k.replace(/_/g, ' ')}</dt>
+                            <dd className="text-ink m-0">{String(v).replace(/-/g, ' ')}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+
+                    {product.countryOfOrigin && (
+                      <p className="pt-1 text-[11px] uppercase tracking-widest text-ink-muted">
+                        {formatCountryOfOrigin(product.countryOfOrigin)}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

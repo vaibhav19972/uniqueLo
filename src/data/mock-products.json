@@ -38,7 +38,8 @@
           "size": "XS",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901292097789"
         },
         {
           "sku": "SRH-WARM-S",
@@ -47,7 +48,8 @@
           "size": "S",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901027591547"
         },
         {
           "sku": "SRH-WARM-M",
@@ -56,7 +58,8 @@
           "size": "M",
           "priceCents": 349900,
           "status": "low-stock",
-          "quantity": 2
+          "quantity": 2,
+          "barcode": "8901598564011"
         },
         {
           "sku": "SRH-WARM-L",
@@ -65,7 +68,8 @@
           "size": "L",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901040187692"
         },
         {
           "sku": "SRH-WARM-XL",
@@ -74,7 +78,8 @@
           "size": "XL",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901815357213"
         },
         {
           "sku": "SRH-WARM-2XL",
@@ -83,7 +88,8 @@
           "size": "2XL",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901321827525"
         },
         {
           "sku": "SRH-WARM-3XL",
@@ -92,7 +98,8 @@
           "size": "3XL",
           "priceCents": 349900,
           "status": "low-stock",
-          "quantity": 2
+          "quantity": 2,
+          "barcode": "8901926385603"
         },
         {
           "sku": "SRH-MIDNIGHT-S",
@@ -101,7 +108,8 @@
           "size": "S",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901382790583"
         },
         {
           "sku": "SRH-MIDNIGHT-M",
@@ -110,7 +118,8 @@
           "size": "M",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901379629540"
         },
         {
           "sku": "SRH-MIDNIGHT-L",
@@ -119,7 +128,8 @@
           "size": "L",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901371921322"
         },
         {
           "sku": "SRH-MIDNIGHT-XL",
@@ -128,7 +138,8 @@
           "size": "XL",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901146101328"
         },
         {
           "sku": "SRH-MIDNIGHT-2XL",
@@ -137,7 +148,8 @@
           "size": "2XL",
           "priceCents": 349900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901316912500"
         }
       ],
       "images": [
@@ -213,7 +225,26 @@
           "chest": 115,
           "length": 72
         }
-      }
+      },
+      "attributes": {
+        "pattern": "embroidered",
+        "neck_type": "hooded",
+        "sleeve_length": "long",
+        "closure": "pull-on",
+        "length": "regular",
+        "occasion": "everyday",
+        "hemline": "curved",
+        "fabric_composition": "100% combed cotton fleece",
+        "fabric_weight_gsm": "450",
+        "stretch": "low"
+      },
+      "styleCode": "UL-HD-001",
+      "fitNotes": "Relaxed through the body; size down for a closer fit.",
+      "modelHeightCm": 178,
+      "modelWornSize": "M",
+      "packageLengthMm": 320,
+      "packageWidthMm": 240,
+      "packageHeightMm": 60
     },
     {
       "slug": "guardian-stripes-pullover",
@@ -251,7 +282,8 @@
           "size": "XS",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901746531916"
         },
         {
           "sku": "GSP-NAVY-S",
@@ -260,7 +292,8 @@
           "size": "S",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901226856070"
         },
         {
           "sku": "GSP-NAVY-M",
@@ -269,7 +302,8 @@
           "size": "M",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901050090739"
         },
         {
           "sku": "GSP-NAVY-L",
@@ -278,7 +312,8 @@
           "size": "L",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901858718117"
         },
         {
           "sku": "GSP-NAVY-XL",
@@ -287,7 +322,8 @@
           "size": "XL",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901952304878"
         },
         {
           "sku": "GSP-NAVY-2XL",
@@ -296,7 +332,8 @@
           "size": "2XL",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901378467498"
         },
         {
           "sku": "GSP-NAVY-3XL",
@@ -305,7 +342,8 @@
           "size": "3XL",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 14
+          "quantity": 14,
+          "barcode": "8901571817613"
         },
         {
           "sku": "GSP-STORM-S",
@@ -314,7 +352,8 @@
           "size": "S",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901540298498"
         },
         {
           "sku": "GSP-STORM-M",
@@ -323,7 +362,8 @@
           "size": "M",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901172029278"
         },
         {
           "sku": "GSP-STORM-L",
@@ -332,7 +372,8 @@
           "size": "L",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901090097129"
         },
         {
           "sku": "GSP-STORM-XL",
@@ -341,7 +382,8 @@
           "size": "XL",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901536824731"
         },
         {
           "sku": "GSP-STORM-2XL",
@@ -350,7 +392,8 @@
           "size": "2XL",
           "priceCents": 359900,
           "status": "in-stock",
-          "quantity": 9
+          "quantity": 9,
+          "barcode": "8901766091549"
         }
       ],
       "images": [
@@ -409,7 +452,26 @@
           "chest": 117,
           "length": 73
         }
-      }
+      },
+      "attributes": {
+        "pattern": "embroidered",
+        "neck_type": "hooded",
+        "sleeve_length": "long",
+        "closure": "pull-on",
+        "length": "regular",
+        "occasion": "everyday",
+        "hemline": "curved",
+        "fabric_composition": "100% combed cotton fleece",
+        "fabric_weight_gsm": "450",
+        "stretch": "low"
+      },
+      "styleCode": "UL-HD-002",
+      "fitNotes": "Relaxed through the body; size down for a closer fit.",
+      "modelHeightCm": 178,
+      "modelWornSize": "M",
+      "packageLengthMm": 320,
+      "packageWidthMm": 240,
+      "packageHeightMm": 60
     },
     {
       "slug": "arch-jaal-scarf",
@@ -447,7 +509,8 @@
           "size": "OS",
           "priceCents": 189900,
           "status": "in-stock",
-          "quantity": 11
+          "quantity": 11,
+          "barcode": "8901917966729"
         }
       ],
       "images": [
@@ -494,7 +557,21 @@
           "length": 180,
           "width": 70
         }
-      }
+      },
+      "attributes": {
+        "pattern": "embroidered",
+        "occasion": "festive",
+        "fabric_composition": "100% mulberry silk",
+        "transparency": "opaque",
+        "stretch": "non-stretch"
+      },
+      "styleCode": "UL-SC-001",
+      "fitNotes": "Generous length, wraps twice.",
+      "modelHeightCm": 172,
+      "modelWornSize": "ONE",
+      "packageLengthMm": 240,
+      "packageWidthMm": 180,
+      "packageHeightMm": 30
     }
   ]
 }

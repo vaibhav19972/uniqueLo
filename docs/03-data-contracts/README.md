@@ -109,12 +109,23 @@ export interface Product {
   material?: string[];
   care?: string[];
   fit?: string;
-  /** Batch scarcity — rendered strictly only when both batchNumber and batchTotal are present. */
-  batchNumber?: number;
-  batchTotal?: number;
-  craftRegion?: string;
-  craftCluster?: string;
   fabricGsm?: string;
+
+  // ---- Trust & logistics (added 2026-10-24, docs/11-data-model) ----
+  /** ISO 3166-1 alpha-2 country of manufacture. Distinct from craft tradition. */
+  countryOfOrigin?: string;
+  manufacturerName?: string;
+  manufacturerAddress?: string;
+  packedBy?: string;
+  /** COD is the #1 first-order blocker in tier-2/3; never assume it. */
+  codAvailable?: boolean;
+  deliveryDaysMin?: number;
+  deliveryDaysMax?: number;
+  /** 0 means non-returnable — the honest value for personalised pieces. */
+  returnWindowDays?: number;
+  weightGrams?: number;
+  hsnCode?: string;
+  sizeChart?: Record<string, unknown>;
 }
 
 export interface Category {
