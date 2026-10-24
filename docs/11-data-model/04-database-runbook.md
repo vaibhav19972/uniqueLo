@@ -14,12 +14,19 @@ Running the seed first fails on missing columns.
 1. backend/schema.sql                                       (13 tables, 39 RLS policies)
 2. backend/migrations/20261024_data_model_trust_fields.sql  (44 columns, registry, trigger)
 3. backend/production-seed.sql                              (3 products / 25 variants)
-4. backend/migrations/20261025_admin_write_policies.sql     (OPTIONAL — closes the catalog-write hole)
-5. backend/scripts/verify-db.sql                            (proves all of the above)
+4. backend/migrations/20261025_admin_write_policies.sql     (REQUIRED — closes the catalog-write hole)
+5. backend/migrations/20261026_publish_product.sql          (the panel's publish path)
+6. backend/scripts/verify-db.sql                            (proves all of the above)
 ```
 
-Step 4 is optional in the sense that the site works without it — but the catalog
-is world-writable without it. Run it. See the security section at the bottom.
+Step 4 is required, not optional: without it the catalog is world-writable and the
+`anon` key that ships in the frontend bundle can delete every product. See the
+security section at the bottom.
+
+Step 5 installs `public.publish_product()`, which is how the Catalog Studio writes
+products. Without it the panel's Publish button fails with *function does not
+exist*. `production-seed.sql` does not need it — the seed inserts directly as the
+database owner.
 
 `production-seed.sql` is **generated**. Never hand-edit it — run
 `node backend/scripts/gen-seed.mjs` and let it rewrite the file from
@@ -270,3 +277,58 @@ Recommended follow-up: change `schema.sql`'s RLS block to a loop over
   It only ever seeded 0 rows. Delete it or regenerate it from `gen-seed.mjs`.
 - **Nothing was run against your production Supabase.** All of the above was
   verified on a local Postgres 16.15 cluster with the real files.
+
+---
+
+## Publishing products from the panel
+
+The Catalog Studio writes through `public.publish_product(p_product jsonb,
+p_variants jsonb)`. This replaced an earlier design where the panel emitted SQL for
+a human to paste into the Supabase SQL editor — that air gap existed because there
+was no trusted write path, not because it was a good boundary. The panel had
+already been writing `universes`, `categories`, `garments`, `collections` and
+`motifs` directly, so products were the only table with a paste step.
+
+**Why a function and not five `supabase.from()` calls.** A product is four tables:
+`products`, `product_images`, `variants` and `embroidery_details`. PostgREST cannot
+open a transaction across four requests, so a mid-way failure leaves a product with
+no variants — which renders as a card with no price and cannot be bought. The
+function body is one transaction, so a failure anywhere rolls back all four. This
+is the same shape as `place_order()`, which the checkout already relies on.
+
+**Security.** `security definer` with a pinned `search_path`, which bypasses RLS —
+so the `is_admin()` check on the first line *is* the gate. It raises
+`insufficient_privilege` rather than returning a soft error, so a caller without
+rights cannot mistake a no-op for success. `execute` is granted to `authenticated`
+only; `anon` is explicitly revoked, since the anon key is public.
+
+**What it validates**, beyond the column types:
+
+| Check | Why |
+|---|---|
+| `is_admin()` | Definer bypasses RLS; this is the only gate |
+| slug is kebab-case | It is a URL and a foreign-key target, so a bad one propagates to every child row |
+| ≥1 variant | A product with no variants has no price and cannot be bought |
+| required attributes | Delegated to the `products` trigger, so the panel, the seed and a manual paste share one contract |
+| barcode is 8–14 digits | The UNIQUE index would reject it, but with a constraint name, not a SKU |
+| barcode not reused | Pre-checked so the message names the conflict |
+| `country_of_origin` is ISO-2 | Otherwise `character(2)` raises a raw type error naming a column nobody typed into |
+
+**Idempotent.** Upserts on `slug`, `sku` and `product_slug`, and images are
+delete-then-inserted because `sort_order` is a semantic slot index — editing a
+product from five images to three must not leave stale slots behind. Re-publishing
+an edited product updates it in place.
+
+**Verifying it without clicking through the UI.** The payload is built inside a
+React component, so nothing typechecks it against the function. Render the real
+object and execute it:
+
+```bash
+cd web && npm run publish:payload | head -c 200     # extracts buildPublishPayload()
+```
+
+`backend/scripts/render-publish-payload.mjs` pulls the actual object literal out of
+`Admin.tsx`, substitutes the component's state, and refuses (non-zero exit) if the
+payload is missing a key the RPC reads. It is wired into `npm run verify`. A rename
+like `cod_available` → `codAvailable` is invisible to `tsc` and to the build; it
+fails at runtime as "Publish Failed" in the operator's face.

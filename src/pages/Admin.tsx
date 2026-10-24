@@ -297,6 +297,10 @@ const AdminStudio: React.FC = () => {
   // Universe creation. Universes are the top of the taxonomy: every collection,
   // motif and product's universe_slug resolves here, so without an insert path
   // the only way to add a world was to paste SQL into Supabase by hand.
+  // Direct publish. Replaces the copy-paste-into-Supabase step: the panel writes
+  // through publish_product() in one transaction.
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [showAddUniverseModal, setShowAddUniverseModal] = useState(false);
   const [newUniSlug, setNewUniSlug] = useState('');
   const [newUniName, setNewUniName] = useState('');
@@ -757,6 +761,131 @@ const AdminStudio: React.FC = () => {
   };
 
   // Build SQL Statement String
+  // Direct publish payload. This is deliberately snake_case and flat: it is sent
+  // to public.publish_product(), which validates it against the same trigger the
+  // seed and a manual paste go through. The camelCase `generatedJSON` above is a
+  // human-readable preview object and is NOT an API contract — do not feed it to
+  // the RPC.
+  const buildPublishPayload = () => {
+    const finalSlug = slug || 'new-product-slug';
+    return {
+      product: {
+        slug: finalSlug,
+        name,
+        subtitle,
+        foreign_tagline: foreignTagline || null,
+        description,
+        category_slug: categorySlug || null,
+        universe_slug: universeSlug || null,
+        collection_slug: collectionSlug || null,
+        garment_type: garmentType || null,
+        gender,
+        motif_id: motifId || null,
+        handcrafted,
+        expression_score: selectedExpressionScore,
+        edits: selectedMoods,
+        tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
+        featured,
+        customizable,
+        material: materialsInput.split(',').map((t) => t.trim()).filter(Boolean),
+        care: careInput.split(',').map((t) => t.trim()).filter(Boolean),
+        fit,
+        style_code: styleCode || null,
+        country_of_origin: countryOfOrigin,
+        manufacturer_name: manufacturerName || null,
+        manufacturer_address: manufacturerAddress || null,
+        packed_by: packedBy || null,
+        cod_available: codAvailable,
+        delivery_days_min: deliveryDaysMin,
+        delivery_days_max: deliveryDaysMax,
+        return_window_days: returnWindowDays,
+        weight_grams: weightGrams || null,
+        hsn_code: hsnCode || null,
+        // Built from the variant sizes, matching what the SQL path emits. A blank
+        // measurement per size is the honest shape: the operator fills the real
+        // numbers, and an empty object is visibly unfilled rather than plausible.
+        size_chart: Object.fromEntries(
+          Array.from(new Set(variants.map((v) => v.size))).filter(Boolean).map((sz) => [sz, {}])
+        ),
+        attributes,
+        fit_notes: fitNotes || null,
+        model_height_cm: modelHeightCm || null,
+        model_worn_size: modelWornSize || null,
+        package_length_mm: packageLengthMm || null,
+        package_width_mm: packageWidthMm || null,
+        package_height_mm: packageHeightMm || null,
+        images: slotImages.map((img, i) => ({
+          src: img.src,
+          alt: img.alt || name,
+          color: variants[0]?.colorHex || '#121214',
+          sort_order: i,
+        })),
+        embroidery: {
+          technique,
+          technique_label: techniqueLabel,
+          artisan_hours: artisanHours,
+          placement: placementInput.split(',').map((t) => t.trim()).filter(Boolean),
+          thread_composition: threadComposition,
+          motif_story: motifStory,
+        },
+      },
+      variants: variants.map((v) => ({
+        sku: v.sku,
+        color: v.color,
+        color_hex: v.colorHex,
+        size: v.size,
+        price_cents: Math.round(v.price * 100),
+        status: v.status,
+        quantity: v.quantity,
+        barcode: v.barcode || null,
+      })),
+    };
+  };
+
+  const handlePublishToDatabase = async () => {
+    if (!isSupabaseConfigured() || !supabase) {
+      showToast({ title: 'Database Offline', description: 'Supabase is not configured in this environment.', type: 'info' });
+      return;
+    }
+    if (!name.trim() || !slug.trim()) {
+      showToast({ title: 'Validation Error', description: 'Product Name and Slug are required.', type: 'info' });
+      return;
+    }
+    if (variants.length === 0) {
+      showToast({ title: 'Validation Error', description: 'At least one variant is required — a product with no variants has no price.', type: 'info' });
+      return;
+    }
+    const badBarcode = variants.find((v) => v.barcode && v.barcode.length !== 13);
+    if (badBarcode) {
+      showToast({ title: 'Invalid Barcode', description: `${badBarcode.sku} has a ${badBarcode.barcode!.length}-digit barcode; EAN-13 needs 13.`, type: 'info' });
+      return;
+    }
+
+    setIsPublishing(true);
+    setPublishResult(null);
+    try {
+      const { product, variants: payloadVariants } = buildPublishPayload();
+      const { data, error } = await supabase.rpc('publish_product', {
+        p_product: product,
+        p_variants: payloadVariants,
+      });
+      if (error) throw error;
+
+      setPublishResult({ ok: true, message: `Published "${name}" — ${data?.variants ?? payloadVariants.length} variants, ${data?.images ?? 0} images.` });
+      showToast({ title: 'Published', description: 'The product is live on the storefront.', type: 'success' });
+      await queryClient.invalidateQueries({ queryKey: catalogKeys.products });
+    } catch (err: any) {
+      // Surface the database's own message: publish_product raises descriptive
+      // errors (missing attribute, duplicate barcode, bad slug) and they are far
+      // more useful than a generic failure.
+      const msg = err?.message || 'Publish failed.';
+      setPublishResult({ ok: false, message: msg });
+      showToast({ title: 'Publish Failed', description: msg, type: 'info' });
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   const generatedSQL = useMemo(() => {
     const finalSlug = slug || 'new-product-slug';
     const tagsArr = tagsInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
@@ -2548,24 +2677,57 @@ INSERT INTO public.embroidery_details (
               {/* Action Deck (Option 2: Air-Gapped Secure Workflow) */}
               <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-stone/30 pb-2">
-                  <h3 className="font-serif text-lg text-ink">Publishing Deck</h3>
+                  <h3 className="font-serif text-lg text-ink">Publish</h3>
                   <span className="text-[10px] uppercase font-sans tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-medium">
-                    🛡️ Air-Gapped Secure
+                    ✦ Admin-only · RLS enforced
                   </span>
                 </div>
 
                 <p className="text-[11px] text-ink-muted leading-relaxed font-light">
-                  Public database write access is strictly locked down. All catalog updates run through your authenticated Supabase Console.
+                  Writes all four tables — product, images, variants and craft provenance — in
+                  one transaction. A failure anywhere rolls back the whole publish, so you can
+                  never end up with a product that has no variants and no price.
                 </p>
 
-                {/* Primary Action Button */}
+                {/* Primary Action: direct publish */}
+                <button
+                  type="button"
+                  onClick={handlePublishToDatabase}
+                  disabled={isPublishing}
+                  className="w-full py-3 bg-emerald-700 text-cream hover:bg-emerald-800 transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>{isPublishing ? '⏳' : '✦'}</span>
+                  <span>{isPublishing ? 'Publishing…' : 'Publish to Database'}</span>
+                </button>
+
+                {publishResult && (
+                  <div
+                    className={`text-[11px] px-3 py-2 border leading-relaxed ${
+                      publishResult.ok
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                        : 'bg-red-50 border-red-300 text-red-900'
+                    }`}
+                  >
+                    {publishResult.ok ? '✓ ' : '✕ '}
+                    {publishResult.message}
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-stone/20">
+                  <p className="text-[10px] text-ink-muted mb-2 leading-relaxed">
+                    Fallback: the same operation as SQL, if you would rather review it first
+                    or apply it to a different environment.
+                  </p>
+                </div>
+
+                {/* Secondary Action: copy SQL (kept as an audit/escape hatch) */}
                 <button
                   type="button"
                   onClick={() => copyToClipboard(generatedSQL, 'Ready-to-run multi-table SQL query')}
-                  className="w-full py-3 bg-accent text-cream hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2.5 bg-accent text-cream hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-medium cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>📋</span>
-                  <span>Copy SQL Query (Ready to Run)</span>
+                  <span>Copy equivalent SQL</span>
                 </button>
 
                 {/* Direct Link to Supabase SQL Editor */}

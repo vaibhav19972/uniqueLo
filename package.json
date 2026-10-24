@@ -10,9 +10,10 @@
     "typecheck": "tsc -b",
     "seed:gen": "node ../backend/scripts/gen-seed.mjs",
     "seed:check": "node ../backend/scripts/gen-seed.mjs --check",
-    "verify": "npm run typecheck && npm run lint && npm run seed:check && npm run contract:check && npm run build",
+    "verify": "npm run typecheck && npm run lint && npm run seed:check && npm run contract:check && npm run publish:payload && npm run build",
     "preview": "vite preview",
-    "contract:check": "node ../backend/scripts/check-contract.mjs"
+    "contract:check": "node ../backend/scripts/check-contract.mjs",
+    "publish:payload": "node ../backend/scripts/render-publish-payload.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
