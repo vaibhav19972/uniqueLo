@@ -112,7 +112,7 @@ Use this table to track real assets as they arrive. Update it when a file is swa
 > not yet re-shot *reuse* atelier files plus category/placeholder frames, so
 > they are listed with their effective 6-image sets, pending dedicated shoots
 > via the All-in-One spec-board intake. The local `products.json` 13-SKU line
-> was deleted as stale; its DB-side record lives on in `supabase/seed.sql`.
+> was deleted as stale; its DB-side record lives on in `backend/seed.sql`.
 > The JSON file is the source of truth for which images the catalog references
 > — never regenerate this table from folder listings.
 

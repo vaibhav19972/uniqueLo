@@ -170,7 +170,7 @@ export interface CartItem {
 
 > `src/data/products.json` (the original 13-product atelier line) was
 > **deleted on 2026-10-12** as stale local data — it is no longer imported
-> anywhere and no longer on disk. `supabase/seed.sql` (as migrated 2026-10-11)
+> anywhere and no longer on disk. `backend/seed.sql` (as migrated 2026-10-11)
 > still seeds that legacy line with `is_mock = false`, and the schema now
 > carries the full universe columns.
 > **Caution:** `getProducts()` does not yet filter `is_mock` (docs/08 §03-2c
@@ -262,7 +262,7 @@ The storefront catalog. As of 2026-10-12 it holds 5 curated products
 
 The original 13-product / 45-variant atelier line was deleted on 2026-10-12
 as stale local data (it had been unimported since the mock phase began).
-The DB-side legacy record lives on in `supabase/seed.sql` (`is_mock = false`).
+The DB-side legacy record lives on in `backend/seed.sql` (`is_mock = false`).
 (`scripts/generate_assets.py` is a standalone PIL generator that reads
 neither catalog file.)
 

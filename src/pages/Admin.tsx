@@ -2778,8 +2778,8 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
                 </p>
                 <div className="pt-2 flex items-center gap-4 text-[11px] font-mono text-ink-muted">
                   <span>File: docs/DATABASE_MIGRATION_GUIDE.md (19 KB)</span>
-                  <span>DDL Blueprint: supabase/schema.sql (14 KB)</span>
-                  <span>Baseline Seed: supabase/production-seed.sql (28 KB)</span>
+                  <span>DDL Blueprint: backend/schema.sql</span>
+                  <span>Baseline Seed: backend/production-seed.sql</span>
                 </div>
               </div>
             </div>

@@ -28,3 +28,9 @@ dist-ssr
 
 # Local-only ChatGPT design reference renders (large binaries, never push)
 sketches/design-renders/chatgpt-v2/
+
+# Design reference screenshots (42 MB of PNGs, captured 2026-10-13)
+# Visual targets only — not imported by any component. The README that indexes
+# them stays tracked; the images themselves do not belong in git.
+design-references/**/*.png
+sketches/**/*.png

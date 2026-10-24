@@ -13,14 +13,14 @@
 - DROP TABLE IF EXISTS public.products CASCADE; -- NEVER RUN THIS IN PRODUCTION
 ```
 Dropping tables destroys real customer orders, patron reviews, live newsletter signups, inventory stock counts, and artisan provenance.  
-The `DROP TABLE ... CASCADE` block at the top of `supabase/schema.sql` is strictly for **fresh local development** or **sandbox rebuilds**. In production, all updates must be **additive, non-destructive, and backward-compatible**.
+The `DROP TABLE ... CASCADE` block at the top of `backend/schema.sql` is strictly for **fresh local development** or **sandbox rebuilds**. In production, all updates must be **additive, non-destructive, and backward-compatible**.
 
 ### 1.2 The Three Database Files & Their Specific Roles
 | File | Role | Execution Timing | Data Contained |
 | :--- | :--- | :--- | :--- |
-| **`supabase/schema.sql`** | **Pure DDL Blueprint** | Once at initial project setup or disaster recovery | Tables, primary/foreign keys, check constraints, performance indexes, RLS policies, Storage buckets. **Zero catalog data rows.** |
-| **`supabase/production-seed.sql`** | **Production Baseline Data** | Once right after initial `schema.sql` execution | Complete Master Taxonomy (3 Universes, 7 Motifs, 5 Categories, 9 Garments, 3 Collections) + exactly 2 authentic flagship products (`is_mock = false`). |
-| **`supabase/seed.sql`** | **Local Development Data** | Localhost & demo testing | Master Taxonomy + 13 mock/legacy products. |
+| **`backend/schema.sql`** | **Pure DDL Blueprint** | Once at initial project setup or disaster recovery | Tables, primary/foreign keys, check constraints, performance indexes, RLS policies, Storage buckets. **Zero catalog data rows.** |
+| **`backend/production-seed.sql`** | **Production Baseline Data** | Once right after initial `schema.sql` execution | Complete Master Taxonomy (3 Universes, 7 Motifs, 5 Categories, 9 Garments, 3 Collections) + exactly 2 authentic flagship products (`is_mock = false`). |
+| **`backend/seed.sql`** | **Local Development Data** | Localhost & demo testing | Master Taxonomy + 13 mock/legacy products. |
 | **`supabase/migrations/`** | **Incremental Migrations** | Ongoing as new features/tables are released | Numbered SQL patches applied sequentially to evolving production databases. |
 
 ---
@@ -154,11 +154,11 @@ CREATE POLICY "Allow admin delete artisan profiles"
   USING (true);
 ```
 
-### Step 4: Update `supabase/schema.sql`
-Add the table definition and its policies into [supabase/schema.sql](file:///Users/apple/MySpace/UniqueLo/supabase/schema.sql) so that any future fresh deployment (or staging environment) automatically includes this table.
+### Step 4: Update `backend/schema.sql`
+Add the table definition and its policies into [../../backend/schema.sql](file:///Users/apple/UniqueLo/backend/schema.sql) so that any future fresh deployment (or staging environment) automatically includes this table.
 
 ### Step 5: Update TypeScript Types & Data Adapter
-Update [src/lib/data.ts](file:///Users/apple/MySpace/UniqueLo/src/lib/data.ts) with the matching TypeScript interface and fetching function:
+Update [src/lib/data.ts](file:///Users/apple/UniqueLo/web/src/lib/data.ts) with the matching TypeScript interface and fetching function:
 ```typescript
 export interface ArtisanProfile {
   slug: string;
@@ -230,8 +230,8 @@ CREATE INDEX IF NOT EXISTS idx_products_sustainability ON public.products(sustai
 ```
 
 ### Synchronize Application Layer:
-1. Update `supabase/schema.sql` in the corresponding table definition.
-2. In [src/lib/data.ts](file:///Users/apple/MySpace/UniqueLo/src/lib/data.ts):
+1. Update `backend/schema.sql` in the corresponding table definition.
+2. In [src/lib/data.ts](file:///Users/apple/UniqueLo/web/src/lib/data.ts):
    - Add the new field to the `Product` interface: `sustainabilityScore?: number; ecoCertifications?: string[];`.
    - Update `getProducts()` Supabase `.select(...)` query to include the new columns.
    - Map with a fallback default: `sustainabilityScore: item.sustainability_score ?? 5,`.
@@ -308,7 +308,7 @@ ON CONFLICT (slug) DO UPDATE SET
 ### 5.4 Keeping Local JSON in Sync
 Whenever new taxonomy rows are added to the production database:
 1. Add the matching JSON record in `src/data/categories.json`, `src/data/garments.json`, `src/data/collections.json`, or `src/data/motifs.json`.
-2. Add the record into [supabase/production-seed.sql](file:///Users/apple/MySpace/UniqueLo/supabase/production-seed.sql) to maintain parity for fresh deploys.
+2. Add the record into [../../backend/production-seed.sql](file:///Users/apple/UniqueLo/backend/production-seed.sql) to maintain parity for fresh deploys.
 
 ---
 

@@ -65,7 +65,7 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 
 ### Step 3.2 — Execute Database Schema (Pure DDL)
 1. In the Supabase Dashboard, open **SQL Editor**.
-2. Click **New Query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and click **Run**.
+2. Click **New Query**, paste the contents of [`backend/schema.sql`](../../backend/schema.sql), and click **Run**.
 3. This creates:
    - All 13 relational tables: `universes`, `motifs`, `categories`, `garments`, `collections`, `products`, `variants`, `product_images`, `embroidery_details`, `newsletter_subscribers`, `reviews`, `orders`, `order_items`
    - High-performance indexes, full Row-Level Security (RLS) policies, and the `product-images` storage bucket.
@@ -73,7 +73,7 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 
 ### Step 3.3 — Seed Production Baseline Taxonomy & Flagship Products
 1. In the Supabase SQL Editor, open a **New Query**.
-2. Paste the contents of [`supabase/production-seed.sql`](../supabase/production-seed.sql) and click **Run**.
+2. Paste the contents of [`backend/production-seed.sql`](../../backend/production-seed.sql) and click **Run**.
 3. This seeds:
    - Complete Master Taxonomy: 3 Universes (`animeverse`, `heroverse`, `itihaas`), 7 Motifs, 5 Categories, 9 Garments, and 3 Collections (inserted in strict foreign-key dependency order).
    - Exactly 2 authentic, handcrafted showcase products (`sakura-ronin-hoodie` and `kantha-chore-jacket`) with real variants, disk images, and embroidery provenance.
