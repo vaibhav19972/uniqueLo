@@ -11,10 +11,15 @@ There are **three files, run in this exact order**. Order is not stylistic —
 Running the seed first fails on missing columns.
 
 ```
-1. backend/schema.sql                                    (13 tables, 39 RLS policies)
+1. backend/schema.sql                                       (13 tables, 39 RLS policies)
 2. backend/migrations/20261024_data_model_trust_fields.sql  (44 columns, registry, trigger)
-3. backend/production-seed.sql                           (3 products / 25 variants)
+3. backend/production-seed.sql                              (3 products / 25 variants)
+4. backend/migrations/20261025_admin_write_policies.sql     (OPTIONAL — closes the catalog-write hole)
+5. backend/scripts/verify-db.sql                            (proves all of the above)
 ```
+
+Step 4 is optional in the sense that the site works without it — but the catalog
+is world-writable without it. Run it. See the security section at the bottom.
 
 `production-seed.sql` is **generated**. Never hand-edit it — run
 `node backend/scripts/gen-seed.mjs` and let it rewrite the file from
@@ -194,19 +199,53 @@ anonymous role ran `delete from products` and the catalog went from **3 rows to
 0**. The same applies to `variants`, `product_images`, `embroidery_details`,
 `collections`, and the other admin write policies.
 
-These are named "Allow admin …" but gate nothing. The fix is to replace
-`using (true)` with a real role check, e.g.:
+These are named "Allow admin …" but gate nothing.
+
+**A `service_role`-only policy would break the admin panel.** `AdminAuthGate`
+signs in with `supabase.auth.signInWithPassword` using the **anon key**, so its
+requests arrive as `authenticated`, not `service_role`. Locking writes to
+`service_role` makes the catalog read-only in the browser.
+
+There is also a second gate problem: `AdminAuthGate` checks only that a session
+**exists**, and `schema.sql` has no role table at all. Anyone able to create an
+account can reach the UI. The app has no signup screen, but Supabase's signup
+endpoint is still reachable with the public anon key unless disabled in
+Authentication → Providers → Email.
+
+**Fixed by `backend/migrations/20261025_admin_write_policies.sql`** — an
+optional fourth file. It creates `public.is_admin()` (true for a row in
+`public.admins`, or `app_metadata.role` of `admin`/`service_role`), a `public.admins`
+table, and replaces 15 permissive policies with one `is_admin()`-gated policy per
+table. `app_metadata` is used rather than `user_metadata` because users cannot
+edit it themselves.
+
+Measured with 8 tests against real Postgres, emulating Supabase's auth functions:
+
+| Test | Result |
+|---|---|
+| anonymous delete | 1 row survives ✓ |
+| logged-in non-admin delete | 1 row survives ✓ |
+| non-admin with `app_metadata.role=authenticated` | 1 row survives ✓ |
+| admin via `app_metadata.role=admin` | deletes successfully ✓ |
+| admin via `public.admins` row | can insert ✓ |
+| customer reads catalog | visible ✓ |
+| anonymous self-promotes to admin | **blocked by RLS** ✓ |
+| customer places an order | succeeds ✓ |
+
+service_role bypasses RLS, so the seed and migrations are unaffected (re-seeded
+successfully after applying). The migration is idempotent — ran it twice, still
+2 policies on `products`.
+
+**Before deploying:** create your admin user in Supabase Auth, then run
 
 ```sql
-drop policy "Allow admin insert products" on public.products;
-create policy "Admin write products" on public.products for all
-  using (auth.jwt() ->> 'role' = 'service_role')
-  with check (auth.jwt() ->> 'role' = 'service_role');
+insert into public.admins (user_id, email)
+select id, email from auth.users where email = 'you@example.com';
 ```
 
-**Not applied yet** — this changes admin behaviour and is your decision. Options:
-`service_role` JWT check (simplest), a `profiles.role = 'admin'` table, or
-Supabase custom claims. The admin UI must keep working either way.
+and disable public signup in the Auth settings. Without a row in `public.admins`
+and without `app_metadata.role`, the admin panel will authenticate but every
+write will be refused.
 
 ### 2. The attribute registry was writable anonymously (fixed)
 
