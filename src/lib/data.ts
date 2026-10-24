@@ -671,6 +671,52 @@ export async function getProductsByCategory(categorySlug: string | 'all'): Promi
 
 /** All active universes, ordered. Renders the Universes dropdown — never hardcode. */
 export async function getUniverses(): Promise<Universe[]> {
+  // Universes are the root of the taxonomy, but this reader was the only one
+  // still bound to the bundled JSON. A universe created in the Catalog Studio
+  // therefore saved to the database and never appeared on the site — the panel
+  // looked broken while the row was correct. Read the DB like every sibling.
+  if (shouldUseSupabaseReads() && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('universes')
+        .select('*')
+        .order('order_num', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        // The Universe interface is snake_case (it mirrors universes.json), so the
+        // DB row maps across almost unchanged — no camelCase conversion here,
+        // unlike products.
+        return data
+          .filter((u: any) => u.is_active !== false)
+          .map((u: any) => ({
+            slug: u.slug,
+            name: u.name,
+            tagline: u.tagline || '',
+            lore: u.lore || '',
+            portal_title_color: u.portal_title_color || undefined,
+            lore_heading: u.lore_heading || undefined,
+            hero_headline: u.hero_headline || undefined,
+            hero_headline_accent: u.hero_headline_accent || undefined,
+            hero_lead_color: u.hero_lead_color || undefined,
+            hero_accent_color: u.hero_accent_color || undefined,
+            hero_headline_case: u.hero_headline_case || undefined,
+            hero_kicker: u.hero_kicker || undefined,
+            hero_ornament: u.hero_ornament || undefined,
+            hero_note: u.hero_note || undefined,
+            hero_vertical_text: u.hero_vertical_text || undefined,
+            hero_image: u.hero_image || undefined,
+            emblem_src: u.emblem_src || undefined,
+            drop_cadence: u.drop_cadence || undefined,
+            is_active: u.is_active ?? true,
+            order: u.order_num ?? 0,
+            theme_tokens: u.theme_tokens || undefined,
+          }));
+      }
+    } catch {
+      // Fall through to the bundled seed
+    }
+  }
+
   return [...seedUniverses]
     .filter((u) => u.is_active)
     .sort((a, b) => a.order - b.order);

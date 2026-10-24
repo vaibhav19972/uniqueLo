@@ -40,6 +40,8 @@ interface VariantForm {
   price: number; // in normal currency, e.g. 380
   status: 'in-stock' | 'low-stock' | 'out-of-stock';
   quantity: number;
+  /** EAN-13. Unique per variant; blank until the physical code is assigned. */
+  barcode?: string;
 }
 
 // Session-unique upload suffix (module scope: pure, lint-clean alternative to
@@ -107,14 +109,13 @@ const PRESET_COLORS = [
 
 const PRESET_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
-const PRESET_REGIONS = [
-  { region: 'Srinagar, Jammu & Kashmir', cluster: 'Valley Aari Needlecraft Guild' },
-  { region: 'Lucknow, Uttar Pradesh', cluster: 'Chikankari & Silk Chain Guild' },
-  { region: 'Jaipur, Rajasthan', cluster: 'Pink City Zardozi Bullion Guild' },
-  { region: 'Bolpur & Murshidabad, West Bengal', cluster: 'Shantiniketan Kantha Collective' },
-  { region: 'Shimla, Himachal Pradesh', cluster: 'Himalayan Hand-Knit Cluster' },
-  { region: 'Ahmedabad, Gujarat', cluster: 'Sabarmati Heavy Duck Canvas Guild' },
-];
+// PRESET_REGIONS was removed 2026-10-24. It hard-coded six invented artisan
+// guilds ("Valley Aari Needlecraft Guild") and pre-filled them into every new
+// product as if they were manufacturing records. Craft region and cluster are no
+// longer product columns: provenance is now `embroidery_details` (technique,
+// artisan hours, thread) plus the legal declarations (manufacturer/packed by),
+// and a named workshop would be a supplier record with a verifiable GSTIN, not a
+// one-click preset.
 
 const PRESET_IMAGES = [
   { label: 'Sakura Hoodie 1', src: '/images/products/sakura-ronin-hoodie-1.jpg' },
@@ -293,6 +294,66 @@ const AdminStudio: React.FC = () => {
     }
   };
 
+  // Universe creation. Universes are the top of the taxonomy: every collection,
+  // motif and product's universe_slug resolves here, so without an insert path
+  // the only way to add a world was to paste SQL into Supabase by hand.
+  const [showAddUniverseModal, setShowAddUniverseModal] = useState(false);
+  const [newUniSlug, setNewUniSlug] = useState('');
+  const [newUniName, setNewUniName] = useState('');
+  const [newUniTagline, setNewUniTagline] = useState('');
+  const [newUniLore, setNewUniLore] = useState('');
+  const [newUniLoreHeading, setNewUniLoreHeading] = useState('');
+  const [newUniDropCadence, setNewUniDropCadence] = useState('');
+  const [newUniPortalColor, setNewUniPortalColor] = useState('#8C6B4F');
+  const [newUniIsActive, setNewUniIsActive] = useState(true);
+
+  const handleSaveNewUniverse = async () => {
+    if (!newUniName.trim() || !newUniSlug.trim()) {
+      showToast({ title: 'Validation Error', description: 'Universe Name and Slug are required.', type: 'info' });
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(newUniSlug.trim())) {
+      showToast({ title: 'Validation Error', description: 'Slug must be lowercase letters, numbers and hyphens only.', type: 'info' });
+      return;
+    }
+    setIsSavingTaxonomy(true);
+    try {
+      if (isSupabaseConfigured() && supabase) {
+        // hero_headline et al. are no longer written: display copy lives in
+        // theme_tokens so there is one source for a universe's look rather than
+        // twelve typed columns plus a JSON file.
+        const { error } = await supabase.from('universes').upsert({
+          slug: newUniSlug.trim().toLowerCase(),
+          name: newUniName.trim(),
+          tagline: newUniTagline.trim() || null,
+          lore: newUniLore.trim() || null,
+          lore_heading: newUniLoreHeading.trim() || null,
+          drop_cadence: newUniDropCadence.trim() || null,
+          portal_title_color: newUniPortalColor || null,
+          is_active: newUniIsActive,
+          order_num: (universes?.length ?? 0) + 1,
+        });
+        if (error) throw error;
+        await queryClient.invalidateQueries({ queryKey: catalogKeys.universes });
+        setUniverseSlug(newUniSlug.trim().toLowerCase() as any);
+        showToast({ title: 'Universe Saved', description: `"${newUniName}" is now live across the storefront.`, type: 'success' });
+        setShowAddUniverseModal(false);
+        setNewUniSlug('');
+        setNewUniName('');
+        setNewUniTagline('');
+        setNewUniLore('');
+        setNewUniLoreHeading('');
+        setNewUniDropCadence('');
+      } else {
+        showToast({ title: 'Database Offline', description: 'Supabase is not configured in this environment.', type: 'info' });
+      }
+    } catch (err: any) {
+      showToast({ title: 'Save Failed', description: err.message || 'Failed to save universe to database.', type: 'info' });
+    } finally {
+      setIsSavingTaxonomy(false);
+    }
+  };
+
   // Form State
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -312,13 +373,58 @@ const AdminStudio: React.FC = () => {
   const [featured, setFeatured] = useState(true);
   const [customizable, setCustomizable] = useState(true);
   const [handcrafted, setHandcrafted] = useState(true);
-  const [rating, setRating] = useState<number>(5.0);
-  const [reviewCount, setReviewCount] = useState<number>(12);
-  const [soldCount, setSoldCount] = useState<string>('50+');
+  const [rating] = useState<number>(5.0);
+  const [reviewCount] = useState<number>(12);
+  // Marketplace attribute contract (mirrors attribute_definitions in the DB).
+  const ATTRIBUTE_OPTIONS: Record<string, string[]> = {
+    pattern: ['solid', 'printed', 'embroidered', 'striped', 'checkered', 'colorblock'],
+    neck_type: ['round', 'v-neck', 'crew', 'collar', 'band', 'hooded', 'square'],
+    sleeve_length: ['sleeveless', 'short', 'three-quarter', 'long'],
+    closure: ['pull-on', 'button', 'zip', 'drawstring', 'tie', 'none'],
+    length: ['cropped', 'regular', 'longline', 'full'],
+    rise: ['low', 'mid', 'high'],
+    occasion: ['casual', 'everyday', 'festive', 'work', 'party', 'travel'],
+    hemline: ['straight', 'curved', 'asymmetric', 'raw'],
+    lining: ['unlined', 'partial', 'full'],
+    transparency: ['opaque', 'semi-sheer', 'sheer'],
+    stretch: ['non-stretch', 'low', 'medium', 'high'],
+  };
+  const REQUIRED_BY_GARMENT: Record<string, string[]> = {
+    tee: ['pattern', 'neck_type', 'sleeve_length', 'occasion', 'fabric_composition'],
+    hoodie: ['pattern', 'neck_type', 'sleeve_length', 'closure', 'occasion', 'fabric_composition'],
+    shirt: ['pattern', 'neck_type', 'sleeve_length', 'closure', 'occasion', 'fabric_composition'],
+    jacket: ['pattern', 'sleeve_length', 'closure', 'occasion', 'fabric_composition'],
+    cardigan: ['pattern', 'neck_type', 'sleeve_length', 'closure', 'occasion', 'fabric_composition'],
+    vest: ['pattern', 'neck_type', 'occasion', 'fabric_composition'],
+    pants: ['pattern', 'closure', 'rise', 'occasion', 'fabric_composition'],
+    scarf: ['pattern', 'occasion', 'fabric_composition'],
+    tote: ['pattern', 'occasion', 'fabric_composition'],
+  };
+
+  const [attributes, setAttributes] = useState<Record<string, string>>({});
+  const [styleCode, setStyleCode] = useState('');
+  const [codAvailable, setCodAvailable] = useState(true);
+  const [deliveryDaysMin, setDeliveryDaysMin] = useState(5);
+  const [deliveryDaysMax, setDeliveryDaysMax] = useState(7);
+  const [returnWindowDays, setReturnWindowDays] = useState(7);
+  const [countryOfOrigin, setCountryOfOrigin] = useState('IN');
+  const [manufacturerName, setManufacturerName] = useState('');
+  const [manufacturerAddress, setManufacturerAddress] = useState('');
+  const [packedBy, setPackedBy] = useState('');
+  const [weightGrams, setWeightGrams] = useState(0);
+  const [hsnCode, setHsnCode] = useState('');
+  const [fitNotes, setFitNotes] = useState('');
+  const [modelHeightCm, setModelHeightCm] = useState(0);
+  const [modelWornSize, setModelWornSize] = useState('');
+  const [packageLengthMm, setPackageLengthMm] = useState(0);
+  const [packageWidthMm, setPackageWidthMm] = useState(0);
+  const [packageHeightMm, setPackageHeightMm] = useState(0);
 
   const selectedExpression =
     EXPRESSION_LEVELS.find((e) => e.score === selectedExpressionScore) || EXPRESSION_LEVELS[2];
   const selectedExpressionSlug = selectedExpression.slug;
+
+  const requiredAttrs = REQUIRED_BY_GARMENT[garmentType] || [];
 
   const { data: universes } = useUniverses();
   const { data: motifs } = useMotifsByUniverse(universeSlug);
@@ -331,12 +437,9 @@ const AdminStudio: React.FC = () => {
   const [threadComposition, setThreadComposition] = useState('100% Spun Mulberry Silk Floss');
   const [motifStory, setMotifStory] = useState(TECHNIQUE_OPTIONS[0].defaultStory);
 
-  // Production Metrics
-  const [craftRegion, setCraftRegion] = useState('Srinagar, Jammu & Kashmir');
-  const [craftCluster, setCraftCluster] = useState('Valley Aari Needlecraft Guild');
+  // Fabric & care
   const [fabricGsm, setFabricGsm] = useState('280 GSM Ringspun Combed Cotton');
-  const [batchNumber, setBatchNumber] = useState(1);
-  const [batchTotal, setBatchTotal] = useState(50);
+  void setFabricGsm; // fabric weight is captured as an attribute value
   const [materialsInput, setMaterialsInput] = useState('100% GOTS Organic Cotton, Mulberry Silk Floss');
   const [careInput, setCareInput] = useState('Machine wash gentle cold (30°C) inside out, Line dry in shade');
   const [fit, setFit] = useState('Boxy atelier drop-shoulder fit, true to size');
@@ -662,47 +765,72 @@ const AdminStudio: React.FC = () => {
     const careArr = careInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
     const placeArr = placementInput.split(',').map((t) => `'${t.trim()}'`).filter(Boolean).join(', ');
 
+    // Serialised for the SQL template. jsonb literals must be escaped as a
+    // single-quoted SQL string, so double the internal single quotes.
+    const attributesJson = `'${JSON.stringify(attributes).replace(/'/g, "''")}'::jsonb`;
+    const sizes = Array.from(new Set(variants.map((v) => v.size))).filter(Boolean);
+    const sizeChart: Record<string, unknown> = {};
+    for (const sz of sizes) sizeChart[sz] = {};
+    const sizeChartJson =
+      sizes.length === 0
+        ? 'NULL'
+        : `'${JSON.stringify(sizeChart).replace(/'/g, "''")}'::jsonb`;
+
     return `-- ====================================================================
 -- UniqueLo SQL: Add "${name || 'New Product'}"
--- Current Schema: Fully synchronized with Universe, Gender & Craft Taxonomy
+-- Generated by the Catalog Studio against schema 20261024 + 20261025.
 -- ====================================================================
 
 -- 1. Insert Base Product
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  collection_slug, garment_type, gender, motif_id, handcrafted, expression_score, expression_slug, edits,
-  rating, review_count, sold_count, tags, featured, customizable,
-  material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
+  collection_slug, garment_type, gender, motif_id, handcrafted, expression_score, edits,
+  tags, featured, customizable, material, care, fit, style_code,
+  country_of_origin, manufacturer_name, manufacturer_address, packed_by,
+  cod_available, delivery_days_min, delivery_days_max, return_window_days,
+  weight_grams, hsn_code, size_chart, attributes,
+  fit_notes, model_height_cm, model_worn_size,
+  package_length_mm, package_width_mm, package_height_mm
 ) VALUES (
   '${finalSlug}',
   '${name.replace(/'/g, "''")}',
   '${subtitle.replace(/'/g, "''")}',
   ${foreignTagline ? `'${foreignTagline.replace(/'/g, "''")}'` : 'NULL'},
   '${description.replace(/'/g, "''")}',
-  '${categorySlug}',
-  '${universeSlug}',
-  '${collectionSlug.replace(/'/g, "''")}',
-  '${garmentType.replace(/'/g, "''")}',
+  ${categorySlug ? `'${categorySlug}'` : 'NULL'},
+  ${universeSlug ? `'${universeSlug}'` : 'NULL'},
+  ${collectionSlug ? `'${collectionSlug}'` : 'NULL'},
+  ${garmentType ? `'${garmentType}'` : 'NULL'},
   '${gender}',
   ${motifId ? `'${motifId.replace(/'/g, "''")}'` : 'NULL'},
   ${handcrafted},
   ${selectedExpressionScore},
-  '${selectedExpressionSlug}',
   ARRAY[${editsArr}],
-  ${rating},
-  ${reviewCount},
-  ${soldCount ? `'${soldCount.replace(/'/g, "''")}'` : 'NULL'},
   ARRAY[${tagsArr}],
   ${featured},
   ${customizable},
   ARRAY[${matArr}],
   ARRAY[${careArr}],
   '${fit.replace(/'/g, "''")}',
-  ${batchNumber},
-  ${batchTotal},
-  '${craftRegion.replace(/'/g, "''")}',
-  '${craftCluster.replace(/'/g, "''")}',
-  '${fabricGsm.replace(/'/g, "''")}'
+  ${styleCode ? `'${styleCode.replace(/'/g, "''")}'` : 'NULL'},
+  '${countryOfOrigin}',
+  ${manufacturerName ? `'${manufacturerName.replace(/'/g, "''")}'` : 'NULL'},
+  ${manufacturerAddress ? `'${manufacturerAddress.replace(/'/g, "''")}'` : 'NULL'},
+  ${packedBy ? `'${packedBy.replace(/'/g, "''")}'` : 'NULL'},
+  ${codAvailable},
+  ${deliveryDaysMin},
+  ${deliveryDaysMax},
+  ${returnWindowDays},
+  ${weightGrams || 'NULL'},
+  ${hsnCode ? `'${hsnCode}'` : 'NULL'},
+  ${sizeChartJson},
+  ${attributesJson},
+  ${fitNotes ? `'${fitNotes.replace(/'/g, "''")}'` : 'NULL'},
+  ${modelHeightCm || 'NULL'},
+  ${modelWornSize ? `'${modelWornSize}'` : 'NULL'},
+  ${packageLengthMm || 'NULL'},
+  ${packageWidthMm || 'NULL'},
+  ${packageHeightMm || 'NULL'}
 ) ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   subtitle = EXCLUDED.subtitle,
@@ -716,14 +844,35 @@ INSERT INTO public.products (
   motif_id = EXCLUDED.motif_id,
   handcrafted = EXCLUDED.handcrafted,
   expression_score = EXCLUDED.expression_score,
-  expression_slug = EXCLUDED.expression_slug,
   edits = EXCLUDED.edits,
-  rating = EXCLUDED.rating,
-  review_count = EXCLUDED.review_count,
-  sold_count = EXCLUDED.sold_count,
   tags = EXCLUDED.tags,
   featured = EXCLUDED.featured,
-  customizable = EXCLUDED.customizable;
+  customizable = EXCLUDED.customizable,
+  material = EXCLUDED.material,
+  care = EXCLUDED.care,
+  fit = EXCLUDED.fit,
+  style_code = EXCLUDED.style_code,
+  country_of_origin = EXCLUDED.country_of_origin,
+  manufacturer_name = EXCLUDED.manufacturer_name,
+  manufacturer_address = EXCLUDED.manufacturer_address,
+  packed_by = EXCLUDED.packed_by,
+  cod_available = EXCLUDED.cod_available,
+  delivery_days_min = EXCLUDED.delivery_days_min,
+  delivery_days_max = EXCLUDED.delivery_days_max,
+  return_window_days = EXCLUDED.return_window_days,
+  weight_grams = EXCLUDED.weight_grams,
+  hsn_code = EXCLUDED.hsn_code,
+  size_chart = EXCLUDED.size_chart,
+  attributes = EXCLUDED.attributes,
+  fit_notes = EXCLUDED.fit_notes,
+  model_height_cm = EXCLUDED.model_height_cm,
+  model_worn_size = EXCLUDED.model_worn_size,
+  package_length_mm = EXCLUDED.package_length_mm,
+  package_width_mm = EXCLUDED.package_width_mm,
+  package_height_mm = EXCLUDED.package_height_mm;
+
+-- rating / review_count are derived from public.reviews and guarded by a trigger;
+-- they are intentionally NOT written here.
 
 -- 2. Insert Images (cleans previous slot allocations for this product)
 DELETE FROM public.product_images WHERE product_slug = '${finalSlug}';
@@ -737,12 +886,12 @@ ${slotImages
   .join(',\n')};
 
 -- 3. Insert or Update Variants
-INSERT INTO public.variants (sku, product_slug, color, color_hex, size, price_cents, status, quantity) 
+INSERT INTO public.variants (sku, product_slug, color, color_hex, size, price_cents, status, quantity, barcode)
 VALUES 
 ${variants
   .map(
     (v) =>
-      `  ('${v.sku}', '${finalSlug}', '${v.color}', '${v.colorHex}', '${v.size}', ${Math.round(v.price * 100)}, '${v.status}', ${v.quantity})`
+      `  ('${v.sku}', '${finalSlug}', '${v.color}', '${v.colorHex}', '${v.size}', ${Math.round(v.price * 100)}, '${v.status}', ${v.quantity}, ${v.barcode ? `'${v.barcode}'` : 'NULL'})`
   )
   .join(',\n')}
 ON CONFLICT (sku) DO UPDATE SET
@@ -751,7 +900,8 @@ ON CONFLICT (sku) DO UPDATE SET
   size = EXCLUDED.size,
   price_cents = EXCLUDED.price_cents,
   status = EXCLUDED.status,
-  quantity = EXCLUDED.quantity;
+  quantity = EXCLUDED.quantity,
+  barcode = EXCLUDED.barcode;
 
 -- 4. Insert Craft & Embroidery Provenance
 INSERT INTO public.embroidery_details (
@@ -788,18 +938,31 @@ INSERT INTO public.embroidery_details (
     selectedExpressionSlug,
     rating,
     reviewCount,
-    soldCount,
     tagsInput,
     featured,
     customizable,
     materialsInput,
     careInput,
     fit,
-    batchNumber,
-    batchTotal,
-    craftRegion,
-    craftCluster,
     fabricGsm,
+    styleCode,
+    attributes,
+    codAvailable,
+    deliveryDaysMin,
+    deliveryDaysMax,
+    returnWindowDays,
+    countryOfOrigin,
+    manufacturerName,
+    manufacturerAddress,
+    packedBy,
+    weightGrams,
+    hsnCode,
+    fitNotes,
+    modelHeightCm,
+    modelWornSize,
+    packageLengthMm,
+    packageWidthMm,
+    packageHeightMm,
     slotImages,
     variants,
     technique,
@@ -831,7 +994,24 @@ INSERT INTO public.embroidery_details (
       edits: selectedMoods,
       rating,
       reviewCount,
-      soldCount,
+      styleCode: styleCode || undefined,
+      attributes,
+      codAvailable,
+      deliveryDaysMin,
+      deliveryDaysMax,
+      returnWindowDays,
+      countryOfOrigin,
+      manufacturerName: manufacturerName || undefined,
+      manufacturerAddress: manufacturerAddress || undefined,
+      packedBy: packedBy || undefined,
+      weightGrams: weightGrams || undefined,
+      hsnCode: hsnCode || undefined,
+      fitNotes: fitNotes || undefined,
+      modelHeightCm: modelHeightCm || undefined,
+      modelWornSize: modelWornSize || undefined,
+      packageLengthMm: packageLengthMm || undefined,
+      packageWidthMm: packageWidthMm || undefined,
+      packageHeightMm: packageHeightMm || undefined,
       tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
       variants: variants.map((v) => ({
         sku: v.sku,
@@ -852,10 +1032,6 @@ INSERT INTO public.embroidery_details (
       material: materialsInput.split(',').map((t) => t.trim()).filter(Boolean),
       care: careInput.split(',').map((t) => t.trim()).filter(Boolean),
       fit,
-      batchNumber,
-      batchTotal,
-      craftRegion,
-      craftCluster,
       fabricGsm,
       embroidery: {
         technique,
@@ -885,7 +1061,6 @@ INSERT INTO public.embroidery_details (
     selectedExpressionSlug,
     rating,
     reviewCount,
-    soldCount,
     tagsInput,
     variants,
     slotImages,
@@ -894,11 +1069,25 @@ INSERT INTO public.embroidery_details (
     materialsInput,
     careInput,
     fit,
-    batchNumber,
-    batchTotal,
-    craftRegion,
-    craftCluster,
     fabricGsm,
+    styleCode,
+    attributes,
+    codAvailable,
+    deliveryDaysMin,
+    deliveryDaysMax,
+    returnWindowDays,
+    countryOfOrigin,
+    manufacturerName,
+    manufacturerAddress,
+    packedBy,
+    weightGrams,
+    hsnCode,
+    fitNotes,
+    modelHeightCm,
+    modelWornSize,
+    packageLengthMm,
+    packageWidthMm,
+    packageHeightMm,
     technique,
     techniqueLabel,
     artisanHours,
@@ -1100,21 +1289,34 @@ INSERT INTO public.embroidery_details (
                         public.universes
                       </span>
                     </div>
-                    <select
-                      value={universeSlug}
-                      onChange={(e) => setUniverseSlug(e.target.value as any)}
-                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize font-medium"
-                    >
-                      {(universes ?? [
-                        { slug: 'itihaas', name: 'Itihaas' },
-                        { slug: 'animeverse', name: 'Animeverse' },
-                        { slug: 'heroverse', name: 'Heroverse' },
-                      ]).map((u) => (
-                        <option key={u.slug} value={u.slug}>
-                          {u.name} ({u.slug})
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex gap-1.5">
+                      <select
+                        value={universeSlug}
+                        onChange={(e) => setUniverseSlug(e.target.value as any)}
+                        className="flex-1 bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent capitalize font-medium"
+                      >
+                        {(universes ?? [
+                          { slug: 'itihaas', name: 'Itihaas' },
+                          { slug: 'animeverse', name: 'Animeverse' },
+                          { slug: 'heroverse', name: 'Heroverse' },
+                        ]).map((u) => (
+                          <option key={u.slug} value={u.slug}>
+                            {u.name} ({u.slug})
+                          </option>
+                        ))}
+                      </select>
+                      {/* Universes are the root of the taxonomy and previously had no
+                          insert path anywhere in this panel — adding a world meant
+                          pasting SQL by hand. */}
+                      <button
+                        type="button"
+                        onClick={() => setShowAddUniverseModal(true)}
+                        title="Create a new universe"
+                        className="px-2.5 py-2 bg-ink text-cream hover:bg-ink-muted text-[11px] font-semibold cursor-pointer shrink-0"
+                      >
+                        + New
+                      </button>
+                    </div>
                     <p className="text-[10px] text-ink-muted mt-1 font-light">
                       Maps to /universe/{universeSlug} portal and database foreign key.
                     </p>
@@ -1346,7 +1548,7 @@ INSERT INTO public.embroidery_details (
                       </label>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-accent font-mono font-medium">
-                          public.products (expression_score, expression_slug)
+                          public.products.expression_score → derived slug
                         </span>
                         <span className="text-[10px] font-sans text-accent font-semibold uppercase tracking-widest">
                           Level {selectedExpressionScore}: {selectedExpression.name}
@@ -1412,73 +1614,33 @@ INSERT INTO public.embroidery_details (
                     </div>
                   </div>
 
-                  {/* Social Proof & Ratings (Stored on public.products) */}
+                  {/* Social proof comes from public.reviews, not from typed-in numbers.
+                      rating / review_count are caches the products_guard_rating_cache
+                      trigger refuses to accept unless app.rating_cache_update=on. */}
                   <div className="sm:col-span-2 pt-3 border-t border-stone/20">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
-                          Social Proof, Reviews & Sales Badge
+                          Social Proof
                         </span>
-                        <span className="text-[10px] text-accent font-serif italic">★ Public Display</span>
+                        <span className="text-[10px] text-accent font-serif italic">★ derived, not typed</span>
                       </div>
                       <span className="text-[10px] text-accent font-mono font-medium">
-                        public.products (rating, review_count, sold_count)
+                        public.reviews → products.rating
                       </span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-cream/40 p-3.5 border border-stone/40">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
-                            Rating (1.0 – 5.0)
-                          </label>
-                          <span className="text-[10px] text-accent font-mono font-medium">★ {rating.toFixed(1)}</span>
-                        </div>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="1.0"
-                          max="5.0"
-                          value={rating}
-                          onChange={(e) => setRating(Math.min(5.0, Math.max(1.0, parseFloat(e.target.value) || 5.0)))}
-                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
-                        />
-                        <p className="text-[10px] text-ink-muted mt-1">Average star rating displayed across product cards and PDP</p>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
-                            Review Count
-                          </label>
-                          <span className="text-[10px] text-ink-muted font-mono">{reviewCount} reviews</span>
-                        </div>
-                        <input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={reviewCount}
-                          onChange={(e) => setReviewCount(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
-                        />
-                        <p className="text-[10px] text-ink-muted mt-1">Number of customer reviews displayed beside the star score</p>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] uppercase tracking-wider text-ink font-medium">
-                            Sold Count Badge
-                          </label>
-                          <span className="text-[10px] text-accent font-mono font-medium">{soldCount || 'None'}</span>
-                        </div>
-                        <input
-                          type="text"
-                          value={soldCount}
-                          onChange={(e) => setSoldCount(e.target.value)}
-                          placeholder="50+, 1.2K+, 400+"
-                          className="w-full bg-paper border border-stone/60 px-3 py-1.5 text-xs text-ink font-mono font-semibold focus:outline-none focus:border-accent"
-                        />
-                        <p className="text-[10px] text-ink-muted mt-1">Marketing badge displayed on PDP (e.g. | {soldCount || '50+'} sold)</p>
-                      </div>
+                    <div className="bg-cream/40 p-3.5 border border-stone/40 space-y-2">
+                      <p className="text-[11px] text-ink-muted leading-relaxed">
+                        Rating and review count are computed from real reviews in
+                        <code className="mx-1 px-1 bg-stone/20 font-mono text-[10px]">public.reviews</code>
+                        and rebuilt by trigger. They are not editable here because a
+                        hand-typed star score is a fabricated claim, not a measurement.
+                      </p>
+                      <p className="text-[11px] text-ink-muted leading-relaxed">
+                        A "sold" badge was removed from the schema entirely — it was a
+                        free-text string (<code className="px-1 bg-stone/20 font-mono text-[10px]">"1.2K+"</code>)
+                        that could not be summed, audited, or distinguished from a guess.
+                      </p>
                     </div>
                   </div>
 
@@ -1663,124 +1825,211 @@ INSERT INTO public.embroidery_details (
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Quick Preset Regional Cluster
-                      </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
-                        public.products.craft_region
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {PRESET_REGIONS.map((preset, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => {
-                            setCraftRegion(preset.region);
-                            setCraftCluster(preset.cluster);
-                          }}
-                          className={`px-2.5 py-1 text-[11px] border text-left cursor-pointer transition-colors ${
-                            craftRegion === preset.region
-                              ? 'border-accent bg-accent/10 text-accent font-medium'
-                              : 'border-stone/40 bg-cream text-ink-muted hover:border-ink-muted'
-                          }`}
-                        >
-                          {preset.region.split(',')[0]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Craft Region
-                      </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
-                        public.products.craft_region
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={craftRegion}
-                      onChange={(e) => setCraftRegion(e.target.value)}
-                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Craft Cluster / Guild
-                      </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
-                        public.products.craft_cluster
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={craftCluster}
-                      onChange={(e) => setCraftCluster(e.target.value)}
-                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                        Fabric Weight / GSM
-                      </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
-                        public.products.fabric_gsm
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={fabricGsm}
-                      onChange={(e) => setFabricGsm(e.target.value)}
-                      placeholder="280 GSM Ringspun Combed Cotton"
-                      className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
+                    <div className="sm:col-span-2">
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                          Batch Run #
+                          Style Code
                         </label>
                         <span className="text-[10px] text-accent font-mono font-medium">
-                          batch_number
+                          public.products.style_code — UNIQUE
                         </span>
                       </div>
                       <input
-                        type="number"
-                        min="1"
-                        value={batchNumber}
-                        onChange={(e) => setBatchNumber(parseInt(e.target.value) || 1)}
-                        className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
+                        type="text"
+                        value={styleCode}
+                        onChange={(e) => setStyleCode(e.target.value)}
+                        placeholder="UL-HD-001"
+                        className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink font-mono focus:outline-none focus:border-accent"
                       />
+                      <p className="text-[10px] text-ink-muted mt-1">
+                        The design family. Sizes and colours hang off it as variants.
+                        Both Myntra and Ajio reject a style code reused across unrelated designs.
+                      </p>
                     </div>
-                    <div>
+
+                    <div className="sm:col-span-2">
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
-                          Total In Run
+                          Category Attributes (validated on insert)
                         </label>
                         <span className="text-[10px] text-accent font-mono font-medium">
-                          batch_total
+                          public.products.attributes · {requiredAttrs.length} required for {garmentType || 'this garment'}
                         </span>
                       </div>
-                      <input
-                        type="number"
-                        min="1"
-                        value={batchTotal}
-                        onChange={(e) => setBatchTotal(parseInt(e.target.value) || 50)}
-                        className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink focus:outline-none focus:border-accent"
-                      />
+                      {requiredAttrs.length === 0 ? (
+                        <p className="text-[11px] text-ink-muted bg-cream border border-stone/40 px-3 py-2">
+                          Select a garment type above — it decides which attributes are mandatory.
+                        </p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-cream/40 p-3 border border-stone/40">
+                          {requiredAttrs.map((key) => {
+                            const opts = ATTRIBUTE_OPTIONS[key];
+                            return (
+                              <div key={key}>
+                                <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">
+                                  {key.replace(/_/g, ' ')}
+                                </label>
+                                {opts ? (
+                                  <select
+                                    value={attributes[key] || ''}
+                                    onChange={(e) => setAttributes((prev) => ({ ...prev, [key]: e.target.value }))}
+                                    className="w-full bg-paper border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent"
+                                  >
+                                    <option value="">— choose —</option>
+                                    {opts.map((o) => (
+                                      <option key={o} value={o}>{o.replace(/-/g, ' ')}</option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    value={attributes[key] || ''}
+                                    onChange={(e) => setAttributes((prev) => ({ ...prev, [key]: e.target.value }))}
+                                    className="w-full bg-paper border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent"
+                                  />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  </div>
+
+                    <div className="sm:col-span-2 pt-3 border-t border-stone/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Trust &amp; Logistics
+                        </span>
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          public.products (cod · delivery · returns)
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">COD</label>
+                          <select
+                            value={codAvailable ? 'yes' : 'no'}
+                            onChange={(e) => setCodAvailable(e.target.value === 'yes')}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent"
+                          >
+                            <option value="yes">Available</option>
+                            <option value="no">Prepaid only</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery min (d)</label>
+                          <input type="number" min="1" value={deliveryDaysMin}
+                            onChange={(e) => setDeliveryDaysMin(parseInt(e.target.value) || 1)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery max (d)</label>
+                          <input type="number" min="1" value={deliveryDaysMax}
+                            onChange={(e) => setDeliveryDaysMax(parseInt(e.target.value) || 1)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Return window (d)</label>
+                          <input type="number" min="0" value={returnWindowDays}
+                            onChange={(e) => setReturnWindowDays(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-ink-muted mt-1.5">
+                        Returns of 0 means non-returnable — the honest value for made-to-order pieces.
+                      </p>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Legal Declarations
+                        </label>
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          required for online sale in India
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Country of origin (ISO-2)</label>
+                          <input type="text" maxLength={2} value={countryOfOrigin}
+                            onChange={(e) => setCountryOfOrigin(e.target.value.toUpperCase())}
+                            placeholder="IN"
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Packed by</label>
+                          <input type="text" value={packedBy} onChange={(e) => setPackedBy(e.target.value)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer name</label>
+                          <input type="text" value={manufacturerName} onChange={(e) => setManufacturerName(e.target.value)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer address</label>
+                          <input type="text" value={manufacturerAddress} onChange={(e) => setManufacturerAddress(e.target.value)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
+                          Shipping & Fit Data
+                        </label>
+                        <span className="text-[10px] text-accent font-mono font-medium">
+                          public.products (weight · hsn · package)
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Weight (g)</label>
+                          <input type="number" min="0" value={weightGrams} onChange={(e) => setWeightGrams(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">HSN</label>
+                          <input type="text" value={hsnCode} onChange={(e) => setHsnCode(e.target.value)} placeholder="6109"
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg L (mm)</label>
+                          <input type="number" min="0" value={packageLengthMm} onChange={(e) => setPackageLengthMm(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg W (mm)</label>
+                          <input type="number" min="0" value={packageWidthMm} onChange={(e) => setPackageWidthMm(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg H (mm)</label>
+                          <input type="number" min="0" value={packageHeightMm} onChange={(e) => setPackageHeightMm(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                        <div className="sm:col-span-1">
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Fit notes</label>
+                          <input type="text" value={fitNotes} onChange={(e) => setFitNotes(e.target.value)}
+                            placeholder="Relaxed through the body; size down for a closer fit."
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Model height (cm)</label>
+                          <input type="number" min="0" value={modelHeightCm} onChange={(e) => setModelHeightCm(parseInt(e.target.value) || 0)}
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Model worn size</label>
+                          <input type="text" value={modelWornSize} onChange={(e) => setModelWornSize(e.target.value)} placeholder="M"
+                            className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
+                        </div>
+                      </div>
+                    </div>
 
                   <div className="sm:col-span-2">
                     <div className="flex items-center justify-between mb-1.5">
@@ -1971,6 +2220,10 @@ INSERT INTO public.embroidery_details (
                           <div>Qty</div>
                           <div className="text-[9px] text-accent font-mono font-normal">quantity</div>
                         </th>
+                        <th className="py-2.5 px-3">
+                          <div>Barcode</div>
+                          <div className="text-[9px] text-accent font-mono font-normal">barcode · UNIQUE</div>
+                        </th>
                         <th className="py-2.5 px-3 text-right">Action</th>
                       </tr>
                     </thead>
@@ -2038,6 +2291,30 @@ INSERT INTO public.embroidery_details (
                               }}
                               className="w-12 bg-transparent border-b border-dashed border-stone/50 text-center font-mono"
                             />
+                          </td>
+                          <td className="py-2 px-3">
+                            <input
+                              type="text"
+                              value={v.barcode || ''}
+                              onChange={(e) => {
+                                const copy = [...variants];
+                                // EAN-13 is digits only; strip anything else so a
+                                // pasted code cannot reach the UNIQUE index malformed.
+                                copy[idx].barcode = e.target.value.replace(/\D/g, '').slice(0, 13);
+                                setVariants(copy);
+                              }}
+                              placeholder="8901234567890"
+                              maxLength={13}
+                              title="Physical EAN-13. Must be unique across all variants — the same code on two sizes is rejected by the database."
+                              className={`w-28 bg-transparent border-b border-dashed font-mono text-[11px] focus:outline-none ${
+                                v.barcode && v.barcode.length !== 13
+                                  ? 'border-red-500 text-red-600'
+                                  : 'border-stone/50 focus:border-accent'
+                              }`}
+                            />
+                            {v.barcode && v.barcode.length !== 13 && (
+                              <div className="text-[9px] text-red-600 mt-0.5">{v.barcode.length}/13</div>
+                            )}
                           </td>
                           <td className="py-2 px-3 text-right">
                             <button
@@ -2411,7 +2688,7 @@ INSERT INTO public.embroidery_details (
                       </th>
                       <th className="py-3 px-3">
                         <div>Batch</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">batch_number</span>
+                        <span className="text-[9px] text-accent font-mono font-normal">style_code</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Rating & Reviews</div>
@@ -2471,9 +2748,9 @@ INSERT INTO public.embroidery_details (
                         <td className="py-3 px-3 text-[11px] font-mono text-ink whitespace-nowrap">
                           ★ {product.rating ? Number(product.rating).toFixed(1) : '5.0'}
                           <span className="text-ink-muted ml-1">({product.reviewCount ?? 0})</span>
-                          {product.soldCount && (
-                            <span className="ml-1.5 px-1.5 py-0.5 bg-accent/10 text-accent text-[9px] border border-accent/30 font-medium">
-                              {product.soldCount}
+                          {product.styleCode && (
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-stone/20 text-ink-muted text-[9px] font-mono">
+                              {product.styleCode}
                             </span>
                           )}
                         </td>
@@ -2520,7 +2797,7 @@ INSERT INTO public.embroidery_details (
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Workflow 1</span>
-                  <h3 className="font-serif text-base text-ink font-semibold">Add New Master Taxonomy (Categories, Silhouettes, Capsules)</h3>
+                  <h3 className="font-serif text-base text-ink font-semibold">Add New Master Taxonomy (Universes, Categories, Garments, Collections, Motifs)</h3>
                   <p className="text-[11px] text-ink-muted">
                     Idempotent upsert queries that add new taxonomies or update existing descriptions without foreign key constraint violations.
                   </p>
@@ -2536,6 +2813,61 @@ INSERT INTO public.embroidery_details (
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 0. Add Universe — the root of the taxonomy. Every collection,
+                    motif and product's universe_slug points here, so this must be
+                    first: adding a world is a prerequisite for adding its lore. */}
+                <div className="p-4 bg-cream border border-stone/40 space-y-2 md:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-ink">0. Add Universe (root of the taxonomy)</span>
+                    <span className="text-[10px] text-accent font-mono font-medium">public.universes</span>
+                  </div>
+                  <p className="text-[10px] text-ink-muted leading-relaxed">
+                    A universe is a whole world — its own route, hero, lore, motifs and
+                    product set. Adding one here makes <code className="bg-stone/20 px-1 font-mono">/universe/&lt;slug&gt;</code> live.
+                    Display copy lives in <code className="bg-stone/20 px-1 font-mono">theme_tokens</code>, not in twelve typed columns.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddUniverseModal(true)}
+                    className="w-full py-2 bg-ink text-cream hover:bg-ink-muted text-[10px] uppercase font-semibold cursor-pointer"
+                  >
+                    ✦ Create New Universe
+                  </button>
+                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-32">
+{`INSERT INTO public.universes
+  (slug, name, tagline, lore, drop_cadence, is_active, order_num)
+VALUES (
+  'noirverse', 'Noirverse',
+  'Shadowed tailoring for the after-hours.',
+  'A world built on charcoal linework and silver thread.',
+  'Quarterly', true, 4
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, tagline = EXCLUDED.tagline, lore = EXCLUDED.lore;`}
+                  </pre>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(
+                        `INSERT INTO public.universes
+  (slug, name, tagline, lore, drop_cadence, is_active, order_num)
+VALUES (
+  'noirverse', 'Noirverse',
+  'Shadowed tailoring for the after-hours.',
+  'A world built on charcoal linework and silver thread.',
+  'Quarterly', true, 4
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name, tagline = EXCLUDED.tagline, lore = EXCLUDED.lore;`,
+                        'Add Universe SQL'
+                      )
+                    }
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                  >
+                    📋 Copy Add Universe SQL
+                  </button>
+                </div>
+
                 {/* 1. Add Category */}
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
@@ -2615,7 +2947,7 @@ ON CONFLICT (slug) DO UPDATE SET
                 {/* 3. Add Collection */}
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-serif font-bold text-ink">3. Add Seasonal Drop</span>
+                    <span className="text-xs font-serif font-bold text-ink">3. Add Collection (Seasonal Drop)</span>
                     <span className="text-[10px] text-accent font-mono font-medium">public.collections</span>
                   </div>
                   <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
@@ -2656,7 +2988,7 @@ ON CONFLICT (slug) DO UPDATE SET
                 {/* 4. Add Motif */}
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-serif font-bold text-ink">4. Add Lore Motif</span>
+                    <span className="text-xs font-serif font-bold text-ink">4. Add Motif</span>
                     <span className="text-[10px] text-accent font-mono font-medium">public.motifs</span>
                   </div>
                   <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
@@ -2689,6 +3021,55 @@ ON CONFLICT (id) DO UPDATE SET
                     📋 Copy Add Motif SQL
                   </button>
                 </div>
+              </div>
+            </div>
+
+            {/* Coverage: what the schema supports vs what this panel can do.
+                A schema that can express nine taxonomy tables is only extensible
+                if the panel surfaces them; otherwise every new axis is a SQL paste. */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Coverage</span>
+                  <h3 className="font-serif text-base text-ink font-semibold">What this panel can manage</h3>
+                  <p className="text-[11px] text-ink-muted">
+                    The database is the contract; this is how much of it the Studio can actually reach.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {[
+                  { table: 'universes', label: 'Universes (worlds)', how: 'Form + SQL', ok: true, note: 'Root of the taxonomy. Route /universe/<slug>.' },
+                  { table: 'categories', label: 'Categories', how: 'Form + SQL', ok: true, note: 'Top-level nav grouping.' },
+                  { table: 'garments', label: 'Garment types', how: 'Form + SQL', ok: true, note: 'Drives which attributes are required.' },
+                  { table: 'collections', label: 'Collections / drops', how: 'Form + SQL', ok: true, note: 'Seasonal capsules inside a universe.' },
+                  { table: 'motifs', label: 'Motifs', how: 'SQL snippet', ok: true, note: 'Lore symbols. No form yet — copy the SQL.' },
+                  { table: 'attribute_definitions', label: 'Attribute registry', how: 'SQL only', ok: false, note: 'Decides what a tee vs a scarf must declare. Edit by migration.' },
+                  { table: 'products', label: 'Products', how: 'SQL generator', ok: true, note: 'Emits a full INSERT you paste into Supabase.' },
+                  { table: 'variants', label: 'Variants (size × colour)', how: 'SQL generator', ok: true, note: 'Includes barcode (EAN-13).' },
+                  { table: 'product_images', label: 'Product images', how: 'Upload', ok: true, note: 'Storage bucket + DB rows.' },
+                  { table: 'embroidery_details', label: 'Embroidery / craft', how: 'SQL generator', ok: true, note: 'Technique, artisan hours, thread.' },
+                  { table: 'reviews', label: 'Reviews', how: 'Not managed', ok: false, note: 'Written by customers on the storefront.' },
+                  { table: 'orders', label: 'Orders', how: 'Not managed', ok: false, note: 'Written by checkout. No back-office view.' },
+                  { table: 'newsletter_subscribers', label: 'Newsletter', how: 'Not managed', ok: false, note: 'Written by the footer form. No list view.' },
+                  { table: 'admins', label: 'Admins', how: 'SQL only', ok: false, note: 'Promote via SQL — deliberately not a browser action.' },
+                ].map((row) => (
+                  <div
+                    key={row.table}
+                    className={`p-2.5 border text-[11px] leading-snug ${
+                      row.ok ? 'border-stone/40 bg-cream' : 'border-amber-300 bg-amber-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-ink">{row.label}</span>
+                      <span className={`text-[9px] font-mono shrink-0 ${row.ok ? 'text-accent' : 'text-amber-700'}`}>
+                        {row.ok ? '✓' : '!'} {row.how}
+                      </span>
+                    </div>
+                    <code className="block text-[9px] text-ink-muted font-mono mt-0.5">{row.table}</code>
+                    <p className="text-[10px] text-ink-muted mt-1">{row.note}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -3031,6 +3412,160 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
         )}
 
         {/* Modal 3: Add New Collection */}
+        {showAddUniverseModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+            <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-stone/30 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <h3 className="font-serif text-lg text-ink font-semibold">Add Universe</h3>
+                </div>
+                <span className="text-[10px] text-accent font-mono font-medium">public.universes</span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Universe Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newUniName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewUniName(val);
+                      if (!newUniSlug || newUniSlug === newUniName.toLowerCase().replace(/[^a-z0-9]+/g, '-')) {
+                        setNewUniSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+                      }
+                    }}
+                    placeholder="e.g. Noirverse"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Slug * <span className="font-mono text-[10px] normal-case">→ /universe/{newUniSlug || 'slug'}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newUniSlug}
+                    onChange={(e) => setNewUniSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                    placeholder="noirverse"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink font-mono focus:outline-none focus:border-accent"
+                  />
+                  <p className="text-[10px] text-ink-muted mt-1">
+                    Lowercase, hyphens only. This becomes the URL and the value every
+                    collection, motif and product stores in <code className="font-mono">universe_slug</code>.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={newUniTagline}
+                    onChange={(e) => setNewUniTagline(e.target.value)}
+                    placeholder="One line that sets the world's tone"
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    Lore
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={newUniLore}
+                    onChange={(e) => setNewUniLore(e.target.value)}
+                    placeholder="The story this world is built on. Shown on the universe page."
+                    className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent leading-relaxed"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Lore heading
+                    </label>
+                    <input
+                      type="text"
+                      value={newUniLoreHeading}
+                      onChange={(e) => setNewUniLoreHeading(e.target.value)}
+                      placeholder="The World"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Drop cadence
+                    </label>
+                    <input
+                      type="text"
+                      value={newUniDropCadence}
+                      onChange={(e) => setNewUniDropCadence(e.target.value)}
+                      placeholder="Quarterly"
+                      className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 items-end">
+                  <div>
+                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                      Portal title colour
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={newUniPortalColor}
+                        onChange={(e) => setNewUniPortalColor(e.target.value)}
+                        className="h-9 w-12 bg-cream border border-stone/60 cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={newUniPortalColor}
+                        onChange={(e) => setNewUniPortalColor(e.target.value)}
+                        className="flex-1 bg-cream border border-stone/60 px-2 py-2 text-ink font-mono text-[11px] focus:outline-none focus:border-accent"
+                      />
+                    </div>
+                  </div>
+                  <label className="flex items-center gap-2 text-ink cursor-pointer select-none pb-2">
+                    <input
+                      type="checkbox"
+                      checked={newUniIsActive}
+                      onChange={(e) => setNewUniIsActive(e.target.checked)}
+                      className="w-4 h-4 accent-accent cursor-pointer"
+                    />
+                    <span>Active (visible on site)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone/30">
+                <button
+                  type="button"
+                  onClick={() => setShowAddUniverseModal(false)}
+                  className="px-3 py-2 text-[11px] uppercase tracking-wider text-ink-muted hover:text-ink cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveNewUniverse}
+                  disabled={isSavingTaxonomy}
+                  className="px-4 py-2 bg-ink text-cream hover:bg-ink-muted text-[11px] uppercase tracking-wider font-semibold cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingTaxonomy ? 'Saving...' : 'Save to public.universes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showAddCollectionModal && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
             <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
