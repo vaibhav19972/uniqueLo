@@ -52,8 +52,10 @@ export const NewAndFeaturedSection: React.FC = () => {
         .slice(0, 4);
     }
     if (activeTab === 'limited-editions') {
+      // A "limited edition" signal now comes from curation (collector edits,
+      // handcrafted pieces), not from a fabricated batch counter.
       return list
-        .filter((p) => p.batchNumber != null && p.batchTotal != null)
+        .filter((p) => p.edits?.includes('collector') || p.handcrafted)
         .slice(0, 4);
     }
     if (activeTab === 'collections') {

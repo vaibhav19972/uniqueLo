@@ -23,7 +23,7 @@
       "name": "Midnight Atelier Collection",
       "tagline": "No world, just pure cloth, heroic crests, and tonal needlecraft.",
       "description": "Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing on heavyweight unbleached and charcoal yarns.",
-      "universeSlug": "atelier",
+      "universeSlug": null,
       "featured": true,
       "order": 3
     }

@@ -272,12 +272,24 @@ export interface Product {
   material?: string[];
   care?: string[];
   fit?: string;
-  batchNumber?: number;
-  batchTotal?: number;
-  craftRegion?: string;
-  craftCluster?: string;
   fabricGsm?: string;
   createdAt?: string;
+
+  // ---- Trust & logistics (docs/11-data-model) ----
+  /** ISO 3166-1 alpha-2 country of manufacture. Distinct from craft tradition. */
+  countryOfOrigin?: string;
+  manufacturerName?: string;
+  manufacturerAddress?: string;
+  packedBy?: string;
+  /** COD is the #1 first-order blocker in tier-2/3; never assume it. */
+  codAvailable?: boolean;
+  deliveryDaysMin?: number;
+  deliveryDaysMax?: number;
+  /** 0 means non-returnable — the honest value for personalised pieces. */
+  returnWindowDays?: number;
+  weightGrams?: number;
+  hsnCode?: string;
+  sizeChart?: Record<string, unknown>;
 }
 
 export interface Category {
@@ -470,7 +482,7 @@ export async function getProducts(): Promise<Product[]> {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, expression_slug, rating, review_count, sold_count, tags, featured, customizable, material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm, created_at,
+          slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, rating, review_count, tags, featured, customizable, material, care, fit, fabric_gsm, created_at, country_of_origin, manufacturer_name, manufacturer_address, packed_by, cod_available, delivery_days_min, delivery_days_max, return_window_days, weight_grams, hsn_code, size_chart,
           variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
@@ -510,24 +522,31 @@ export async function getProducts(): Promise<Product[]> {
             artStyleSlug: item.collection_slug,
             intensity: item.intensity ?? (item.expression_score <= 2 ? 'quiet' : item.expression_score === 3 ? 'balanced' : 'loud'),
             expressionScore: item.expression_score ?? 3,
-            expressionSlug: (item.expression_slug ? normalizeStyleSlug(item.expression_slug) : undefined) ?? 'cult',
+            // expression_slug was a 1:1 rename of expression_score; derive it here
+            expressionSlug: getExpressionByScore(item.expression_score)?.slug ?? 'cult',
             isMock: false,
             handcrafted: item.handcrafted ?? false,
             craftTechniques: item.craft_techniques ?? [],
             edits: item.edits ?? [],
             rating: item.rating !== null && item.rating !== undefined ? Number(item.rating) : 5.0,
             reviewCount: item.review_count !== null && item.review_count !== undefined ? Number(item.review_count) : 0,
-            soldCount: item.sold_count || undefined,
             tags: item.tags || [],
             featured: item.featured || false,
             customizable: item.customizable || false,
             material: item.material || [],
             care: item.care || [],
             fit: item.fit,
-            batchNumber: item.batch_number,
-            batchTotal: item.batch_total,
-            craftRegion: item.craft_region,
-            craftCluster: item.craft_cluster,
+            countryOfOrigin: item.country_of_origin ?? 'IN',
+            manufacturerName: item.manufacturer_name ?? undefined,
+            manufacturerAddress: item.manufacturer_address ?? undefined,
+            packedBy: item.packed_by ?? undefined,
+            codAvailable: item.cod_available ?? false,
+            deliveryDaysMin: item.delivery_days_min ?? undefined,
+            deliveryDaysMax: item.delivery_days_max ?? undefined,
+            returnWindowDays: item.return_window_days ?? 0,
+            weightGrams: item.weight_grams ?? undefined,
+            hsnCode: item.hsn_code ?? undefined,
+            sizeChart: item.size_chart ?? undefined,
             fabricGsm: item.fabric_gsm,
             createdAt: item.created_at,
             variants: (item.variants || []).map((v: any) => ({
@@ -957,6 +976,29 @@ export function formatPrice(cents: number): string {
     currency: 'INR',
     maximumFractionDigits: 0,
   }).format(Math.round(cents / 100));
+}
+
+/**
+ * Country of manufacture for display. Distinct from craft tradition: a Kutch
+ * embroidery technique on a garment stitched in Tiruppur is still "Made in India".
+ * Falls back to India because every SKU is domestically made today — but the
+ * field exists so that stops being an assumption (docs/11-data-model).
+ */
+const COUNTRY_LABELS: Record<string, string> = {
+  IN: 'Made in India',
+  JP: 'Made in Japan',
+  IT: 'Made in Italy',
+  PT: 'Made in Portugal',
+  TR: 'Made in Türkiye',
+  BD: 'Made in Bangladesh',
+  LK: 'Made in Sri Lanka',
+  VN: 'Made in Vietnam',
+  CN: 'Made in China',
+};
+
+export function formatCountryOfOrigin(code: string | undefined): string {
+  if (!code) return 'Made in India';
+  return COUNTRY_LABELS[code.toUpperCase()] ?? `Made in ${code.toUpperCase()}`;
 }
 
 export function getDefaultVariant(product: Product): ProductVariant {

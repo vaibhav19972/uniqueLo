@@ -82,12 +82,12 @@ export const NewFeatured: React.FC = () => {
       case 'bestsellers':
         return list.filter((p) => p.tags.includes('bestseller') || (p.rating && p.rating >= 4.7));
       case 'limited-editions':
-        return list.filter((p) => p.batchNumber != null || p.edits?.includes('collector') || p.handcrafted);
+        return list.filter((p) => p.edits?.includes('collector') || p.handcrafted);
       case 'collections':
         return list.filter((p) => Boolean(p.collectionSlug));
       case 'all':
       default:
-        return list.filter((p) => p.featured || p.tags.includes('bestseller') || p.batchNumber != null);
+        return list.filter((p) => p.featured || p.tags.includes('bestseller'));
     }
   }, [allProducts, activeTabKey]);
 

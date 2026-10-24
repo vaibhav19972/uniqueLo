@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import {
   type Product,
   formatPrice,
+  formatCountryOfOrigin,
   getDefaultVariant,
   getExpressionByScore,
   getExpressionScore,
@@ -172,11 +173,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div>
           <div className="flex items-center justify-between text-[9px] sm:text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-0.5 sm:mb-1">
             <span className="truncate max-w-[120px] sm:max-w-none">
-              {product.craftRegion || 'Made in India'}
+              {formatCountryOfOrigin(product.countryOfOrigin)}
               {product.garmentType ? ` · ${product.garmentType}` : ''}
             </span>
-            {product.batchNumber != null && product.batchTotal != null && (
-              <span className="shrink-0">Ed. {product.batchNumber}/{product.batchTotal}</span>
+            {product.codAvailable && (
+              <span className="shrink-0">COD</span>
             )}
           </div>
 

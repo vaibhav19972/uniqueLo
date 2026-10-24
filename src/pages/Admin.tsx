@@ -2466,7 +2466,7 @@ INSERT INTO public.embroidery_details (
                           {product.variants.length} SKUs
                         </td>
                         <td className="py-3 px-3 text-[11px] text-ink-muted">
-                          Run {product.batchNumber ?? 1} / {product.batchTotal ?? 50}
+                          {product.codAvailable ? 'COD' : 'Prepaid'}
                         </td>
                         <td className="py-3 px-3 text-[11px] font-mono text-ink whitespace-nowrap">
                           ★ {product.rating ? Number(product.rating).toFixed(1) : '5.0'}

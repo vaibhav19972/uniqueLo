@@ -7,6 +7,7 @@ import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
 import {
   formatPrice,
+  formatCountryOfOrigin,
   getDefaultVariant,
   getMotifSync,
   COLLECTIONS,
@@ -449,7 +450,7 @@ export const ProductDetail: React.FC = () => {
               <div className="flex flex-col gap-1.5 mb-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
-                    {product.craftRegion || 'Made in India'} // {product.garmentType ?? product.categorySlug}
+                    {formatCountryOfOrigin(product.countryOfOrigin)} // {product.garmentType ?? product.categorySlug}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-ink">
                     {displayRating ? (
@@ -459,12 +460,9 @@ export const ProductDetail: React.FC = () => {
                         </span>
                         <span className="font-medium">{displayRating.value.toFixed(1)}</span>
                         <span className="text-ink-muted text-[11px]">({displayRating.count} reviews)</span>
-                        {product.soldCount && (
-                          <span className="text-ink-muted text-[11px]">| {product.soldCount} sold</span>
-                        )}
                       </>
                     ) : (
-                      <span className="text-ink-muted text-[11px]">New atelier edition — be the first to review</span>
+                      <span className="text-ink-muted text-[11px]">No reviews yet</span>
                     )}
                   </div>
                 </div>
@@ -494,15 +492,24 @@ export const ProductDetail: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Quiet Batch Scarcity Marker */}
-                <div className="inline-flex items-center gap-2 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
-                  {product.batchNumber != null && product.batchTotal != null && (
-                    <span className="text-ink font-medium">
-                      Edition {product.batchNumber} of {product.batchTotal}
+                {/* Trust row — replaces the old batch/cluster scarcity strip.
+                    These are the surfaces a first-time tier-2/3 buyer checks
+                    before adding to bag (docs/11-data-model §5). */}
+                <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
+                  {product.codAvailable && (
+                    <span className="text-ink font-medium">Cash on delivery</span>
+                  )}
+                  {product.returnWindowDays != null && product.returnWindowDays > 0 && (
+                    <span>{product.returnWindowDays}-day returns</span>
+                  )}
+                  {product.returnWindowDays === 0 && (
+                    <span>Made to order · non-returnable</span>
+                  )}
+                  {product.deliveryDaysMin != null && product.deliveryDaysMax != null && (
+                    <span>
+                      Delivers in {product.deliveryDaysMin}–{product.deliveryDaysMax} days
                     </span>
                   )}
-                  {product.batchNumber != null && product.craftCluster && <span>•</span>}
-                  {product.craftCluster && <span>{product.craftCluster}</span>}
                 </div>
               </div>
 
@@ -1394,9 +1401,6 @@ export const ProductDetail: React.FC = () => {
                   {product.name}
                 </span>
                 <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
-                  {product.batchNumber != null && product.batchTotal != null
-                    ? `Edition ${product.batchNumber}/${product.batchTotal} • `
-                    : ''}
                   {currentVariant.size}
                 </span>
               </div>
