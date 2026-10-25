@@ -57,8 +57,11 @@ Update the image `src` in `src/data/mock-products.json` (the canonical catalog)
 to the real path once it exists. Until then, point `src` to the placeholder.
 
 **Current state (2026-10-12):** the storefront catalog is
-`src/data/mock-products.json` (5 curated products, 31 variants;
-`isMock: true`). Its image `src` paths point at real files in
+`src/data/mock-products.json` (3 fallback products, 25 variants; no `isMock`
+flag — retired 2026-10-25). The real catalogue is Supabase `products`
+(29 rows) seeded from `backend/production-seed.sql`, whose images live in the
+`product-images` storage bucket as absolute CDN URLs. The fallback's image `src`
+paths point at real files in
 `public/images/products/`, `public/images/categories/`, and
 `public/images/placeholders/` (all referenced paths verified on disk,
 2026-10-12). `sakura-ronin-hoodie` is fully dedicated (v1 spec-board crop);

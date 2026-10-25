@@ -19,7 +19,6 @@
         "everyday"
       ],
       "motifId": "sakura",
-      "isMock": true,
       "foreignTagline": "桜の浪人",
       "rating": 4.8,
       "reviewCount": 320,
@@ -265,7 +264,6 @@
         "everyday"
       ],
       "motifId": "guardian-stripes",
-      "isMock": true,
       "rating": 4.7,
       "reviewCount": 68,
       "featured": false,
@@ -492,7 +490,6 @@
         "festive-gifting"
       ],
       "motifId": "arch-jaal",
-      "isMock": true,
       "rating": 4.8,
       "reviewCount": 33,
       "featured": false,

@@ -19,8 +19,8 @@ The `DROP TABLE ... CASCADE` block at the top of `backend/schema.sql` is strictl
 | File | Role | Execution Timing | Data Contained |
 | :--- | :--- | :--- | :--- |
 | **`backend/schema.sql`** | **Pure DDL Blueprint** | Once at initial project setup or disaster recovery | Tables, primary/foreign keys, check constraints, performance indexes, RLS policies, Storage buckets. **Zero catalog data rows.** |
-| **`backend/production-seed.sql`** | **Production Baseline Data** | Once right after initial `schema.sql` execution | Complete Master Taxonomy (3 Universes, 7 Motifs, 5 Categories, 9 Garments, 3 Collections) + exactly 2 authentic flagship products (`is_mock = false`). |
-| **`backend/seed.sql`** | **Local Development Data** | Localhost & demo testing | Master Taxonomy + 13 mock/legacy products. |
+| **`backend/production-seed.sql`** | **Production Baseline Data** | Once right after initial `schema.sql` execution | Complete Master Taxonomy as generated today (4 Universes, 8 Motifs, 7 Categories, 10 Garments, 4 Collections) + 3 flagship products / 25 variants. Counts are whatever `web/src/data/*.json` holds — do not hand-quote them; they are `gen-seed` output. No `is_mock` column — that flag was retired 2026-10-25 and `production-seed.sql` does not reference it (verified: 0 occurrences). |
+| **`backend/seed.sql`** | **Local Development Data (legacy)** | Localhost & demo testing | Master Taxonomy + 13 mock/legacy products. Does not load against the current schema (inserts the never-created `is_mock`/`vibes`/`moods`) — see `backend/contracts/schema-drift.md`. |
 | **`supabase/migrations/`** | **Incremental Migrations** | Ongoing as new features/tables are released | Numbered SQL patches applied sequentially to evolving production databases. |
 
 ---
@@ -331,12 +331,21 @@ If inserting via the Supabase SQL Editor, execute in this strict order within a 
 BEGIN;
 
 -- 1. Base Product Record
+-- Columns match CONTRACT.md §3 / the measured live 44-column shape.
+-- The attribute trigger requires every attribute the registry marks mandatory
+-- for this garment_type ('hoodie'): pattern, neck_type, sleeve_length, closure
+-- (per-garment) + occasion, fabric_composition (global).
 INSERT INTO public.products (
   slug, name, subtitle, foreign_tagline, description, category_slug, universe_slug,
-  collection_slug, garment_type, gender, motif_id, is_mock, handcrafted, intensity,
-  craft_techniques, edits, expression_score, expression_slug, vibes, moods,
-  rating, review_count, sold_count, tags, featured, customizable,
-  material, care, fit, batch_number, batch_total, craft_region, craft_cluster, fabric_gsm
+  collection_slug, garment_type, gender, motif_id, handcrafted,
+  craft_techniques, edits, expression_score,
+  tags, featured, customizable,
+  material, care, fit, fabric_gsm,
+  country_of_origin, manufacturer_name, manufacturer_address, packed_by,
+  cod_available, delivery_days_min, delivery_days_max, return_window_days,
+  weight_grams, hsn_code, size_chart, attributes, style_code,
+  fit_notes, model_height_cm, model_worn_size,
+  package_length_mm, package_width_mm, package_height_mm
 ) VALUES (
   'monochrome-katana-hoodie',
   'Monochrome Katana Oversized Hoodie',
@@ -349,27 +358,40 @@ INSERT INTO public.products (
   'hoodie',          -- Must exist in garments
   'unisex',
   'sakura',          -- Must exist in motifs (or NULL)
-  false,             -- Production live item
   true,              -- Handcrafted atelier piece
-  'balanced',        -- 'quiet' | 'balanced' | 'loud'
   ARRAY['high-relief-fill', 'satin-stitch'],
   ARRAY['statement', 'everyday'],
   3,
-  'cult',            -- 'minimal' | 'understated' | 'cult' | 'expressive' | 'maximalist'
-  ARRAY['aesthetic', 'noir'],
-  ARRAY['statement', 'poetic'],
-  5.0, 14, '65+',
   ARRAY['hoodie', 'katana', 'animeverse', 'black', 'heavyweight'],
   true, false,
   ARRAY['100% GOTS Organic Cotton Fleece (450 GSM)', 'Japanese Rayon Threads'],
   ARRAY['Machine wash cold gentle', 'Dry flat in shade'],
   'Boxy oversized atelier drape',
-  1, 50,
-  'Kyoto & Tirupur Guild', 'Master Needlecraft Studio', '450 GSM'
+  '450 GSM',
+  'IN',                                  -- ISO 3166-1 alpha-2
+  'UniqueLo Atelier Pvt Ltd',            -- manufacturer_name
+  'Tirupur, Tamil Nadu 641604, India',   -- manufacturer_address
+  'Tirupur, Tamil Nadu 641604, India',   -- packed_by
+  true,                                  -- cod_available
+  3, 7,                                  -- delivery_days_min / max
+  7,                                     -- return_window_days
+  900,                                   -- weight_grams
+  '6110',                                -- hsn_code (4-8 digits)
+  '{"S":{"chest_cm":104,"length_cm":68},"M":{"chest_cm":110,"length_cm":70}}'::jsonb,
+  '{"pattern":"solid","neck_type":"hooded","sleeve_length":"long","closure":"pull-on","occasion":"casual","fabric_composition":"100% organic cotton fleece"}'::jsonb,
+  'UL-KAT-HOOD-001',                     -- style_code (unique per design family)
+  'Drops 2cm at the shoulder; size down for a regular fit.',
+  178,                                   -- model_height_cm
+  'M',                                   -- model_worn_size
+  350, 280, 90                           -- package L/W/H mm (volumetric)
 ) ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   subtitle = EXCLUDED.subtitle,
   description = EXCLUDED.description;
+
+-- NOTE: rating / review_count are deliberately omitted. They are caches
+-- maintained from public.reviews; products_guard_rating_cache refuses a manual
+-- change unless app.rating_cache_update = 'on'.
 
 -- 2. Images (Slots 0 to 5)
 DELETE FROM public.product_images WHERE product_slug = 'monochrome-katana-hoodie';

@@ -85,14 +85,11 @@ export interface Product {
   vibes?: string[];
   /** Buyer-intent mood tags (1–3 per product, registry: moods.json). */
   moods?: string[];
-  /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
-  isMock?: boolean;
   /** True only for genuinely handcrafted pieces; gates the "Handcrafted" tag on cards + PDP. */
   handcrafted?: boolean;
   /** Mock-phase social proof. Replaced by real review aggregates at launch. */
   rating?: number;
   reviewCount?: number;
-  soldCount?: string;
   /** Tags for filtering / search */
   tags: string[];
   variants: ProductVariant[];
@@ -182,15 +179,16 @@ export interface CartItem {
 > `src/data/products.json` (the original 13-product atelier line) was
 > **deleted on 2026-10-12** as stale local data — it is no longer imported
 > anywhere and no longer on disk. `backend/seed.sql` (as migrated 2026-10-11)
-> still seeds that legacy line with `is_mock = false`, and the schema now
-> carries the full universe columns.
-> **Caution:** `getProducts()` does not yet filter `is_mock` (docs/08 §03-2c
-> requirement) — after applying the migrated seed, legacy rows pass universe
-> feature-detection and would leak to the storefront. Add the `.eq('is_mock',
-> true)` guard (or treat this as a real-SKU launch, not a mock-phase deploy).
-> Precedence:
-> **`mock-products.json` (bundled, mock phase) → Supabase `is_mock = true`
-> rows (real SKUs, post-launch)**.
+> **Superseded 2026-10-25 — there is no `is_mock` column and no mock flag.**
+> `is_mock`, `vibes` and `moods` were never created by any DDL and have been
+> retired by decision; `product.isMock` was removed from `data.ts` and
+> `mock-products.json`. Do **not** add the `.eq('is_mock', true)` guard this
+> section used to recommend — there is nothing to filter.
+> Precedence today:
+> **`mock-products.json` is a client-side fallback only** (used when Supabase is
+> unconfigured or errors), **not** a second catalogue. Supabase rows are the real
+> catalogue, and `products/` + `production-seed.sql` is its content source.
+> Either side may hold any number of products.
 
 ### `src/data/categories.json`
 
@@ -250,18 +248,19 @@ export interface CartItem {
 
 ### `src/data/mock-products.json`
 
-The storefront catalog. As of 2026-10-12 it holds 5 curated products
-(`isMock: true`, the featured set covering all 3 universes) — 2 Animeverse,
-2 Heroverse, 1 Itihaas — each with:
+The storefront fallback catalog. As of 2026-10-25 it holds 3 curated products
+(the featured set covering 3 universes), used only when Supabase is
+unconfigured or a read errors — not a second catalogue. Each has:
 
 - 1 slug + name + subtitle + description
 - 1 categorySlug matching `categories.json`, 1 universeSlug matching `universes.json`
 - 1–3 mood tags + vibe tokens (registry-driven facets)
-- 1+ variants with at least one color and one size (31 variants total; most have
-  6–7)
-- 6 images each (`sakura-ronin-hoodie` fully dedicated via the All-in-One
-  spec-board intake; remaining SKUs reuse atelier/product imagery — see docs/06)
-- rating / reviewCount / soldCount mock social proof (`isMock` gates honesty rules)
+- 1+ variants with at least one color and one size (25 variants total,
+  measured 2026-10-25: 12 / 12 / 1)
+- 2–6 images each (`sakura-ronin-hoodie` has 6 and is fully dedicated via the
+  All-in-One spec-board intake; the other two reuse atelier/product imagery — see docs/06)
+- rating / reviewCount — cached social proof (no `soldCount`: that column was
+  dropped by `20261024`, and hand-typed strings like `"120+"` are not carried)
 
 ### Supporting registries
 
@@ -273,7 +272,10 @@ The storefront catalog. As of 2026-10-12 it holds 5 curated products
 
 The original 13-product / 45-variant atelier line was deleted on 2026-10-12
 as stale local data (it had been unimported since the mock phase began).
-The DB-side legacy record lives on in `backend/seed.sql` (`is_mock = false`).
+The DB-side legacy record lives on only in `backend/seed.sql`, which is a
+local/dev file that still mentions the never-created `is_mock` / `vibes` / `moods`
+columns and therefore does not load against the current schema. It is not a
+production path; the production baseline is `backend/production-seed.sql`.
 (`scripts/generate_assets.py` is a standalone PIL generator that reads
 neither catalog file.)
 

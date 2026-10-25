@@ -252,8 +252,8 @@ export interface Product {
    * Powers the Edits gateway + edit facet — never rendering.
    */
   edits?: EditSlug[];
-  /** True for render-derived mock seed. Storefront shows mock catalog until real SKUs land. */
-  isMock?: boolean;
+  // No mock flag: the catalogue has no is_mock column and nothing marks rows
+  // as seed-derived. mock-products.json is a fallback only, not a second catalogue.
   /**
    * True only for pieces that are genuinely handcrafted. Generic embroidery
    * copy must never claim handcraft — this flag gates the per-product
@@ -540,7 +540,6 @@ export async function getProducts(): Promise<Product[]> {
             expressionScore: item.expression_score ?? 3,
             // expression_slug was a 1:1 rename of expression_score; derive it here
             expressionSlug: getExpressionByScore(item.expression_score)?.slug ?? 'cult',
-            isMock: false,
             handcrafted: item.handcrafted ?? false,
             craftTechniques: item.craft_techniques ?? [],
             edits: item.edits ?? [],

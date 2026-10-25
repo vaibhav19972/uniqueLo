@@ -1,6 +1,6 @@
 # Testing Strategy & Test-Case Plan
 
-> **Owner:** Vaibhav · **Created:** 2026-10-12 · **Status:** Plan (nothing implemented yet)
+> **Owner:** Vaibhav · **Created:** 2026-10-12 · **Status:** Layer 1 started 2026-10-25 (`npm test`, `src/lib/data.test.ts`); T2/T3 still planned
 > **Goal:** Guard the two biggest regression surfaces — the catalog data spine and the
 > cart/checkout/customizer flows — with a layered test suite. Layer 1 catches logic bugs
 > in milliseconds; Layer 2 catches what users actually experience.
@@ -51,7 +51,7 @@ jsdom.
 | T1.1 | Data integrity gate | Every mock product: slug unique; every variant has sku/color/size/price_cents; `technique` ∈ `CRAFT_TECHNIQUES`; every `vibe` ∈ `VIBES`; every `mood` ∈ mood registry; `image paths` resolve (join `public/`) — turns the manual parity audit (5 products/31 variants, 25 image paths) into a 5 ms failing test |
 | T1.2 | `formatPrice` | INR grouping (`Intl.NumberFormat('en-IN')`), no decimals; non-negative; matches docs/03 contract |
 | T1.3 | `filterProducts()` | Each `FilterState` dimension alone filters correctly (universe, gender, technique, vibe, mood, size, price); combinations AND together; empty state returns `[]` not throw |
-| T1.4 | Catalog fallback precedence | With Supabase unset → mock catalog; with Supabase error → mock catalog; with rows lacking `universe_slug` → mock catalog (feature detection); **with `is_mock=true` rows → still filtered out (TDD for the `[[kb/is-mock-guard-gap]]` guard: write this test red first, then add the `.eq('is_mock', true)`)** |
+| T1.4 | Catalog fallback precedence | With Supabase unset → mock catalog; with Supabase error → mock catalog; with rows lacking `universe_slug` → mock catalog (feature detection); **No `is_mock` guard — the flag was retired 2026-10-25 and the DB has no mock column, so this case now covers fallback precedence only** |
 | T1.5 | `createOrder()` payload | order + order_items shape matches `docs/03` CartItem/Order contract; price in paise; customization jsonb round-trips |
 
 **T2. Zustand stores (`src/stores/`)**
@@ -157,6 +157,8 @@ obsolete, so don't over-invest.
 
 1. Vitest installed + `data.ts` integrity gate (T1.1) — **this alone converts the
    parity audit from a manual checklist into a runnable test**.
-2. `is_mock` guard TDD red-green (T1.4) + the code fix in `getProducts()`.
+2. Catalog fallback precedence (T1.4) — Supabase unset / error / missing
+   `universe_slug`. **No `is_mock` guard:** that column was retired 2026-10-25
+   and never existed in any DDL, so there is nothing to filter.
 3. Cart store clamping tests (T2.1–T2.2).
 4. e2e init + 3 smoke tests (T5.1, T5.4, T5.7).

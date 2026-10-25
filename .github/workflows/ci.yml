@@ -1,0 +1,45 @@
+name: web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    # Set BACKEND_TOKEN (a PAT with read access to UniqueLo-backend) to also run
+    # the shared contract/seed gates; without it the web-only gates still run.
+    env:
+      BACKEND_TOKEN: ${{ secrets.BACKEND_TOKEN }}
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: web
+
+      - name: Checkout shared backend (contract gate)
+        if: env.BACKEND_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          repository: vaibhav19972/UniqueLo-backend
+          path: backend
+          token: ${{ env.BACKEND_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+      - name: Contract + seed parity (needs backend/)
+        if: env.BACKEND_TOKEN != ''
+        run: npm run contract:check && npm run seed:check && node ../backend/scripts/check-schema-parity.mjs
