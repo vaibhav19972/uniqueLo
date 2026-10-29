@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useAuthStore } from '../../stores/auth';
 import { Button } from '../ui/Button';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
@@ -27,13 +27,26 @@ export const AuthModal: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setPassword('');
     setShowPassword(false);
     setResetSent(false);
     clearError();
     closeModal();
-  };
+  }, [clearError, closeModal]);
+
+  // A successful sign-in closes the modal from inside the store
+  // (`set({ isOpen: false })`), which bypasses handleClose and leaves the
+  // typed password sitting in component state. Clear it whenever the modal
+  // is not open, regardless of which path closed it.
+  React.useEffect(() => {
+    if (!isOpen) {
+      setPassword('');
+      setShowPassword(false);
+      setResetSent(false);
+      clearError();
+    }
+  }, [isOpen, clearError]);
 
   const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, handleClose);
 

@@ -4,12 +4,21 @@ import { useEffect, useRef } from 'react';
  * Dialog focus management: initial focus on open, Tab trap while open,
  * Escape to close, and return-focus to the opener on close.
  * Attach the returned ref to the dialog surface (with tabIndex={-1}).
+ *
+ * IMPORTANT — `onClose` must be referentially stable (a store action, or
+ * wrapped in useCallback). If the caller passes an inline arrow, its identity
+ * changes on every render, this effect re-runs, and it re-runs `initial.focus()`
+ * — which yanks focus back to the first field after every keystroke and makes
+ * the rest of the form impossible to fill.
  */
 export function useDialogFocus<T extends HTMLElement>(
   isOpen: boolean,
   onClose: () => void,
 ) {
   const ref = useRef<T | null>(null);
+  // Latest onClose in a ref so the effect does not depend on its identity.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -34,7 +43,7 @@ export function useDialogFocus<T extends HTMLElement>(
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== 'Tab') return;
@@ -59,7 +68,7 @@ export function useDialogFocus<T extends HTMLElement>(
       node.removeEventListener('keydown', onKeyDown);
       previouslyFocused?.focus?.();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   return ref;
 }

@@ -467,7 +467,7 @@ export const Header: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
             </svg>
             {user && (
-              <span className="absolute bottom-1 sm:bottom-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-600" aria-hidden="true" />
+              <span className="absolute bottom-1 sm:bottom-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
             )}
           </button>
 
@@ -703,7 +703,7 @@ export const Header: React.FC = () => {
                       {(user.user_metadata?.full_name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Customer'}
                     </p>
                   </div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" aria-label="Signed in" />
+                  <span className="w-2 h-2 rounded-full bg-success shrink-0" aria-label="Signed in" />
                 </div>
                 <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone/30">
                   <Link

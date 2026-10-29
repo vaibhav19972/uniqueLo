@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router';
 import { useAuthStore } from '../../stores/auth';
 import { Button } from '../ui/Button';
@@ -31,10 +31,13 @@ export const AccountDrawer: React.FC = () => {
     pincode: '',
   });
 
-  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, () => {
-    setAdding(false);
-    closeDrawer();
-  });
+  const dialogRef = useDialogFocus<HTMLDivElement>(
+    isOpen,
+    useCallback(() => {
+      setAdding(false);
+      closeDrawer();
+    }, [closeDrawer]),
+  );
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
