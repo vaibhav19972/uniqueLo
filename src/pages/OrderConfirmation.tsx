@@ -32,10 +32,11 @@ interface OrderItemRecord {
 }
 
 export const OrderConfirmation: React.FC = () => {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { orderId: routeOrderId } = useParams<{ orderId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const emailParam = searchParams.get('email') || '';
 
+  const [inputOrderId, setInputOrderId] = useState(routeOrderId || '');
   const [inputEmail, setInputEmail] = useState(emailParam);
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [items, setItems] = useState<OrderItemRecord[]>([]);
@@ -45,6 +46,8 @@ export const OrderConfirmation: React.FC = () => {
   const [, startTransition] = useTransition();
 
   const showToast = useToastStore((s) => s.showToast);
+
+  const activeOrderId = order?.id || routeOrderId || inputOrderId.trim();
 
   const fetchOrder = async (targetId: string, emailToUse: string) => {
     if (!targetId || !emailToUse.trim()) return;
@@ -69,23 +72,25 @@ export const OrderConfirmation: React.FC = () => {
   };
 
   useEffect(() => {
-    if (orderId && emailParam) {
+    if (routeOrderId && emailParam) {
       startTransition(() => {
-        fetchOrder(orderId, emailParam);
+        fetchOrder(routeOrderId, emailParam);
       });
     }
-  }, [orderId, emailParam]);
+  }, [routeOrderId, emailParam]);
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleLookupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputEmail.trim() || !orderId) return;
-    setSearchParams({ email: inputEmail.trim() });
-    fetchOrder(orderId, inputEmail.trim());
+    const targetId = routeOrderId || inputOrderId.trim();
+    const targetEmail = inputEmail.trim();
+    if (!targetId || !targetEmail) return;
+    setSearchParams({ email: targetEmail });
+    fetchOrder(targetId, targetEmail);
   };
 
   const handleCopyId = () => {
-    if (!orderId) return;
-    navigator.clipboard.writeText(orderId);
+    if (!activeOrderId) return;
+    navigator.clipboard.writeText(activeOrderId);
     setCopied(true);
     showToast({
       title: 'Order ID Copied',
@@ -143,9 +148,15 @@ export const OrderConfirmation: React.FC = () => {
                 Atelier Order Vault
               </h1>
               <p className="text-xs text-ink-muted mt-2.5 leading-relaxed font-sans">
-                Please enter the collector email associated with order reference{' '}
-                <span className="font-mono text-ink font-medium break-all">{orderId}</span> to
-                retrieve your verified archival receipt.
+                {routeOrderId ? (
+                  <>
+                    Please enter the collector email associated with order reference{' '}
+                    <span className="font-mono text-ink font-medium break-all">{routeOrderId}</span> to
+                    retrieve your verified archival receipt.
+                  </>
+                ) : (
+                  'Enter your Order ID and associated collector email to retrieve your verified archival receipt.'
+                )}
               </p>
 
               {errorMessage && (
@@ -154,7 +165,17 @@ export const OrderConfirmation: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleEmailSubmit} className="mt-6 space-y-3">
+              <form onSubmit={handleLookupSubmit} className="mt-6 space-y-3">
+                {!routeOrderId && (
+                  <input
+                    type="text"
+                    required
+                    placeholder="Order ID (e.g. 550e8400-e29b-41d4-a716-446655440000)"
+                    value={inputOrderId}
+                    onChange={(e) => setInputOrderId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-cream border border-stone text-xs text-ink focus:outline-none focus:border-ink font-mono"
+                  />
+                )}
                 <input
                   type="email"
                   required

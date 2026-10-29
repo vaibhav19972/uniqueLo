@@ -3,6 +3,9 @@ import { persist } from 'zustand/middleware';
 
 interface WishlistState {
   savedSlugs: string[];
+  isOpen: boolean;
+  openWishlist: () => void;
+  closeWishlist: () => void;
   toggleWishlist: (slug: string) => void;
   isWishlisted: (slug: string) => boolean;
   clearWishlist: () => void;
@@ -13,6 +16,9 @@ export const useWishlistStore = create<WishlistState>()(
   persist(
     (set, get) => ({
       savedSlugs: [],
+      isOpen: false,
+      openWishlist: () => set({ isOpen: true }),
+      closeWishlist: () => set({ isOpen: false }),
       toggleWishlist: (slug) => {
         set((state) => {
           const exists = state.savedSlugs.includes(slug);

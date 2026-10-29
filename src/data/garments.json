@@ -62,6 +62,55 @@
       "categorySlug": "accessories",
       "description": "Raw-canvas totes with sun-disc and motif hits.",
       "order": 9
+    },
+    {
+      "slug": "sweater",
+      "name": "Sweaters",
+      "categorySlug": "knitwear",
+      "description": "Knit pullovers with mandarin collars and tonal botanical embroidery.",
+      "order": 10
+    },
+    {
+      "slug": "sweatshirt",
+      "name": "Sweatshirts",
+      "categorySlug": "tops",
+      "description": "Fleece-back crewneck sweatshirts with chest graphics.",
+      "order": 11
+    },
+    {
+      "slug": "blouse",
+      "name": "Blouses",
+      "categorySlug": "tops",
+      "description": "Button-front and tie-neck blouses with sleeve and yoke embroidery.",
+      "order": 12
+    },
+    {
+      "slug": "kurta",
+      "name": "Kurtas",
+      "categorySlug": "tops",
+      "description": "Tunic-length kurtas with folk embroidery and tassel ties.",
+      "order": 13
+    },
+    {
+      "slug": "tunic",
+      "name": "Tunics",
+      "categorySlug": "tops",
+      "description": "Relaxed tunic tops with embroidered necklines and hem bands.",
+      "order": 14
+    },
+    {
+      "slug": "skirt",
+      "name": "Skirts",
+      "categorySlug": "bottoms",
+      "description": "Gathered A-line skirts with waistband and trailing floral embroidery.",
+      "order": 15
+    },
+    {
+      "slug": "jeans",
+      "name": "Jeans",
+      "categorySlug": "bottoms",
+      "description": "Wide-leg denim with embroidered hems and contrast topstitching.",
+      "order": 16
     }
   ]
 }

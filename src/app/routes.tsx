@@ -169,6 +169,14 @@ export const routes: RouteObject[] = [
         element: withSuspense(<OrderConfirmation />),
       },
       {
+        path: 'track-order',
+        element: withSuspense(<OrderConfirmation />),
+      },
+      {
+        path: 'orders',
+        element: withSuspense(<OrderConfirmation />),
+      },
+      {
         path: '*',
         element: <NotFound />,
       },

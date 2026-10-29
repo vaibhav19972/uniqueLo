@@ -469,6 +469,18 @@ export function getCharacterIds(p: Product | undefined): string[] {
 
 const mockReviews: Record<string, Review[]> = {
   // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
+  'cherry-blossom-hoodie': [
+    {
+      id: 'mock-rev-1',
+      productSlug: 'cherry-blossom-hoodie',
+      author: 'Arjun Mehta',
+      rating: 5,
+      title: 'Embroidery quality is next level',
+      comment: 'Feels premium and even better in person. Oversized fit is perfect.',
+      verified: true,
+      createdAt: '2 weeks ago',
+    },
+  ],
   'sakura-ronin-hoodie': [
     {
       id: 'mock-rev-1',
@@ -1257,10 +1269,23 @@ export async function createOrder(input: CreateOrderInput): Promise<{ success: b
       }
 
       if (rpcError) {
-        console.warn('[UniqueLo] place_order RPC failed, trying fallback insert:', rpcError);
+        // Fall back ONLY if the RPC function itself is missing on older backends (404 / 501 / PGRST202).
+        // Any business error (P0001 out of stock, P0002 unknown SKU, invalid coupon 22023) MUST fail immediately.
+        const msg = (rpcError.message || '').toLowerCase();
+        const isMissingRpc =
+          rpcError.code === 'PGRST202' ||
+          rpcError.code === '42883' ||
+          (msg.includes('function') && msg.includes('not found')) ||
+          msg.includes('does not exist');
+
+        if (!isMissingRpc) {
+          throw new Error(rpcError.message || 'Could not place order. Please review your bag and try again.');
+        }
+
+        console.warn('[UniqueLo] place_order RPC not found on backend, trying legacy direct insert:', rpcError);
       }
 
-      // Fallback: direct insert with client-supplied orderId and return=minimal to avoid RLS SELECT 42501
+      // Legacy fallback: direct insert with client-supplied orderId and return=minimal to avoid RLS SELECT 42501
       const { error: orderError } = await supabase.from('orders').insert(p_order);
 
       if (orderError) throw orderError;

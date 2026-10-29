@@ -53,7 +53,7 @@ web
 ## Evidence on Hand
 
 - Fully operational React 19 + TypeScript + Vite codebase running locally on dev server.
-- Catalog infrastructure: 13 curated products (121 variants) in `src/data/mock-products.json` (canonical storefront catalog, `isMock: true`; 5 Atelier / 3 Animeverse / 3 Heroverse / 2 Itihaas; intensity 5 Quiet / 4 Balanced / 4 Loud). Placeholders, category tiles, and campaign frames stay in-repo for owner updates. Supabase backend live for orders/newsletter (see docs/07).
+- Catalog infrastructure: 29 curated products (197 variants) synchronized across `src/data/mock-products.json` (canonical offline fallback), `products/` pipeline, and `backend/production-seed.sql` (Atelier, Animeverse, Heroverse, Itihaas; full Quiet / Balanced / Loud intensity spectrum). Placeholders, category tiles, and campaign frames stay in-repo for owner updates. Supabase backend live for orders/newsletter (see docs/07).
 - High-definition macro photography and garment assets in `public/images/` (products, categories, campaigns — placeholder tonal blocks pending the real shoot; see docs/06).
 - Validated build pipeline: `tsc -b`, `vite build`, and `oxlint` all passing with 0 errors.
 

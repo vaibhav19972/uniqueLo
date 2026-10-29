@@ -3,6 +3,7 @@ import { Outlet } from 'react-router';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { CartDrawer } from '../components/layout/CartDrawer';
+import { WishlistDrawer } from '../components/layout/WishlistDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { ToastContainer } from '../components/ui/Toast';
@@ -29,6 +30,7 @@ export const Layout: React.FC = () => {
       </main>
       <Footer />
       <CartDrawer />
+      <WishlistDrawer />
       <CustomizerModal />
       <QuickViewModal />
       <ToastContainer />

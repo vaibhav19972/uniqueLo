@@ -124,7 +124,13 @@ export const Footer: React.FC = () => {
             <ul className="mt-4 space-y-2.5 text-sm text-cream/75 font-light">
               {CARE_LINKS.map((l) => (
                 <li key={l}>
-                  <span className="hover:text-cream transition-colors cursor-pointer">{l}</span>
+                  {l === 'Track Your Order' ? (
+                    <Link to="/track-order" className="hover:text-cream transition-colors">
+                      {l}
+                    </Link>
+                  ) : (
+                    <span className="hover:text-cream transition-colors cursor-pointer">{l}</span>
+                  )}
                 </li>
               ))}
             </ul>

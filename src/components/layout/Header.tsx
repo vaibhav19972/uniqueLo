@@ -25,6 +25,7 @@ export const Header: React.FC = () => {
   const totalItems = useCartStore((state) => state.getTotalItems());
   const openCart = useCartStore((state) => state.openCart);
   const wishlistCount = useWishlistStore((state) => state.count());
+  const openWishlist = useWishlistStore((state) => state.openWishlist);
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
   const showToast = useToastStore((state) => state.showToast);
 
@@ -84,23 +85,7 @@ export const Header: React.FC = () => {
   const closeMenu = () => setActiveMenu(null);
 
   const handleWishlistClick = () => {
-    if (wishlistCount === 0) {
-      showToast({
-        title: 'Your Wishlist is Empty',
-        description: 'Tap the heart icon on any garment card to bookmark your desired pieces.',
-        type: 'info',
-      });
-    } else {
-      showToast({
-        title: `Wishlist: ${wishlistCount} Pieces Saved`,
-        description: 'Explore the Collections page to review and add them to your Atelier Bag.',
-        actionLabel: 'Go to Collections',
-        onAction: () => {
-          navigate('/shop');
-        },
-        type: 'accent',
-      });
-    }
+    openWishlist();
   };
 
   // Active path helpers
