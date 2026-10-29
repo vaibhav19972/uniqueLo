@@ -974,20 +974,20 @@ export const CartDrawer: React.FC = () => {
 
       {/* Simulated Checkout Modal */}
       {isCheckoutOpen && (
-        <div className="fixed inset-0 z-[490] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[490] flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div
             onClick={() => setIsCheckoutOpen(false)}
             className="fixed inset-0 bg-ink/70 backdrop-blur-md"
           />
-          <div className="relative w-full max-w-lg bg-paper border border-stone shadow-2xl rounded-sm p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-lg bg-paper border border-stone shadow-2xl rounded-t-xl sm:rounded-sm p-5 sm:p-8 z-10 max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
             {checkoutStep === 'details' ? (
-              <div>
-                <div className="flex justify-between items-center pb-3 border-b border-stone/60">
+              <div className="flex flex-col flex-1 min-h-0">
+                <div className="flex justify-between items-center pb-3 border-b border-stone/60 shrink-0">
                   <h3 className="font-serif text-2xl text-ink">Atelier Order Checkout</h3>
                   <button onClick={() => setIsCheckoutOpen(false)} aria-label="Close checkout" className="min-w-[44px] min-h-[44px] px-2 text-xs text-ink-muted hover:text-ink">✕</button>
                 </div>
 
-                <div className="my-4 p-3 bg-cream border border-stone/60 text-xs">
+                <div className="my-3 p-3 bg-cream border border-stone/60 text-xs shrink-0">
                   <div className="flex justify-between font-medium text-ink">
                     <span>Order Total ({cartLines.length} items):</span>
                     <span>{formatPrice(finalTotalCents)}</span>
@@ -997,7 +997,7 @@ export const CartDrawer: React.FC = () => {
                   )}
                 </div>
 
-                <form onSubmit={handleCheckoutSubmit} className="space-y-3.5 max-h-[60vh] overflow-y-auto pr-1">
+                <form onSubmit={handleCheckoutSubmit} className="space-y-3.5 overflow-y-auto flex-1 pr-1">
                   {savedAddresses.length > 0 && (
                     <div>
                       <p className="text-[11px] uppercase tracking-wider text-ink-muted mb-2">Deliver to a saved address</p>

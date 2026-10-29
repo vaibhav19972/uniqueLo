@@ -44,10 +44,13 @@ interface AuthState {
   isAdmin: boolean;
   isOpen: boolean;
   mode: 'signin' | 'signup';
+  isAccountDrawerOpen: boolean;
 
   init: () => () => void;
   openModal: (mode?: 'signin' | 'signup') => void;
   closeModal: () => void;
+  openAccountDrawer: () => void;
+  closeAccountDrawer: () => void;
 
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, fullName?: string) => Promise<boolean>;
@@ -90,6 +93,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   isAdmin: false,
   isOpen: false,
   mode: 'signin',
+  isAccountDrawerOpen: false,
 
   init: () => {
     if (!isSupabaseConfigured() || !supabase) return () => {};
@@ -126,6 +130,8 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   openModal: (mode = 'signin') => set({ isOpen: true, mode, error: null }),
   closeModal: () => set({ isOpen: false, error: null }),
+  openAccountDrawer: () => set({ isAccountDrawerOpen: true }),
+  closeAccountDrawer: () => set({ isAccountDrawerOpen: false }),
   clearError: () => set({ error: null }),
 
   signIn: async (email, password) => {
@@ -173,6 +179,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   signOut: async () => {
+    set({ isAccountDrawerOpen: false });
     if (!supabase) return;
     await supabase.auth.signOut();
     set({ user: null, session: null, addresses: [], isAdmin: false, status: 'idle', error: null });

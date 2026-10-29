@@ -4,7 +4,6 @@ import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useFiltersStore } from '../../stores/filters';
 import { useAuthStore } from '../../stores/auth';
-import { AccountDrawer } from '../auth/AccountDrawer';
 import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalog';
 import { prefersReducedMotion } from '../../lib/motion';
 import { AnnouncementBar } from './AnnouncementBar';
@@ -30,6 +29,7 @@ export const Header: React.FC = () => {
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
   const user = useAuthStore((state) => state.user);
   const openAuthModal = useAuthStore((state) => state.openModal);
+  const openAccountDrawer = useAuthStore((state) => state.openAccountDrawer);
 
   const { data: universes } = useUniverses();
   const { data: expressions } = useExpressions();
@@ -458,21 +458,18 @@ export const Header: React.FC = () => {
           </button>
 
           {/* Account: sign-in trigger when signed out, account panel when signed in */}
-          <div className="hidden md:flex items-center">
-            {user ? (
-              <AccountDrawer />
-            ) : (
-              <button
-                onClick={() => openAuthModal('signin')}
-                aria-label="Sign in to your account"
-                className="flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
-                </svg>
-              </button>
+          <button
+            onClick={() => (user ? openAccountDrawer() : openAuthModal('signin'))}
+            aria-label={user ? 'Open account panel' : 'Sign in to your account'}
+            className="relative flex p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] items-center justify-center cursor-pointer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
+            </svg>
+            {user && (
+              <span className="absolute bottom-1 sm:bottom-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-600" aria-hidden="true" />
             )}
-          </div>
+          </button>
 
           {/* Wishlist Button */}
           <button
@@ -693,6 +690,59 @@ export const Header: React.FC = () => {
             >
               Our Craft
             </Link>
+          </div>
+
+          {/* Account Section in Mobile Menu */}
+          <div className="border-b border-stone/40 pb-3 pt-2">
+            {user ? (
+              <div className="bg-paper border border-stone/60 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase tracking-wider text-accent font-medium block">Atelier Account</span>
+                    <p className="font-serif text-base text-ink truncate mt-0.5">
+                      {(user.user_metadata?.full_name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Customer'}
+                    </p>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" aria-label="Signed in" />
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone/30">
+                  <Link
+                    to="/orders"
+                    onClick={() => setMobileOpen(false)}
+                    className="text-center py-2 px-2 text-xs font-mono tracking-wider uppercase text-ink border border-stone/60 hover:bg-cream transition-colors"
+                  >
+                    My Orders
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      openAccountDrawer();
+                    }}
+                    className="text-center py-2 px-2 text-xs font-mono tracking-wider uppercase text-ink border border-stone/60 hover:bg-cream transition-colors cursor-pointer"
+                  >
+                    Addresses
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-paper border border-stone/60 p-3 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider text-ink-muted block">Atelier Account</span>
+                  <p className="text-xs text-ink mt-0.5">Sign in to sync pieces & track orders</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    openAuthModal('signin');
+                  }}
+                  className="px-3.5 py-2 bg-ink text-cream hover:bg-gold hover:text-ink text-xs font-mono uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Action Row */}

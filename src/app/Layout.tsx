@@ -4,6 +4,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { CartDrawer } from '../components/layout/CartDrawer';
 import { WishlistDrawer } from '../components/layout/WishlistDrawer';
+import { AccountDrawer } from '../components/auth/AccountDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -39,6 +40,7 @@ export const Layout: React.FC = () => {
       <Footer />
       <CartDrawer />
       <WishlistDrawer />
+      <AccountDrawer />
       <AuthModal />
       <CustomizerModal />
       <QuickViewModal />

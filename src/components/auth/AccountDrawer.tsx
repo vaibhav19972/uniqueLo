@@ -18,7 +18,8 @@ export const AccountDrawer: React.FC = () => {
   const error = useAuthStore((s) => s.error);
   const showToast = useToastStore((s) => s.showToast);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useAuthStore((s) => s.isAccountDrawerOpen);
+  const closeDrawer = useAuthStore((s) => s.closeAccountDrawer);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({
     recipient_name: '',
@@ -30,17 +31,26 @@ export const AccountDrawer: React.FC = () => {
     pincode: '',
   });
 
-  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, () => setIsOpen(false));
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, () => {
+    setAdding(false);
+    closeDrawer();
+  });
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !adding) setIsOpen(false);
+      if (e.key === 'Escape' && isOpen) {
+        if (adding) {
+          setAdding(false);
+        } else {
+          closeDrawer();
+        }
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, adding]);
+  }, [isOpen, adding, closeDrawer]);
 
-  if (!user) return null;
+  if (!isOpen || !user) return null;
 
   const displayName =
     (user.user_metadata?.full_name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Customer';
@@ -65,47 +75,31 @@ export const AccountDrawer: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="fixed inset-0 z-[320] flex justify-end" role="dialog" aria-modal="true" aria-labelledby="account-title">
       <button
-        onClick={() => setIsOpen(true)}
-        aria-label={`Account: ${displayName}`}
-        className="relative flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center cursor-pointer"
+        aria-label="Close account panel"
+        onClick={closeDrawer}
+        className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
+      />
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        className="relative h-full w-full sm:max-w-[420px] bg-paper border-l border-stone overflow-y-auto focus:outline-none animate-in slide-in-from-right duration-300"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
-        </svg>
-        <span className="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
-      </button>
-
-      {isOpen && (
-        <div className="fixed inset-0 z-[70] flex justify-end">
+        <div className="sticky top-0 bg-paper border-b border-stone px-5 py-4 flex items-center justify-between z-10">
+          <h2 id="account-title" className="text-[10px] uppercase tracking-[0.22em] text-ink font-medium">
+            {adding ? 'Add address' : 'Your account'}
+          </h2>
           <button
-            aria-label="Close account panel"
-            onClick={() => setIsOpen(false)}
-            className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
-          />
-          <div
-            ref={dialogRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="account-title"
-            className="relative h-full w-full sm:max-w-[420px] bg-paper border-l border-stone overflow-y-auto focus:outline-none"
+            onClick={() => (adding ? setAdding(false) : closeDrawer())}
+            aria-label={adding ? 'Back' : 'Close'}
+            className="p-2 -mr-2 text-ink-muted hover:text-ink transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
           >
-            <div className="sticky top-0 bg-paper border-b border-stone px-5 py-4 flex items-center justify-between z-10">
-              <h2 id="account-title" className="text-[10px] uppercase tracking-[0.22em] text-ink">
-                {adding ? 'Add address' : 'Your account'}
-              </h2>
-              <button
-                onClick={() => (adding ? setAdding(false) : setIsOpen(false))}
-                aria-label={adding ? 'Back' : 'Close'}
-                className="p-2 -mr-2 text-ink-muted hover:text-ink transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
             {adding ? (
               <form onSubmit={handleSave} className="p-5 space-y-3.5">
@@ -156,7 +150,7 @@ export const AccountDrawer: React.FC = () => {
                 <div className="divide-y divide-stone border-y border-stone">
                   <Link
                     to="/orders"
-                    onClick={() => setIsOpen(false)}
+                    onClick={closeDrawer}
                     className="flex items-center justify-between py-3.5 text-sm text-ink hover:text-accent transition-colors"
                   >
                     <span>Order history</span>
@@ -166,7 +160,7 @@ export const AccountDrawer: React.FC = () => {
                   </Link>
                   <Link
                     to="/track-order"
-                    onClick={() => setIsOpen(false)}
+                    onClick={closeDrawer}
                     className="flex items-center justify-between py-3.5 text-sm text-ink hover:text-accent transition-colors"
                   >
                     <span>Track an order</span>
@@ -234,7 +228,6 @@ export const AccountDrawer: React.FC = () => {
                 <button
                   onClick={() => {
                     void signOut();
-                    setIsOpen(false);
                     showToast({ title: 'Signed out', type: 'info' });
                   }}
                   className="w-full text-left text-sm text-ink-muted hover:text-error transition-colors py-2 cursor-pointer"
@@ -245,7 +238,5 @@ export const AccountDrawer: React.FC = () => {
             )}
           </div>
         </div>
-      )}
-    </>
   );
 };

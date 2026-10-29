@@ -62,7 +62,7 @@ export const WishlistDrawer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end" role="dialog" aria-modal="true" aria-label="Saved Pieces">
+    <div className="fixed inset-0 z-[310] flex justify-end" role="dialog" aria-modal="true" aria-label="Saved Pieces">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-ink/40 backdrop-blur-xs transition-opacity"

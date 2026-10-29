@@ -27,16 +27,15 @@ export const AuthModal: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, closeModal);
+  const handleClose = () => {
+    setPassword('');
+    setShowPassword(false);
+    setResetSent(false);
+    clearError();
+    closeModal();
+  };
 
-  React.useEffect(() => {
-    if (!isOpen) {
-      setPassword('');
-      setShowPassword(false);
-      setResetSent(false);
-      clearError();
-    }
-  }, [isOpen, clearError]);
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, handleClose);
 
   if (!isOpen) return null;
 
@@ -56,7 +55,10 @@ export const AuthModal: React.FC = () => {
   };
 
   const switchMode = () => {
+    setPassword('');
+    setShowPassword(false);
     setResetSent(false);
+    clearError();
     openModal(isSignup ? 'signin' : 'signup');
   };
 
@@ -67,10 +69,10 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[350] flex items-end sm:items-center justify-center">
       <button
         aria-label="Close account dialog"
-        onClick={closeModal}
+        onClick={handleClose}
         className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
       />
 
@@ -90,7 +92,7 @@ export const AuthModal: React.FC = () => {
             </h2>
           </div>
           <button
-            onClick={closeModal}
+            onClick={handleClose}
             aria-label="Close"
             className="p-2 -mr-2 -mt-1 text-ink-muted hover:text-ink transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
           >
