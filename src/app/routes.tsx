@@ -22,6 +22,7 @@ const Expression = lazy(() => import('../pages/Expression').then((m) => ({ defau
 const NewFeatured = lazy(() => import('../pages/NewFeatured').then((m) => ({ default: m.NewFeatured })));
 const Admin = lazy(() => import('../pages/Admin').then((m) => ({ default: m.Admin })));
 const OrderConfirmation = lazy(() => import('../pages/OrderConfirmation').then((m) => ({ default: m.OrderConfirmation })));
+const Orders = lazy(() => import('../pages/Orders').then((m) => ({ default: m.Orders })));
 
 const PageFallback: React.FC = () => (
   <div className="min-h-[50vh] flex items-center justify-center bg-cream">
@@ -174,7 +175,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'orders',
-        element: withSuspense(<OrderConfirmation />),
+        element: withSuspense(<Orders />),
       },
       {
         path: '*',

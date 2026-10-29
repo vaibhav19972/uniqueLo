@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useFiltersStore } from '../../stores/filters';
-import { useToastStore } from '../../stores/toast';
+import { useAuthStore } from '../../stores/auth';
+import { AccountDrawer } from '../auth/AccountDrawer';
 import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalog';
 import { prefersReducedMotion } from '../../lib/motion';
 import { AnnouncementBar } from './AnnouncementBar';
@@ -27,7 +28,8 @@ export const Header: React.FC = () => {
   const wishlistCount = useWishlistStore((state) => state.count());
   const openWishlist = useWishlistStore((state) => state.openWishlist);
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
-  const showToast = useToastStore((state) => state.showToast);
+  const user = useAuthStore((state) => state.user);
+  const openAuthModal = useAuthStore((state) => state.openModal);
 
   const { data: universes } = useUniverses();
   const { data: expressions } = useExpressions();
@@ -455,22 +457,22 @@ export const Header: React.FC = () => {
             </svg>
           </button>
 
-          {/* Account (desktop only) */}
-          <button
-            onClick={() =>
-              showToast({
-                title: 'Atelier Accounts Are Coming Soon',
-                description: 'Join the Atelier List below and we will invite you first.',
-                type: 'info',
-              })
-            }
-            aria-label="Account"
-            className="hidden md:flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center cursor-pointer"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
-            </svg>
-          </button>
+          {/* Account: sign-in trigger when signed out, account panel when signed in */}
+          <div className="hidden md:flex items-center">
+            {user ? (
+              <AccountDrawer />
+            ) : (
+              <button
+                onClick={() => openAuthModal('signin')}
+                aria-label="Sign in to your account"
+                className="flex p-2 text-ink hover:text-accent transition-colors min-w-[44px] min-h-[44px] items-center justify-center cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
+                </svg>
+              </button>
+            )}
+          </div>
 
           {/* Wishlist Button */}
           <button

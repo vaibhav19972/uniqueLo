@@ -4,6 +4,7 @@ import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
 import { getCartLine, formatPrice, createOrder, getDefaultVariant, type CartLine, type PaymentMethod } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
+import { useAuthStore } from '../../stores/auth';
 import { CartLineItem } from './CartLineItem';
 import { Button } from '../ui/Button';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
@@ -47,6 +48,34 @@ export const CartDrawer: React.FC = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [placedOrderId, setPlacedOrderId] = useState('');
+
+  // Saved addresses (signed-in customers only). Selecting one fills the form;
+  // it does not lock the fields, so a one-off delivery address still works.
+  const authUser = useAuthStore((s) => s.user);
+  const savedAddresses = useAuthStore((s) => s.addresses);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+
+  // Prefill identity from the account on first open, so a signed-in customer
+  // never retypes their own email.
+  React.useEffect(() => {
+    if (!isCheckoutOpen || !authUser) return;
+    setCustomerEmail((prev) => prev || authUser.email || '');
+    const name = (authUser.user_metadata?.full_name as string | undefined)?.trim();
+    if (name) setCustomerName((prev) => prev || name);
+    const def = savedAddresses.find((a) => a.is_default) ?? savedAddresses[0];
+    if (def && !selectedAddressId) applyAddress(def.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCheckoutOpen, authUser, savedAddresses.length]);
+
+  const applyAddress = (id: string) => {
+    const a = savedAddresses.find((x) => x.id === id);
+    if (!a) return;
+    setSelectedAddressId(id);
+    setCustomerName(a.recipient_name);
+    setCustomerPhone(a.phone.replace(/\D/g, '').slice(-10));
+    setCustomerPincode(a.pincode);
+    setShippingAddress([a.address_line, a.landmark, a.city, a.state].filter(Boolean).join(', '));
+  };
 
   const cartLines = useMemo(() => {
     return items
@@ -969,6 +998,46 @@ export const CartDrawer: React.FC = () => {
                 </div>
 
                 <form onSubmit={handleCheckoutSubmit} className="space-y-3.5 max-h-[60vh] overflow-y-auto pr-1">
+                  {savedAddresses.length > 0 && (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-ink-muted mb-2">Deliver to a saved address</p>
+                      <div className="flex flex-wrap gap-2">
+                        {savedAddresses.map((a) => {
+                          const selected = selectedAddressId === a.id;
+                          return (
+                            <button
+                              key={a.id}
+                              type="button"
+                              onClick={() => applyAddress(a.id)}
+                              aria-pressed={selected}
+                              className={`text-left px-3 py-2 border min-h-[44px] transition-colors cursor-pointer ${
+                                selected
+                                  ? 'border-ink bg-cream'
+                                  : 'border-stone hover:border-ink/60 bg-paper'
+                              }`}
+                            >
+                              <span className="block text-[11px] font-medium text-ink">{a.recipient_name}</span>
+                              <span className="block text-[10px] text-ink-muted mt-0.5">
+                                {a.city} {a.pincode}
+                              </span>
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedAddressId(null);
+                            setShippingAddress('');
+                            setCustomerPincode('');
+                          }}
+                          className="text-left px-3 py-2 border border-dashed border-stone hover:border-ink/60 min-h-[44px] transition-colors cursor-pointer"
+                        >
+                          <span className="block text-[11px] text-ink-muted">New address</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label htmlFor="co-name" className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">

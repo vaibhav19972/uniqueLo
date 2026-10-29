@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -3876,16 +3876,40 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  // A session is not an admin. Since customers can now sign in, holding a
+  // session only proves "someone is logged in"; is_admin() is the real gate.
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [adminChecked, setAdminChecked] = useState(false);
+
+  const checkAdmin = useCallback(async () => {
+    if (!supabase) {
+      setAdminChecked(true);
+      return;
+    }
+    try {
+      const { data, error } = await supabase.rpc('is_admin');
+      // A permission/RLS error means "not admin" as far as this UI is
+      // concerned. Erring toward true would be the dangerous direction.
+      setIsAdmin(!error && data === true);
+    } catch {
+      setIsAdmin(false);
+    } finally {
+      setAdminChecked(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isSupabaseConfigured() || !supabase) {
       setLoading(false);
+      setAdminChecked(true);
       return;
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+      if (session) void checkAdmin();
+      else setAdminChecked(true);
     });
 
     const {
@@ -3893,10 +3917,17 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setLoading(false);
+      if (session) {
+        setAdminChecked(false);
+        void checkAdmin();
+      } else {
+        setIsAdmin(null);
+        setAdminChecked(true);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [checkAdmin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -4005,6 +4036,49 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             >
               ← Return to Public Storefront
             </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Signed in, but the admin predicate has not resolved yet.
+  if (session && !adminChecked) {
+    return (
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center text-ink p-4">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="font-serif text-lg text-ink-muted">Checking studio access…</p>
+      </div>
+    );
+  }
+
+  // Signed in as a customer. Refuse explicitly: without this the studio renders
+  // and every write silently fails with 42501, which looks like a broken app.
+  if (session && isAdmin === false) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-paper border border-stone/50 p-8 sm:p-10 shadow-sm text-ink">
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent font-medium block">
+            UniqueLo Atelier Studio
+          </span>
+          <h1 className="font-serif text-2xl text-ink mt-2">Not a staff account</h1>
+          <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+            You are signed in as <strong className="text-ink">{session.user.email}</strong>, but this account is not on
+            the studio allowlist. Catalogue and media editing is limited to staff accounts.
+          </p>
+          <div className="mt-6 flex flex-col gap-2">
+            <Link
+              to="/"
+              className="w-full py-2.5 bg-ink text-cream text-xs font-mono uppercase tracking-widest text-center hover:bg-ink/90 transition-colors"
+            >
+              Return to storefront
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="w-full py-2.5 border border-stone text-xs font-mono uppercase tracking-widest text-ink hover:border-ink transition-colors cursor-pointer"
+            >
+              Sign out
+            </button>
           </div>
         </div>
       </div>

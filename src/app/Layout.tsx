@@ -6,8 +6,10 @@ import { CartDrawer } from '../components/layout/CartDrawer';
 import { WishlistDrawer } from '../components/layout/WishlistDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
+import { AuthModal } from '../components/auth/AuthModal';
 import { ToastContainer } from '../components/ui/Toast';
 import { useIsThemeV2 } from '../config/theme';
+import { useAuthStore } from '../stores/auth';
 
 /**
  * Unified site layout supporting both v1 (The Atelier) and v2 (Modern D2C Streetwear
@@ -15,6 +17,12 @@ import { useIsThemeV2 } from '../config/theme';
  */
 export const Layout: React.FC = () => {
   useIsThemeV2();
+
+  // One auth subscription for the whole app. Without this, no component sees
+  // session state and a refresh silently signs the customer out of the UI while
+  // their token still exists.
+  const initAuth = useAuthStore((s) => s.init);
+  React.useEffect(() => initAuth(), [initAuth]);
 
   return (
     <div className="min-h-screen flex flex-col bg-cream text-ink selection:bg-accent/20 selection:text-ink">
@@ -31,6 +39,7 @@ export const Layout: React.FC = () => {
       <Footer />
       <CartDrawer />
       <WishlistDrawer />
+      <AuthModal />
       <CustomizerModal />
       <QuickViewModal />
       <ToastContainer />
