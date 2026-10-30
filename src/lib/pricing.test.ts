@@ -19,6 +19,7 @@ import {
   QuoteError,
   lineMrpCents,
   lineDiscountPercent,
+  catalogMrp,
   remainingForFreeShipping,
   freeShippingProgress,
   type Quote,
@@ -139,5 +140,43 @@ describe('pricing — the bag may not invent a number', () => {
     const q = quote({ subtotal_cents: 200000, free_shipping_threshold_cents: 149900 });
     expect(remainingForFreeShipping(q)).toBe(0);
     expect(freeShippingProgress(q)).toBe(100);
+  });
+
+  // Storefront cards have no quote line, so they read the catalog's MRP
+  // directly. That path has no server to enforce the expiry for it, which is
+  // exactly how an ended sale keeps advertising itself.
+  describe('catalogMrp — a strike-through is a claim about a live sale', () => {
+    const NOW = new Date('2026-10-31T00:00:00Z');
+    const base = { priceCents: 119900, compareAtPriceCents: 149900 };
+
+    it('P1.9 shows a live markdown with a floored percentage', () => {
+      // 149900 -> 119900 is 20.01% off; the badge must not claim 21%.
+      expect(catalogMrp({ ...base, compareAtEndsAt: null }, NOW)).toEqual({
+        mrpCents: 149900,
+        offPercent: 20,
+      });
+      // Open-ended: absent and null both mean "no expiry".
+      expect(catalogMrp(base, NOW)?.offPercent).toBe(20);
+      expect(catalogMrp({ ...base, compareAtEndsAt: '2026-12-01T00:00:00Z' }, NOW)?.offPercent).toBe(20);
+    });
+
+    it('P1.10 refuses an expired markdown', () => {
+      expect(catalogMrp({ ...base, compareAtEndsAt: '2026-10-30T23:59:59Z' }, NOW)).toBeNull();
+      // Exactly on the boundary the sale is over, matching price_cart's
+      // `compare_at_ends_at > now()` test.
+      expect(catalogMrp({ ...base, compareAtEndsAt: '2026-10-31T00:00:00Z' }, NOW)).toBeNull();
+    });
+
+    it('P1.11 refuses a markdown that is not a markdown', () => {
+      expect(catalogMrp({ priceCents: 119900 }, NOW)).toBeNull();
+      expect(catalogMrp({ priceCents: 149900, compareAtPriceCents: 149900 }, NOW)).toBeNull();
+      expect(catalogMrp({ priceCents: 149900, compareAtPriceCents: 100000 }, NOW)).toBeNull();
+      // A percentage that floors to zero is not worth a badge.
+      expect(catalogMrp({ priceCents: 149899, compareAtPriceCents: 149900 }, NOW)).toBeNull();
+    });
+
+    it('P1.12 treats an unparseable expiry as no sale, not as forever', () => {
+      expect(catalogMrp({ ...base, compareAtEndsAt: 'not-a-date' }, NOW)).toBeNull();
+    });
   });
 });

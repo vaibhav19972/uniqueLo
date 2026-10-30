@@ -228,7 +228,9 @@ export const CartDrawer: React.FC = () => {
     }
     addItem(product.slug, variant.sku, 1, undefined, variant.quantity ?? 99);
     showToast({
-      title: 'Archival Care Added',
+      // Not 'Archival Care Added' — that was legacy copy for the care-kit
+      // accessory, and it fired for hoodies and scarves too.
+      title: 'Added to Bag',
       description: `${product.name} (size ${variant.size})`,
       type: 'accent',
     });
@@ -417,6 +419,7 @@ export const CartDrawer: React.FC = () => {
                       <CartLineItem
                         key={line.id}
                         line={line}
+                        priced={quote?.lines.find((q) => q.sku === line.variant.sku)}
                         onUpdateQuantity={updateQuantity}
                         onRemove={removeItem}
                       />
@@ -524,10 +527,22 @@ export const CartDrawer: React.FC = () => {
                       </h4>
 
                       <div className="grid grid-cols-2 gap-3">
-                        {upsellProducts.map((up, idx) => {
+                        {upsellProducts.map((up) => {
                           const uv = getDefaultVariant(up);
-                          const simOriginal = Math.round(uv.priceCents * 1.35);
-                          const discountTag = idx === 0 ? '36% off' : '20% off';
+                          // An upsell is by definition NOT in the bag, so it has
+                          // no line in the quote. The previous code faked one:
+                          // `priceCents * 1.35` plus a tag chosen by array index
+                          // ('36% off' for the first card — not even 26%).
+                          //
+                          // It is tempting to read `uv.compareAtPriceCents` from
+                          // the catalog here, which IS real data, but the catalog
+                          // carries no `compareAtEndsAt`, so an expired markdown
+                          // would still render a live strike-through. The server
+                          // returns `compare_at_cents` only when the markdown is
+                          // unexpired; we have no server number for a SKU that is
+                          // not in the bag. So: show the real price, no badge.
+                          // (Fix properly by quoting upsell SKUs alongside cart
+                          // lines — see Phase 5.)
                           return (
                             <div
                               key={up.slug}
@@ -539,9 +554,6 @@ export const CartDrawer: React.FC = () => {
                                   alt={up.name}
                                   className="w-full h-full object-cover"
                                 />
-                                <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">
-                                  {discountTag}
-                                </span>
                               </div>
 
                               <div>
@@ -549,9 +561,6 @@ export const CartDrawer: React.FC = () => {
                                   {up.name}
                                 </h5>
                                 <div className="flex items-baseline gap-1.5 mt-1">
-                                  <span className="font-sans text-[11px] text-gray-400 line-through">
-                                    {formatPrice(simOriginal)}
-                                  </span>
                                   <span className="font-sans font-bold text-xs text-gray-900">
                                     {formatPrice(uv.priceCents)}
                                   </span>
@@ -750,6 +759,7 @@ export const CartDrawer: React.FC = () => {
                       <CartLineItem
                         key={line.id}
                         line={line}
+                        priced={quote?.lines.find((q) => q.sku === line.variant.sku)}
                         onUpdateQuantity={updateQuantity}
                         onRemove={removeItem}
                       />

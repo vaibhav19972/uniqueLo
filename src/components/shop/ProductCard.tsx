@@ -9,6 +9,7 @@ import {
   getExpressionScore,
   COLLECTIONS,
 } from '../../lib/data';
+import { catalogMrp } from '../../lib/pricing';
 import { useCartStore } from '../../stores/cart';
 import { useCustomizerStore } from '../../stores/customizer';
 import { useQuickViewStore } from '../../stores/quickView';
@@ -38,11 +39,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const expScore = getExpressionScore(product);
   const expInfo = getExpressionByScore(expScore);
 
-  const compareAt = defaultVariant.compareAtPriceCents;
-  const offPct =
-    compareAt && compareAt > defaultVariant.priceCents
-      ? Math.round((1 - defaultVariant.priceCents / compareAt) * 100)
-      : 0;
+  const mrp = catalogMrp(defaultVariant);
+  const compareAt = mrp?.mrpCents ?? null;
+  const offPct = mrp?.offPercent ?? 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();

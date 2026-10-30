@@ -4,15 +4,21 @@ import { formatPrice } from '../../lib/data';
 import { Image } from '../ui/Image';
 import { useIsThemeV2 } from '../../config/theme';
 import { useCartStore } from '../../stores/cart';
+import { lineMrpCents, lineDiscountPercent, type PricedLine } from '../../lib/pricing';
 
 interface CartLineItemProps {
   line: CartLine;
+  /** The server's priced view of this line. Absent while the quote loads, in
+   *  which case NO discount is shown — a missing number is better than an
+   *  invented one. */
+  priced?: PricedLine;
   onUpdateQuantity: (id: string, qty: number, max?: number) => void;
   onRemove: (id: string) => void;
 }
 
 export const CartLineItem: React.FC<CartLineItemProps> = ({
   line,
+  priced,
   onUpdateQuantity,
   onRemove,
 }) => {
@@ -20,10 +26,14 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
   const updateVariant = useCartStore((state) => state.updateVariant);
   const { product, variant, quantity, lineTotalCents, customization } = line;
 
+  // Strike-through and "% OFF" come from the quote, never from arithmetic on
+  // the selling price. The previous version used `priceCents * 1.266` with a
+  // `Math.max(10, ...)` floor, which showed a discount badge on every line
+  // whether or not any discount existed.
+  const mrpCents = priced ? lineMrpCents(priced) : null;
+  const discountPercent = priced ? lineDiscountPercent(priced) : null;
+
   if (isV2) {
-    // Calculated realistic strikethrough price and discount percentage matching D2C bag
-    const originalPriceCents = Math.round(variant.priceCents * 1.266);
-    const discountPercent = Math.max(10, Math.round(((originalPriceCents - variant.priceCents) / originalPriceCents) * 100));
 
     return (
       <div className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-sm mb-3.5 flex gap-3.5 transition-all text-gray-900">
@@ -45,9 +55,11 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
               <h4 className="font-sans font-medium text-[15px] text-gray-900 leading-snug line-clamp-1">
                 {product.name}
               </h4>
-              <span className="font-sans text-xs text-gray-400 line-through whitespace-nowrap">
-                {formatPrice(originalPriceCents)}
-              </span>
+              {mrpCents != null && (
+                <span className="font-sans text-xs text-gray-400 line-through whitespace-nowrap">
+                  {formatPrice(mrpCents)}
+                </span>
+              )}
             </div>
 
             {/* Size Dropdown Chip & Current Price */}
@@ -69,17 +81,23 @@ export const CartLineItem: React.FC<CartLineItemProps> = ({
                 </span>
               </div>
 
+              {/* LINE total, not unit price. At qty 2 this must read the priced
+                  line (2 x unit), matching what the footer and the server charge.
+                  V1 below already did this; V2 rendered one unit beside a stepper
+                  reading 2. */}
               <span className="font-sans font-bold text-base text-gray-900">
-                {formatPrice(variant.priceCents)}
+                {formatPrice(priced ? priced.line_total_cents : lineTotalCents)}
               </span>
             </div>
 
-            {/* Discount tag */}
-            <div className="flex justify-end mt-0.5">
-              <span className="font-sans font-bold text-xs text-emerald-600">
-                ({discountPercent}% OFF)
-              </span>
-            </div>
+            {/* Discount tag — only when the server says there is one. */}
+            {discountPercent != null && (
+              <div className="flex justify-end mt-0.5">
+                <span className="font-sans font-bold text-xs text-emerald-600">
+                  ({discountPercent}% OFF)
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Stepper & Trash Icon */}

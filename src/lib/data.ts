@@ -181,6 +181,11 @@ export interface ProductVariant {
   size: string;
   priceCents: number;
   compareAtPriceCents?: number;
+  /** When the markdown above stops being claimable. NULL/absent = open-ended.
+   *  Mirrors variants.compare_at_ends_at (migration 20261101 §0). Not mapping
+   *  this was what let an expired markdown keep rendering a live
+   *  strike-through: the price was real, the *sale* was over. */
+  compareAtEndsAt?: string | null;
   status: ProductStatus;
   quantity?: number;
   /** Physical scannable identifier (EAN). Unique across variants; null until assigned. */
@@ -511,7 +516,7 @@ export async function getProducts(): Promise<Product[]> {
         .from('products')
         .select(`
           slug, name, subtitle, description, foreign_tagline, category_slug, universe_slug, collection_slug, garment_type, gender, motif_id, handcrafted, craft_techniques, edits, expression_score, rating, review_count, tags, featured, customizable, material, care, fit, fabric_gsm, created_at, country_of_origin, manufacturer_name, manufacturer_address, packed_by, cod_available, delivery_days_min, delivery_days_max, return_window_days, weight_grams, hsn_code, size_chart, style_code, attributes, fit_notes, model_height_cm, model_worn_size, package_length_mm, package_width_mm, package_height_mm,
-          variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, status, quantity, barcode),
+          variants (sku, color, color_hex, size, price_cents, compare_at_price_cents, compare_at_ends_at, status, quantity, barcode),
           product_images (src, alt, color, sort_order),
           embroidery_details (technique, technique_label, artisan_hours, placement, thread_composition, motif_story, macro_image_src, macro_image_alt)
         `)
@@ -591,6 +596,7 @@ export async function getProducts(): Promise<Product[]> {
               size: v.size,
               priceCents: v.price_cents,
               compareAtPriceCents: v.compare_at_price_cents,
+              compareAtEndsAt: v.compare_at_ends_at,
               status: v.status || 'in-stock',
               quantity: v.quantity,
             })),

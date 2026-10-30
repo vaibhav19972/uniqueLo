@@ -155,6 +155,38 @@ export function lineDiscountPercent(line: PricedLine): number | null {
   return pct > 0 ? pct : null;
 }
 
+/** MRP triple for a catalog variant: the strike-through price and the honest
+ *  percent off, or nulls when there is no live markdown.
+ *
+ *  The catalog carries the reference price AND its expiry, but only the server
+ *  enforces the expiry (price_cart returns compare_at_cents only while
+ *  unexpired). Storefront cards have no quote line, so they must apply the same
+ *  rule locally — a strike-through is a claim about a sale, and a sale that has
+ *  ended cannot keep being advertised.
+ *
+ *  Returns nothing when the markdown is expired, when there is no reference
+ *  price, or when the reference price is not actually higher than the selling
+ *  price (the storage-layer check, mirrored so a bad row can never lie in the UI).
+ */
+export function catalogMrp(
+  variant: { priceCents: number; compareAtPriceCents?: number; compareAtEndsAt?: string | null },
+  now: Date = new Date()
+): { mrpCents: number; offPercent: number } | null {
+  const mrp = variant.compareAtPriceCents;
+  if (mrp == null || mrp <= variant.priceCents) return null;
+
+  const ends = variant.compareAtEndsAt;
+  if (ends != null) {
+    const endsAt = new Date(ends);
+    // An unparseable date is not a reason to advertise a sale forever.
+    if (Number.isNaN(endsAt.getTime()) || endsAt <= now) return null;
+  }
+
+  // Rounded DOWN, same as lineDiscountPercent — the badge never overstates.
+  const pct = Math.floor(((mrp - variant.priceCents) / mrp) * 100);
+  return pct > 0 ? { mrpCents: mrp, offPercent: pct } : null;
+}
+
 /** How much more to spend to unlock free delivery. 0 when already there. */
 export function remainingForFreeShipping(quote: Quote): number {
   // `subtotal_cents` is the PRE-discount subtotal — the server computes it before

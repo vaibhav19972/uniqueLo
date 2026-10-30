@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { formatPrice, getDefaultVariant, type Product } from '../../lib/data';
+import { catalogMrp } from '../../lib/pricing';
 import { useCartStore } from '../../stores/cart';
 import { useQuickViewStore } from '../../stores/quickView';
 import { useWishlistStore } from '../../stores/wishlist';
@@ -67,11 +68,13 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
     );
   }, [product, size, defaultVariant]);
 
-  const compareAt = currentVariant.compareAtPriceCents ?? defaultVariant.compareAtPriceCents;
-  const offPct =
-    compareAt && compareAt > currentVariant.priceCents
-      ? Math.round((1 - currentVariant.priceCents / compareAt) * 100)
-      : 0;
+  // One rule for the whole card: the markdown must belong to the variant being
+  // sold (not borrowed from the default variant) and must still be live. The
+  // `?? defaultVariant` fallback below was how an expired or different-size
+  // markdown ended up on this card's price.
+  const mrp = catalogMrp(currentVariant);
+  const compareAt = mrp?.mrpCents ?? null;
+  const offPct = mrp?.offPercent ?? 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -218,8 +221,11 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </p>
         )}
         <p className="flex items-baseline gap-2 mt-1.5">
-          <span className="font-serif text-2xl text-ink">{formatPrice(defaultVariant.priceCents)}</span>
-          {compareAt && compareAt > defaultVariant.priceCents && (
+          {/* Tracks the selected size chip like the CTA below it. Pinned to
+              defaultVariant this read one price while "Add to Cart —" read
+              another for the same card. */}
+          <span className="font-serif text-2xl text-ink">{formatPrice(currentVariant.priceCents)}</span>
+          {compareAt && compareAt > currentVariant.priceCents && (
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
               <span
