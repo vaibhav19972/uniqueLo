@@ -1,8 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
 import { getCartLine, formatPrice, createOrder, getDefaultVariant, type CartLine, type PaymentMethod } from '../../lib/data';
+import { useQuote } from '../../hooks/useQuote';
+import {
+  lineMrpCents,
+  remainingForFreeShipping,
+  freeShippingProgress,
+  type BestCoupon,
+} from '../../lib/pricing';
 import { useToastStore } from '../../stores/toast';
 import { useAuthStore } from '../../stores/auth';
 import { CartLineItem } from './CartLineItem';
@@ -10,7 +17,6 @@ import { Button } from '../ui/Button';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
 import { useIsThemeV2 } from '../../config/theme';
 
-const STANDARD_SHIPPING_CENTS = 199900;
 
 export const CartDrawer: React.FC = () => {
   const isV2 = useIsThemeV2();
@@ -38,6 +44,17 @@ export const CartDrawer: React.FC = () => {
 
   // Checkout Modal State
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // The bag hands off to /checkout. Checkout is a page, not a modal: it needs
+  // saved addresses, a stable URL, and a back button that does not strand the
+  // customer in a drawer.
+  const goToCheckout = () => {
+    if (items.length === 0) return;
+    setIsCheckoutOpen(false);
+    closeCart();
+    navigate('/checkout');
+  };
   const [checkoutStep, setCheckoutStep] = useState<'details' | 'success'>('details');
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -83,81 +100,64 @@ export const CartDrawer: React.FC = () => {
       .filter((line): line is CartLine => line !== null);
   }, [items, products]);
 
+  // ── Server pricing: the single source of every number in this drawer ──
+  const { quote } = useQuote({ couponCode: appliedCoupon?.code ?? null });
+
   const rawSubtotalCents = useMemo(() => {
     return cartLines.reduce((acc, line) => acc + line.lineTotalCents, 0);
   }, [cartLines]);
 
-  // Discount calculation
-  const discountCents = useMemo(() => {
-    if (!appliedCoupon) return 0;
-    if (appliedCoupon.discountPercent) {
-      return Math.round((rawSubtotalCents * appliedCoupon.discountPercent) / 100);
-    }
-    if (appliedCoupon.discountCents) {
-      return Math.min(rawSubtotalCents, appliedCoupon.discountCents);
-    }
-    return 0;
-  }, [rawSubtotalCents, appliedCoupon]);
+  // The server's view of the bag. When it has not answered yet, these are null
+  // and the UI renders an em dash rather than guessing a number.
+  const serverSubtotal = quote?.subtotal_cents ?? null;
+  const displayTotalCents = quote ? quote.total_cents : null;
+  const savingsCents = quote?.savings_cents ?? 0;
+  const remainingFree = quote ? remainingForFreeShipping(quote) : 0;
+  const freeShippingQualified = quote ? quote.shipping_cents === 0 : false;
 
-  const subtotalCents = Math.max(0, rawSubtotalCents - discountCents);
+  // Genuine strike-through: sum of real MRPs across the bag, only when every
+  // discounted line has one. A partial MRP total would understate the markdown
+  // and look like a smaller discount than it is.
+  const mrpTotalCents = useMemo(() => {
+    if (!quote || quote.lines.length === 0) return null;
+    let total = 0;
+    for (const line of quote.lines) {
+      const mrp = lineMrpCents(line);
+      if (mrp == null) return null;
+      total += mrp * line.quantity;
+    }
+    return total > (serverSubtotal ?? 0) ? total : null;
+  }, [quote, serverSubtotal]);
 
-  // Free shipping (₹29,050) and Gift Tier (₹49,800) — India-first thresholds
-  const freeShippingThresholdCents = 2905000;
+  // Whole-bag percentage off MRP, floored so the badge never overstates it.
+  const totalDiscountPercent = useMemo(() => {
+    if (mrpTotalCents == null || !serverSubtotal || mrpTotalCents <= 0) return null;
+    const pct = Math.floor(((mrpTotalCents - serverSubtotal) / mrpTotalCents) * 100);
+    return pct > 0 ? pct : null;
+  }, [mrpTotalCents, serverSubtotal]);
+
+  const offers: BestCoupon[] = quote?.available_offers ?? [];
+  const offersCount = offers.length;
+
+  const describeOffer = (o: BestCoupon) =>
+    o.discount_type === 'percent' ? `${o.discount_value}% off your order`
+    : o.discount_type === 'fixed' ? `${formatPrice(o.discount_value)} off your order`
+    : 'Complimentary delivery';
+
+  const milestonePrompt = (() => {
+    if (!quote) return 'Pricing your bag…';
+    if (quote.shipping_cents === 0) return '✓ Complimentary delivery unlocked';
+    const best = quote.best_coupon;
+    if (best) {
+      return `Add ${formatPrice(remainingFree)} for free delivery · ${best.code} saves ${formatPrice(best.value_cents)}`;
+    }
+    return `Add ${formatPrice(remainingFree)} more for complimentary delivery`;
+  })();
+
   const giftTierThresholdCents = 4980000;
-
-  const freeShippingQualified = subtotalCents >= freeShippingThresholdCents || appliedCoupon?.code === 'FREESHIP';
-  const giftTierQualified = subtotalCents >= giftTierThresholdCents;
-
-  const remainingForFreeShipping = Math.max(0, freeShippingThresholdCents - subtotalCents);
-  const remainingForGiftTier = Math.max(0, giftTierThresholdCents - subtotalCents);
-
-  const shippingCostCents = freeShippingQualified ? 0 : STANDARD_SHIPPING_CENTS;
-  const finalTotalCents = subtotalCents + shippingCostCents;
-
-  // Progress meters
-  const shippingProgressPercent = Math.min(
-    100,
-    Math.round((subtotalCents / freeShippingThresholdCents) * 100)
-  );
-
-  // v2 Milestone Thresholds: ₹500 (10%), ₹5,999 (15%), ₹9,999 (20%)
-  const milestone1Cents = 50000;
-  const milestone2Cents = 599900;
-  const milestone3Cents = 999900;
-
-  // v2 Calculated Savings
-  const simulatedOriginalTotalCents = Math.round(rawSubtotalCents * 1.266);
-  const totalSavingsCents = Math.max(40000, (simulatedOriginalTotalCents - rawSubtotalCents) + discountCents);
-
-  const v2ProgressPercent = useMemo(() => {
-    if (rawSubtotalCents <= 0) return 0;
-    if (rawSubtotalCents < milestone1Cents) {
-      return (rawSubtotalCents / milestone1Cents) * 20;
-    }
-    if (rawSubtotalCents < milestone2Cents) {
-      return 20 + ((rawSubtotalCents - milestone1Cents) / (milestone2Cents - milestone1Cents)) * 40;
-    }
-    if (rawSubtotalCents < milestone3Cents) {
-      return 60 + ((rawSubtotalCents - milestone2Cents) / (milestone3Cents - milestone2Cents)) * 40;
-    }
-    return 100;
-  }, [rawSubtotalCents, milestone1Cents, milestone2Cents, milestone3Cents]);
-
-  const v2MilestonePrompt = useMemo(() => {
-    if (rawSubtotalCents < milestone1Cents) {
-      const rem = milestone1Cents - rawSubtotalCents;
-      return `Add items worth ${formatPrice(rem)} more to unlock 10% off with code HUSTLE10`;
-    }
-    if (rawSubtotalCents < milestone2Cents) {
-      const rem = milestone2Cents - rawSubtotalCents;
-      return `Add items worth ${formatPrice(rem)} more to unlock 15% off with code GOBONKERS15`;
-    }
-    if (rawSubtotalCents < milestone3Cents) {
-      const rem = milestone3Cents - rawSubtotalCents;
-      return `Add items worth ${formatPrice(rem)} more to unlock 20% off with code BONKERS20`;
-    }
-    return `🎉 Maximum 20% tier unlocked! Use code BONKERS20 at checkout.`;
-  }, [rawSubtotalCents, milestone1Cents, milestone2Cents, milestone3Cents]);
+  const giftTierQualified = rawSubtotalCents >= giftTierThresholdCents;
+  const remainingForGiftTier = Math.max(0, giftTierThresholdCents - rawSubtotalCents);
+  const shippingProgressPercent = quote ? freeShippingProgress(quote) : 0;
 
   // Close on Escape key
   useEffect(() => {
@@ -273,10 +273,13 @@ export const CartDrawer: React.FC = () => {
         customerPhone: customerPhone.trim() || undefined,
         pincode: customerPincode.trim(),
         paymentMethod,
-        subtotalCents: rawSubtotalCents,
-        discountCents,
-        shippingCents: shippingCostCents,
-        totalCents: finalTotalCents,
+        // Report what the server quoted, not what the client computed. These are
+        // display-only for the receipt; place_order re-prices from variants and
+        // ignores them, so a stale value here can never change the charge.
+        subtotalCents: quote?.subtotal_cents ?? rawSubtotalCents,
+        discountCents: quote?.discount_cents ?? 0,
+        shippingCents: quote?.shipping_cents ?? 0,
+        totalCents: quote?.total_cents ?? rawSubtotalCents,
         couponCode: appliedCoupon?.code || null,
         giftNote: hasGiftNote ? giftNoteText : null,
         shippingAddress: shippingAddress.trim(),
@@ -362,68 +365,26 @@ export const CartDrawer: React.FC = () => {
               Get 10% off with code HUSTLE10
             </button>
 
-            {/* Milestone Tiered Discount Tracker */}
+            {/* Free-delivery meter — thresholds come from shipping_rules.
+                The old ladder advertised 10/15/20% "tiers" at Rs 500/5,999/9,999
+                that no table backed and no coupon matched. */}
             <div className="bg-white px-5 py-3 border-b border-gray-200/80 text-center">
               <p className="font-sans font-semibold text-xs text-gray-800 tracking-tight leading-snug">
-                {v2MilestonePrompt}
+                {milestonePrompt}
               </p>
 
-              {/* Progress Track & Nodes */}
-              <div className="relative pt-5 pb-1 px-4 mt-1">
-                {/* Background Connecting Line */}
-                <div className="absolute top-[34px] left-8 right-8 h-1 bg-[#e2e4e8] rounded-full overflow-hidden">
+              <div className="relative pt-3 pb-1 px-1 mt-1">
+                <div className="w-full h-1.5 bg-[#e2e4e8] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-black transition-all duration-500"
-                    style={{ width: `${v2ProgressPercent}%` }}
+                    style={{ width: `${shippingProgressPercent}%` }}
                   />
                 </div>
-
-                {/* Nodes */}
-                <div className="relative flex justify-between items-center z-10">
-                  {/* Node 1 */}
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-sans font-medium text-gray-600 mb-1">₹500.00</span>
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors ${
-                        rawSubtotalCents >= milestone1Cents ? 'bg-black border-black text-white' : 'bg-white border-gray-300 text-gray-400'
-                      }`}
-                    >
-                      <span className="text-[10px] font-bold">%</span>
-                    </div>
-                    <span className={`text-[10px] font-sans mt-1 ${rawSubtotalCents >= milestone1Cents ? 'font-bold text-black' : 'text-gray-500'}`}>
-                      10% Off
-                    </span>
-                  </div>
-
-                  {/* Node 2 */}
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-sans font-medium text-gray-600 mb-1">₹5,999.00</span>
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors ${
-                        rawSubtotalCents >= milestone2Cents ? 'bg-black border-black text-white' : 'bg-white border-gray-300 text-gray-400'
-                      }`}
-                    >
-                      <span className="text-[10px] font-bold">%</span>
-                    </div>
-                    <span className={`text-[10px] font-sans mt-1 ${rawSubtotalCents >= milestone2Cents ? 'font-bold text-black' : 'text-gray-500'}`}>
-                      15% Off
-                    </span>
-                  </div>
-
-                  {/* Node 3 */}
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-sans font-medium text-gray-600 mb-1">₹9,999.00</span>
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors ${
-                        rawSubtotalCents >= milestone3Cents ? 'bg-black border-black text-white' : 'bg-white border-gray-300 text-gray-400'
-                      }`}
-                    >
-                      <span className="text-[10px] font-bold">%</span>
-                    </div>
-                    <span className={`text-[10px] font-sans mt-1 ${rawSubtotalCents >= milestone3Cents ? 'font-bold text-black' : 'text-gray-500'}`}>
-                      20% Off
-                    </span>
-                  </div>
+                <div className="flex justify-between mt-1.5">
+                  <span className="text-[10px] font-sans text-gray-500">Now</span>
+                  <span className="text-[10px] font-sans font-medium text-gray-700">
+                    {quote ? formatPrice(quote.free_shipping_threshold_cents) : '—'} for free delivery
+                  </span>
                 </div>
               </div>
             </div>
@@ -545,9 +506,11 @@ export const CartDrawer: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center">
-                          12
-                        </span>
+                        {offersCount > 0 && (
+                          <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center">
+                            {offersCount}
+                          </span>
+                        )}
                         <span className="text-gray-400 group-hover:text-black font-bold">›</span>
                       </div>
                     </button>
@@ -617,9 +580,11 @@ export const CartDrawer: React.FC = () => {
               <div className="relative">
                 {/* Floating Saved Banner on top */}
                 <div className="flex justify-center -mb-2 relative z-20 pointer-events-none">
-                  <span className="bg-black text-white font-sans text-xs font-bold py-1 px-5 rounded-t-lg tracking-wide shadow-md">
-                    {formatPrice(totalSavingsCents)} Saved so far!
-                  </span>
+                  {savingsCents > 0 && (
+                    <span className="bg-black text-white font-sans text-xs font-bold py-1 px-5 rounded-t-lg tracking-wide shadow-md">
+                      {formatPrice(savingsCents)} Saved so far!
+                    </span>
+                  )}
                 </div>
 
                 {/* Main Checkout Panel */}
@@ -635,67 +600,68 @@ export const CartDrawer: React.FC = () => {
                     </div>
 
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-sans text-xs text-gray-400 line-through">
-                        {formatPrice(simulatedOriginalTotalCents)}
-                      </span>
+                      {mrpTotalCents != null && (
+                        <span className="font-sans text-xs text-gray-400 line-through">
+                          {formatPrice(mrpTotalCents)}
+                        </span>
+                      )}
                       <span className="font-sans font-bold text-lg text-gray-900">
-                        {formatPrice(finalTotalCents)}
+                        {displayTotalCents == null ? '—' : formatPrice(displayTotalCents)}
                       </span>
-                      <span className="font-sans font-bold text-xs text-emerald-600">
-                        (21% OFF)
-                      </span>
+                      {totalDiscountPercent != null && (
+                        <span className="font-sans font-bold text-xs text-emerald-600">
+                          ({totalDiscountPercent}% OFF)
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Value Badges */}
+                  {/* Value Badges — every figure below comes from the server. */}
                   <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-[11px] font-sans font-medium">
-                      🚚 Incl. ~₹50.00 est. shipping
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-md text-[11px] font-sans font-semibold">
-                      ✓ Save up to ₹74.95 on Prepaid
-                    </span>
+                    {quote && (
+                      quote.shipping_cents === 0 ? (
+                        <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-[11px] font-sans font-medium">
+                          🚚 Free delivery
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-[11px] font-sans font-medium">
+                          🚚 +{formatPrice(quote.shipping_cents)} delivery
+                        </span>
+                      )
+                    )}
+                    {remainingFree > 0 && quote && (
+                      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-md text-[11px] font-sans font-medium">
+                        Add {formatPrice(remainingFree)} for free delivery
+                      </span>
+                    )}
+                    {quote && quote.cod_fee_cents > 0 && (
+                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-[11px] font-sans font-medium">
+                        COD +{formatPrice(quote.cod_fee_cents)} (max {quote.cod_max_units} units)
+                      </span>
+                    )}
                   </div>
 
                   {/* Solid Black CHECKOUT Button with Payment Partner Logos */}
                   <button
                     type="button"
-                    onClick={() => setIsCheckoutOpen(true)}
+                    onClick={goToCheckout}
                     className="w-full bg-black hover:bg-neutral-900 text-white rounded-xl py-2.5 px-4 flex items-center justify-between shadow-md transition-all cursor-pointer group"
                   >
                     <div className="text-left">
                       <span className="font-sans font-bold text-sm tracking-wider uppercase block text-white">
                         CHECKOUT
                       </span>
-                      <span className="font-sans text-[10px] text-gray-300 tracking-wide uppercase block">
-                        5% OFF ON PREPAID ORDERS
-                      </span>
+                      {savingsCents > 0 && (
+                        <span className="font-sans text-[10px] text-gray-300 tracking-wide uppercase block">
+                          {formatPrice(savingsCents)} saved on this bag
+                        </span>
+                      )}
                     </div>
 
-                    {/* Partner Logos Pill */}
-                    <div className="bg-white rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-                      <span className="text-[10px] font-black tracking-tighter text-[#00b9f5] leading-none">
-                        Pay<span className="text-[#002e6e]">tm</span>
-                      </span>
-                      <span className="w-px h-3 bg-gray-200" />
-                      <span className="w-3.5 h-3.5 rounded-full bg-[#5f259f] text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                        पे
-                      </span>
-                      <span className="w-px h-3 bg-gray-200" />
-                      <span className="text-[10px] font-bold text-gray-700 leading-none flex items-center">
-                        <span className="text-[#4285f4]">G</span>Pay
-                      </span>
-                    </div>
+                    {/* Card marks removed: no payment gateway is integrated, so
+                        advertising Paytm/GPay here promised a flow that does not
+                        exist. Restore with a real gateway, not an SVG. */}
                   </button>
-
-                  {/* Gokwik Brand Attribution */}
-                  <div className="flex items-center justify-center gap-1 text-[11px] font-sans text-gray-500 pt-1">
-                    <span>Powered by</span>
-                    <div className="flex items-center gap-1 font-bold text-gray-800">
-                      <span className="inline-block w-2.5 h-2.5 rotate-45 bg-gradient-to-tr from-[#ff6b00] to-[#00b9f5] rounded-xs" />
-                      <span>GoKwik</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -742,7 +708,7 @@ export const CartDrawer: React.FC = () => {
               ) : (
                 <div>
                   <p className="font-light text-ink-muted">
-                    Add <span className="font-medium text-ink">{formatPrice(remainingForFreeShipping)}</span> more for complimentary atelier delivery
+                    Add <span className="font-medium text-ink">{formatPrice(remainingFree)}</span> more for complimentary atelier delivery
                   </p>
                   <div className="w-full bg-stone h-1.5 mt-2 rounded-full overflow-hidden">
                     <div
@@ -888,19 +854,19 @@ export const CartDrawer: React.FC = () => {
                     <span>Subtotal</span>
                     <span className="text-ink font-medium">{formatPrice(rawSubtotalCents)}</span>
                   </div>
-                  {discountCents > 0 && (
+                  {(quote?.discount_cents ?? 0) > 0 && (
                     <div className="flex justify-between text-accent font-medium">
                       <span>Privilege Savings</span>
-                      <span>–{formatPrice(discountCents)}</span>
+                      <span>–{formatPrice(quote?.discount_cents ?? 0)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-ink-muted">
                     <span>Shipping</span>
-                    <span>{freeShippingQualified ? 'Complimentary' : formatPrice(STANDARD_SHIPPING_CENTS)}</span>
+                    <span>{freeShippingQualified ? 'Complimentary' : formatPrice(quote?.flat_rate_cents ?? 0)}</span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-ink pt-2 border-t border-stone/40">
                     <span>Total</span>
-                    <span>{formatPrice(finalTotalCents)}</span>
+                    <span>{formatPrice(displayTotalCents ?? 0)}</span>
                   </div>
                 </div>
 
@@ -908,7 +874,7 @@ export const CartDrawer: React.FC = () => {
                   variant="primary"
                   size="lg"
                   className="w-full tracking-widest text-xs uppercase h-11"
-                  onClick={() => setIsCheckoutOpen(true)}
+                  onClick={goToCheckout}
                 >
                   Proceed to Atelier Checkout
                 </Button>
@@ -931,7 +897,9 @@ export const CartDrawer: React.FC = () => {
           />
           <div className="relative w-full max-w-md bg-white rounded-t-2xl sm:rounded-2xl p-5 z-10 shadow-2xl animate-in slide-in-from-bottom duration-200">
             <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-              <h4 className="font-sans font-bold text-base text-gray-900">Available Offers (12)</h4>
+              <h4 className="font-sans font-bold text-base text-gray-900">
+                Available Offers{offersCount > 0 ? ` (${offersCount})` : ''}
+              </h4>
               <button
                 onClick={() => setIsOffersModalOpen(false)}
                 className="p-1 text-gray-500 hover:text-black cursor-pointer"
@@ -941,19 +909,30 @@ export const CartDrawer: React.FC = () => {
             </div>
 
             <div className="py-3 space-y-3 max-h-[60vh] overflow-y-auto">
-              {[
-                { code: 'HUSTLE10', title: '10% OFF on all drops', desc: 'Valid on prepaid and COD orders above ₹500.' },
-                { code: 'GOBONKERS15', title: '15% OFF Tier Reward', desc: 'Unlocked on cart value ₹5,999+.' },
-                { code: 'BONKERS20', title: '20% OFF Maximum Tier', desc: 'Unlocked on cart value ₹9,999+.' },
-                { code: 'FREESHIP', title: 'Complimentary Express Delivery', desc: 'Pan-India free shipping with no minimum.' },
-              ].map((offer) => (
-                <div key={offer.code} className="border border-gray-200 rounded-xl p-3 flex justify-between items-center">
-                  <div>
+              {offers.length === 0 && (
+                <p className="font-sans text-xs text-gray-500 py-4 text-center">
+                  {quote?.best_coupon
+                    ? 'One offer available — see the prompt above.'
+                    : 'No offers are active right now.'}
+                </p>
+              )}
+              {/* Driven by public.coupons. The old list was four hardcoded
+                  objects behind a "(12)" heading, with minimums the server
+                  never enforced (BONKERS20 claimed ₹9,999 and checked nothing). */}
+              {offers.map((offer) => (
+                <div key={offer.code} className="border border-gray-200 rounded-xl p-3 flex justify-between items-center gap-3">
+                  <div className="min-w-0">
                     <span className="font-mono font-bold text-xs bg-gray-100 text-gray-900 px-2 py-0.5 rounded border border-gray-300">
                       {offer.code}
                     </span>
-                    <p className="font-sans font-semibold text-xs text-gray-900 mt-1">{offer.title}</p>
-                    <p className="font-sans text-[11px] text-gray-500">{offer.desc}</p>
+                    <p className="font-sans font-semibold text-xs text-gray-900 mt-1">
+                      {offer.description ?? describeOffer(offer)}
+                    </p>
+                    <p className="font-sans text-[11px] text-gray-500">
+                      {offer.min_subtotal_cents > 0
+                        ? `On orders above ${formatPrice(offer.min_subtotal_cents)}`
+                        : 'No minimum order'}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -961,7 +940,7 @@ export const CartDrawer: React.FC = () => {
                       applySpecificCode(offer.code);
                       setIsOffersModalOpen(false);
                     }}
-                    className="px-3 py-1 bg-black text-white text-xs font-semibold rounded-md hover:bg-neutral-800 cursor-pointer"
+                    className="px-3 py-1 bg-black text-white text-xs font-semibold rounded-md hover:bg-neutral-800 cursor-pointer shrink-0"
                   >
                     Apply
                   </button>
@@ -990,7 +969,7 @@ export const CartDrawer: React.FC = () => {
                 <div className="my-3 p-3 bg-cream border border-stone/60 text-xs shrink-0">
                   <div className="flex justify-between font-medium text-ink">
                     <span>Order Total ({cartLines.length} items):</span>
-                    <span>{formatPrice(finalTotalCents)}</span>
+                    <span>{formatPrice(displayTotalCents ?? 0)}</span>
                   </div>
                   {appliedCoupon && (
                     <span className="text-[11px] text-accent block mt-1">✦ Code {appliedCoupon.code} applied</span>
@@ -1186,7 +1165,7 @@ export const CartDrawer: React.FC = () => {
                       Back to Bag
                     </Button>
                     <Button type="submit" variant="primary" size="sm" disabled={isPlacingOrder}>
-                      {isPlacingOrder ? 'Placing Order…' : `Pay ${paymentMethod.toUpperCase()} • ${formatPrice(finalTotalCents)}`}
+                      {isPlacingOrder ? 'Placing Order…' : `Pay ${paymentMethod.toUpperCase()} • ${formatPrice(displayTotalCents ?? 0)}`}
                     </Button>
                   </div>
                 </form>

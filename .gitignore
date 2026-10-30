@@ -45,3 +45,4 @@ sketches/design-renders/chatgpt-v2/
 # them stays tracked; the images themselves do not belong in git.
 design-references/**/*.png
 sketches/**/*.png
+.hermes/
