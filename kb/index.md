@@ -4,7 +4,7 @@
 |---|---|---|---|
 | [[catalog-spine]] | concept | Data flows JSON/seed → `data.ts` adapter → TanStack Query hooks → components | [[catalog-fallback-gate]], [[route-map]] |
 | [[catalog-fallback-gate]] | mechanism | Supabase → feature-detect `universe_slug` → mock fallback chain | [[catalog-spine]], [[is-mock-guard-gap]], [[legacy-catalog-frozen]] |
-| [[is-mock-guard-gap]] | bug (open) | `getProducts()` lacks `.eq('is_mock', true)`; migrated seed leaks legacy rows to storefront | [[catalog-fallback-gate]], [[audit-trail]] |
+| [[is-mock-guard-gap]] | decision (closed) | Retired 2026-10-25: no mock flag in DB or clients; real published catalogue in DB | [[catalog-fallback-gate]], [[audit-trail]] |
 | [[universe-theming]] | mechanism | `[data-universe]` on `<html>`, scoped token remaps, `data-u-zone` opt-out for neutral zones | [[mood-vibe-taxonomy]], [[route-map]] |
 | [[mood-vibe-taxonomy]] | data | Two-axis discovery: vibes.json (7, aesthetic axis) × moods.json (6, buyer intent); gateway components | [[universe-theming]], [[catalog-spine]] |
 | [[legacy-catalog-frozen]] | decision | `products.json` + 13-SKU legacy seed: deprecated-retained, never imported by `src/` | [[catalog-fallback-gate]], [[catalog-spine]] |

@@ -1,39 +1,23 @@
 ---
 title: is_mock Guard Gap
 type: bug
-status: open
-updated: 2026-10-12
-sources: [src/lib/data.ts (getProducts), supabase/seed.sql, docs/08-universe-build/03-data-model.md §2c, docs/07-backend/README.md §3]
+status: closed (retired by decision 2026-10-25)
+updated: 2026-10-25
+sources: [backend/CONTRACT.md §5, backend/contracts/parity-gaps.md, src/lib/data.ts]
 links: ["[[catalog-fallback-gate]]", "[[audit-trail]]", "[[legacy-catalog-frozen]]"]
 ---
 
-# is_mock Guard Gap (OPEN BUG)
+# is_mock Guard Gap (CLOSED / RETIRED)
 
-`getProducts()` does not filter `is_mock = true`. The migrated seed
-(`95b1f93`, 2026-10-11) seeds **legacy** 13-SKU rows with `is_mock = false`
-and full universe columns — those rows **pass** the `universe_slug`
-feature-detection gate and would be served to the storefront by a
-Supabase-backed deploy. Intended behavior per docs/08 §03-2c: storefront
-serves `is_mock = true` rows only.
+> **Status: Closed 2026-10-25.**
+> There is **no `is_mock` column and no mock flag in the contract or schema**.
+> Retired on 2026-10-25: nothing consumed it, the column never existed in the
+> production schema, and catalogue size is a property of the data, not of a boolean.
+> `mock-products.json` is a client-side offline fallback only, while the database holds
+> the real published catalogue. No `.eq('is_mock', ...)` filter is required or valid.
 
-## Repro (logic)
+## Historical Context (2026-10-11 to 2026-10-12)
 
-Any deploy with `VITE_SUPABASE_*` set + migrated seed applied →
-`getProducts()` returns 13 legacy atelier products alongside/instead of the
-mock line → PLP/PDP render legacy products with no universe theming fit.
-
-## Fix
-
-Add `.eq('is_mock', true)` to the products select in `src/lib/data.ts`.
-Write the test red first (T1.4 in docs/10-testing) — feature-detection tests
-already exist as a pattern there.
-
-## Tracked in
-
-- `audit.md` — "Code fix needed before mock-phase deploys against a seeded DB."
-- `docs/03` + `docs/07` — carry the caution note (uncommitted as of 2026-10-12).
-
-## Changelog
-- 2026-10-11 — surfaced by docs↔code reconciliation; doc-side notes written.
-- 2026-10-12 — confirmed still open (grep: `is_mock` appears in the select list, no
-  `.eq('is_mock', …)` anywhere in `getProducts()`). Not fixed today.
+Prior to the 2026-10-25 contract alignment, an `is_mock` flag was proposed to distinguish
+local prototypes from database rows. That flag was officially retired across web, mobile,
+and backend. Both clients now query `products` directly and map rows via their adapters.

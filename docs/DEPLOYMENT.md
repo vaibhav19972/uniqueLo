@@ -67,17 +67,17 @@ Click **Deploy**. Vercel will run `tsc -b && vite build` and deploy the static a
 1. In the Supabase Dashboard, open **SQL Editor**.
 2. Click **New Query**, paste the contents of [`backend/schema.sql`](../../backend/schema.sql), and click **Run**.
 3. This creates:
-   - All 13 relational tables: `universes`, `motifs`, `categories`, `garments`, `collections`, `products`, `variants`, `product_images`, `embroidery_details`, `newsletter_subscribers`, `reviews`, `orders`, `order_items`
+   - All 21 relational tables: `universes`, `motifs`, `categories`, `garments`, `collections`, `products`, `variants`, `product_images`, `embroidery_details`, `reviews`, `newsletter_subscribers`, `orders`, `order_items`, `attribute_definitions`, `admins`, `coupons`, `shipping_rules`, `customer_addresses`, `customer_wishlists`, `coupon_redemptions`, `payment_intents`.
    - High-performance indexes, full Row-Level Security (RLS) policies, and the `product-images` storage bucket.
    - Note: `schema.sql` is 100% pure DDL with zero data rows, guaranteeing error-free execution on clean databases.
 
-### Step 3.3 — Seed Production Baseline Taxonomy & Flagship Products
+### Step 3.3 — Seed Production Baseline Taxonomy & Catalogue Products
 1. In the Supabase SQL Editor, open a **New Query**.
 2. Paste the contents of [`backend/production-seed.sql`](../../backend/production-seed.sql) and click **Run**.
 3. This seeds:
    - Complete Master Taxonomy: 3 Universes (`animeverse`, `heroverse`, `itihaas`), 7 Motifs, 5 Categories, 9 Garments, and 3 Collections (inserted in strict foreign-key dependency order).
-   - Exactly 2 authentic, handcrafted showcase products (`sakura-ronin-hoodie` and `kantha-chore-jacket`) with real variants, disk images, and embroidery provenance.
-   - The database remains clean and unpolluted with dummy data, allowing you to upload real catalog items one-by-one via the **Admin Studio** (`/admin`).
+   - 29 authentic, handcrafted catalog products (197 variants) with real variants, disk images, and embroidery provenance.
+   - The database remains clean and unpolluted with dummy data, allowing you to upload new catalog items via the **Admin Studio** (`/admin`).
 
 ### Step 3.4 — Copy API Keys
 In Supabase, navigate to **Project Settings** > **API**:

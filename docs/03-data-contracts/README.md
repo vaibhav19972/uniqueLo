@@ -81,12 +81,16 @@ export interface Product {
   gender?: 'men' | 'women' | 'unisex';
   /** Motif lore link (motifs.json id). */
   motifId?: string;
-  /** Style-vibe tokens (registry: vibes.json). Presentation hints, never merchandising. */
-  vibes?: string[];
-  /** Buyer-intent mood tags (1–3 per product, registry: moods.json). */
-  moods?: string[];
   /** True only for genuinely handcrafted pieces; gates the "Handcrafted" tag on cards + PDP. */
   handcrafted?: boolean;
+  /** 3-stop aesthetic volume axis (quiet, balanced, loud) derived from expression_score */
+  intensity?: 'quiet' | 'balanced' | 'loud';
+  /** Expression score 1..5 describing embroidery prominence */
+  expressionScore?: number;
+  /** Craft techniques applied on this garment */
+  craftTechniques?: string[];
+  /** Curated buyer-intent collections */
+  edits?: string[];
   /** Mock-phase social proof. Replaced by real review aggregates at launch. */
   rating?: number;
   reviewCount?: number;
@@ -145,8 +149,13 @@ export interface FilterState {
   universeSlug?: string | 'all';
   gender?: 'men' | 'women' | 'unisex' | 'all';
   garmentTypes?: string[];
-  vibe?: string | 'all';
-  mood?: string | 'all';
+  intensity?: 'quiet' | 'balanced' | 'loud' | 'all';
+  expressionSlug?: string | 'all';
+  expressionScore?: number | 'all';
+  characterId?: string | 'all';
+  collectionSlug?: string | 'all';
+  artStyleSlug?: string | 'all';
+  edit?: string | 'all';
   colors: string[];
   sizes: string[];
   techniques?: EmbroideryTechnique[];
@@ -174,7 +183,7 @@ export interface CartItem {
 
 ## 2. Canonical Dataset
 
-**Source of truth: `src/data/mock-products.json` (5 curated products, 31 variants as of 2026-10-12), plus the registries `universes.json`, `motifs.json`, `vibes.json`, `moods.json`.**
+**Source of truth: `src/data/mock-products.json` (29 curated products, 197 variants), plus the registries `universes.json`, `motifs.json`, `categories.json`, `garments.json`, `collections.json`, `intensity.json`, `edits.json`, and `craft-techniques.json`.**
 
 > `src/data/products.json` (the original 13-product atelier line) was
 > **deleted on 2026-10-12** as stale local data — it is no longer imported

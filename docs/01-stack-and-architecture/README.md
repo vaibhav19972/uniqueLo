@@ -16,7 +16,7 @@ Build a state-of-the-art embroidered clothing e-commerce experience — from edi
 | Concern | Pick | Reason |
 |--------|------|--------|
 | Build tool | **Vite + React 19 + TypeScript** | Fast dev server, simple config, fewer hallucinated configs than Next.js for local models. |
-| Routing | **React Router v7 (library mode)** | 10 child routes live (`/`, `/shop`, `/universes/:slug`, `/men`, `/women`, `/product/:slug`, `/atelier`, `/atelier/:techniqueSlug`, `/admin`, `*`), code-split via `React.lazy`. |
+| Routing | **React Router v7 (library mode)** | Child routes live (`/`, `/shop`, `/universes`, `/worlds`, `/styles`, `/clothing`, `/garments`, `/collections`, `/new-featured`, `/our-craft`, `/atelier`, `/product/:slug`, `/checkout`, `/order-confirmation/:orderId`, `/orders`, `/track-order`, `/admin`, `*`), code-split via `React.lazy`. |
 | Styling | **Tailwind CSS v4 + CSS variables** | Utility speed + token-based palette/type/spacing keeps every agent consistent. CSS-first via `@tailwindcss/vite` — no `tailwind.config.ts`. |
 | Scroll animation | **GSAP + ScrollTrigger** | Industry standard for pinned sections, parallax, and scrubbed reveals. |
 | Smooth scroll | **Lenis** | The "premium inertia" feel used by award-winning fashion sites. |
@@ -48,11 +48,10 @@ UniqueLo/
 │   │   └── placeholders/       ← generated tonal blocks while assets are pending
 │   └── fonts/                  ← self-hosted fonts only (no FOUT)
 ├── scripts/                    ← asset-generation tooling (e.g. generate_assets.py)
-├── supabase/                   ← schema.sql + seed.sql (legacy atelier seed)
 ├── src/
 │   ├── app/                    ← router, layout shell, page transitions
 │   │   ├── App.tsx             ← QueryClientProvider mount
-│   │   ├── routes.tsx          ← 10 child routes, React.lazy code-split
+│   │   ├── routes.tsx          ← full route suite, React.lazy code-split
 │   │   └── Layout.tsx          ← [data-universe] theming shell
 │   ├── styles/
 │   │   ├── tokens.css          ← CSS variables for colors, type, spacing, easing
@@ -64,19 +63,26 @@ UniqueLo/
 │   │   ├── supabase.ts         ← Supabase client + isSupabaseConfigured()
 │   │   ├── queryClient.ts      ← TanStack Query client
 │   │   ├── motion.ts           ← shared easings, variants, stagger helpers
-│   │   └── lenis.ts            ← Lenis init + React Router integration
+│   │   ├── lenis.ts            ← Lenis init + React Router integration
+│   │   ├── payments.ts         ← Razorpay checkout client seam
+│   │   └── pricing.ts          ← quote_order contract & price formatting
 │   ├── data/
-│   │   ├── mock-products.json  ← canonical storefront catalog (5 curated products, local testing set)
+│   │   ├── mock-products.json  ← canonical storefront catalog (29 products, offline fallback)
 │   │   ├── categories.json
 │   │   ├── universes.json      ← universe roster + theme tokens
 │   │   ├── motifs.json         ← IP-cleared motif lore registry
-│   │   ├── vibes.json          ← style-vibe registry
-│   │   └── moods.json          ← buyer-intent mood registry
+│   │   ├── intensity.json      ← 3-stop discovery axis (quiet/balanced/loud)
+│   │   ├── edits.json          ← curated collections by buyer intent
+│   │   ├── craft-techniques.json ← 9 registered craft techniques
+│   │   ├── garments.json       ← garment registry
+│   │   └── collections.json    ← thematic drops
 │   ├── hooks/
 │   │   ├── useCatalog.ts       ← TanStack Query hooks over data.ts
+│   │   ├── useQuote.ts         ← server pricing quote hook
+│   │   ├── useReconcileCart.ts ← bag reconciliation against live catalogue
 │   │   └── useHorizontalRailGuard.ts ← horizontal-rail scroll guard (Bestsellers)
 │   ├── stores/                 ← Zustand stores
-│   │   ├── cart.ts / filters.ts / customizer.ts
+│   │   ├── cart.ts / filters.ts / customizer.ts / auth.ts
 │   │   └── quickView.ts / wishlist.ts / toast.ts
 │   ├── components/
 │   │   ├── layout/             ← Header, Footer, CartDrawer, CartLineItem, AnnouncementBar

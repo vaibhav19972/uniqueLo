@@ -11,6 +11,7 @@ import { useToastStore } from '../../stores/toast';
  */
 export const AccountDrawer: React.FC = () => {
   const user = useAuthStore((s) => s.user);
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   const addresses = useAuthStore((s) => s.addresses);
   const signOut = useAuthStore((s) => s.signOut);
   const saveAddress = useAuthStore((s) => s.saveAddress);
@@ -171,6 +172,18 @@ export const AccountDrawer: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={closeDrawer}
+                      className="flex items-center justify-between py-3.5 text-sm text-accent hover:text-accent-hover transition-colors font-medium"
+                    >
+                      <span>Admin Catalog Studio</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  )}
                 </div>
 
                 <div>

@@ -100,9 +100,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
     const client = supabase;
 
+    const checkAdmin = async () => {
+      try {
+        const { data, error } = await client.rpc('is_admin');
+        set({ isAdmin: !error && data === true });
+      } catch {
+        set({ isAdmin: false });
+      }
+    };
+
     client.auth.getSession().then(({ data: { session } }) => {
       set({ session, user: session?.user ?? null });
       if (session) {
+        void checkAdmin();
         void get().loadAddresses();
         void useWishlistStore.getState().syncOnSignIn(session.user.id);
       }
@@ -113,6 +123,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     } = client.auth.onAuthStateChange((event, session) => {
       set({ session, user: session?.user ?? null });
       if (session) {
+        void checkAdmin();
         void get().loadAddresses();
         // SIGNED_IN also fires on token refresh; syncOnSignIn is idempotent
         // (union + upsert) so re-running it costs one read and changes nothing.
@@ -147,6 +158,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     }
     set({ status: 'idle', session: data.session, user: data.user, isOpen: false });
     void get().loadAddresses();
+    if (data.session) {
+      try {
+        const { data: adminData, error: adminErr } = await supabase.rpc('is_admin');
+        set({ isAdmin: !adminErr && adminData === true });
+      } catch {
+        set({ isAdmin: false });
+      }
+    }
     return true;
   },
 
@@ -175,6 +194,14 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
     set({ status: 'idle', session: data.session, user: data.user, isOpen: false });
     void get().loadAddresses();
+    if (data.session) {
+      try {
+        const { data: adminData, error: adminErr } = await supabase.rpc('is_admin');
+        set({ isAdmin: !adminErr && adminData === true });
+      } catch {
+        set({ isAdmin: false });
+      }
+    }
     return true;
   },
 

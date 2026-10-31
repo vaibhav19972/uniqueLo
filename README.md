@@ -11,7 +11,7 @@ Read the complete North Star Vision & Engineering Blueprint in **[STAR_GOAL.md](
 ## 🚀 Deployment (Vercel, Supabase & Docker Production)
 Read the full step-by-step production deployment guide in **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)**.
 - **Vercel**: Pre-configured with `vercel.json` for edge caching and SPA routing.
-- **Supabase**: Complete SQL schema ([`supabase/schema.sql`](./supabase/schema.sql)) and seed dataset ([`supabase/seed.sql`](./supabase/seed.sql)) ready for 1-click execution.
+- **Supabase**: Complete SQL schema ([`backend/schema.sql`](../backend/schema.sql)) and production seed dataset ([`backend/production-seed.sql`](../backend/production-seed.sql)) ready for execution.
 - **Real Production Server (Docker)**: Multi-stage `Dockerfile` and `docker-compose.prod.yml` ready to deploy on any VPS or Linux host.
 
 ---

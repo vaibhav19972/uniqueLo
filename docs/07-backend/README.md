@@ -93,12 +93,11 @@ no default, so every SKU must state its policy); `delivery_days_min` /
 non-returnable, the honest value for personalised pieces); `weight_grams`;
 `hsn_code` (check `^[0-9]{4,8}$`); `size_chart` (jsonb).
 
-### `suppliers` / `product_suppliers`
-Real manufacturing partners: `slug`, `name`, `city`, `state`, `country_code`,
-`gstin` (format-checked), contact fields, `verified_at` (null until someone has
-actually visited), `is_active`. Joined to products through `product_suppliers`
-with a `role` of `manufacturer` / `embroiderer` / `packer` / `dyer`, because one
-SKU can involve more than one workshop. RLS enabled, public read on active rows.
+### `suppliers` / `product_suppliers` *(Proposed — Not in active schema)*
+Vendor partner design: `slug`, `name`, `city`, `state`, `country_code`, `gstin`, `verified_at`, `is_active`. Deferred until workshop partner visits are complete. Not present in `backend/schema.sql`.
+
+### Current Relational Tables (21 tables in `backend/schema.sql`)
+1. `universes`, 2. `motifs`, 3. `categories`, 4. `garments`, 5. `collections`, 6. `products`, 7. `variants`, 8. `product_images`, 9. `embroidery_details`, 10. `reviews`, 11. `newsletter_subscribers`, 12. `orders`, 13. `order_items`, 14. `attribute_definitions`, 15. `admins`, 16. `coupons`, 17. `shipping_rules`, 18. `customer_addresses`, 19. `customer_wishlists`, 20. `coupon_redemptions`, 21. `payment_intents`.
 
 ### `variants`
 `sku` (text, PK), `product_slug` (FK → products.slug, cascade), `color`, `color_hex`, `size`, `price_cents` (int), `compare_at_price_cents` (int), `status` (check: `in-stock` | `low-stock` | `out-of-stock`), `quantity` (int), `created_at`.
@@ -125,7 +124,7 @@ SKU can involve more than one workshop. RLS enabled, public read on active rows.
 > - `backend/schema.sql` is 100% pure DDL (tables, foreign keys, indexes, RLS policies, storage).
 > - `backend/production-seed.sql` is **generated** by `backend/scripts/gen-seed.mjs` from
 >   `web/src/data/mock-products.json`, and seeds the full Master Taxonomy plus the
->   current product set (3 products / 25 variants as of 2026-10-24). Never edit it by
+>   current product set (29 products / 197 variants). Never edit it by
 >   hand — run `npm run seed:gen`, and `npm run seed:check` fails CI when it is stale.
 > - `backend/seed.sql` is **stale and cannot run**: it references `is_mock`, `vibes`
 >   and `moods`, none of which `schema.sql` defines. It is not a 13-product dev seed
