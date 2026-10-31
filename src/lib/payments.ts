@@ -76,7 +76,18 @@ export function loadRazorpay(): Promise<RazorpayConstructor> {
     tag.src = CHECKOUT_SRC;
     tag.async = true;
     tag.addEventListener('load', done, { once: true });
-    tag.addEventListener('error', () => reject(scriptFailure()), { once: true });
+    tag.addEventListener(
+      'error',
+      () => {
+        // Remove the dead tag. Leaving it in the DOM means the next call finds it
+        // via querySelector, attaches listeners to a script that has already
+        // finished failing, and hangs forever waiting for load/error that will
+        // never fire again.
+        tag.remove();
+        reject(scriptFailure());
+      },
+      { once: true }
+    );
     document.head.appendChild(tag);
   }).catch((err) => {
     // Never cache a rejection: a retry after the adblocker is disabled must work.
@@ -103,20 +114,33 @@ export type PaymentErrorCode =
   | 'REJECTED'
   | 'AMOUNT_CHANGED'
   | 'VERIFY_FAILED'
+  | 'TAKEN_NO_ORDER'
   | 'PAYMENT_SCRIPT_FAILED'
   | 'PAYMENT_SCRIPT_BLOCKED'
   | 'CANCELLED'
   | 'FAILED';
 
 export class PaymentError extends Error {
+  readonly code: PaymentErrorCode;
+  /** True when retrying the same action could plausibly succeed. */
+  readonly retryable: boolean;
+  /** The server's parsed body. Carries `payment_id` on a taken-but-unplaced row. */
+  readonly detail: Record<string, unknown> | null;
+  readonly status: number | null;
+
   constructor(
-    readonly code: PaymentErrorCode,
+    code: PaymentErrorCode,
     message: string,
-    /** True when retrying the same action could plausibly succeed. */
-    readonly retryable = true
+    retryable = true,
+    detail: Record<string, unknown> | null = null,
+    status: number | null = null
   ) {
     super(message);
     this.name = 'PaymentError';
+    this.code = code;
+    this.retryable = retryable;
+    this.detail = detail;
+    this.status = status;
   }
 }
 
@@ -126,6 +150,17 @@ export function isPaymentsConfigured(): boolean {
 }
 
 // ── create-order ────────────────────────────────────────────────────────
+/** The delivery details place_order stores. Mirrors the COD path's shape — the
+ *  confirmation page and admin queue both read `phone` and `pincode` off it, so
+ *  sending a bare address string silently loses them. */
+export interface ShippingDetails {
+  address: string;
+  phone?: string;
+  pincode?: string;
+  city?: string;
+  state?: string;
+}
+
 export interface CreatePaymentOrderInput {
   items: {
     variantSku: string;
@@ -140,7 +175,14 @@ export interface CreatePaymentOrderInput {
   customerEmail: string;
   customerName: string;
   customerPhone?: string;
-  shippingAddress: string;
+  shippingAddress: ShippingDetails;
+  /**
+   * The total the page is showing. The server compares it to what it just priced
+   * and refuses with 409 BEFORE creating a Razorpay order, so a mid-checkout price
+   * move leaves no gateway order behind. Optional only so a caller that cannot
+   * know the total still works; omitting it is a weaker guarantee, not a safe one.
+   */
+  expectedTotalCents?: number;
   /** Generated once per checkout attempt and reused on retry. */
   clientOrderId: string;
 }
@@ -158,11 +200,13 @@ type EdgeFn = 'razorpay-create-order' | 'razorpay-verify';
  * Invoke an Edge Function and turn every failure shape into a PaymentError.
  *
  * `functions.invoke` reports non-2xx as a `FunctionsHttpError` whose JSON body
- * sits on `error.context`. Without this unwrapping every server-side message —
- * "coupon expired", "gateway rejected our credentials" — collapses into a
- * generic network error, which is how a checkout becomes undebuggable.
+ * sits on `error.context`. Unwrapping it matters more than it looks: the server
+ * answers 400 (bad coupon), 402 (not settled), 409 (amount changed) and 502
+ * (money taken, no order) and the page must react DIFFERENTLY to each. Collapsing
+ * them into "network error" produces the one outcome that must never happen — a
+ * customer whose payment was captured being invited to pay again.
  */
-async function invoke<T>(fn: EdgeFn, body: unknown): Promise<T> {
+async function invoke<T>(fn: EdgeFn, body: Record<string, unknown>): Promise<T> {
   if (!supabase) {
     throw new PaymentError('NOT_CONFIGURED', 'Online payment is unavailable in this build.', false);
   }
@@ -172,21 +216,50 @@ async function invoke<T>(fn: EdgeFn, body: unknown): Promise<T> {
   if (error) {
     let message = error.message || 'The payment service is unavailable.';
     let code: PaymentErrorCode = 'NETWORK';
+    let detail: Record<string, unknown> | null = null;
+    let status: number | null = null;
 
-    // FunctionsHttpError carries the response; read our own { error } field off it.
     const ctx = (error as { context?: Response }).context;
     if (ctx && typeof ctx.json === 'function') {
+      status = ctx.status;
       try {
         const parsed = await ctx.json();
-        if (parsed?.error) message = parsed.error;
-        code = ctx.status === 400 ? 'REJECTED' : 'NETWORK';
-        if (/not configured/i.test(message)) code = 'NOT_CONFIGURED';
+        if (parsed && typeof parsed === 'object') {
+          detail = parsed as Record<string, unknown>;
+          if (typeof detail.error === 'string') message = detail.error;
+        }
       } catch {
-        /* non-JSON body; keep the generic message */
+        /* non-JSON body; the status alone still tells us enough */
       }
     }
 
-    throw new PaymentError(code, message, code !== 'NOT_CONFIGURED');
+    // A body carrying a payment_id means money moved. That outranks the status
+    // code: 409 and 502 both use it, and both mean "do NOT pay again."
+    const hasPaymentRef =
+      detail !== null && (typeof detail.payment_id === 'string' || detail.owed !== undefined);
+
+    if (hasPaymentRef) {
+      code = 'TAKEN_NO_ORDER';
+    } else if (status === 404) {
+      // The function is not deployed, or the project ref is wrong. A build
+      // problem, not a network blip — the caller switches to COD.
+      code = 'NOT_CONFIGURED';
+    } else if (status === 409) {
+      code = 'AMOUNT_CHANGED';
+    } else if (status === 402) {
+      code = 'FAILED';
+    } else if (status === 400) {
+      code = 'REJECTED';
+    } else if (status === 503) {
+      code = 'NOT_CONFIGURED';
+    } else if (/not configured|not available/i.test(message)) {
+      code = 'NOT_CONFIGURED';
+    }
+
+    // Only these two are safe to retry: a rejected input can be corrected, and a
+    // network fault may clear. Anything else may already have taken money.
+    const retryable = code === 'REJECTED' || code === 'NETWORK';
+    throw new PaymentError(code, message, retryable, detail, status);
   }
 
   return data as T;
@@ -199,7 +272,19 @@ export async function createPaymentOrder(input: CreatePaymentOrderInput): Promis
     customer_email: input.customerEmail,
     customer_name: input.customerName,
     customer_phone: input.customerPhone ?? null,
-    shipping_address: { address: input.shippingAddress, payment_method: 'prepaid' },
+    // Structured, not a bare string: phone and pincode are what the courier and
+    // the confirmation page actually need.
+    shipping_address: {
+      address: input.shippingAddress.address,
+      phone: input.shippingAddress.phone ?? null,
+      pincode: input.shippingAddress.pincode ?? null,
+      city: input.shippingAddress.city ?? null,
+      state: input.shippingAddress.state ?? null,
+      payment_method: 'prepaid',
+    },
+    // Must be sent, or the server's pre-check never fires: Number(undefined) is
+    // NaN and the guard is written as `Number.isFinite(expected) && expected > 0`.
+    expected_total_cents: input.expectedTotalCents ?? null,
     client_order_id: input.clientOrderId,
   });
 }
@@ -227,6 +312,13 @@ export interface PayOnlineInput extends CreatePaymentOrderInput {
   prefill: { name: string; email: string; contact?: string };
   /** Store's ink token, so the modal does not look like a different product. */
   accentColor?: string;
+  /**
+   * Progress, because the gap after the modal closes is where customers panic.
+   * `verifying` covers a server round trip (fetch payment, capture, place_order)
+   * that can take seconds; without a signal the page looks frozen and people
+   * refresh — mid-payment. The caller disables the button and says so.
+   */
+  onStage?: (stage: 'creating' | 'awaiting' | 'verifying') => void;
 }
 
 export interface PayOnlineResult {
@@ -247,10 +339,16 @@ export interface PayOnlineResult {
  * outcome at a payment page, and silently "fixing" it is not better.
  */
 export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult> {
+  const stage = input.onStage ?? (() => {});
+  stage('creating');
+
   const Razorpay = await loadRazorpay();
   const order = await createPaymentOrder(input);
 
   if (order.amount !== input.expectedTotalCents) {
+    // The server re-priced and got a different number than the page shows.
+    // The modal must NOT open: charging an amount the customer never saw is the
+    // worst outcome at a payment page, and silently "fixing" it is not better.
     throw new PaymentError(
       'AMOUNT_CHANGED',
       'Your order total changed while you were paying. Please review the updated amount.',
@@ -260,6 +358,19 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
 
   return new Promise<PayOnlineResult>((resolve, reject) => {
     let settled = false;
+    /**
+     * The most recent gateway failure, if any.
+     *
+     * NOT used to settle the promise. Razorpay keeps the modal open after a
+     * failed attempt so the customer can retry another method — UPI fails, they
+     * pay by card, which is the single most common recovery path in Indian
+     * checkout. Settling on `payment.failed` would set `settled = true` and then
+     * silently DROP the later `handler` success: money captured, verify never
+     * called, no order. This variable exists only so that *closing* the modal
+     * after a failure reports the gateway's reason instead of "you cancelled".
+     */
+    let lastFailure: PaymentError | null = null;
+
     const finish = (fn: () => void) => {
       if (settled) return;
       settled = true;
@@ -282,17 +393,16 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
       notes: { client_order_id: input.clientOrderId },
       theme: { color: input.accentColor ?? '#141414' },
       modal: {
-        // The customer closed the window. Not an error, not a lost sale — the bag
-        // is intact and the same intent is reused if they try again.
+        // The customer closed the window. If the last thing that happened was a
+        // gateway failure, that is the more useful message than "cancelled".
         ondismiss: () =>
-          finish(() =>
-            reject(new PaymentError('CANCELLED', 'Payment cancelled — your bag is saved.'))
-          ),
+          finish(() => reject(lastFailure ?? new PaymentError('CANCELLED', 'Payment cancelled — your bag is saved.'))),
       },
       handler: (resp: RazorpaySuccess) => {
         // Razorpay does not await this callback, so the promise resolution must
         // happen inside it rather than after `open()` returns.
         finish(() => {
+          stage('verifying');
           verifyPayment(resp)
             .then((result) =>
               resolve({ orderId: result.order_id, paymentId: result.payment_id ?? resp.razorpay_payment_id })
@@ -303,7 +413,10 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
                   ? err
                   : new PaymentError(
                       'VERIFY_FAILED',
-                      'We could not confirm your payment. Do not retry payment — contact us with your reference.'
+                      'We could not confirm your payment. Do not retry payment — contact us with your reference.',
+                      // NOT retryable: money may already be captured, and a second
+                      // attempt could charge twice.
+                      false
                     )
               )
             );
@@ -312,18 +425,20 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
     });
 
     rzp.on('payment.failed', (resp) => {
-      finish(() =>
-        reject(
-          new PaymentError(
-            'FAILED',
-            resp.error?.description || 'The payment did not go through. No money was taken.'
-          )
-        )
+      // Record only. See `lastFailure` above — settling here breaks retry-to-success.
+      lastFailure = new PaymentError(
+        'FAILED',
+        resp.error?.description || 'The payment did not go through. No money was taken.',
+        // A different method can plausibly succeed, so the *customer* may try
+        // again; this flag governs retrying the same action, which is safe here
+        // because nothing was captured.
+        true
       );
     });
 
     try {
       rzp.open();
+      stage('awaiting');
     } catch {
       finish(() => reject(new PaymentError('FAILED', 'Could not open the payment window.')));
     }

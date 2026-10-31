@@ -408,16 +408,20 @@ export const OrderConfirmation: React.FC = () => {
                           </span>{' '}
                           ready at the time of courier handover.
                         </div>
-                      ) : paymentMethod === 'upi' ? (
-                        <div className="p-2.5 bg-cream border border-stone/40 text-[11px] text-ink font-sans">
-                          <strong>UPI Settlement:</strong> Transaction recorded with UniqueLo merchant
-                          treasury (<span className="font-mono text-accent">uniquelo@upi</span>).
-                          Archival invoice generated.
-                        </div>
                       ) : (
                         <div className="p-2.5 bg-cream border border-stone/40 text-[11px] text-ink font-sans">
-                          <strong>Prepaid Card / Netbanking:</strong> Authorization verified. Zero
-                          outstanding balance.
+                          <strong>Paid online:</strong> Settled through Razorpay. Your card and UPI
+                          details were entered on their secure page and are never stored by
+                          UniqueLo.
+                          {paymentMethod === 'upi' && (
+                            <>
+                              {' '}
+                              <span className="text-ink-muted">
+                                (Earlier orders were recorded against a UPI handle; the payment
+                                gateway is now the only online route.)
+                              </span>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
