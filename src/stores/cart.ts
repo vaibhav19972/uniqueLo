@@ -16,6 +16,8 @@ interface CartState {
     maxQuantity?: number
   ) => void;
   removeItem: (id: string) => void;
+  /** Bulk removal by id. Used to drop lines the catalogue can no longer price. */
+  removeItems: (ids: string[]) => void;
   updateQuantity: (id: string, quantity: number, maxQuantity?: number) => void;
   updateVariant: (id: string, newVariantSku: string) => void;
   clearCart: () => void;
@@ -78,6 +80,14 @@ export const useCartStore = create<CartState>()(
       removeItem: (id) => {
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),
+        }));
+      },
+
+      removeItems: (ids) => {
+        if (ids.length === 0) return;
+        const drop = new Set(ids);
+        set((state) => ({
+          items: state.items.filter((item) => !drop.has(item.id)),
         }));
       },
 

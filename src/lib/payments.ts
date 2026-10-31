@@ -114,6 +114,7 @@ export type PaymentErrorCode =
   | 'REJECTED'
   | 'AMOUNT_CHANGED'
   | 'VERIFY_FAILED'
+  | 'VERIFY_TIMEOUT'
   | 'TAKEN_NO_ORDER'
   | 'PAYMENT_SCRIPT_FAILED'
   | 'PAYMENT_SCRIPT_BLOCKED'
@@ -197,6 +198,59 @@ export interface PaymentOrder {
 type EdgeFn = 'razorpay-create-order' | 'razorpay-verify';
 
 /**
+ * Hard ceilings on the function round trip.
+ *
+ * Observed reality: verify normally answers in ~2s, but a cold Deno isolate plus a
+ * Razorpay payment lookup plus `place_order` under row locks can push it to 10s+.
+ * Without a ceiling, ANY stall (edge redeploy, Cloudflare hiccup, a request that
+ * never returns) leaves `payOnline` unresolved — and because the checkout awaits
+ * it, the page sits on "Confirming your payment…" forever with no way out. That is
+ * worse than an error: the customer cannot retry, cannot navigate, and does not
+ * know whether they were charged.
+ *
+ * Generous on purpose. These exist to break a hang, not to cut off slow-but-fine
+ * payments.
+ */
+const CREATE_TIMEOUT_MS = 20_000;
+const VERIFY_TIMEOUT_MS = 45_000;
+
+/**
+ * Race a promise against a deadline.
+ *
+ * `functions.invoke` accepts a `timeout` option, but this is a second, independent
+ * belt: the SDK's timeout guards its own fetch, while this guards the whole call
+ * (including any await inside `invoke` that could itself stall). Cheap, and the
+ * failure it prevents is the one this bug was.
+ */
+function withDeadline<T>(promise: Promise<T>, ms: number, fn: EdgeFn): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(
+        new PaymentError(
+          fn === 'razorpay-verify' ? 'VERIFY_TIMEOUT' : 'NETWORK',
+          fn === 'razorpay-verify'
+            ? 'We could not confirm your payment in time. Do not pay again — check your orders or contact us.'
+            : 'The payment service took too long to respond. Please try again.',
+          // A verify timeout means money may already have moved: not retryable.
+          fn !== 'razorpay-verify'
+        )
+      );
+    }, ms);
+
+    promise.then(
+      (v) => {
+        clearTimeout(timer);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(timer);
+        reject(e);
+      }
+    );
+  });
+}
+
+/**
  * Invoke an Edge Function and turn every failure shape into a PaymentError.
  *
  * `functions.invoke` reports non-2xx as a `FunctionsHttpError` whose JSON body
@@ -211,7 +265,13 @@ async function invoke<T>(fn: EdgeFn, body: Record<string, unknown>): Promise<T> 
     throw new PaymentError('NOT_CONFIGURED', 'Online payment is unavailable in this build.', false);
   }
 
-  const { data, error } = await supabase.functions.invoke(fn, { body });
+  const ceiling = fn === 'razorpay-verify' ? VERIFY_TIMEOUT_MS : CREATE_TIMEOUT_MS;
+
+  const { data, error } = await withDeadline(
+    supabase.functions.invoke(fn, { body, timeout: ceiling }),
+    ceiling + 5_000,
+    fn
+  );
 
   if (error) {
     let message = error.message || 'The payment service is unavailable.';

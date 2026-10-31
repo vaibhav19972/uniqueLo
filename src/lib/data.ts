@@ -1106,6 +1106,37 @@ export function getDefaultVariant(product: Product): ProductVariant {
   };
 }
 
+/**
+ * Cart lines the current catalogue can no longer fulfil.
+ *
+ * A persisted cart outlives the catalogue it was filled from. Three ways a line
+ * goes stale:
+ *   • the SKU was retired or re-keyed (Admin's matrix generator emits
+ *     `prefix-col-sz`, which is not the seeded `UL-XXXX-COLOR-SZ` shape),
+ *   • the product was drafted but never published,
+ *   • the bag was filled in a different build — localhost and production are
+ *     different origins, so they hold different localStorage carts.
+ *
+ * This asymmetry is what bricked production checkout: `quote_order` refuses the
+ * WHOLE bag on one unknown SKU (`P0002`, migration 20261101), while `getCartLine`
+ * returns null for the same line, so every visible list filters it out. The
+ * customer sees a normal bag, a red server error, and no way to delete the line
+ * causing it.
+ *
+ * `products.length === 0` means "the catalogue has not loaded", not "everything
+ * is gone" — pruning on that would empty a valid bag whenever a fetch failed.
+ */
+export function findUnavailableCartItems(items: CartItem[], products: Product[]): CartItem[] {
+  if (products.length === 0) return [];
+
+  const bySlug = new Map(products.map((p) => [p.slug, p]));
+  return items.filter((item) => {
+    const product = bySlug.get(item.productSlug);
+    if (!product) return true;
+    return !product.variants.some((v) => v.sku === item.variantSku);
+  });
+}
+
 export function getCartLine(item: CartItem, products: Product[]): CartLine | null {
   const product = products.find((p) => p.slug === item.productSlug);
   if (!product) return null;

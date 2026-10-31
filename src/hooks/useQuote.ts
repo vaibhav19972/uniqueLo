@@ -53,6 +53,9 @@ export function useQuote(opts?: { couponCode?: string | null; paymentMethod?: Pa
       // Do not retry a structural failure: no backend, or the RPC is not
       // deployed. Retrying just delays an honest error message.
       if (err?.code === 'NO_BACKEND' || err?.code === 'NOT_DEPLOYED') return false;
+      // An unknown SKU is deterministic — the same bag will be refused forever.
+      // Retrying burns the customer's time before the prune can happen.
+      if (err?.code === 'UNKNOWN_VARIANT') return false;
       return count < 2;
     },
     enabled: quoteItems.length > 0,

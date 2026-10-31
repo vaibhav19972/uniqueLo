@@ -5,9 +5,11 @@ import { useAuthStore, type CustomerAddress } from '../stores/auth';
 import { useToastStore } from '../stores/toast';
 import { useProducts } from '../hooks/useCatalog';
 import { useQuote } from '../hooks/useQuote';
+import { useReconcileCart } from '../hooks/useReconcileCart';
 import { getCartLine, formatPrice, createOrder, type CartLine, type PaymentMethod } from '../lib/data';
 import { PaymentError, isPaymentsConfigured, newClientOrderId, payOnline } from '../lib/payments';
 import {
+  UnknownVariantError,
   lineMrpCents,
   lineDiscountPercent,
   remainingForFreeShipping,
@@ -46,8 +48,13 @@ export const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
+  const removeItems = useCartStore((s) => s.removeItems);
   const { data: products = [] } = useProducts();
   const showToast = useToastStore((s) => s.showToast);
+
+  // Prune bag lines the live catalogue can no longer price, before the quote
+  // runs. See useReconcileCart for why this has to happen at all.
+  useReconcileCart();
 
   const user = useAuthStore((s) => s.user);
   const addresses = useAuthStore((s) => s.addresses);
@@ -144,6 +151,29 @@ export const Checkout: React.FC = () => {
   useEffect(() => {
     if (!codAvailable && paymentMethod === 'cod') setPaymentMethod('upi');
   }, [codAvailable, paymentMethod]);
+
+  // Safety net behind useReconcileCart.
+  //
+  // The pruner keys off the CATALOGUE, and the catalogue can disagree with the
+  // server — a cached product list, a variant published to the DB but missing
+  // from the client's copy, or a bag hydrated before either query settled. When
+  // that happens the server is the authority: it names the SKU it refused
+  // (`P0002`), so drop exactly those lines and let the quote re-run. Without
+  // this, one unpurchasable SKU leaves the pay button permanently disabled and
+  // the customer with no line to delete.
+  useEffect(() => {
+    if (!(quoteError instanceof UnknownVariantError)) return;
+    const culprits = items.filter((i) => i.variantSku === quoteError.sku);
+    if (culprits.length === 0) return;
+
+    removeItems(culprits.map((i) => i.id));
+    showToast({
+      title: 'An item is no longer available',
+      description: 'We removed it from your bag so you can complete your order.',
+      type: 'info',
+    });
+    // Removing re-keys the quote query; no explicit refetch needed.
+  }, [quoteError, items, removeItems, showToast]);
 
   const bestCoupon: BestCoupon | null = quote?.best_coupon ?? null;
   const offers: BestCoupon[] = quote?.available_offers ?? [];
@@ -365,6 +395,7 @@ export const Checkout: React.FC = () => {
 
       case 'TAKEN_NO_ORDER':
       case 'VERIFY_FAILED':
+      case 'VERIFY_TIMEOUT':
         // Money may be captured. Hard stop: no retry, bag NOT cleared.
         setFatal({
           message: e.message,
@@ -884,6 +915,14 @@ export const Checkout: React.FC = () => {
                     <p className="text-[10px] text-amber-900/70 mt-2">
                       Do not pay again. Quote this reference if you contact us.
                     </p>
+                    {/* The customer is stranded without an order id, so give them
+                        a way to look for the order the payment actually created. */}
+                    <Link
+                      to="/orders"
+                      className="inline-block mt-2.5 text-[10px] uppercase tracking-[0.14em] text-amber-900 underline underline-offset-4 hover:no-underline"
+                    >
+                      Check your orders →
+                    </Link>
                   </div>
                 )}
 

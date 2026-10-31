@@ -17,6 +17,8 @@ vi.mock('./supabase', () => ({
 import {
   quoteOrder,
   QuoteError,
+  UnknownVariantError,
+  parseUnknownVariant,
   lineMrpCents,
   lineDiscountPercent,
   catalogMrp,
@@ -77,6 +79,53 @@ describe('pricing — the bag may not invent a number', () => {
     await expect(
       quoteOrder({ items: [{ variant_sku: 'HOOD-M', quantity: 1 }] })
     ).rejects.toMatchObject({ code: 'NOT_DEPLOYED' });
+  });
+
+  // The live storefront's checkout died on exactly this: one stale SKU in a
+  // persisted bag makes quote_order refuse the WHOLE cart, and the raw Postgres
+  // message was what the customer saw. It has to arrive typed and parsed so the
+  // page can drop that line instead of blacklisting checkout.
+  it('P1.2b surfaces an uncatalogued SKU as UnknownVariantError naming the SKU', async () => {
+    configured = true;
+    rpc.mockResolvedValueOnce({
+      data: null,
+      error: {
+        code: 'P0002',
+        message: 'Unknown or uncatalogued variant SKU: ihdl-nat-s',
+      },
+    });
+
+    const err = await quoteOrder({ items: [{ variant_sku: 'ihdl-nat-s', quantity: 1 }] }).catch(
+      (e) => e
+    );
+    expect(err).toBeInstanceOf(UnknownVariantError);
+    expect(err).toBeInstanceOf(QuoteError);
+    expect(err.code).toBe('UNKNOWN_VARIANT');
+    expect(err.sku).toBe('ihdl-nat-s');
+  });
+
+  it('P1.2c leaves a P0002 it cannot parse as a plain QuoteError', async () => {
+    // A different raise in the same SQLSTATE must not be mistaken for a bad SKU:
+    // the caller would then remove a line that was never the problem.
+    configured = true;
+    rpc.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'P0002', message: 'no_data_found' },
+    });
+    await expect(
+      quoteOrder({ items: [{ variant_sku: 'HOOD-M', quantity: 1 }] })
+    ).rejects.toMatchObject({ code: 'P0002' });
+  });
+
+  it('P1.2d parses the SKU out of the server message, and only when present', () => {
+    expect(parseUnknownVariant('Unknown or uncatalogued variant SKU: ihdl-nat-s')).toBe('ihdl-nat-s');
+    expect(parseUnknownVariant('Unknown or uncatalogued variant SKU: UL-H4B0-CREAM-M')).toBe(
+      'UL-H4B0-CREAM-M'
+    );
+    // Not a shape this parser claims to understand — must not invent one.
+    expect(parseUnknownVariant('no_data_found')).toBeNull();
+    expect(parseUnknownVariant(undefined)).toBeNull();
+    expect(parseUnknownVariant('')).toBeNull();
   });
 
   it('P1.3 passes the coupon and payment method through untouched', async () => {

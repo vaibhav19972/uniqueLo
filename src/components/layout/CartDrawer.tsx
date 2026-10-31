@@ -4,6 +4,7 @@ import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
 import { getCartLine, formatPrice, createOrder, getDefaultVariant, type CartLine, type PaymentMethod } from '../../lib/data';
 import { useQuote } from '../../hooks/useQuote';
+import { useReconcileCart } from '../../hooks/useReconcileCart';
 import {
   lineMrpCents,
   remainingForFreeShipping,
@@ -102,6 +103,12 @@ export const CartDrawer: React.FC = () => {
 
   // ── Server pricing: the single source of every number in this drawer ──
   const { quote } = useQuote({ couponCode: appliedCoupon?.code ?? null });
+
+  // The drawer is where a stale line is most visible as a bug: it renders from
+  // `cartLines`, which silently drops unpurchasable lines, so the bag looks
+  // smaller than the bag that gets quoted. Prune first, then quote a cart the
+  // server will actually accept.
+  useReconcileCart();
 
   const rawSubtotalCents = useMemo(() => {
     return cartLines.reduce((acc, line) => acc + line.lineTotalCents, 0);

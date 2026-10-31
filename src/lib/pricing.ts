@@ -84,6 +84,34 @@ export class QuoteError extends Error {
 }
 
 /**
+ * The server refused a specific variant rather than the request as a whole.
+ *
+ * `quote_order` raises `P0002 Unknown or uncatalogued variant SKU: <sku>` and
+ * names the offender in the message. That is the one quote failure a customer
+ * can act on: the SKU is unpurchasable, so the line must go rather than the
+ * whole checkout be blacklisted. Kept as its own class so the UI can prune and
+ * retry instead of printing a Postgres exception at a shopper.
+ */
+export class UnknownVariantError extends QuoteError {
+  constructor(
+    message: string,
+    readonly sku: string
+  ) {
+    super(message, 'UNKNOWN_VARIANT');
+    this.name = 'UnknownVariantError';
+  }
+}
+
+/** Extracts the SKU from `Unknown or uncatalogued variant SKU: <sku>`. */
+const UNKNOWN_SKU_RE = /variant sku:\s*(\S+)/i;
+
+export function parseUnknownVariant(message: string | undefined): string | null {
+  if (!message) return null;
+  const m = UNKNOWN_SKU_RE.exec(message);
+  return m ? m[1].trim() : null;
+}
+
+/**
  * Ask the server what this bag costs.
  *
  * This is the only source of money in the app. It is called on every bag
@@ -129,6 +157,12 @@ export async function quoteOrder(input: {
         'Server pricing is not deployed yet. Run migration 20261101_checkout_pricing.sql.',
         'NOT_DEPLOYED'
       );
+    }
+    // P0002 names the SKU it refused. Surface it as a typed error so the caller
+    // can drop that line and re-quote instead of showing a raw database message.
+    if (error.code === 'P0002') {
+      const sku = parseUnknownVariant(error.message);
+      if (sku) throw new UnknownVariantError(error.message, sku);
     }
     throw new QuoteError(error.message || 'Could not price your bag.', error.code);
   }
