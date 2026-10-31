@@ -2551,7 +2551,7 @@ INSERT INTO public.embroidery_details (
                         <button
                           type="button"
                           onClick={applyBoardCrops}
-                          className="flex-1 px-3 py-2 bg-paper border border-ink/30 hover:border-ink text-ink text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors"
+                          className="flex-1 px-3 py-2 bg-paper border border-stone-strong hover:border-ink text-ink text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors"
                         >
                           Apply previews to slots
                         </button>

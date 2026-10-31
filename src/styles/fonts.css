@@ -1,11 +1,43 @@
-/* src/styles/fonts.css — self-hosted brand fonts (chatgpt-v2 render era).
-   Playfair Display carries ALL editorial + functional text (nav, body, CTAs);
-   Satoshi is reserved for tracked-out caps eyebrows / micro-labels.
-   Licenses: Playfair Display — Google OFL; Satoshi/Melodrama — Fontshare free. */
+/* src/styles/fonts.css — self-hosted brand fonts.
+   TWO roles, deliberately split:
+
+   • Display  — Playfair Display (OFL). Headlines, hero, editorial pull-quotes.
+                Only ever used at text-2xl and above.
+   • UI       — Geist (OFL). Body, navigation, buttons, prices, labels, tables.
+                Anything a customer reads at reading size or interacts with.
+
+   Geist Mono is kept for prices, SKUs and tracked micro-labels so numbers hold
+   their width. Melodrama stays behind Playfair as a last-resort serif fallback.
+
+   All files are self-hosted in /public/fonts. Do NOT add Google Fonts to
+   index.html — the font files below are the only loading path. */
 
 /* ═══════════════════════════════════════════════════════════════════
-   Playfair Display — primary serif (display, nav, body, buttons).
-   Variable: wght 400–900. True italic included (poetic taglines).
+   Geist — the functional face. Variable wght 100–900.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Geist Mono — prices, SKUs, order numbers.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Playfair Display — the display face. Variable wght 400–900, true italic.
+   Reserved for text-2xl and above so the brand voice stays editorial
+   without making body copy hard to read.
    ═══════════════════════════════════════════════════════════════════ */
 @font-face {
   font-family: 'Playfair Display';
@@ -24,28 +56,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Satoshi — sans (eyebrows, micro-labels, tracked caps only).
-   Variable font: weight 300–900 in one ~43KB file.
-   ═══════════════════════════════════════════════════════════════════ */
-@font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
-  font-weight: 300 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2');
-  font-weight: 300 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   Melodrama — serif fallback (kept behind Playfair in the stack).
-   Display face; no true italic cut — do not promote above Playfair.
+   Melodrama — serif fallback only. Never promoted above Playfair.
    ═══════════════════════════════════════════════════════════════════ */
 @font-face {
   font-family: 'Melodrama';

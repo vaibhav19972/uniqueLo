@@ -41,34 +41,48 @@ export const Collections: React.FC = () => {
           <Link
             key={col.slug}
             to={`/collections/${col.slug}`}
-            className="group bg-paper border border-stone/70 p-3.5 sm:p-8 hover:border-ink transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
+            className="group flex flex-col justify-between overflow-hidden border border-stone bg-paper shadow-xs transition-all hover:border-accent hover:shadow-md"
           >
+            {col.image && (
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-stone/20">
+                <img
+                  src={col.image}
+                  alt={`${col.name} — placeholder campaign art`}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="scrim-bottom-soft absolute inset-x-0 bottom-0 h-1/2" aria-hidden="true" />
+                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-8">
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-1 text-[8px] sm:text-[10px] uppercase font-sans tracking-[0.15em] sm:tracking-[0.2em] text-accent font-medium mb-2 sm:mb-3">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-1 font-sans text-[8px] font-medium uppercase tracking-[0.15em] text-accent sm:mb-3 sm:text-[10px] sm:tracking-[0.2em]">
                 <span className="truncate">{col.universeSlug ? `${col.universeSlug} Capsule` : 'Atelier Release'}</span>
                 {col.featured && (
-                  <span className="bg-gold/10 text-gold-deep px-1.5 sm:px-2 py-0.5 border border-gold/20 shrink-0">
+                  <span className="shrink-0 border border-accent-border bg-accent-soft px-1.5 py-0.5 text-accent sm:px-2">
                     Active Drop
                   </span>
                 )}
               </div>
-              <h2 className="font-serif text-base sm:text-2xl lg:text-3xl text-ink group-hover:text-accent transition-colors line-clamp-1">
+              <h2 className="line-clamp-1 font-serif text-base text-ink transition-colors group-hover:text-accent sm:text-2xl lg:text-3xl">
                 {col.name}
               </h2>
-              <p className="font-serif italic text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">
+              <p className="mt-1 line-clamp-1 font-sans text-xs text-ink-muted sm:mt-1.5 sm:text-sm">
                 {col.tagline}
               </p>
-              <p className="text-[11px] sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+              <p className="mt-2 line-clamp-2 font-sans text-[11px] leading-relaxed text-ink-muted sm:mt-3 sm:line-clamp-none sm:text-xs">
                 {col.description}
               </p>
             </div>
-            <div className="pt-3 sm:pt-6 border-t border-stone/40 mt-3 sm:mt-6 flex items-center justify-between">
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
+            <div className="mt-3 flex items-center justify-between border-t border-stone/40 pt-3 sm:mt-6 sm:pt-6">
+              <span className="font-sans text-[10px] font-medium uppercase tracking-widest text-ink sm:text-[11px]">
                 {counts[col.slug] ?? 0} {counts[col.slug] === 1 ? 'Garment' : 'Garments'}
               </span>
-              <span className="text-[10px] sm:text-xs text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true">
+              <span className="font-sans text-[10px] text-ink transition-transform group-hover:translate-x-1 sm:text-xs" aria-hidden="true">
                 Explore →
               </span>
+            </div>
             </div>
           </Link>
         ))}

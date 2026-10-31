@@ -7,8 +7,10 @@ import {
   type Product,
 } from '../../lib/data';
 import { MarketingHeader } from '../ui/MarketingHeader';
+import { useReveal } from '../../hooks/useReveal';
 
 export const FindYourExpression: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   const { data: products } = useProducts();
   const [selectedScore, setSelectedScore] = useState<number>(3); // Default to artistic midpoint
 
@@ -23,18 +25,16 @@ export const FindYourExpression: React.FC = () => {
         level,
         count: matching.length,
         sampleProduct: sample,
-        sampleImage:
-          sample?.images[0]?.src ||
-          sample?.images[1]?.src ||
-          '/images/campaigns/atelier-craft.jpg',
+        // Curated placeholder art per expression level — a taxonomy card, so
+        // the artwork must not churn with the catalogue.
+        sampleImage: `/images/expression/${level.slug}.jpg`,
       };
     });
   }, [products]);
 
   return (
-    <section
-      aria-labelledby="expression-gateway-heading"
-      className="bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16 border-b border-stone/50 overflow-hidden"       aria-labelledby="expression-gateway-heading"
+      
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
@@ -63,10 +63,10 @@ export const FindYourExpression: React.FC = () => {
                     setSelectedScore(level.score);
                   }
                 }}
-                className={`group flex flex-col bg-paper border transition-all duration-300 relative cursor-pointer select-none text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`group relative flex cursor-pointer select-none flex-col overflow-hidden border bg-paper text-left transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   isSelected
-                    ? 'border-ink ring-2 ring-ink shadow-lg -translate-y-1'
-                    : 'border-stone/60 hover:border-accent hover:shadow-md hover:-translate-y-0.5'
+                    ? '-translate-y-1 border-accent ring-2 ring-accent shadow-lg'
+                    : 'border-stone hover:-translate-y-0.5 hover:border-accent hover:shadow-md'
                 }`}
               >
                 {/* Visual Imagery / Macro Detail */}
@@ -77,19 +77,20 @@ export const FindYourExpression: React.FC = () => {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+                  <div className="scrim-bottom absolute inset-x-0 bottom-0 h-2/3" aria-hidden="true" />
+                  <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
                   
                   {/* Active Selection Badge (replaces Level pill) */}
                   {isSelected && (
-                    <div className="absolute top-3 left-3 bg-ink/95 text-gold-zari text-[9px] uppercase tracking-widest font-sans font-semibold px-2 py-0.5 border border-gold-zari/40 shadow-sm flex items-center gap-1.5 animate-fadeIn">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gold-zari animate-pulse" />
+                    <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 border border-accent-border bg-paper/95 px-2 py-0.5 font-sans text-[9px] font-semibold uppercase tracking-widest text-accent shadow-sm animate-fadeIn">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
                       Active
                     </div>
                   )}
 
                   {/* Bottom Image Overlay Details */}
-                  <div className="absolute bottom-3 inset-x-3 text-cream">
-                    <span className="text-[10px] uppercase font-sans tracking-widest text-gold-zari font-semibold block">
+                  <div className="absolute bottom-3 inset-x-3 z-10 text-ink">
+                    <span className="block font-sans text-[10px] font-semibold uppercase tracking-widest text-accent">
                       {level.characteristics.split(',')[0]}
                     </span>
                     <h3 className="font-serif text-lg leading-tight mt-0.5">
@@ -101,15 +102,15 @@ export const FindYourExpression: React.FC = () => {
                 {/* Card Editorial Body */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div>
-                    <p className="text-[11px] text-ink-muted leading-relaxed font-light line-clamp-3">
+                    <p className="line-clamp-3 font-sans text-[11px] leading-relaxed text-ink-muted">
                       {level.description}
                     </p>
                     {sampleProduct && (
                       <div className="mt-3 pt-2.5 border-t border-stone/30 text-[10px] text-ink-muted">
-                        <span className="uppercase tracking-widest text-ink/70 block">
+                        <span className="block uppercase tracking-widest text-ink-muted">
                           Featured in this style:
                         </span>
-                        <span className="font-serif text-ink font-medium truncate block mt-0.5">
+                        <span className="mt-0.5 block truncate font-sans font-medium text-ink">
                           {sampleProduct.name}
                         </span>
                       </div>
@@ -123,8 +124,8 @@ export const FindYourExpression: React.FC = () => {
                       onClick={(e) => e.stopPropagation()}
                       className={`w-full py-2 px-3 text-center text-[10px] uppercase tracking-widest font-semibold transition-colors block ${
                         isSelected
-                          ? 'bg-accent text-cream hover:bg-accent-hover'
-                          : 'bg-cream text-ink border border-stone/60 hover:bg-ink hover:text-cream hover:border-ink'
+                          ? 'bg-accent text-on-accent hover:bg-accent-hover'
+                          : 'border border-stone-strong bg-paper text-ink hover:border-ink'
                       }`}
                     >
                       Shop Style ({count}) →
@@ -138,7 +139,7 @@ export const FindYourExpression: React.FC = () => {
 
         {/* Philosophy Footnote */}
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-ink-muted gap-2 pt-4 border-t border-stone/40">
-          <p className="font-serif italic">
+          <p className="font-sans text-xs italic">
             "Your embroidery style should reflect your mood, the setting, and how much of your story you want the world to see."
           </p>
           <Link

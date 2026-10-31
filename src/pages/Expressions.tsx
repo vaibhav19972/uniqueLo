@@ -51,29 +51,43 @@ export const Expressions: React.FC = () => {
             <Link
               key={exp.slug}
               to={`/styles/${exp.slug}`}
-              className="group bg-paper border border-stone/70 p-3.5 sm:p-7 hover:border-ink hover:shadow-lg transition-all flex flex-col justify-between"
+              className="group flex flex-col justify-between overflow-hidden border border-stone bg-paper transition-all hover:border-accent hover:shadow-lg"
             >
-              <div>
-                <div className="flex items-center justify-between mb-2 sm:mb-4 gap-1">
-                  <span className="font-sans text-[9px] sm:text-[11px] font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-accent truncate">
-                    Level {exp.score} of 5
-                  </span>
-                  <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted shrink-0">
-                    {counts[exp.slug] ?? 0} pieces
+              {exp.image && (
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone/20">
+                  <img
+                    src={exp.image}
+                    alt={`${exp.name} — placeholder campaign art`}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="scrim-bottom-soft absolute inset-x-0 bottom-0 h-1/2" aria-hidden="true" />
+                  <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
+                </div>
+              )}
+              <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-7">
+                <div>
+                  <div className="mb-2 flex items-center justify-between gap-1 sm:mb-4">
+                    <span className="truncate font-sans text-[9px] font-semibold uppercase tracking-[0.15em] text-accent sm:text-[11px] sm:tracking-[0.2em]">
+                      Level {exp.score} of 5
+                    </span>
+                    <span className="shrink-0 font-sans text-[9px] uppercase tracking-widest text-ink-muted sm:text-[10px]">
+                      {counts[exp.slug] ?? 0} pieces
+                    </span>
+                  </div>
+                  <h2 className="line-clamp-1 font-serif text-base text-ink transition-colors group-hover:text-accent sm:text-2xl lg:text-3xl">
+                    {exp.name}
+                  </h2>
+                  <p className="mt-1 line-clamp-1 font-sans text-xs text-ink-muted sm:mt-1.5 sm:text-sm">{exp.tagline}</p>
+                  <p className="mt-2 line-clamp-2 font-sans text-[11px] leading-relaxed text-ink-muted sm:mt-3 sm:line-clamp-none sm:text-xs">{exp.description}</p>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-1 border-t border-stone/40 pt-3 text-xs text-ink sm:mt-6 sm:pt-4">
+                  <span className="truncate font-sans text-[10px] text-ink-muted sm:text-[11px]">{exp.characteristics}</span>
+                  <span className="inline-flex shrink-0 items-center gap-1 font-sans text-[10px] font-medium uppercase tracking-widest transition-transform group-hover:translate-x-1 sm:text-[11px]">
+                    Explore <span aria-hidden="true">→</span>
                   </span>
                 </div>
-                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl text-ink group-hover:text-accent transition-colors line-clamp-1">
-                  {exp.name}
-                </h2>
-                <p className="font-serif italic text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">{exp.tagline}</p>
-                <p className="text-[11px] sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">{exp.description}</p>
-              </div>
-
-              <div className="mt-3 sm:mt-6 pt-3 sm:pt-4 border-t border-stone/40 flex items-center justify-between text-xs text-ink gap-1">
-                <span className="text-[10px] sm:text-[11px] font-sans text-ink-muted truncate">{exp.characteristics}</span>
-                <span className="uppercase tracking-widest text-[10px] sm:text-[11px] font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 shrink-0">
-                  Explore <span aria-hidden="true">→</span>
-                </span>
               </div>
             </Link>
           ))}

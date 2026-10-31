@@ -26,18 +26,18 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
 }) => (
   <div className="flex items-end justify-between gap-6 mb-10 lg:mb-12">
     <div>
-      <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
+      <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-accent">
         {eyebrow}
       </p>
       <h2
         id={titleId}
-        className="font-serif font-medium text-ink mt-3 leading-display tracking-tight"
+        className="mt-2.5 font-serif font-semibold leading-[1.02] tracking-tight text-ink"
         style={{ fontSize: 'var(--text-display-lg)' }}
       >
         {title}
       </h2>
       {sub && (
-        <p className="font-serif italic text-lg text-ink-muted mt-3 max-w-2xl">{sub}</p>
+        <p className="mt-2.5 max-w-2xl font-sans text-base text-ink-muted">{sub}</p>
       )}
     </div>
     {linkTo && linkLabel && (

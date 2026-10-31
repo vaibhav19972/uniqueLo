@@ -4,21 +4,23 @@ import { useProducts } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
 import { EDITS, type EditSlug } from '../../lib/data';
 import { MarketingHeader } from '../ui/MarketingHeader';
+import { useReveal } from '../../hooks/useReveal';
 
 /**
  * Explore by Edit — curated shoppable collections (buyer intent promoted).
  * Registry-driven from src/data/edits.json; counts computed from the catalog.
  */
 const EDIT_IMAGE: Record<EditSlug, string> = {
-  everyday: '/images/campaigns/editorial-split.jpg',
-  statement: '/images/campaigns/hero.jpg',
-  heritage: '/images/campaigns/atelier-craft.jpg',
-  'festive-gifting': '/images/campaigns/lookbook-01.jpg',
-  comfort: '/images/campaigns/lookbook-02.jpg',
-  collector: '/images/campaigns/lookbook-03.jpg',
+  everyday: '/images/edits/everyday.jpg',
+  statement: '/images/edits/statement.jpg',
+  heritage: '/images/edits/heritage.jpg',
+  'festive-gifting': '/images/edits/festive-gifting.jpg',
+  comfort: '/images/edits/comfort.jpg',
+  collector: '/images/edits/collector.jpg',
 };
 
 export const EditsGateway: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   const { data: products } = useProducts();
   const setEdit = useFiltersStore((state) => state.setEdit);
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export const EditsGateway: React.FC = () => {
   const featured = EDITS.filter((e) => e.featured);
 
   return (
-    <section aria-labelledby="edits-heading" className="bg-cream py-16 lg:py-24">
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16" aria-labelledby="edits-heading" >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Shop by intent"

@@ -58,7 +58,8 @@ export const Universes: React.FC = () => {
             return (
               <article
                 key={u.slug}
-                className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
+                data-accent={u.slug}
+                className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:border-accent hover:shadow-md"
               >
                 {/* Artwork media preview */}
                 {u.emblem_src && (
@@ -69,7 +70,8 @@ export const Universes: React.FC = () => {
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-paper/30 to-transparent" />
+                    <div className="scrim-bottom-soft absolute inset-x-0 bottom-0 h-1/2" aria-hidden="true" />
+                    <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
                   </div>
                 )}
 
@@ -83,7 +85,7 @@ export const Universes: React.FC = () => {
                       {u.tagline}
                     </p>
                     <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                    <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
+                    <p className="font-sans text-xs sm:text-[14px] text-ink-muted mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                       {u.lore}
                     </p>
                   </div>
@@ -97,7 +99,7 @@ export const Universes: React.FC = () => {
                     </p>
                     <Link
                       to={`/universes/${u.slug}`}
-                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-sans text-xs font-semibold sm:text-[15px] bg-accent text-on-accent hover:bg-accent-hover min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                       aria-label={`Enter ${u.name}`}
                     >
                       Enter {u.name} <span aria-hidden="true">→</span>
@@ -114,7 +116,7 @@ export const Universes: React.FC = () => {
           >
             <div className="relative h-28 sm:h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
               <img
-                src="/images/campaigns/atelier-craft.jpg"
+                src="/images/products/ivory-mandarin-knit-sweater-1.jpg"
                 alt="The Atelier artwork"
                 loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -130,7 +132,7 @@ export const Universes: React.FC = () => {
                   Pure craftsmanship, no theme
                 </p>
                 <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
+                <p className="font-sans text-xs sm:text-[14px] text-ink-muted mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                   The base line of the house: artisanal embroidery for its own sake — technique, textile, and construction above every story.
                 </p>
               </div>
@@ -145,7 +147,7 @@ export const Universes: React.FC = () => {
                 <button
                   type="button"
                   onClick={enterAtelier}
-                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-sans text-xs font-semibold sm:text-[15px] bg-accent text-on-accent hover:bg-accent-hover min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                   aria-label="Enter The Atelier"
                 >
                   Enter The Atelier <span aria-hidden="true">→</span>

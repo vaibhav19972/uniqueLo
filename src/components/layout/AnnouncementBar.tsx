@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import { useIsThemeV2 } from '../../config/theme';
 import {
   type AnnouncementItem,
   type AnnouncementBadgeStyle,
@@ -89,42 +88,31 @@ const AnnouncementIcon: React.FC<{
 };
 
 /**
- * Badge styling resolver for Theme V2 & V1
+ * Badge styling resolver.
+ *
+ * The bar carries one accent — the universe's — so badge variants differ by
+ * EMPHASIS, not by hue. Three treatments only:
+ *
+ *   default   → quiet panel chip, reads as metadata
+ *   urgent    → solid accent chip, reads as a deadline (crimson / amber)
+ *   highlight → soft accent chip, reads as an offer (emerald / cyan / etc.)
+ *
+ * `isFlashing` adds a slow opacity pulse to the urgent treatment and nothing
+ * to the rest. The old beacon pulse was dropped: it competed with the sticky
+ * header for attention on every scroll.
  */
-function getBadgeClasses(
-  style: AnnouncementBadgeStyle,
-  isV2: boolean,
-  isFlashing?: boolean
-): string {
-  if (!isV2) {
-    // V1: The Atelier gold theme
-    return 'bg-cream/20 text-cream border border-cream/30 text-[10px] tracking-widest font-sans font-semibold uppercase';
+function getBadgeClasses(style: AnnouncementBadgeStyle, isFlashing?: boolean): string {
+  const base = 'inline-flex items-center px-2 py-0.5 text-[10px] font-sans font-semibold uppercase tracking-widest';
+
+  if (style === 'crimson' || style === 'amber') {
+    return `${base} bg-accent text-on-accent ${isFlashing ? 'animate-flash-text' : ''}`;
   }
 
-  // V2: Modern D2C Streetwear
-  const flashAnim = isFlashing
-    ? style === 'crimson'
-      ? 'animate-flash-badge-urgent'
-      : 'animate-flash-badge-emerald'
-    : '';
-
-  switch (style) {
-    case 'emerald':
-      return `bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 ${flashAnim}`;
-    case 'cyan':
-      return `bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 ${flashAnim}`;
-    case 'amber':
-      return `bg-amber-500/20 text-amber-300 border border-amber-500/40 ${flashAnim}`;
-    case 'crimson':
-      return `bg-rose-500/20 text-rose-300 border border-rose-500/40 ${flashAnim}`;
-    case 'purple':
-      return `bg-purple-500/20 text-purple-300 border border-purple-500/40 ${flashAnim}`;
-    case 'gold':
-      return 'bg-amber-400/20 text-amber-200 border border-amber-400/40';
-    case 'default':
-    default:
-      return 'bg-white/10 text-white/85 border border-white/20';
+  if (style === 'default') {
+    return `${base} border border-stone bg-panel text-ink`;
   }
+
+  return `${base} border border-accent-border bg-accent-soft text-accent`;
 }
 
 /**
@@ -133,9 +121,8 @@ function getBadgeClasses(
  */
 const AnnouncementCard: React.FC<{
   item: AnnouncementItem;
-  isV2: boolean;
-}> = ({ item, isV2 }) => {
-  const badgeClasses = getBadgeClasses(item.badgeStyle, isV2, item.isFlashing);
+}> = ({ item }) => {
+  const badgeClasses = getBadgeClasses(item.badgeStyle, item.isFlashing);
 
   // Split text if it has highlighted words
   let renderedText: React.ReactNode = item.text;
@@ -144,15 +131,7 @@ const AnnouncementCard: React.FC<{
     renderedText = (
       <>
         <span>{before}</span>
-        <span
-          className={
-            isV2
-              ? item.badgeStyle === 'crimson'
-                ? 'text-rose-400 font-bold tracking-wide animate-flash-text'
-                : 'text-emerald-400 font-bold tracking-wide animate-flash-text'
-              : 'text-cream font-bold underline underline-offset-2'
-          }
-        >
+        <span className="font-semibold text-accent underline decoration-accent/40 underline-offset-2">
           {item.highlightWords}
         </span>
         <span>{after}</span>
@@ -162,18 +141,12 @@ const AnnouncementCard: React.FC<{
 
   const content = (
     <div className="inline-flex items-center gap-2.5 whitespace-nowrap group/item py-0.5">
-      {/* Flashing Live Beacon Dot */}
+      {/* Live dot — a single accent dot, no ping ring. */}
       {item.isFlashing && (
-        <span className="relative flex h-2 w-2 shrink-0 items-center justify-center" aria-hidden="true">
-          <span
-            className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-            style={{ backgroundColor: item.beaconColor || '#10b981' }}
-          />
-          <span
-            className="relative inline-flex rounded-full h-1.5 w-1.5"
-            style={{ backgroundColor: item.beaconColor || '#10b981' }}
-          />
-        </span>
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+          aria-hidden="true"
+        />
       )}
 
       {/* Badge Pill */}
@@ -187,13 +160,7 @@ const AnnouncementCard: React.FC<{
       )}
 
       {/* Main Text */}
-      <span
-        className={`text-[11.5px] sm:text-[12.5px] font-medium tracking-tight transition-colors ${
-          isV2
-            ? 'text-white/95 group-hover/item:text-white font-sans'
-            : 'text-cream group-hover/item:text-white font-serif'
-        }`}
-      >
+      <span className="font-sans text-[11.5px] sm:text-[12.5px] font-medium tracking-tight text-ink transition-colors">
         {renderedText}
       </span>
 
@@ -201,7 +168,7 @@ const AnnouncementCard: React.FC<{
       {item.link && (
         <span
           aria-hidden="true"
-          className="text-white/40 text-[10px] group-hover/item:text-white group-hover/item:translate-x-0.5 transition-all"
+          className="text-ink-muted text-[10px] group-hover/item:text-accent group-hover/item:translate-x-0.5 transition-all"
         >
           →
         </span>
@@ -214,7 +181,7 @@ const AnnouncementCard: React.FC<{
       <Link
         to={item.link}
         aria-label={item.ariaLabel || item.text}
-        className="inline-flex items-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 rounded-sm"
+        className="inline-flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
       >
         {content}
       </Link>
@@ -238,7 +205,6 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
   customItems,
   speedSeconds = SITE_TWEAKS.announcements.speedSeconds,
 }) => {
-  const isV2 = useIsThemeV2();
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Announcements ordered with flexible priority from top
@@ -250,19 +216,11 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
     return null;
   }
 
-  // Base background & border depending on theme
-  const containerClasses = isV2
-    ? 'bg-[#090b0e] text-white border-b border-white/[0.08] shadow-[0_1px_8px_rgba(0,0,0,0.4)]'
-    : 'text-on-gold border-b border-stone/30 font-serif shadow-sm';
-
-  const containerStyle = isV2 ? {} : { backgroundColor: 'var(--brand-gold)' };
-
   return (
     <aside
       role="region"
       aria-label="Store Announcements and Offers"
-      className={`relative z-[210] h-[36px] w-full select-none overflow-hidden text-xs transition-all ${containerClasses}`}
-      style={containerStyle}
+      className="relative z-10 h-9 w-full select-none overflow-hidden border-b border-stone bg-panel text-xs text-ink"
     >
       <div className="h-full max-w-[var(--container-max)] mx-auto px-2 sm:px-4 flex items-center justify-between gap-2">
         {/* RUNNING / ROLLING MARQUEE */}
@@ -279,15 +237,8 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
             <div className="flex shrink-0 items-center space-x-6 sm:space-x-8 pr-6 sm:pr-8">
               {announcements.map((item) => (
                 <React.Fragment key={`set1-${item.id}`}>
-                  <AnnouncementCard item={item} isV2={isV2} />
-                  <span
-                    aria-hidden="true"
-                    className={
-                      isV2
-                        ? 'text-white/20 select-none text-[10px]'
-                        : 'text-cream/40 select-none text-[10px]'
-                    }
-                  >
+                  <AnnouncementCard item={item} />
+                  <span aria-hidden="true" className="select-none text-[10px] text-ink-muted/50">
                     ✦
                   </span>
                 </React.Fragment>
@@ -301,15 +252,8 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
             >
               {announcements.map((item) => (
                 <React.Fragment key={`set2-${item.id}`}>
-                  <AnnouncementCard item={item} isV2={isV2} />
-                  <span
-                    aria-hidden="true"
-                    className={
-                      isV2
-                        ? 'text-white/20 select-none text-[10px]'
-                        : 'text-cream/40 select-none text-[10px]'
-                    }
-                  >
+                  <AnnouncementCard item={item} />
+                  <span aria-hidden="true" className="select-none text-[10px] text-ink-muted/50">
                     ✦
                   </span>
                 </React.Fragment>
@@ -323,7 +267,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
           onClick={() => setIsDismissed(true)}
           aria-label="Dismiss announcement"
           title="Dismiss announcement"
-          className="p-1 rounded text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0 z-10 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          className="p-1 rounded text-ink-muted hover:text-ink hover:bg-panel-raised transition-colors shrink-0 z-10 min-w-[28px] min-h-[28px] flex items-center justify-center"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

@@ -51,7 +51,7 @@ export const FeaturedProducts: React.FC = () => {
       ref={containerRef}
       className="relative bg-paper text-ink overflow-hidden border-b border-stone/50"
     >
-      <div className="py-20 lg:py-24">
+      <div className="py-14 lg:py-16">
         {/* Header */}
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-end justify-between mb-12">
           <div>

@@ -47,6 +47,8 @@ export interface ExpressionInfo {
   tagline: string;
   description: string;
   characteristics: string;
+  /** Placeholder campaign art for the style card — never product imagery. */
+  image?: string;
   order: number;
 }
 
@@ -73,6 +75,8 @@ export interface CollectionInfo {
   description: string;
   universeSlug?: string;
   featured?: boolean;
+  /** Placeholder campaign art for the collection card. */
+  image?: string;
   order: number;
 }
 
@@ -87,6 +91,8 @@ export interface GarmentInfo {
   name: string;
   categorySlug: string;
   description: string;
+  /** Placeholder campaign art for the garment card. */
+  image?: string;
   order: number;
 }
 
@@ -163,6 +169,8 @@ export interface Motif {
   name: string;
   meaning: string;
   symbol_notes?: string;
+  /** Flat embroidery study of the motif — the lore card's artwork. */
+  image?: string;
   /** Motifs must be IP-cleared before any product references them. */
   ip_cleared: boolean;
 }
@@ -784,6 +792,7 @@ export async function getCollections(): Promise<CollectionInfo[]> {
           description: c.description || '',
           universeSlug: c.universe_slug,
           featured: c.featured ?? true,
+          image: `/images/collections/${c.slug}.jpg`,
           order: c.order_num ?? 0,
         }));
       }
@@ -822,6 +831,7 @@ export async function getGarments(): Promise<GarmentInfo[]> {
           name: g.name,
           categorySlug: g.category_slug,
           description: g.description,
+          image: `/images/garments/${g.slug}.jpg`,
           order: g.order_num ?? 0,
         }));
       }

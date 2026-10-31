@@ -34,7 +34,7 @@ export const Expression: React.FC = () => {
 
   if (expressions !== undefined && !currentExp) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="py-16 text-center max-w-md mx-auto px-4">
         <h1 className="font-serif text-3xl text-ink">Style not found</h1>
         <p className="text-sm text-ink-muted mt-2">This embroidery style tier does not exist.</p>
         <Link to="/styles" className="inline-block mt-6 text-sm underline underline-offset-4">
@@ -71,11 +71,22 @@ export const Expression: React.FC = () => {
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
                 {currentExp?.name ?? 'Style'}
               </h1>
-              <p className="font-serif italic text-lg sm:text-xl text-ink-muted mt-2">{currentExp?.tagline}</p>
-              <p className="text-xs sm:text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
+              <p className="mt-2 font-sans text-lg text-ink-muted sm:text-xl">{currentExp?.tagline}</p>
+              <p className="mt-3 max-w-2xl font-sans text-xs leading-relaxed text-ink-muted sm:text-sm">
                 {currentExp?.description}
               </p>
             </div>
+
+            {currentExp?.image && (
+              <div className="relative aspect-[4/5] w-36 shrink-0 overflow-hidden border border-stone self-start lg:self-end">
+                <img
+                  src={currentExp.image}
+                  alt={`${currentExp.name} — placeholder campaign art`}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
+              </div>
+            )}
 
             {/* Intensity Level Pill Selector */}
             <div className="flex flex-wrap items-center gap-1.5 p-2 bg-cream border border-stone/80 self-start lg:self-end">
@@ -91,7 +102,7 @@ export const Expression: React.FC = () => {
                     aria-current={isActive ? 'page' : undefined}
                     className={`px-3 py-1.5 text-xs font-sans border transition-all ${
                       isActive
-                        ? 'border-ink bg-ink text-cream font-medium shadow-xs'
+                        ? 'border-accent bg-accent text-on-accent font-medium shadow-xs'
                         : 'border-transparent bg-paper text-ink hover:border-stone'
                     }`}
                   >

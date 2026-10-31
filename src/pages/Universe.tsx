@@ -81,7 +81,7 @@ export const Universe: React.FC = () => {
 
   if (universe === undefined) {
     return (
-      <div className="py-24 text-center">
+      <div className="py-16 text-center">
         <p className="font-serif text-2xl text-ink">Unfolding universe…</p>
       </div>
     );
@@ -89,7 +89,7 @@ export const Universe: React.FC = () => {
 
   if (!universe) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="py-16 text-center max-w-md mx-auto px-4">
         <h1 className="font-serif text-3xl text-ink">Universe not found</h1>
         <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
         <Link to="/" className="inline-block mt-6 text-sm underline underline-offset-4">Back to the Atelier</Link>
@@ -110,7 +110,7 @@ export const Universe: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       {/* Editorial Hero — unified Atelier quiet-luxury layout */}
       <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-20 relative z-10">
+        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-14 relative z-10">
           <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
@@ -154,21 +154,21 @@ export const Universe: React.FC = () => {
             )}
           </h1>
 
-          <p className="font-serif italic text-xl sm:text-2xl mt-3 text-ink-muted">{universe.tagline}</p>
-          <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed text-ink/85">
+          <p className="mt-3 font-sans text-lg text-ink-muted sm:text-xl">{universe.tagline}</p>
+          <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-ink/85 sm:text-lg">
             {universe.lore}
           </p>
 
-          <div className="flex flex-wrap gap-3 mt-8">
+          <div className="mt-7 flex flex-wrap gap-3">
             <a
               href="#collection"
-              className="inline-flex items-center gap-2 px-8 py-3.5 font-serif text-[17px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm"
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-md bg-accent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-on-accent transition-colors hover:bg-accent-hover active:translate-y-px"
             >
               Explore Collection <span aria-hidden="true">→</span>
             </a>
             <a
               href="#lore"
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-[15px] font-serif border border-stone min-h-[48px] text-ink hover:border-ink transition-colors rounded-sm"
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-md border border-stone-strong px-7 py-3.5 font-sans text-sm text-ink transition-colors hover:border-ink"
             >
               Read the Lore <span aria-hidden="true">↓</span>
             </a>
@@ -197,7 +197,7 @@ export const Universe: React.FC = () => {
       {/* Lore strip — unified Atelier parchment panels */}
       <section id="lore" aria-label={`${universe.name} lore`} className="bg-cream border-b border-stone/60">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
+          <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-accent">
             The {universe.name} lore
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 font-medium leading-display tracking-tight">
@@ -212,10 +212,19 @@ export const Universe: React.FC = () => {
                 <Link
                   key={m.id}
                   to={`/universes/${universe.slug}/characters/${m.id}`}
-                  className="group bg-parchment border border-stone/70 p-3 sm:p-5 hover:border-ink transition-colors flex flex-col justify-between"
+                  className="group flex flex-col justify-between border border-stone bg-paper p-3 transition-colors hover:border-accent sm:p-5"
                 >
                   <div>
-                    <div className="aspect-[16/9] bg-stone/30 mb-2 sm:mb-4" aria-hidden="true" />
+                    <div className="mb-2 aspect-[16/9] overflow-hidden bg-stone/30 sm:mb-4">
+                      {m.image && (
+                        <img
+                          src={m.image}
+                          alt={`${m.name} — embroidered motif`}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
+                    </div>
                     <h3 className="font-serif text-base sm:text-xl text-ink group-hover:text-accent transition-colors truncate">
                       {m.name}
                     </h3>

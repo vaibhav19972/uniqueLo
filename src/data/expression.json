@@ -7,7 +7,8 @@
       "tagline": "Tiny, discreet, tonal or restrained embroidery.",
       "description": "Quiet luxury worn close to the chest. Intimate threadwork, tonal crests, and understated accents noticed only by the discerning.",
       "characteristics": "Discreet, tonal, micro-motifs, minimal contrast",
-      "order": 1
+      "order": 1,
+      "image": "/images/expression/minimal.jpg"
     },
     {
       "score": 2,
@@ -16,7 +17,8 @@
       "tagline": "Small but noticeable motifs, refined placement.",
       "description": "Refined focal points that invite conversation without overwhelming. Thoughtfully placed emblems on pockets, cuffs, and hemlines.",
       "characteristics": "Small motifs, single placement, refined contrast",
-      "order": 2
+      "order": 2,
+      "image": "/images/expression/understated.jpg"
     },
     {
       "score": 3,
@@ -25,7 +27,8 @@
       "tagline": "Medium compositions, iconic mythology and anime heraldry.",
       "description": "Balancing wearable elegance with narrative needlecraft. Multi-element compositions carrying recognizable heraldry, symbols, and measured storytelling.",
       "characteristics": "Medium coverage, iconic symbols, harmonic contrast, collector appeal",
-      "order": 3
+      "order": 3,
+      "image": "/images/expression/cult.jpg"
     },
     {
       "score": 4,
@@ -34,7 +37,8 @@
       "tagline": "Large artwork, prominent contrast or multiple placements.",
       "description": "Commanding apparel with undeniable presence. Broad panels, vibrant bullion contrast, and expressive artwork designed to turn heads.",
       "characteristics": "Large artwork, high contrast, multiple placements, expressive",
-      "order": 4
+      "order": 4,
+      "image": "/images/expression/expressive.jpg"
     },
     {
       "score": 5,
@@ -43,7 +47,8 @@
       "tagline": "Dense compositions, complex motifs or extensive threadwork.",
       "description": "Museum-grade couture needlework. 30 to 60+ artisan hours of continuous hand-zardozi, bullion wire, and multi-layered relief across full panels.",
       "characteristics": "Dense threadwork, maximum relief, full panels, master craft",
-      "order": 5
+      "order": 5,
+      "image": "/images/expression/maximalist.jpg"
     }
   ]
 }

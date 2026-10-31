@@ -3,8 +3,10 @@ import { Link } from 'react-router';
 import { useCategories } from '../../hooks/useCatalog';
 import { Image } from '../ui/Image';
 import { useFiltersStore } from '../../stores/filters';
+import { useReveal } from '../../hooks/useReveal';
 
 export const CategoryStrip: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   const { data: categories } = useCategories();
   const visibleCategories = useMemo(() => {
     return (categories ?? []).filter((c) => c.slug !== 'all');
@@ -13,7 +15,7 @@ export const CategoryStrip: React.FC = () => {
   const setCategory = useFiltersStore((state) => state.setCategory);
 
   return (
-    <section className="py-20 bg-cream border-b border-stone/50">
+    <section ref={revealRef} className="reveal py-14 bg-cream border-b border-stone/50">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-stone/40">

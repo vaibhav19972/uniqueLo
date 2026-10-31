@@ -62,7 +62,7 @@ export const Hero: React.FC = () => {
         ref={imageRef}
         className="absolute inset-0 z-0 bg-cover bg-center filter brightness-[0.72] transform"
         style={{
-          backgroundImage: `url('/images/campaigns/hero.jpg')`,
+          backgroundImage: `url('/images/campaigns/freestyle-hero-cleaned.jpg')`,
         }}
       >
         {/* Subtle Gradient & Vignette Overlay */}

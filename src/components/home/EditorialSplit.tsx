@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
+import { useReveal } from '../../hooks/useReveal';
 
 export const EditorialSplit: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   return (
-    <section
-      id="editorial-manifesto"
-      className="py-24 lg:py-32 bg-cream border-b border-stone/50 overflow-hidden"
+    <section ref={revealRef} className="reveal py-16 lg:py-14 bg-cream border-b border-stone/50 overflow-hidden"       id="editorial-manifesto"
+      
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
@@ -15,7 +16,7 @@ export const EditorialSplit: React.FC = () => {
           <div className="lg:col-span-6 relative">
             <div className="relative z-10 w-4/5 ml-auto border border-stone/80">
               <Image
-                src="/images/campaigns/editorial-split.jpg"
+                src="/images/products/ivory-mandarin-knit-sweater-1.jpg"
                 alt="Close-up of botanical chain embroidery"
                 aspectRatio="4/5"
                 className="w-full object-cover"
@@ -24,7 +25,7 @@ export const EditorialSplit: React.FC = () => {
             {/* Secondary overlapping frame */}
             <div className="absolute top-1/4 left-0 z-20 w-3/5 border border-stone/80 bg-paper p-3 hidden sm:block">
               <Image
-                src="/images/campaigns/atelier-craft.jpg"
+                src="/images/products/kantha-chore-jacket-1.jpg"
                 alt="Macro metallic zari thread tension and bullion wire detail"
                 aspectRatio="1/1"
                 className="w-full object-cover"

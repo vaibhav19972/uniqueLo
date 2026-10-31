@@ -5,112 +5,128 @@
       "name": "Hoodies",
       "categorySlug": "tops",
       "description": "Heavyweight fleece hoodies with back-panel and crest embroidery.",
-      "order": 1
+      "order": 1,
+      "image": "/images/garments/hoodie.jpg"
     },
     {
       "slug": "tee",
       "name": "Tees",
       "categorySlug": "tops",
       "description": "Combed-cotton tees carrying chest and back threadwork.",
-      "order": 2
+      "order": 2,
+      "image": "/images/garments/tee.jpg"
     },
     {
       "slug": "shirt",
       "name": "Shirts",
       "categorySlug": "tops",
       "description": "Oxfords, poplins and band-collar tunics with monogram detail.",
-      "order": 3
+      "order": 3,
+      "image": "/images/garments/shirt.jpg"
     },
     {
       "slug": "jacket",
       "name": "Jackets",
       "categorySlug": "outerwear",
       "description": "Chore jackets, capes and overcoats with procession-scale embroidery.",
-      "order": 4
+      "order": 4,
+      "image": "/images/garments/jacket.jpg"
     },
     {
       "slug": "cardigan",
       "name": "Cardigans",
       "categorySlug": "knitwear",
       "description": "Cashmere cardigans with crewel relief.",
-      "order": 5
+      "order": 5,
+      "image": "/images/garments/cardigan.jpg"
     },
     {
       "slug": "vest",
       "name": "Vests",
       "categorySlug": "knitwear",
       "description": "Knit vests with sculpted knot texture.",
-      "order": 6
+      "order": 6,
+      "image": "/images/garments/vest.jpg"
     },
     {
       "slug": "pants",
       "name": "Pants",
       "categorySlug": "bottoms",
       "description": "Selvedge denim and work pants with structural stitching.",
-      "order": 7
+      "order": 7,
+      "image": "/images/garments/pants.jpg"
     },
     {
       "slug": "scarf",
       "name": "Scarves",
       "categorySlug": "accessories",
       "description": "Silk scarves with arch-jaal and flora borders.",
-      "order": 8
+      "order": 8,
+      "image": "/images/garments/scarf.jpg"
     },
     {
       "slug": "tote",
       "name": "Totes",
       "categorySlug": "accessories",
       "description": "Raw-canvas totes with sun-disc and motif hits.",
-      "order": 9
+      "order": 9,
+      "image": "/images/garments/tote.jpg"
     },
     {
       "slug": "sweater",
       "name": "Sweaters",
       "categorySlug": "knitwear",
       "description": "Knit pullovers with mandarin collars and tonal botanical embroidery.",
-      "order": 10
+      "order": 10,
+      "image": "/images/garments/sweater.jpg"
     },
     {
       "slug": "sweatshirt",
       "name": "Sweatshirts",
       "categorySlug": "tops",
       "description": "Fleece-back crewneck sweatshirts with chest graphics.",
-      "order": 11
+      "order": 11,
+      "image": "/images/garments/sweatshirt.jpg"
     },
     {
       "slug": "blouse",
       "name": "Blouses",
       "categorySlug": "tops",
       "description": "Button-front and tie-neck blouses with sleeve and yoke embroidery.",
-      "order": 12
+      "order": 12,
+      "image": "/images/garments/blouse.jpg"
     },
     {
       "slug": "kurta",
       "name": "Kurtas",
       "categorySlug": "tops",
       "description": "Tunic-length kurtas with folk embroidery and tassel ties.",
-      "order": 13
+      "order": 13,
+      "image": "/images/garments/kurta.jpg"
     },
     {
       "slug": "tunic",
       "name": "Tunics",
       "categorySlug": "tops",
       "description": "Relaxed tunic tops with embroidered necklines and hem bands.",
-      "order": 14
+      "order": 14,
+      "image": "/images/garments/tunic.jpg"
     },
     {
       "slug": "skirt",
       "name": "Skirts",
       "categorySlug": "bottoms",
       "description": "Gathered A-line skirts with waistband and trailing floral embroidery.",
-      "order": 15
+      "order": 15,
+      "image": "/images/garments/skirt.jpg"
     },
     {
       "slug": "jeans",
       "name": "Jeans",
       "categorySlug": "bottoms",
       "description": "Wide-leg denim with embroidered hems and contrast topstitching.",
-      "order": 16
+      "order": 16,
+      "image": "/images/garments/jeans.jpg"
     }
   ]
 }

@@ -41,15 +41,29 @@ export const Garments: React.FC = () => {
           <Link
             key={g.slug}
             to={`/garments/${g.slug}`}
-            className="group bg-paper border border-stone/70 p-3.5 sm:p-6 hover:border-ink transition-colors flex flex-col justify-between"
+            className="group flex flex-col justify-between overflow-hidden border border-stone bg-paper transition-colors hover:border-accent"
           >
-            <div>
-              <h2 className="font-serif text-base sm:text-2xl text-ink group-hover:text-accent transition-colors truncate">{g.name}</h2>
-              <p className="text-[11px] sm:text-xs text-ink-muted mt-1 font-light line-clamp-2 sm:line-clamp-none">{g.description}</p>
+            {g.image && (
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone/20">
+                <img
+                  src={g.image}
+                  alt={`${g.name} — placeholder campaign art`}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="scrim-bottom-soft absolute inset-x-0 bottom-0 h-1/2" aria-hidden="true" />
+                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-6">
+              <div>
+                <h2 className="font-serif text-base text-ink transition-colors group-hover:text-accent sm:text-2xl">{g.name}</h2>
+                <p className="mt-1 font-sans text-[11px] text-ink-muted line-clamp-2 sm:text-xs">{g.description}</p>
+              </div>
+              <span className="mt-2.5 inline-flex items-center gap-1 font-sans text-[10px] font-medium uppercase tracking-widest text-ink sm:mt-4 sm:text-[11px]">
+                {counts[g.slug] ?? 0} pieces <span aria-hidden="true">→</span>
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1 mt-2.5 sm:mt-4 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
-              {counts[g.slug] ?? 0} pieces <span aria-hidden="true">→</span>
-            </span>
           </Link>
         ))}
       </div>

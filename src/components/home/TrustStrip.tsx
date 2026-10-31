@@ -1,4 +1,5 @@
 import React from 'react';
+import { useReveal } from '../../hooks/useReveal';
 
 /** Render target 01: 4-up trust strip below the hero (chatgpt-v2).
  * Copy rule: "embroidery", never "hand-embroidery" — handcraft claims are
@@ -35,22 +36,21 @@ const ITEMS = [
 ];
 
 export const TrustStrip: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   return (
-    <section aria-label="Why UniqueLo" className="bg-paper border-y border-stone/60">
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone/60">
+    <section ref={revealRef} className="reveal border-y border-stone bg-cream" aria-label="Why UniqueLo" >
+      <div className="mx-auto grid max-w-[var(--container-max)] grid-cols-2 divide-y divide-stone px-4 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:px-6 lg:grid-cols-4 lg:px-12">
         {ITEMS.map((item, i) => (
           <div
             key={item.title}
-            className={`flex items-center gap-2.5 sm:gap-4 py-3.5 sm:py-6 px-1.5 sm:px-6 lg:pl-8 sm:justify-center lg:justify-start ${
-              i % 2 === 1 ? 'border-l border-stone/60 sm:border-l-0' : ''
-            }`}
+            className={`flex items-center gap-2.5 px-1.5 py-4 sm:justify-center sm:gap-4 sm:px-6 lg:justify-start lg:pl-8 ${i % 2 === 1 ? 'border-l border-stone sm:border-l-0' : ''}`}
           >
             <svg className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               {item.icon}
             </svg>
             <div>
-              <p className="font-serif text-xs sm:text-base text-ink font-medium leading-tight">{item.title}</p>
-              <p className="font-serif text-[10px] sm:text-sm text-ink-muted leading-tight mt-0.5">{item.detail}</p>
+              <p className="font-sans text-xs font-medium leading-tight text-ink sm:text-base">{item.title}</p>
+              <p className="mt-0.5 font-sans text-[10px] leading-tight text-ink-muted sm:text-sm">{item.detail}</p>
             </div>
           </div>
         ))}

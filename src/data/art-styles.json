@@ -5,7 +5,9 @@
       "name": "Ukiyo Linework",
       "tagline": "Woodblock waves, blossom scatter, ink-line calm.",
       "description": "Flat discs, wave curls and petal scatter drawn from Japanese woodblock language — Sakura, Koi and Red Sun live here.",
-      "universes": ["animeverse"],
+      "universes": [
+        "animeverse"
+      ],
       "order": 1
     },
     {
@@ -13,7 +15,9 @@
       "name": "Anime Pop",
       "tagline": "Bold graphic spirits, chest-and-back storytelling.",
       "description": "High-contrast character graphics with embroidered relief — the roaring-spirit end of Animeverse.",
-      "universes": ["animeverse"],
+      "universes": [
+        "animeverse"
+      ],
       "order": 2
     },
     {
@@ -21,7 +25,9 @@
       "name": "Comic Noir",
       "tagline": "Action lines, burst geometry, hero-scale crests.",
       "description": "Diagonal speed bands and shield-crest geometry — Guardian Stripes and the Heroverse burst language.",
-      "universes": ["heroverse"],
+      "universes": [
+        "heroverse"
+      ],
       "order": 3
     },
     {
@@ -29,7 +35,9 @@
       "name": "Crest & Emblem",
       "tagline": "Gold-on-deep sigils, worn like insignia.",
       "description": "Ascendant Crest style insignia — centred chest crests and shoulder sweeps in metallic thread.",
-      "universes": ["heroverse"],
+      "universes": [
+        "heroverse"
+      ],
       "order": 4
     },
     {
@@ -37,7 +45,9 @@
       "name": "Mughal Miniature",
       "tagline": "Arches, jaals and processions in court language.",
       "description": "Arch lattices, elephant processions and jaal geometry from Itihaas court and folk lineages.",
-      "universes": ["itihaas"],
+      "universes": [
+        "itihaas"
+      ],
       "order": 5
     },
     {

@@ -4,18 +4,32 @@
 @import './universes.css';
 
 /* Map design tokens into the Tailwind theme so utilities like `bg-cream`,
-   `text-ink`, `font-serif`, `text-hero`, `bg-gold-zari` resolve from tokens.css. */
+   `text-ink`, `font-serif`, `text-hero` resolve to the vars in tokens.css —
+   which is what makes the light/dark and per-universe axes work without
+   touching component files. */
 @theme {
-  /* colors */
+  /* surfaces + text */
   --color-cream: var(--color-cream);
   --color-paper: var(--color-paper);
+  --color-panel: var(--color-panel);
+  --color-panel-raised: var(--color-panel-raised);
   --color-ink: var(--color-ink);
   --color-ink-muted: var(--color-ink-muted);
   --color-stone: var(--color-stone);
+  --color-stone-strong: var(--color-stone-strong);
   --color-warm-gray: var(--color-warm-gray);
 
+  /* accent + companions (re-declared per universe) */
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-accent-border: var(--color-accent-border);
+  --color-on-accent: var(--color-on-accent);
+
+  --color-error: var(--color-error);
+  --color-success: var(--color-success);
+
+  /* legacy names — read only, never extend */
   --color-saffron: var(--color-saffron);
   --color-gold-zari: var(--color-gold-zari);
   --color-pistachio: var(--color-pistachio);
@@ -23,10 +37,6 @@
   --color-riviera: var(--color-riviera);
   --color-blush: var(--color-blush);
   --color-parchment: var(--color-parchment);
-
-  --color-error: var(--color-error);
-  --color-success: var(--color-success);
-
   --color-anime-deep: var(--color-anime-deep);
   --color-hero-crimson: var(--color-hero-crimson);
   --color-itihaas-bronze: var(--color-itihaas-bronze);
@@ -35,9 +45,6 @@
   --color-coal-glass: var(--color-coal-glass);
   --color-stone-deep: var(--color-stone-deep);
 
-  /* render-era marketing shell (chatgpt-v2 targets) — quiet-luxury graphite +
-     champagne (Oct 2026). --on-gold is the text color that passes contrast
-     on champagne; themed scopes remap it to --u-on-accent. */
   --color-gold: var(--brand-gold);
   --color-gold-hover: var(--brand-gold-hover);
   --color-gold-deep: var(--brand-gold-deep);
@@ -45,24 +52,26 @@
   --color-coal: var(--brand-coal);
   --color-coal-soft: var(--brand-coal-soft);
 
-  /* fonts */
+  /* type */
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
 
-  /* render-era type treatments (chatgpt-v2 targets) */
   --tracking-eyebrow: var(--tracking-eyebrow);
   --tracking-label: var(--tracking-label);
   --leading-display: var(--leading-display);
   --text-display: var(--text-display);
   --text-display-lg: var(--text-display-lg);
-
-  /* type scale */
   --text-hero: var(--text-hero);
+
+  /* motion — so `ease-base` in a class agrees with the token */
+  --ease-base: var(--ease-base);
+  --ease-playful: var(--ease-playful);
 
   /* semantic spacing */
   --spacing-section: var(--section-gap);
-  --spacing-header: var(--header-height);
-  --spacing-drawer: var(--drawer-width);
+  --spacing-section-lg: var(--section-gap-lg);
+  --spacing-gutter: var(--section-gutter);
 }
 
 @layer base {
@@ -77,21 +86,55 @@
     min-height: 100dvh;
     background-color: var(--color-cream);
     color: var(--color-ink);
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
     overflow-x: clip;
+    /* Mode flips are a colour change, not a movement: short and eased. */
+    transition: background-color var(--duration-color) var(--ease-base),
+      color var(--duration-color) var(--ease-base);
   }
 
-  :root[data-theme="v2"] body, html.theme-v2 body {
+  /* ── Display face scoping ───────────────────────────────────────────
+     Playfair is the brand voice, but only where it can breathe. Any
+     `.font-serif` element at reading size drops back to the UI face, so
+     the 272 existing call sites keep working while small serif text stops
+     looking spindly on screens. */
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .text-xs.font-serif,
+  .text-sm.font-serif,
+  .text-base.font-serif,
+  .text-lg.font-serif,
+  .text-xl.font-serif {
     font-family: var(--font-sans);
-    background-color: var(--color-cream);
-    color: var(--color-ink);
+    letter-spacing: -0.005em;
   }
 
-  /* When v2 is active, re-route font-serif to font-sans for full neo-grotesque coherence */
-  html.theme-v2 .font-serif, [data-theme="v2"] .font-serif {
-    font-family: var(--font-sans) !important;
+  /* Buttons, inputs and tabular figures are UI, never display. */
+  button.font-serif,
+  input.font-serif,
+  select.font-serif,
+  textarea.font-serif,
+  label.font-serif {
+    font-family: var(--font-sans);
+  }
+
+  /* No faux italics — the serif has a real italic cut, the sans does not. */
+  .font-sans em,
+  .font-sans i,
+  button em,
+  button i,
+  figcaption em {
+    font-style: normal;
+  }
+
+  /* Prices, SKUs and counts hold their width as digits change. */
+  [data-numeric],
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 
   * {
@@ -103,41 +146,247 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  /* Respect the OS setting at the source: no smooth scroll, no long easing. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
-/* ─────────────────────────────────────
-   Stitched Needlework & Playful Utilities
-   ───────────────────────────────────── */
-.stitch-border {
-  border: 1.5px dashed var(--color-stone);
+/* ═══════════════════════════════════════════════════════════════
+   MEDIA OVERLAYS
+   Photography scrims are keyed to the CANVAS, not to black. On the dark
+   canvas the scrim is black and the text reads white; on the light canvas
+   the scrim is warm ivory and the same `text-ink` reads near-black. One
+   markup tree, correct in both modes — and no grey fog over a bright
+   studio shot.
+   ═══════════════════════════════════════════════════════════════ */
+.scrim-bottom {
+  /* Ramp runs all the way to 100%: the previous version went transparent at
+     88%, which left an eyebrow sitting at ~93% with no scrim behind it at all.
+     Opacity is held high through the middle so 12–14px copy stays readable,
+     then released at the very top so the photograph still shows. */
+  background-image: linear-gradient(
+    to top,
+    var(--color-cream) 0%,
+    color-mix(in srgb, var(--color-cream) 99%, transparent) 25%,
+    color-mix(in srgb, var(--color-cream) 94%, transparent) 45%,
+    color-mix(in srgb, var(--color-cream) 80%, transparent) 62%,
+    color-mix(in srgb, var(--color-cream) 52%, transparent) 78%,
+    color-mix(in srgb, var(--color-cream) 22%, transparent) 90%,
+    transparent 100%
+  );
 }
 
-.stitch-border-gold {
-  border: 1.5px dashed var(--color-gold-zari);
+/* Lighter version for cards where the image should stay readable. */
+.scrim-bottom-soft {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-cream) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-cream) 55%, transparent) 40%,
+    transparent 78%
+  );
 }
 
-.stitch-border-terracotta {
-  border: 1.5px dashed var(--color-accent);
+/* Top edge only — used where a sticky header floats over media. */
+.scrim-top {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-cream) 70%, transparent) 0%,
+    transparent 100%
+  );
 }
 
-/* Subtle Floating Animation for Badges */
-@keyframes needle-float {
+/* ═══════════════════════════════════════════════════════════════
+   SURFACE TEXTURE
+   The approved alternative to decorative gradients: one fixed grain layer
+   over the whole app, blended into whatever canvas the mode provides.
+   ═══════════════════════════════════════════════════════════════ */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: calc(0.035 * var(--grain-opacity));
+  mix-blend-mode: var(--grain-blend);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Universe texture families — repeating rules, never gradients.
+   Set --u-texture on a universe scope, then opt in with .u-texture. */
+:root {
+  --texture-petal: repeating-radial-gradient(
+    circle at 30% 20%,
+    color-mix(in srgb, var(--color-accent) 22%, transparent) 0 1px,
+    transparent 1px 22px
+  );
+  --texture-lines: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color-accent) 18%, transparent) 0 1px,
+    transparent 1px 14px
+  );
+  --texture-arch: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-accent) 16%, transparent) 0 1px,
+    transparent 1px 28px
+  );
+  --texture-stitch: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--color-accent) 14%, transparent) 0 2px,
+    transparent 2px 10px
+  );
+}
+
+.u-texture {
+  background-image: var(--u-texture);
+}
+
+/* Section wash — a soft accent-tinted field. Used behind hero and portal
+   bands to give the page a colour temperature instead of flat canvas. */
+.section-wash {
+  background-color: var(--u-wash, var(--color-cream));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOTION
+   Reveal-on-scroll (IntersectionObserver, see hooks/useReveal.ts) plus the
+   playful ambient loops. All of it collapses under reduced-motion.
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* A softer variant for large blocks that shouldn't slide far. */
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.is-visible {
+  animation: reveal-up var(--duration-reveal) var(--ease-base) forwards;
+}
+
+.reveal-soft {
+  opacity: 0;
+}
+
+.reveal-soft.is-visible {
+  animation: reveal-fade 900ms var(--ease-base) forwards;
+}
+
+/* Staggered children — set --i on each child (0,1,2…) */
+.reveal-stagger > * {
+  opacity: 0;
+}
+
+.reveal-stagger.is-visible > * {
+  animation: reveal-up var(--duration-reveal) var(--ease-base) forwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible,
+  .reveal-soft,
+  .reveal-soft.is-visible,
+  .reveal-stagger > *,
+  .reveal-stagger.is-visible > * {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ── Ambient loops ───────────────────────────────────────────── */
+
+/* Slow vertical drift for badges and stickers. */
+@keyframes float-drift {
 
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0) rotate(var(--drift-rotate, 0deg));
   }
 
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-6px) rotate(var(--drift-rotate, 0deg));
   }
 }
 
-.animate-needle-float {
-  animation: needle-float 4s ease-in-out infinite;
+.animate-float {
+  animation: float-drift 6s ease-in-out infinite;
 }
 
-/* Marquee scrolling ticker */
+/* Big, very slow blobs behind hero bands — the "playful background".
+   Pure transform/opacity so it stays on the compositor. */
+@keyframes blob-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate3d(4%, -6%, 0) scale(1.08);
+  }
+
+  66% {
+    transform: translate3d(-5%, 4%, 0) scale(0.95);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob-drift 26s ease-in-out infinite;
+}
+
+.animate-blob-slow {
+  animation: blob-drift 38s ease-in-out infinite reverse;
+}
+
+/* A static, hand-drawn blob used as the colour field itself. */
+.wash-blob {
+  position: absolute;
+  border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-blob,
+  .animate-blob-slow {
+    animation: none;
+  }
+}
+
+/* Marquee ticker */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -162,68 +411,6 @@
   animation-play-state: paused !important;
 }
 
-/* Announcement Bar Flashing & Glowing Effects */
-@keyframes flash-beacon {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.35;
-    transform: scale(1.25);
-  }
-}
-
-@keyframes flash-badge-glow {
-  0%, 100% {
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
-    border-color: rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
-    border-color: rgba(52, 211, 153, 0.9);
-  }
-}
-
-@keyframes flash-urgent-glow {
-  0%, 100% {
-    box-shadow: 0 0 4px rgba(244, 63, 94, 0.3);
-    border-color: rgba(244, 63, 94, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(244, 63, 94, 0.85);
-    border-color: rgba(251, 113, 133, 0.95);
-  }
-}
-
-@keyframes flash-text-pulse {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 0px transparent;
-  }
-  50% {
-    opacity: 0.9;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.65);
-  }
-}
-
-.animate-flash-beacon {
-  animation: flash-beacon 1.4s ease-in-out infinite;
-}
-
-.animate-flash-badge-emerald {
-  animation: flash-badge-glow 2s ease-in-out infinite;
-}
-
-.animate-flash-badge-urgent {
-  animation: flash-urgent-glow 1.2s ease-in-out infinite;
-}
-
-.animate-flash-text {
-  animation: flash-text-pulse 2.2s ease-in-out infinite;
-}
-
-/* Marquee edge gradient mask for seamless edge gliding */
 .mask-marquee-fade {
   mask-image: linear-gradient(
     to right,
@@ -241,7 +428,24 @@
   );
 }
 
-/* Custom scrollbar */
+/* Legacy utility kept for the announcement badge variants. */
+@keyframes needle-float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-needle-float {
+  animation: needle-float 4s ease-in-out infinite;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -252,7 +456,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-stone);
+  background: var(--color-stone-strong);
   border-radius: 3px;
 }
 
@@ -260,14 +464,7 @@
   background: var(--color-warm-gray);
 }
 
-/* ─────────────────────────────────────
-   Reduced motion: intentional alternative
-   Spatial movement snaps instantly (no pan, slide, or parallax);
-   opacity fades keep a brief 150ms so state feedback
-   (drawer, accordion, focus) stays legible.
-   JS mirrors this: Lenis never starts, GSAP reveals
-   early-return, staggers collapse (see lib/motion.ts).
-   ───────────────────────────────────── */
+/* ── Reduced motion: spatial movement snaps, opacity keeps a brief fade ── */
 @media (prefers-reduced-motion: reduce) {
 
   *,

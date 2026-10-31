@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useProducts, useCollections } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { ProductCard } from '../shop/ProductCard';
+import { useReveal } from '../../hooks/useReveal';
 
 type FeaturedTab = 'new-arrivals' | 'limited-editions' | 'collections';
 
@@ -31,6 +32,7 @@ const TABS: TabConfig[] = [
 ];
 
 export const NewAndFeaturedSection: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   const { data: allProducts } = useProducts();
   const { data: collections } = useCollections();
   const [activeTab, setActiveTab] = useState<FeaturedTab>('new-arrivals');
@@ -88,9 +90,8 @@ export const NewAndFeaturedSection: React.FC = () => {
       : `Explore Complete ${currentTabConfig.title} Collection`;
 
   return (
-    <section
-      aria-labelledby="new-featured-heading"
-      className="bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16 border-b border-stone/50 overflow-hidden"       aria-labelledby="new-featured-heading"
+      
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
@@ -103,11 +104,11 @@ export const NewAndFeaturedSection: React.FC = () => {
         />
 
         {/* Tab Controls */}
-        <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone/40">
+        <div className="mt-6 flex flex-col gap-3 border-b border-stone pb-4">
           <div
             role="tablist"
             aria-label="Filter products by feature tier"
-            className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0"
+            className="flex flex-wrap items-center gap-1.5 sm:gap-2"
           >
             {TABS.map((tab) => {
               const isSelected = activeTab === tab.slug;
@@ -122,7 +123,7 @@ export const NewAndFeaturedSection: React.FC = () => {
                       setSelectedCollectionSlug('all');
                     }
                   }}
-                  className={`px-4 py-2 text-xs uppercase font-sans tracking-widest font-semibold transition-all border cursor-pointer whitespace-nowrap ${isSelected
+                  className={`whitespace-nowrap border px-3 py-2 font-sans text-[10px] font-semibold uppercase tracking-[0.12em] transition-all cursor-pointer sm:px-4 sm:text-xs sm:tracking-widest ${isSelected
                       ? 'bg-ink text-cream border-ink shadow-sm'
                       : 'bg-paper text-ink border-stone/60 hover:border-accent hover:text-accent'
                     }`}
@@ -133,9 +134,7 @@ export const NewAndFeaturedSection: React.FC = () => {
             })}
           </div>
 
-          <p className="font-serif italic text-xs sm:text-sm text-ink-muted">
-            {currentTabConfig.tagline}
-          </p>
+          <p className="font-sans text-sm text-ink-muted">{currentTabConfig.tagline}</p>
         </div>
 
         {/* Collections Dropdown Pills (when Collections tab is active) */}

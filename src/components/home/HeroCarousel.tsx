@@ -35,7 +35,7 @@ const CAROUSEL_SLIDES: CarouselSlide[] = [
   {
     id: 'heroverse',
     image: '/images/campaigns/hero-heroverse.jpg',
-    tagline: 'LIMITED ATELIER CAPSULE',
+    tagline: 'LIMITED CELESTIAL CAPSULE',
     title: 'CELESTIAL HEROVERSE',
     description: 'Gold zari threadwork on structured outerwear inspired by cosmic archetypes',
     ctaText: 'DISCOVER HEROVERSE',
@@ -298,30 +298,23 @@ export const HeroCarousel: React.FC = () => {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. Vignette & Bottom Contrast Gradient
-             Smoothly darkens towards the bottom so the white typography,
-             CTA button, and timer pills pop with razor-sharp legibility.
+          2. Canvas scrims
+             Keyed to --color-cream, not black, so the headline and CTA stay
+             legible in BOTH modes. A black scrim over a bright studio shot
+             is what turned this hero into grey fog on the light canvas.
           ───────────────────────────────────────────────────────────── */}
-      <div
-        className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent"
-        aria-hidden="true"
-      />
-
-      {/* Subtle top header shadow vignette */}
-      <div
-        className="absolute top-0 inset-x-0 h-28 z-10 pointer-events-none bg-gradient-to-b from-black/40 to-transparent"
-        aria-hidden="true"
-      />
+      <div className="scrim-bottom absolute inset-x-0 bottom-0 z-10 h-[58%] pointer-events-none" aria-hidden="true" />
+      <div className="scrim-top absolute inset-x-0 top-0 z-10 h-28 pointer-events-none" aria-hidden="true" />
 
       {/* ─────────────────────────────────────────────────────────────
           3. Centered Content Layer: Tagline, Title, CTA Button
           ───────────────────────────────────────────────────────────── */}
-      <div className="relative z-20 w-full h-full flex flex-col justify-end items-center text-center px-4 pb-8 sm:pb-16 lg:pb-20">
-        <div className="max-w-3xl mx-auto flex flex-col items-center">
+      <div className="relative z-20 w-full h-full flex flex-col justify-end items-center px-4 pb-8 text-center sm:pb-16 lg:pb-20">
+        <div className="mx-auto flex max-w-3xl flex-col items-center">
           {/* Subtitle / Kicker */}
           <p
             key={`kicker-${activeIndex}`}
-            className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white/95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-in fade-in duration-500"
+            className="font-sans text-xs font-medium uppercase tracking-[0.25em] text-ink/80 animate-in fade-in duration-500 sm:text-sm"
           >
             {currentSlide.tagline}
           </p>
@@ -329,8 +322,7 @@ export const HeroCarousel: React.FC = () => {
           {/* Main Collection Headline */}
           <h1
             key={`title-${activeIndex}`}
-            className="mt-3 sm:mt-4 text-2xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-2 duration-500"
-            style={{ fontFamily: "'Satoshi', var(--font-sans), sans-serif" }}
+            className="mt-3 font-serif text-4xl font-semibold uppercase leading-[0.95] tracking-tight text-ink animate-in fade-in slide-in-from-bottom-2 duration-500 sm:mt-4 sm:text-6xl lg:text-7xl"
           >
             {currentSlide.title}
           </h1>
@@ -339,17 +331,17 @@ export const HeroCarousel: React.FC = () => {
           {currentSlide.description && (
             <p
               key={`desc-${activeIndex}`}
-              className="mt-2 text-xs sm:text-sm text-stone-200/80 font-normal max-w-xl hidden sm:block drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] animate-in fade-in duration-700"
+              className="mt-3 hidden max-w-xl font-sans text-sm text-ink-muted animate-in fade-in duration-700 sm:block"
             >
               {currentSlide.description}
             </p>
           )}
 
-          {/* CTA Button: White rounded capsule button with black text */}
+          {/* Primary CTA — the single accent, in the universe's colour. */}
           <div className="mt-6 sm:mt-7">
             <Link
               to={currentSlide.ctaLink}
-              className="inline-flex items-center justify-center rounded-full bg-white text-black font-extrabold uppercase tracking-widest text-xs sm:text-sm px-9 py-3.5 sm:px-11 sm:py-4 shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:bg-neutral-100 hover:scale-105 active:scale-95 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-white"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-md bg-accent px-8 py-3.5 font-sans text-xs font-semibold uppercase tracking-[0.16em] text-on-accent shadow-md transition-all duration-300 hover:bg-accent-hover active:translate-y-px sm:px-10 sm:text-sm"
             >
               {currentSlide.ctaText}
             </Link>
@@ -412,13 +404,13 @@ export const HeroCarousel: React.FC = () => {
                         />
                       </svg>
                       {/* Center white dot inside the circle */}
-                      <span className="absolute w-2 h-2 rounded-full bg-white shadow-sm" />
+                      <span className="absolute w-2 h-2 rounded-full bg-paper shadow-sm" />
                     </div>
                   ) : (
                     /* Inactive Indicator: Clean small white dot */
                     <span
                       aria-hidden="true"
-                      className="w-2.5 h-2.5 rounded-full bg-white/50 group-hover:bg-white/90 group-hover:scale-125 transition-all duration-300"
+                      className="w-2.5 h-2.5 rounded-full bg-paper/50 group-hover:bg-white/90 group-hover:scale-125 transition-all duration-300"
                     />
                   )}
                 </button>
@@ -440,13 +432,13 @@ export const HeroCarousel: React.FC = () => {
         <div
           role="complementary"
           aria-label="Download mobile application"
-          className="hidden sm:flex absolute bottom-6 left-5 sm:bottom-8 sm:left-8 lg:left-12 z-30 items-center gap-3.5 bg-black/75 backdrop-blur-md border border-white/20 rounded-sm p-3 sm:p-3.5 shadow-2xl text-white max-w-[260px] animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-black/85 transition-colors"
+          className="absolute bottom-6 left-5 z-30 hidden max-w-[260px] items-center gap-3.5 rounded-md border border-stone bg-paper/95 p-3 text-ink shadow-lg backdrop-blur-md transition-colors animate-in fade-in slide-in-from-bottom-3 duration-500 hover:bg-paper sm:bottom-8 sm:left-8 sm:p-3.5 lg:left-12"
         >
           {/* Close button with circular white badge */}
           <button
             onClick={handleDismissQR}
             aria-label="Close download app banner"
-            className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-neutral-200 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+            className="absolute -right-2.5 -top-2.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-stone bg-paper text-ink shadow-md transition-transform hover:scale-110 hover:bg-panel-raised active:scale-95"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -460,16 +452,16 @@ export const HeroCarousel: React.FC = () => {
           </button>
 
           {/* Dummy QR Code Image */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-sm bg-white p-1.5 shrink-0 flex items-center justify-center text-black shadow-md">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm bg-paper p-1.5 text-black shadow-sm sm:h-16 sm:w-16">
             <DummyQRCode className="w-full h-full" />
           </div>
 
           {/* Text Information */}
           <div className="flex flex-col pr-2">
-            <span className="text-sm sm:text-base font-bold text-white leading-tight">
+            <span className="font-sans text-sm font-semibold leading-tight text-ink sm:text-base">
               Download our app
             </span>
-            <span className="text-[11px] text-white/70 font-normal mt-0.5 leading-tight">
+            <span className="mt-0.5 font-sans text-[11px] font-normal leading-tight text-ink-muted">
               Scan with camera
             </span>
           </div>

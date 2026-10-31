@@ -20,7 +20,6 @@ import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
 import { ExpressionGuideModal } from '../components/shop/ExpressionGuideModal';
 import { CtaButton } from '../components/ui/Cta';
-import { useIsThemeV2 } from '../config/theme';
 
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -32,7 +31,6 @@ export const ProductDetail: React.FC = () => {
   const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((state) => state.showToast);
-  const isV2 = useIsThemeV2();
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -575,33 +573,27 @@ export const ProductDetail: React.FC = () => {
                         <span className="text-base text-ink-muted line-through">
                           {formatPrice(currentVariant.compareAtPriceCents)}
                         </span>
-                        <span
-                          className={`text-[12px] font-sans px-2 py-0.5 ${
-                            isV2
-                              ? 'font-semibold text-emerald-700 bg-emerald-50'
-                              : 'bg-gold-deep/10 text-gold-deep'
-                          }`}
-                        >
-                          {isV2 ? `(${discountPct}% OFF)` : `${discountPct}% OFF`}
+                        <span className="text-[12px] font-sans font-semibold px-2 py-0.5 text-accent bg-accent-soft">
+                          {discountPct}% OFF
                         </span>
                       </>
                     )}
                 </div>
 
-                {/* V2 D2C Promo Callout matching bag design system */}
-                {isV2 && (
-                  <div className="mt-3 p-3 bg-emerald-50/80 border border-emerald-200/90 flex items-center justify-between text-xs text-emerald-950 font-sans">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base text-emerald-600">⚡</span>
-                      <span>
-                        Get extra 10% OFF with code <strong className="font-mono font-bold text-emerald-800">HUSTLE10</strong> at checkout
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-semibold bg-emerald-700 text-white px-2 py-0.5">
-                      APPLY IN BAG
+                {/* First-order incentive, in the house accent rather than a
+                    second colour family. */}
+                <div className="mt-3 p-3 border border-accent-border bg-accent-soft flex items-center justify-between gap-3 text-xs text-ink font-sans">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base text-accent" aria-hidden="true">✦</span>
+                    <span>
+                      Get an extra 10% off with code{' '}
+                      <strong className="font-mono font-bold text-accent">HUSTLE10</strong> at checkout
                     </span>
                   </div>
-                )}
+                  <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide bg-accent text-on-accent px-2 py-0.5">
+                    Apply in bag
+                  </span>
+                </div>
 
                 <p className="text-[11px] text-ink-muted mt-2 font-light">
                   Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
@@ -749,7 +741,7 @@ export const ProductDetail: React.FC = () => {
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                   </svg>
-                  {isV2 ? 'Free shipping on orders above ₹500' : 'Free shipping on orders above ₹29,050'}
+                  'Free shipping on orders above ₹500'
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -1031,7 +1023,7 @@ export const ProductDetail: React.FC = () => {
               {universe && (
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-ink/30 hover:border-ink transition-colors min-h-[48px]"
+                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-stone-strong hover:border-ink transition-colors min-h-[48px]"
                 >
                   Explore {universe.name} <span aria-hidden="true">→</span>
                 </Link>
@@ -1087,7 +1079,7 @@ export const ProductDetail: React.FC = () => {
             </div>
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="mt-4 sm:mt-0 px-5 py-2.5 bg-transparent text-ink border border-ink/30 text-xs uppercase tracking-widest font-sans hover:border-ink transition-colors min-h-[44px]"
+              className="mt-4 sm:mt-0 px-5 py-2.5 bg-transparent text-ink border border-stone-strong text-xs uppercase tracking-widest font-sans hover:border-ink transition-colors min-h-[44px]"
             >
               Write a review
             </button>

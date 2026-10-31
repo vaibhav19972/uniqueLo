@@ -52,7 +52,7 @@ export const Orders: React.FC = () => {
   if (!user) {
     return (
       <div className="bg-cream min-h-screen">
-        <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
           <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Atelier Account</p>
           <h1 className="font-serif text-3xl text-ink mt-2">Sign in to see your orders</h1>
           <p className="text-sm text-ink-muted mt-3 max-w-md mx-auto leading-relaxed">

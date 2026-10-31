@@ -3,6 +3,7 @@ import { useProducts, useUniverses } from '../../hooks/useCatalog';
 import { useHorizontalRailGuard, RAIL_PREVENT_ATTR } from '../../hooks/useHorizontalRailGuard';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { BestsellerCard } from './BestsellerCard';
+import { useReveal } from '../../hooks/useReveal';
 
 /**
  * Render target 05: Community Favourites.
@@ -15,6 +16,7 @@ const TRUST = [
 ];
 
 export const Bestsellers: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   const { data: products } = useProducts();
   const { data: universes } = useUniverses();
   const [tab, setTab] = useState<string>('all');
@@ -76,7 +78,7 @@ export const Bestsellers: React.FC = () => {
   };
 
   return (
-    <section aria-labelledby="best-heading" className="bg-cream py-16 lg:py-24 overflow-x-clip">
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16 overflow-x-clip" aria-labelledby="best-heading" >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Bestsellers"

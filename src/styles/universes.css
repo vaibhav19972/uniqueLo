@@ -1,29 +1,58 @@
-/* src/styles/universes.css — Unified Atelier Design System.
-   Universes share the quiet-luxury editorial palette of The Atelier
-   (cream canvas, crisp paper surfaces, obsidian ink, bullion gold accents).
-   All separate jarring universe themes are retired in favor of one
-   harmonious, elevated brand voice across the entire website. */
+/* src/styles/universes.css — universe scoping layer.
 
-:root {
-  /* Quiet-luxury shell: graphite + antique champagne */
-  --brand-gold: #c2a878;
-  --brand-gold-hover: #ab935f;
-  --brand-gold-deep: #7a6234;
-  --brand-coal: #111116;
-  --brand-coal-soft: #1a1a21;
-  --on-gold: #ffffff;
+   A universe no longer owns a competing palette. It owns an ACCENT, declared
+   once in tokens.css under [data-accent='<slug>']. This file supplies the
+   handful of derived values that page shells and portals read (--u-*), plus
+   the texture families that give each world its own surface character.
 
-  /* Unified Atelier tokens used across all universe pages and components */
-  --u-bg: #f7f5f0;
-  --u-surface: #ffffff;
-  --u-ink: #141414;
-  --u-ink-muted: #686560;
-  --u-accent: #cba043;
-  --u-accent-2: #d95d39;
-  --u-product-zone: #f7f5f0;
-  --u-on-accent: #ffffff;
-  --u-texture-opacity: 0.04;
-  --u-display-font: var(--font-serif);
-  --u-display-weight: 600;
-  --u-display-style: normal;
+   To theme a subtree for a universe, put data-accent on it:
+
+       <div data-accent="itihaas"> … </div>
+
+   Nested universes compose: an Itihaas block inside an Animeverse page takes
+   the wine accent and leaves the rose one behind. */
+
+:root,
+[data-accent] {
+  --u-bg:               var(--color-cream);
+  --u-surface:          var(--color-paper);
+  --u-ink:              var(--color-ink);
+  --u-ink-muted:        var(--color-ink-muted);
+  --u-accent:           var(--color-accent);
+  --u-accent-2:         var(--color-accent);
+  --u-product-zone:     var(--color-cream);
+  --u-on-accent:        var(--color-on-accent);
+  --u-texture-opacity:  0.05;
+  --u-display-font:     var(--font-serif);
+  --u-display-weight:   600;
+  --u-display-style:    normal;
+
+  /* Universe wash — the soft field behind a portal or hero. Derived from the
+     accent so it can never drift out of family. */
+  --u-wash: color-mix(in srgb, var(--color-accent) 7%, var(--color-cream));
+  --u-wash-strong: color-mix(in srgb, var(--color-accent) 14%, var(--color-cream));
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Texture families — each universe names one. Rendered by .u-texture
+   in globals.css using a repeating pattern, never a decorative gradient.
+   ───────────────────────────────────────────────────────────── */
+[data-accent='animeverse'] {
+  --u-texture: var(--texture-petal);
+  --u-card-frame: 0.75rem;
+}
+
+[data-accent='heroverse'] {
+  --u-texture: var(--texture-lines);
+  --u-card-frame: 0.25rem;
+}
+
+[data-accent='itihaas'] {
+  --u-texture: var(--texture-arch);
+  --u-card-frame: 1.25rem 1.25rem 0 0;
+}
+
+[data-accent='atelier'] {
+  --u-texture: var(--texture-stitch);
+  --u-card-frame: 0.5rem;
 }

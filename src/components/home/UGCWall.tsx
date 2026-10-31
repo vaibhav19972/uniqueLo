@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { MarketingHeader } from '../ui/MarketingHeader';
+import { useReveal } from '../../hooks/useReveal';
 
 /**
  * Render target 06: Worn Across Universes (chatgpt-v2).
@@ -16,7 +17,7 @@ const SAMPLE_STORIES = [
     quote: 'The embroidery feels alive. I get compliments everywhere.',
     name: 'Rhea Sharma',
     detail: 'Student, Delhi',
-    image: '/images/campaigns/lookbook-01.jpg',
+    image: '/images/campaigns/hero-animeverse.jpg',
     alt: 'Customer wearing embroidered hoodie in city street (sample photo)',
     tall: true,
   },
@@ -24,7 +25,7 @@ const SAMPLE_STORIES = [
     quote: 'My go-to tee. Amazing quality and the embroidery is next level.',
     name: 'Arjun Mehta',
     detail: 'Product Designer, Bengaluru',
-    image: '/images/campaigns/lookbook-02.jpg',
+    image: '/images/products/sakura-ronin-hoodie-1.jpg',
     alt: 'Customer wearing koi embroidered tee outdoors (sample photo)',
     tall: false,
   },
@@ -32,7 +33,7 @@ const SAMPLE_STORIES = [
     quote: 'Perfect for anime events! So many people asked me where I got this from.',
     name: 'Ishita Rao',
     detail: 'Cosplayer, Mumbai',
-    image: '/images/campaigns/lookbook-03.jpg',
+    image: '/images/products/kantha-chore-jacket-1.jpg',
     alt: 'Customer wearing graphic embroidered jacket at event (sample photo)',
     tall: false,
   },
@@ -40,7 +41,7 @@ const SAMPLE_STORIES = [
     quote: 'Super comfortable and the embroidery is so elegant.',
     name: 'Ananya Verma',
     detail: 'Marketing, Gurugram',
-    image: '/images/campaigns/editorial-split.jpg',
+    image: '/images/products/ivory-embroidered-shirt-1.jpg',
     alt: 'Customer wearing crane sweatshirt at cafe (sample photo)',
     tall: false,
   },
@@ -48,7 +49,7 @@ const SAMPLE_STORIES = [
     quote: 'Feels like wearing art. The fit, the fabric, everything is perfect.',
     name: 'Kabir Malhotra',
     detail: 'Student, Pune',
-    image: '/images/campaigns/atelier-craft.jpg',
+    image: '/images/products/crewel-cashmere-cardigan-1.jpg',
     alt: 'Customer wearing tiger embroidered jacket at night market (sample photo)',
     tall: false,
   },
@@ -56,7 +57,7 @@ const SAMPLE_STORIES = [
     quote: 'A piece of history I can wear. The detailing is incredible.',
     name: 'Kushagra Singh',
     detail: 'History Enthusiast, Jaipur',
-    image: '/images/campaigns/hero.jpg',
+    image: '/images/campaigns/freestyle-hero-cleaned.jpg',
     alt: 'Customer wearing procession jacket before palace (sample photo)',
     tall: true,
   },
@@ -79,8 +80,9 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const UGCWall: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   return (
-    <section aria-labelledby="ugc-heading" className="bg-cream py-16 lg:py-24">
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16" aria-labelledby="ugc-heading" >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Real people. Real stories."
@@ -144,7 +146,7 @@ export const UGCWall: React.FC = () => {
         </div>
 
         <div className="mt-6 text-center sm:hidden">
-          <Link to="/shop" className="text-[15px] font-serif text-ink border-b border-ink/30 pb-1">
+          <Link to="/shop" className="text-[15px] font-serif text-ink border-b border-stone-strong pb-1">
             See more stories →
           </Link>
         </div>

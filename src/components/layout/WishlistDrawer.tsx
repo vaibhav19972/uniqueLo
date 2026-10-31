@@ -73,10 +73,10 @@ export const WishlistDrawer: React.FC = () => {
       {/* Drawer */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-md bg-cream text-ink h-full shadow-2xl flex flex-col justify-between border-l border-ink/10 animate-in slide-in-from-right duration-300"
+        className="relative z-10 w-full max-w-md bg-cream text-ink h-full shadow-2xl flex flex-col justify-between border-l border-stone animate-in slide-in-from-right duration-300"
       >
         {/* Header */}
-        <div className="p-6 border-b border-ink/10 flex items-center justify-between">
+        <div className="p-6 border-b border-stone flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h2 className="font-serif text-xl tracking-wide">Saved Pieces</h2>
             <span className="text-xs uppercase tracking-widest text-ink/50 bg-ink/5 px-2 py-0.5 rounded-full font-mono">
@@ -136,12 +136,12 @@ export const WishlistDrawer: React.FC = () => {
             savedProducts.map((product) => {
               const defaultVariant = getDefaultVariant(product);
               const isSoldOut = !defaultVariant || defaultVariant.status === 'out-of-stock';
-              const primaryImg = product.images?.[0]?.src || '/images/placeholders/hoodie.jpg';
+              const primaryImg = product.images?.[0]?.src || '/images/placeholders/hero.jpg';
 
               return (
                 <div
                   key={product.slug}
-                  className="flex gap-4 p-3 bg-white/70 border border-ink/5 rounded-sm hover:border-ink/15 transition-colors"
+                  className="flex gap-4 p-3 bg-paper/70 border border-ink/5 rounded-sm hover:border-stone transition-colors"
                 >
                   <Link
                     to={`/product/${product.slug}`}
@@ -212,11 +212,11 @@ export const WishlistDrawer: React.FC = () => {
 
         {/* Footer */}
         {savedProducts.length > 0 && (
-          <div className="p-6 border-t border-ink/10 bg-white/50">
+          <div className="p-6 border-t border-stone bg-paper/50">
             <Link
               to="/shop"
               onClick={closeWishlist}
-              className="block w-full py-2.5 text-center border border-ink/20 text-ink hover:bg-ink hover:text-cream transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
+              className="block w-full py-2.5 text-center border border-stone-strong text-ink hover:bg-ink hover:text-cream transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
             >
               Continue Exploring
             </Link>

@@ -6,6 +6,7 @@ import { useFiltersStore } from '../../stores/filters';
 import { useAuthStore } from '../../stores/auth';
 import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalog';
 import { prefersReducedMotion } from '../../lib/motion';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { AnnouncementBar } from './AnnouncementBar';
 
 type NavMenuKey = 'worlds' | 'styles' | 'clothing' | 'new-featured' | 'our-craft' | null;
@@ -470,6 +471,9 @@ export const Header: React.FC = () => {
               <span className="absolute bottom-1 sm:bottom-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
             )}
           </button>
+
+          {/* Light ⇄ dark */}
+          <ThemeToggle className="-mr-1" />
 
           {/* Wishlist Button */}
           <button

@@ -125,7 +125,7 @@ export const OrderConfirmation: React.FC = () => {
       : 'upi';
 
   return (
-    <div className="bg-cream min-h-screen py-12 lg:py-20 text-ink">
+    <div className="bg-cream min-h-screen py-12 lg:py-14 text-ink">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb / Back Navigation */}
         <nav aria-label="Breadcrumb" className="mb-8">
@@ -194,7 +194,7 @@ export const OrderConfirmation: React.FC = () => {
 
         {/* Loading Skeleton */}
         {isLoading && (
-          <div className="py-20 text-center">
+          <div className="py-14 text-center">
             <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="font-serif text-lg text-ink-muted animate-pulse">
               Retrieving archival needlecraft records…

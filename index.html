@@ -1,21 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-mode="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f5f0" />
+    <meta name="theme-color" content="#f7f3ec" />
     <meta
       name="description"
       content="UniqueLo — Hand-Embroidered Essentials. Made in India. Built to last. Numbered capsule runs in Zardozi, Kantha, Chikankari and Kashmiri crewel."
     />
     <title>UniqueLo — Hand-Embroidered Essentials. Made in India. Built to Last.</title>
 
-    <!-- Brand fonts (Satoshi + Melodrama) are self-hosted in /public/fonts
-         and declared in src/styles/fonts.css. Do NOT add Google Fonts here —
+    <!--
+      Resolve the colour mode BEFORE first paint. Without this the page paints
+      light, then snaps to dark once React mounts. Kept inline and dependency
+      free on purpose; it must run before any stylesheet-driven paint.
+      The stored choice always wins over the OS setting.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('uniquelo:theme-mode');
+          var mode =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-mode', mode);
+          document.documentElement.style.colorScheme = mode;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', mode === 'dark' ? '#000000' : '#f7f3ec');
+        } catch (e) {
+          document.documentElement.setAttribute('data-mode', 'light');
+        }
+      })();
+    </script>
+
+    <!-- Brand fonts are self-hosted in /public/fonts and declared in
+         src/styles/fonts.css. Do NOT add Google Fonts here —
          see docs/02-design-system §12.1. -->
   </head>
-  <body class="bg-cream text-ink antialiased selection:bg-accent/20">
+  <body class="bg-cream text-ink antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

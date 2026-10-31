@@ -47,7 +47,7 @@ export const Character: React.FC = () => {
 
   if (universe === undefined || character === undefined) {
     return (
-      <div className="py-24 text-center">
+      <div className="py-16 text-center">
         <p className="font-serif text-2xl text-ink">Unfolding character…</p>
       </div>
     );
@@ -55,7 +55,7 @@ export const Character: React.FC = () => {
 
   if (!universe || !character || character.universe_slug !== universe.slug) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="py-16 text-center max-w-md mx-auto px-4">
         <h1 className="font-serif text-3xl text-ink">Character not found</h1>
         <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
         <Link to="/universes" className="inline-block mt-6 text-sm underline underline-offset-4">

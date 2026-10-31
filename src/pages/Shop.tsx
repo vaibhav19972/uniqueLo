@@ -9,7 +9,7 @@ import { ProductGrid } from '../components/shop/ProductGrid';
 
 function CatalogState({ message, detail }: { message: string; detail?: string }) {
   return (
-    <div className="py-24 text-center max-w-md mx-auto px-4">
+    <div className="py-16 text-center max-w-md mx-auto px-4">
       <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center mb-4 text-ink-muted" aria-hidden="true">
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" />

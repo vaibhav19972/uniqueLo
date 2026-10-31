@@ -6,7 +6,6 @@ import { useCartStore } from '../../stores/cart';
 import { useQuickViewStore } from '../../stores/quickView';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
-import { useIsThemeV2 } from '../../config/theme';
 
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
@@ -37,7 +36,6 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const openQuickView = useQuickViewStore((s) => s.openQuickView);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((s) => s.showToast);
-  const isV2 = useIsThemeV2();
 
   const sizes = useMemo(() => {
     const unique = [...new Set(product.variants.map((v) => v.size))];
@@ -146,7 +144,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </button>
 
           {/* Size selection & Add to Cart — crisp white floating surface */}
-          <div className="bg-white p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
+          <div className="bg-paper p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
             <div className="grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="Choose size">
               {sizes.map((s) => {
                 const available = inStockSizes.has(s);
@@ -164,10 +162,8 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
                     className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border transition-colors flex items-center justify-center ${
                       size === s
-                        ? isV2
-                          ? 'bg-ink text-paper border-transparent font-semibold shadow-xs'
-                          : 'bg-gold text-on-gold border-transparent font-medium shadow-xs'
-                        : 'bg-white border-stone-deep text-ink hover:border-gold-deep'
+                        ? 'bg-ink text-cream border-transparent font-semibold shadow-xs'
+                        : 'bg-paper border-stone text-ink hover:border-ink'
                     } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
                   >
                     {s}
@@ -178,11 +174,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <button
               type="button"
               onClick={handleAdd}
-              className={`w-full mt-2 min-h-[44px] py-2 font-serif text-[13px] sm:text-[14px] transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
-                isV2
-                  ? 'bg-ink text-paper hover:bg-black font-sans font-semibold'
-                  : 'bg-gold text-on-gold hover:bg-gold-hover'
-              }`}
+              className="w-full mt-2 min-h-[44px] py-2 font-sans text-[13px] sm:text-[14px] font-semibold tracking-wide transition-colors flex items-center justify-center bg-ink text-cream hover:bg-ink-muted shadow-xs active:scale-[0.99]"
             >
               Add to Cart — {formatPrice(currentVariant.priceCents)}
             </button>
@@ -228,14 +220,8 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           {compareAt && compareAt > currentVariant.priceCents && (
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
-              <span
-                className={`text-[11px] font-sans px-1.5 py-0.5 ${
-                  isV2
-                    ? 'font-semibold text-emerald-700 bg-emerald-50'
-                    : 'bg-gold-deep/10 text-gold-deep'
-                }`}
-              >
-                {isV2 ? `(${offPct}% OFF)` : `${offPct}% OFF`}
+              <span className="text-[11px] font-sans font-semibold px-1.5 py-0.5 text-accent bg-accent-soft">
+                {offPct}% OFF
               </span>
             </>
           )}

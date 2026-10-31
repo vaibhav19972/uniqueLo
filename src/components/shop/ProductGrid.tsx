@@ -13,7 +13,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
   if (products.length === 0) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="py-16 text-center max-w-md mx-auto px-4">
         <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center text-stone text-xl mb-4">
           ✦
         </div>

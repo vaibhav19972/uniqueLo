@@ -437,7 +437,7 @@ export const Checkout: React.FC = () => {
   if (cartLines.length === 0) {
     return (
       <div className="bg-cream min-h-screen">
-        <div className="max-w-2xl mx-auto px-5 py-24 text-center">
+        <div className="max-w-2xl mx-auto px-5 py-16 text-center">
           <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Checkout</p>
           <h1 className="font-serif text-3xl text-ink mt-2">Your bag is empty</h1>
           <p className="text-sm text-ink-muted mt-3 leading-relaxed">
@@ -455,7 +455,7 @@ export const Checkout: React.FC = () => {
   }
 
   const field =
-    'w-full border border-ink/15 bg-white px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40';
+    'w-full border border-stone bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40';
 
   const busy = submitting || stage !== 'idle';
   const onlinePayable = isPaymentsConfigured();
@@ -515,7 +515,7 @@ export const Checkout: React.FC = () => {
                       className={`w-full text-left border p-4 transition-colors ${
                         selectedAddressId === a.id
                           ? 'border-ink bg-white'
-                          : 'border-ink/15 bg-white/50 hover:border-ink/30'
+                          : 'border-stone bg-paper/50 hover:border-stone-strong'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -523,7 +523,7 @@ export const Checkout: React.FC = () => {
                           <p className="text-sm font-medium text-ink">
                             {a.recipient_name}
                             {a.label && (
-                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted border border-ink/15 px-1.5 py-0.5">
+                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted border border-stone px-1.5 py-0.5">
                                 {a.label}
                               </span>
                             )}
@@ -544,7 +544,7 @@ export const Checkout: React.FC = () => {
                         </div>
                         <span
                           className={`mt-1 w-3.5 h-3.5 rounded-full border shrink-0 ${
-                            selectedAddressId === a.id ? 'border-ink bg-ink' : 'border-ink/30'
+                            selectedAddressId === a.id ? 'border-ink bg-ink' : 'border-stone-strong'
                           }`}
                         />
                       </div>
@@ -562,7 +562,7 @@ export const Checkout: React.FC = () => {
 
               {/* Address form */}
               {(!user || addresses.length === 0 || showAddressForm) && (
-                <div className="bg-white border border-ink/15 p-5 space-y-3">
+                <div className="bg-paper border border-stone p-5 space-y-3">
                   {user && addresses.length > 0 && (
                     <button
                       type="button"
@@ -693,15 +693,15 @@ export const Checkout: React.FC = () => {
                   onClick={() => setPaymentMethod('upi')}
                   className={`w-full text-left border p-4 ${
                     !onlinePayable
-                      ? 'border-ink/10 bg-white/30 opacity-60 cursor-not-allowed'
+                      ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'upi'
                         ? 'border-ink bg-white'
-                        : 'border-ink/15 bg-white/50'
+                        : 'border-stone bg-paper/50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">Pay online</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'upi' ? 'border-ink bg-ink' : 'border-ink/30'}`} />
+                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'upi' ? 'border-ink bg-ink' : 'border-stone-strong'}`} />
                   </div>
                   <p className="text-xs text-ink-muted mt-1">
                     {onlinePayable
@@ -716,15 +716,15 @@ export const Checkout: React.FC = () => {
                   onClick={() => setPaymentMethod('cod')}
                   className={`w-full text-left border p-4 ${
                     !codAvailable
-                      ? 'border-ink/10 bg-white/30 opacity-60 cursor-not-allowed'
+                      ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'cod'
                         ? 'border-ink bg-white'
-                        : 'border-ink/15 bg-white/50'
+                        : 'border-stone bg-paper/50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">Cash on delivery</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'cod' ? 'border-ink bg-ink' : 'border-ink/30'}`} />
+                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'cod' ? 'border-ink bg-ink' : 'border-stone-strong'}`} />
                   </div>
                   <p className="text-xs text-ink-muted mt-1">
                     {!codAvailable
@@ -740,8 +740,8 @@ export const Checkout: React.FC = () => {
 
           {/* ── Right: summary ──────────────────────────────────────── */}
           <aside className="lg:sticky lg:top-[calc(var(--header-height)+2rem)]">
-            <div className="bg-white border border-ink/15">
-              <div className="px-5 py-4 border-b border-ink/10 flex items-baseline justify-between">
+            <div className="bg-paper border border-stone">
+              <div className="px-5 py-4 border-b border-stone flex items-baseline justify-between">
                 <h2 className="font-serif text-lg text-ink">Order summary</h2>
                 <span className="text-[10px] uppercase tracking-[0.14em] text-ink-muted">
                   {quote ? `${quote.units} item${quote.units === 1 ? '' : 's'}` : '—'}
@@ -786,11 +786,11 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Coupon */}
-              <div className="px-5 py-3 border-t border-ink/10">
+              <div className="px-5 py-3 border-t border-stone">
                 {appliedCode ? (
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-ink">
-                      <span className="font-mono bg-cream px-1.5 py-0.5 border border-ink/10">{appliedCode}</span>
+                      <span className="font-mono bg-cream px-1.5 py-0.5 border border-stone">{appliedCode}</span>
                       {quote?.coupon && !quote.coupon.error && (
                         <span className="ml-2 text-emerald-700">
                           −{formatPrice(quote.coupon.discount_cents ?? 0)}
@@ -809,7 +809,7 @@ export const Checkout: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <input
-                        className="flex-1 border border-ink/15 bg-cream px-3 py-2 text-xs text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40 uppercase"
+                        className="flex-1 border border-stone bg-cream px-3 py-2 text-xs text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40 uppercase"
                         placeholder="Coupon code"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -857,7 +857,7 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Totals — server values only */}
-              <div className="px-5 py-4 border-t border-ink/10 space-y-2 text-xs">
+              <div className="px-5 py-4 border-t border-stone space-y-2 text-xs">
                 {quoteError ? (
                   <p className="text-[11px] text-red-600 leading-relaxed">{quoteError.message}</p>
                 ) : isLoading || !quote ? (
@@ -880,7 +880,7 @@ export const Checkout: React.FC = () => {
                         Add {formatPrice(remainingFree)} for free delivery.
                       </p>
                     )}
-                    <div className="pt-2 mt-1 border-t border-ink/10 flex items-baseline justify-between">
+                    <div className="pt-2 mt-1 border-t border-stone flex items-baseline justify-between">
                       <span className="text-sm font-medium text-ink">Total</span>
                       <span className="font-serif text-xl text-ink">{formatPrice(quote.total_cents)}</span>
                     </div>

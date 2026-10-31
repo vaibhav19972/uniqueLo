@@ -9,7 +9,7 @@ type CtaVariant = 'gold' | 'outline' | 'light';
 
 const variantStyles: Record<CtaVariant, string> = {
   gold: 'bg-gold text-on-gold hover:bg-gold-hover',
-  outline: 'bg-transparent text-ink border border-ink/30 hover:border-ink',
+  outline: 'bg-transparent text-ink border border-stone-strong hover:border-ink',
   light: 'bg-cream text-ink hover:bg-paper',
 };
 
@@ -52,7 +52,7 @@ export const TextLink: React.FC<{ to: string; children: React.ReactNode; classNa
 }) => (
   <Link
     to={to}
-    className={`hidden sm:inline-flex items-center gap-2 text-[15px] font-sans font-medium text-ink border-b border-ink/30 hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
+    className={`hidden sm:inline-flex items-center gap-2 text-[15px] font-sans font-medium text-ink border-b border-stone-strong hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
   >
     {children}
   </Link>

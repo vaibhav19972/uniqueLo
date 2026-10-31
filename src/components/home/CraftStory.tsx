@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { MarketingHeader } from '../ui/MarketingHeader';
+import { useReveal } from '../../hooks/useReveal';
 
 /**
  * Render target 04: Slow Fashion. Deeper Stories. (chatgpt-v2)
@@ -15,8 +16,8 @@ const ATELIER_NOTE = {
     'For me, embroidery is a way of keeping our stories alive — in every stitch, there is a piece of home.',
   name: 'Savitri Devi',
   role: 'Artisan, Uttar Pradesh',
-  photo: '/images/campaigns/lookbook-01.jpg',
-  photoAlt: 'Artisan hand-embroidering a motif (sample photo, replace at P5)',
+  photo: '/images/campaigns/craft-artisan.jpg',
+  photoAlt: 'Artisan at an embroidery frame in a sunlit workshop',
 };
 
 const STEPS = [
@@ -24,29 +25,29 @@ const STEPS = [
     n: '01',
     title: 'Sketch',
     detail: 'Ideas become art.',
-    image: '/images/campaigns/editorial-split.jpg',
-    alt: 'Step 1 — motif sketch becoming embroidery art (placeholder)',
+    image: '/images/campaigns/craft-sketch.jpg',
+    alt: 'Step 1 — sketching an embroidery motif onto silk',
   },
   {
     n: '02',
     title: 'Thread-dye',
     detail: 'Naturally dyed, richer tones.',
-    image: '/images/campaigns/lookbook-02.jpg',
-    alt: 'Step 2 — bowls of naturally dyed thread (placeholder)',
+    image: '/images/campaigns/craft-thread-dye.jpg',
+    alt: 'Step 2 — bowls of naturally dyed silk thread',
   },
   {
     n: '03',
     title: '40-hr handwork',
     detail: 'Skilled hands bring every detail to life.',
-    image: '/images/campaigns/lookbook-03.jpg',
-    alt: 'Step 3 — hands stitching a floral motif (placeholder)',
+    image: '/images/campaigns/craft-handwork.jpg',
+    alt: 'Step 3 — hands stitching a motif on a wooden frame',
   },
   {
     n: '04',
     title: 'Finish',
     detail: 'A piece made to last.',
-    image: '/images/campaigns/atelier-craft.jpg',
-    alt: 'Step 4 — finished embroidered garment on hanger (placeholder)',
+    image: '/images/campaigns/craft-finish.jpg',
+    alt: 'Step 4 — finished embroidered shirt on a hanger',
   },
 ];
 
@@ -75,8 +76,9 @@ const BADGES = [
 ];
 
 export const CraftStory: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
   return (
-    <section aria-labelledby="craft-heading" className="bg-cream py-16 lg:py-24">
+    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16" aria-labelledby="craft-heading" >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Our Craft"
@@ -93,7 +95,7 @@ export const CraftStory: React.FC = () => {
           <div className="relative min-h-[380px] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:min-h-[560px]">
             <img
               src="/images/campaigns/atelier-craft.jpg"
-              alt="Macro of gold and red embroidery (placeholder)"
+              alt="Hands guiding gold zari thread through ivory silk"
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover"
             />

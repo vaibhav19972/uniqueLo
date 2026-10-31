@@ -17,7 +17,6 @@ import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
-import { useIsThemeV2 } from '../../config/theme';
 
 interface ProductCardProps {
   product: Product;
@@ -34,7 +33,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const frontImage = product.images[0]?.src || '/images/placeholders/hero.jpg';
   const macroImage = product.images[1]?.src || frontImage;
   const isWish = isWishlisted(product.slug);
-  const isV2 = useIsThemeV2();
 
   const expScore = getExpressionScore(product);
   const expInfo = getExpressionByScore(expScore);
@@ -193,9 +191,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {compareAt && compareAt > defaultVariant.priceCents && (
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-[10px] sm:text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
-                  {isV2 && offPct > 0 && (
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.2 sm:px-1.5 sm:py-0.5">
-                      ({offPct}%)
+                  {offPct > 0 && (
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-accent bg-accent-soft px-1 py-0.2 sm:px-1.5 sm:py-0.5">
+                      {offPct}%
                     </span>
                   )}
                 </div>

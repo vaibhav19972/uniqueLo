@@ -45,7 +45,7 @@ export const Garment: React.FC = () => {
 
   if (garments !== undefined && !garment) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto px-4">
+      <div className="py-16 text-center max-w-md mx-auto px-4">
         <h1 className="font-serif text-3xl text-ink">Garment not found</h1>
         <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
         <Link to="/clothing" className="inline-block mt-6 text-sm underline underline-offset-4">
@@ -66,10 +66,24 @@ export const Garment: React.FC = () => {
             <span className="mx-2">›</span>
             <span>{garment?.name ?? '…'}</span>
           </nav>
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-3 tracking-tight">
-            {garment?.name ?? 'Garment'}
-          </h1>
-          <p className="text-sm text-ink-muted mt-3 max-w-2xl font-light">{garment?.description}</p>
+          <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink tracking-tight">
+                {garment?.name ?? 'Garment'}
+              </h1>
+              <p className="mt-3 max-w-2xl font-sans text-sm text-ink-muted">{garment?.description}</p>
+            </div>
+            {garment?.image && (
+              <div className="relative aspect-[4/5] w-32 shrink-0 overflow-hidden border border-stone sm:w-44">
+                <img
+                  src={garment.image}
+                  alt={`${garment.name} — placeholder campaign art`}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
+              </div>
+            )}
+          </div>
 
           {/* Context-Sensitive Filter Chips: World & Expression */}
           <div className="mt-8 flex flex-wrap items-center gap-2 pt-6 border-t border-stone/40">

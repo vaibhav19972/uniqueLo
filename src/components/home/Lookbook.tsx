@@ -20,7 +20,7 @@ const LOOKS: LookItem[] = [
     title: 'Winter Flora & Botanical Silk',
     subtitle: 'Wild alpine roses rendered in mulberry floss over heavy cotton canvas.',
     quote: '"The needle creates a botanical relief that printed ink can never simulate."',
-    image: '/images/campaigns/lookbook-01.jpg',
+    image: '/images/campaigns/hero-animeverse.jpg',
     featuredSlug: 'botanical-silk-embroidered-jacket',
   },
   {
@@ -29,7 +29,7 @@ const LOOKS: LookItem[] = [
     title: 'Celestial Zardozi Wirework',
     subtitle: 'Astronomical constellations hand-anchored in French bullion wires.',
     quote: '"Gold wire reflects ambient light as the wearer moves through candlelit salons."',
-    image: '/images/campaigns/lookbook-02.jpg',
+    image: '/images/campaigns/hero-itihaas.jpg',
     featuredSlug: 'celestial-zardozi-wool-coat',
   },
   {
@@ -38,7 +38,7 @@ const LOOKS: LookItem[] = [
     title: 'Sashiko Architectural Indigo',
     subtitle: 'Japanese Toyoda shuttle-loom denim reinforced with geometric rice-grain stitches.',
     quote: '"Form follows tactile endurance; embroidery as structural reinforcement."',
-    image: '/images/campaigns/lookbook-03.jpg',
+    image: '/images/campaigns/hero-heroverse.jpg',
     featuredSlug: 'selvedge-sashiko-embroidered-denim',
   },
 ];
@@ -48,7 +48,7 @@ export const Lookbook: React.FC = () => {
   const activeLook = LOOKS[activeLookIndex];
 
   return (
-    <section className="py-24 bg-ink text-cream border-b border-stone/20 overflow-hidden">
+    <section className="py-16 bg-ink text-cream border-b border-stone/20 overflow-hidden">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         {/* Header & Look Selectors */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between pb-10 border-b border-stone/20 gap-6">

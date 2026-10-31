@@ -7,7 +7,8 @@
       "description": "Inspired by spring in the floating world — flat sun discs, wave curls, and floating cherry blossom embroidery across heavyweight fleece, combed cotton, and raw canvas.",
       "universeSlug": "animeverse",
       "featured": true,
-      "order": 1
+      "order": 1,
+      "image": "/images/collections/spring-sakura.jpg"
     },
     {
       "slug": "royal-heritage",
@@ -16,7 +17,8 @@
       "description": "Arch lattices, elephant processions, and intricate jaal geometry drawn from royal court lineages, rendered in metallic zari, raw silk, and fine needlework.",
       "universeSlug": "itihaas",
       "featured": true,
-      "order": 2
+      "order": 2,
+      "image": "/images/collections/royal-heritage.jpg"
     },
     {
       "slug": "midnight-atelier",
@@ -25,7 +27,8 @@
       "description": "Universe-neutral and nocturnal luxury pieces — sashiko grids, crewel relief, comic noir geometry, and understated crest detailing on heavyweight unbleached and charcoal yarns.",
       "universeSlug": null,
       "featured": true,
-      "order": 3
+      "order": 3,
+      "image": "/images/collections/midnight-atelier.jpg"
     }
   ]
 }
