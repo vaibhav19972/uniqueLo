@@ -461,13 +461,25 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
       handler: (resp: RazorpaySuccess) => {
         // Razorpay does not await this callback, so the promise resolution must
         // happen inside it rather than after `open()` returns.
+        console.log('[UniqueLo Razorpay] Payment handler received response:', {
+          order_id: resp.razorpay_order_id,
+          payment_id: resp.razorpay_payment_id,
+        });
+        // Explicitly dismiss the checkout modal so it doesn't freeze over the page
+        try {
+          rzp.close();
+        } catch {
+          /* modal may already be closed */
+        }
         finish(() => {
           stage('verifying');
           verifyPayment(resp)
-            .then((result) =>
-              resolve({ orderId: result.order_id, paymentId: result.payment_id ?? resp.razorpay_payment_id })
-            )
-            .catch((err) =>
+            .then((result) => {
+              console.log('[UniqueLo Razorpay] Verification succeeded:', result);
+              resolve({ orderId: result.order_id, paymentId: result.payment_id ?? resp.razorpay_payment_id });
+            })
+            .catch((err) => {
+              console.error('[UniqueLo Razorpay] Verification failed:', err);
               reject(
                 err instanceof PaymentError
                   ? err
@@ -478,8 +490,8 @@ export async function payOnline(input: PayOnlineInput): Promise<PayOnlineResult>
                       // attempt could charge twice.
                       false
                     )
-              )
-            );
+              );
+            });
         });
       },
     });
