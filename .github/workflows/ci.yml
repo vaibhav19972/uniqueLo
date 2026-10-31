@@ -42,4 +42,4 @@ jobs:
 
       - name: Contract + seed parity (needs backend/)
         if: env.BACKEND_TOKEN != ''
-        run: npm run contract:check && npm run seed:check && node ../backend/scripts/check-schema-parity.mjs
+        run: npm run contract:check && npm run seed:check && npm run schema:check && node ../backend/scripts/check-schema-parity.mjs
