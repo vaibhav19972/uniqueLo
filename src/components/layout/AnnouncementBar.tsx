@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import { useIsThemeV2 } from '../../config/theme';
 import {
   type AnnouncementItem,
   type AnnouncementBadgeStyle,
@@ -91,40 +90,15 @@ const AnnouncementIcon: React.FC<{
 /**
  * Badge styling resolver for Theme V2 & V1
  */
-function getBadgeClasses(
-  style: AnnouncementBadgeStyle,
-  isV2: boolean,
-  isFlashing?: boolean
-): string {
-  if (!isV2) {
-    // V1: The Atelier gold theme
-    return 'bg-cream/20 text-cream border border-cream/30 text-[10px] tracking-widest font-sans font-semibold uppercase';
+function getBadgeClasses(style: AnnouncementBadgeStyle): string {
+  // One accent, one treatment. Badge kind no longer changes the color — it
+  // only decides whether the label is filled or outlined, so a rotating
+  // announcement never reads as five different brands.
+  if (style === 'default') {
+    return 'bg-panel text-ink-muted border border-stone-strong text-xs tracking-label font-medium uppercase';
   }
 
-  // V2: Modern D2C Streetwear
-  const flashAnim = isFlashing
-    ? style === 'crimson'
-      ? 'animate-flash-badge-urgent'
-      : 'animate-flash-badge-emerald'
-    : '';
-
-  switch (style) {
-    case 'emerald':
-      return `bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 ${flashAnim}`;
-    case 'cyan':
-      return `bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 ${flashAnim}`;
-    case 'amber':
-      return `bg-amber-500/20 text-amber-300 border border-amber-500/40 ${flashAnim}`;
-    case 'crimson':
-      return `bg-rose-500/20 text-rose-300 border border-rose-500/40 ${flashAnim}`;
-    case 'purple':
-      return `bg-purple-500/20 text-purple-300 border border-purple-500/40 ${flashAnim}`;
-    case 'gold':
-      return 'bg-amber-400/20 text-amber-200 border border-amber-400/40';
-    case 'default':
-    default:
-      return 'bg-white/10 text-white/85 border border-white/20';
-  }
+  return 'bg-accent-soft text-accent border border-accent-border text-xs tracking-label font-medium uppercase';
 }
 
 /**
@@ -133,9 +107,8 @@ function getBadgeClasses(
  */
 const AnnouncementCard: React.FC<{
   item: AnnouncementItem;
-  isV2: boolean;
-}> = ({ item, isV2 }) => {
-  const badgeClasses = getBadgeClasses(item.badgeStyle, isV2, item.isFlashing);
+}> = ({ item }) => {
+  const badgeClasses = getBadgeClasses(item.badgeStyle);
 
   // Split text if it has highlighted words
   let renderedText: React.ReactNode = item.text;
@@ -144,17 +117,7 @@ const AnnouncementCard: React.FC<{
     renderedText = (
       <>
         <span>{before}</span>
-        <span
-          className={
-            isV2
-              ? item.badgeStyle === 'crimson'
-                ? 'text-rose-400 font-bold tracking-wide animate-flash-text'
-                : 'text-emerald-400 font-bold tracking-wide animate-flash-text'
-              : 'text-cream font-bold underline underline-offset-2'
-          }
-        >
-          {item.highlightWords}
-        </span>
+        <span className="text-accent font-semibold">{item.highlightWords}</span>
         <span>{after}</span>
       </>
     );
@@ -162,24 +125,18 @@ const AnnouncementCard: React.FC<{
 
   const content = (
     <div className="inline-flex items-center gap-2.5 whitespace-nowrap group/item py-0.5">
-      {/* Flashing Live Beacon Dot */}
+      {/* Static status dot — a pulsing beacon reads as an alarm, not a store. */}
       {item.isFlashing && (
-        <span className="relative flex h-2 w-2 shrink-0 items-center justify-center" aria-hidden="true">
-          <span
-            className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-            style={{ backgroundColor: item.beaconColor || '#10b981' }}
-          />
-          <span
-            className="relative inline-flex rounded-full h-1.5 w-1.5"
-            style={{ backgroundColor: item.beaconColor || '#10b981' }}
-          />
-        </span>
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+          aria-hidden="true"
+        />
       )}
 
-      {/* Badge Pill */}
+      {/* Badge Label — square corners, one accent, no scaling on hover */}
       {item.badge && (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider uppercase transition-transform group-hover/item:scale-105 ${badgeClasses}`}
+          className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium tracking-label uppercase ${badgeClasses}`}
         >
           {item.icon && <AnnouncementIcon type={item.icon} className="w-3 h-3 shrink-0" />}
           <span>{item.badge}</span>
@@ -187,21 +144,15 @@ const AnnouncementCard: React.FC<{
       )}
 
       {/* Main Text */}
-      <span
-        className={`text-[11.5px] sm:text-[12.5px] font-medium tracking-tight transition-colors ${
-          isV2
-            ? 'text-white/95 group-hover/item:text-white font-sans'
-            : 'text-cream group-hover/item:text-white font-serif'
-        }`}
-      >
+      <span className="text-xs font-medium tracking-tight text-ink transition-colors group-hover/item:text-accent">
         {renderedText}
       </span>
 
-      {/* Subtle Arrow Indicator on Clickable Items */}
+      {/* Arrow indicator on clickable items */}
       {item.link && (
         <span
           aria-hidden="true"
-          className="text-white/40 text-[10px] group-hover/item:text-white group-hover/item:translate-x-0.5 transition-all"
+          className="text-xs text-ink-muted transition-colors group-hover/item:translate-x-0.5 group-hover/item:text-accent"
         >
           →
         </span>
@@ -238,7 +189,6 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
   customItems,
   speedSeconds = SITE_TWEAKS.announcements.speedSeconds,
 }) => {
-  const isV2 = useIsThemeV2();
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Announcements ordered with flexible priority from top
@@ -250,19 +200,11 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
     return null;
   }
 
-  // Base background & border depending on theme
-  const containerClasses = isV2
-    ? 'bg-[#090b0e] text-white border-b border-white/[0.08] shadow-[0_1px_8px_rgba(0,0,0,0.4)]'
-    : 'text-on-gold border-b border-stone/30 font-serif shadow-sm';
-
-  const containerStyle = isV2 ? {} : { backgroundColor: 'var(--brand-gold)' };
-
   return (
     <aside
       role="region"
       aria-label="Store Announcements and Offers"
-      className={`relative z-[210] h-[36px] w-full select-none overflow-hidden text-xs transition-all ${containerClasses}`}
-      style={containerStyle}
+      className="relative z-10 h-9 w-full select-none overflow-hidden border-b border-stone bg-panel text-xs text-ink transition-colors"
     >
       <div className="h-full max-w-[var(--container-max)] mx-auto px-2 sm:px-4 flex items-center justify-between gap-2">
         {/* RUNNING / ROLLING MARQUEE */}
@@ -279,14 +221,10 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
             <div className="flex shrink-0 items-center space-x-6 sm:space-x-8 pr-6 sm:pr-8">
               {announcements.map((item) => (
                 <React.Fragment key={`set1-${item.id}`}>
-                  <AnnouncementCard item={item} isV2={isV2} />
+                  <AnnouncementCard item={item} />
                   <span
                     aria-hidden="true"
-                    className={
-                      isV2
-                        ? 'text-white/20 select-none text-[10px]'
-                        : 'text-cream/40 select-none text-[10px]'
-                    }
+                    className='select-none text-xs text-ink-muted'
                   >
                     ✦
                   </span>
@@ -301,14 +239,10 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
             >
               {announcements.map((item) => (
                 <React.Fragment key={`set2-${item.id}`}>
-                  <AnnouncementCard item={item} isV2={isV2} />
+                  <AnnouncementCard item={item} />
                   <span
                     aria-hidden="true"
-                    className={
-                      isV2
-                        ? 'text-white/20 select-none text-[10px]'
-                        : 'text-cream/40 select-none text-[10px]'
-                    }
+                    className='select-none text-xs text-ink-muted'
                   >
                     ✦
                   </span>

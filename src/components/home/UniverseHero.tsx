@@ -135,7 +135,7 @@ export const UniverseHero: React.FC = () => {
 
           {/* Subtle perimeter vignettes for luxury framing */}
           <div
-            className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-cream/40 via-transparent to-cream/20"
+            className="absolute inset-0 z-10 pointer-events-none bg-black/25"
             aria-hidden="true"
           />
 
@@ -148,7 +148,7 @@ export const UniverseHero: React.FC = () => {
               {/* Tracked caps eyebrow + hairline rule */}
               <div className="flex items-center gap-4 max-w-md">
                 <span
-                  className="text-[12px] font-sans uppercase tracking-eyebrow font-medium leading-relaxed"
+                  className="text-xs font-sans uppercase tracking-eyebrow font-medium leading-relaxed"
                   style={{ color: 'var(--brand-gold-deep)' }}
                 >
                   Embroidered apparel for dreamers, believers and builders
@@ -162,7 +162,7 @@ export const UniverseHero: React.FC = () => {
                 style={{ fontSize: 'var(--text-display)' }}
               >
                 Wear the Universe,{' '}
-                <span className="text-gold-deep italic block sm:inline">
+                <span className="text-gold-deep block sm:inline">
                   Embroidered for You.
                 </span>
               </h1>

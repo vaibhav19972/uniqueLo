@@ -18,7 +18,7 @@ export const CategoryStrip: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 pb-4 border-b border-stone/40">
           <div>
-            <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+            <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
               Curated Wardrobe
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-1">
@@ -46,37 +46,37 @@ export const CategoryStrip: React.FC = () => {
             >
               <div className="relative overflow-hidden bg-stone aspect-[4/5] border border-stone/60 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:border-ink/50 group-hover:-translate-y-1">
                 {/* Decorative Needlework Stitch Border Template Overlay */}
-                <div className="absolute inset-2 border border-dashed border-cream/40 z-10 pointer-events-none group-hover:border-accent/70 transition-colors" />
+                <div className="absolute inset-2 border border-dashed border-white/20 z-10 pointer-events-none group-hover:border-accent/70 transition-colors" />
 
                 <Image
                   src={cat.image || '/images/placeholders/hero.jpg'}
                   alt={cat.name}
                   aspectRatio="4/5"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-base group-hover:scale-108"
                 />
                 
                 {/* Subtle Gradient & Shimmer */}
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent opacity-85 group-hover:opacity-95 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-85 group-hover:opacity-95 transition-opacity" />
 
                 {/* Floating Tag */}
                 <div className="absolute top-4 left-4 z-20">
-                  <span className="bg-cream/90 text-ink text-[9px] uppercase tracking-widest px-2 py-0.5 backdrop-blur-xs font-medium border border-stone/60">
+                  <span className="bg-cream/90 text-ink text-xs uppercase tracking-widest px-2 py-0.5 backdrop-blur-xs font-medium border border-stone/60">
                     Ed. 0{cat.order}
                   </span>
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-5 text-cream z-20">
-                  <span className="text-[9px] uppercase tracking-[0.25em] text-accent font-medium block mb-0.5">
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white z-20">
+                  <span className="text-xs uppercase tracking-eyebrow text-accent font-medium block mb-0.5">
                     Atelier Edition
                   </span>
-                  <h3 className="font-serif text-xl text-cream leading-tight group-hover:text-accent transition-colors">
+                  <h3 className="font-serif text-xl text-white leading-tight group-hover:text-accent transition-colors">
                     {cat.name}
                   </h3>
-                  <p className="text-[11px] text-stone/80 font-light line-clamp-2 mt-1 leading-relaxed">
+                  <p className="text-xs text-stone/80 font-light line-clamp-2 mt-1 leading-relaxed">
                     {cat.description}
                   </p>
                   
-                  <div className="mt-3 flex items-center gap-1.5 text-[10px] text-cream uppercase tracking-widest font-sans opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-white uppercase tracking-widest font-sans opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <span>Explore Wardrobe</span>
                     <span className="text-accent">→</span>
                   </div>

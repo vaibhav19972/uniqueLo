@@ -67,7 +67,7 @@ export const FilterBar: React.FC = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
               aria-controls="facet-filter-tray"
-              className="inline-flex items-center space-x-2 text-xs font-sans tracking-[0.2em] uppercase font-medium text-ink hover:text-accent transition-colors cursor-pointer"
+              className="inline-flex items-center space-x-2 text-xs font-sans tracking-eyebrow uppercase font-medium text-ink hover:text-accent transition-colors cursor-pointer"
             >
               <svg
                 className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
@@ -79,7 +79,7 @@ export const FilterBar: React.FC = () => {
               </svg>
               <span>Facet Filters</span>
               {activeFilterCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-accent text-paper text-[10px] inline-flex items-center justify-center font-bold">
+                <span className="w-5 h-5 rounded-full bg-accent text-white text-xs inline-flex items-center justify-center font-bold">
                   {activeFilterCount}
                 </span>
               )}
@@ -116,7 +116,7 @@ export const FilterBar: React.FC = () => {
 
           {/* Collections axis: seasonal drops & aesthetic capsules */}
           <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Collections">
-            <span className="text-[10px] uppercase tracking-widest text-ink font-medium sm:mr-4">
+            <span className="text-xs uppercase tracking-widest text-ink font-medium sm:mr-4">
               Collections
             </span>
             {COLLECTIONS.map((c) => {
@@ -130,9 +130,9 @@ export const FilterBar: React.FC = () => {
                   }}
                   aria-pressed={isActive}
                   title={c.tagline}
-                  className={`rounded-full px-3.5 py-2 min-h-[44px] text-[11px] uppercase tracking-widest font-sans border transition-colors cursor-pointer ${
+                  className={`rounded-full px-3.5 py-2 min-h-[44px] text-xs uppercase tracking-widest font-sans border transition-colors cursor-pointer ${
                     isActive
-                      ? 'border-transparent bg-ink text-cream'
+                      ? 'border-transparent bg-panel-raised text-white'
                       : 'border-stone bg-paper text-ink hover:border-ink'
                   }`}
                 >
@@ -163,68 +163,68 @@ export const FilterBar: React.FC = () => {
         {/* Active Filter Chips Bar */}
         {activeFilterCount > 0 && (
           <div className="mt-3 pt-3 border-t border-stone/40 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] uppercase tracking-widest text-ink-muted font-medium mr-1">
+            <span className="text-xs uppercase tracking-widest text-ink-muted font-medium mr-1">
               Active:
             </span>
 
             {filters.searchQuery && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Query: "{filters.searchQuery}"
                 <button onClick={() => setSearchQuery('')} aria-label="Clear search query" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
             {filters.universeSlug && filters.universeSlug !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 World: {filters.universeSlug}
                 <button onClick={() => setUniverse('all')} aria-label="Clear universe filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
             {filters.characterId && filters.characterId !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Character: {filters.characterId}
                 <button onClick={() => setCharacter('all')} aria-label="Clear character filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
             {filters.expressionSlug && filters.expressionSlug !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Style: {filters.expressionSlug.replace(/-/g, ' ')}
                 <button onClick={() => setExpressionSlug('all')} aria-label="Clear style filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
             {((filters.collectionSlug && filters.collectionSlug !== 'all') || (filters.artStyleSlug && filters.artStyleSlug !== 'all')) && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Collection: {COLLECTIONS.find((c) => c.slug === (filters.collectionSlug || filters.artStyleSlug))?.name.replace(' Collection', '') ?? (filters.collectionSlug || filters.artStyleSlug)}
                 <button onClick={() => setCollectionSlug('all')} aria-label="Clear collection filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 
             {filters.garmentTypes?.map((g) => (
-              <span key={g} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span key={g} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 {g}
                 <button onClick={() => toggleGarmentType(g)} aria-label={`Remove ${g} filter`} className="text-ink-muted hover:text-ink">✕</button>
               </span>
             ))}
 
             {filters.techniques?.map((t) => (
-              <span key={t} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span key={t} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 {t}
                 <button onClick={() => toggleTechnique(t)} aria-label={`Remove ${t} filter`} className="text-ink-muted hover:text-ink">✕</button>
               </span>
             ))}
 
             {filters.sizes.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Size: {s}
                 <button onClick={() => toggleSize(s)} aria-label={`Remove size ${s} filter`} className="text-ink-muted hover:text-ink">✕</button>
               </span>
             ))}
 
             {filters.priceMax && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-[11px] text-ink">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-paper border border-stone text-xs text-ink">
                 Max: {formatPrice(filters.priceMax)}
                 <button onClick={() => setPriceMax(undefined)} aria-label="Clear price filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
@@ -232,7 +232,7 @@ export const FilterBar: React.FC = () => {
 
             <button
               onClick={resetFilters}
-              className="text-[11px] uppercase tracking-widest text-accent hover:underline font-medium ml-2"
+              className="text-xs uppercase tracking-widest text-accent hover:underline font-medium ml-2"
             >
               Reset All
             </button>
@@ -244,7 +244,7 @@ export const FilterBar: React.FC = () => {
           <div id="facet-filter-tray" className="pt-6 pb-3 border-t border-stone/50 mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 animate-in fade-in duration-200">
             {/* 1. Garment Silhouette */}
             <div>
-              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+              <h4 className="text-xs font-sans uppercase tracking-eyebrow font-medium text-ink mb-3">
                 Garment Silhouette
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -256,9 +256,9 @@ export const FilterBar: React.FC = () => {
                       onClick={() => toggleGarmentType(g.slug)}
                       aria-pressed={!!isSelected}
                       aria-label={`Filter by silhouette ${g.name}`}
-                      className={`px-2.5 py-1 min-h-[44px] text-[11px] border transition-colors cursor-pointer capitalize ${
+                      className={`px-2.5 py-1 min-h-[44px] text-xs border transition-colors cursor-pointer capitalize ${
                         isSelected
-                          ? 'border-ink bg-ink text-cream font-medium'
+                          ? 'border-ink bg-panel-raised text-white font-medium'
                           : 'border-stone bg-paper text-ink hover:border-ink/50'
                       }`}
                     >
@@ -271,7 +271,7 @@ export const FilterBar: React.FC = () => {
 
             {/* 2. Style (1-5 Scale) */}
             <div>
-              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+              <h4 className="text-xs font-sans uppercase tracking-eyebrow font-medium text-ink mb-3">
                 Embroidery Style (1–5)
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -283,9 +283,9 @@ export const FilterBar: React.FC = () => {
                       onClick={() => setExpressionSlug(isSelected ? 'all' : exp.slug)}
                       aria-pressed={isSelected}
                       title={exp.tagline}
-                      className={`px-2.5 py-1 min-h-[44px] text-[11px] border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1 min-h-[44px] text-xs border transition-colors cursor-pointer ${
                         isSelected
-                          ? 'border-ink bg-ink text-cream font-medium'
+                          ? 'border-ink bg-panel-raised text-white font-medium'
                           : 'border-stone bg-paper text-ink hover:border-ink/50'
                       }`}
                     >
@@ -298,7 +298,7 @@ export const FilterBar: React.FC = () => {
 
             {/* 3. Embroidery Technique */}
             <div>
-              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+              <h4 className="text-xs font-sans uppercase tracking-eyebrow font-medium text-ink mb-3">
                 Needlecraft Technique
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -310,9 +310,9 @@ export const FilterBar: React.FC = () => {
                       onClick={() => toggleTechnique(tech.key)}
                       aria-pressed={!!isSelected}
                       aria-label={`Filter by ${tech.label}`}
-                      className={`px-2.5 py-1 min-h-[44px] text-[11px] border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1 min-h-[44px] text-xs border transition-colors cursor-pointer ${
                         isSelected
-                          ? 'border-ink bg-ink text-cream'
+                          ? 'border-ink bg-panel-raised text-white'
                           : 'border-stone bg-paper text-ink hover:border-ink/50'
                       }`}
                     >
@@ -325,7 +325,7 @@ export const FilterBar: React.FC = () => {
 
             {/* 4. Sizes */}
             <div>
-              <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink mb-3">
+              <h4 className="text-xs font-sans uppercase tracking-eyebrow font-medium text-ink mb-3">
                 Garment Size
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -339,7 +339,7 @@ export const FilterBar: React.FC = () => {
                       aria-pressed={isSelected}
                       className={`min-w-[44px] min-h-[44px] w-11 h-11 text-xs border transition-colors cursor-pointer font-sans ${
                         isSelected
-                          ? 'border-ink bg-ink text-cream'
+                          ? 'border-ink bg-panel-raised text-white'
                           : 'border-stone bg-paper text-ink hover:border-ink/50'
                       }`}
                     >
@@ -353,7 +353,7 @@ export const FilterBar: React.FC = () => {
             {/* 5. Price Max Slider & Reset */}
             <div>
               <div className="flex justify-between items-center mb-3">
-                <h4 className="text-xs font-sans uppercase tracking-[0.2em] font-medium text-ink">
+                <h4 className="text-xs font-sans uppercase tracking-eyebrow font-medium text-ink">
                   Price Limit
                 </h4>
                 <span className="text-xs font-sans font-medium text-ink">
@@ -370,7 +370,7 @@ export const FilterBar: React.FC = () => {
                 className="w-full accent-accent cursor-pointer"
                 disabled={maxPriceCents === undefined}
               />
-              <div className="flex justify-between text-[10px] text-ink-muted mt-1">
+              <div className="flex justify-between text-xs text-ink-muted mt-1">
                 <span>{formatPrice(150000)}</span>
                 <span>{maxPriceCents !== undefined ? formatPrice(maxPriceCents) : '…'}</span>
               </div>

@@ -6,7 +6,6 @@ import { useCartStore } from '../../stores/cart';
 import { useQuickViewStore } from '../../stores/quickView';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
-import { useIsThemeV2 } from '../../config/theme';
 
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
@@ -37,7 +36,6 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const openQuickView = useQuickViewStore((s) => s.openQuickView);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((s) => s.showToast);
-  const isV2 = useIsThemeV2();
 
   const sizes = useMemo(() => {
     const unique = [...new Set(product.variants.map((v) => v.size))];
@@ -93,7 +91,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
 
   return (
     <div
-      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 w-[220px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start"
+      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-stone0 hover:-translate-y-1 w-[220px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start"
     >
       {/* Visual */}
       <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
@@ -107,7 +105,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
         </Link>
 
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gold text-on-gold text-[11px] font-sans tracking-wide px-3 py-1.5">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gold text-on-gold text-xs font-sans tracking-wide px-3 py-1.5">
             <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
           </span>
         )}
@@ -116,7 +114,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           onClick={() => toggleWishlist(product.slug)}
           aria-label={isWish ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
           aria-pressed={isWish}
-          className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-paper/90 flex items-center justify-center transition-colors ${
+          className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-panel-raised flex items-center justify-center transition-colors ${
             isWish ? 'text-red-700' : 'text-ink'
           } hover:text-red-700`}
         >
@@ -136,7 +134,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
               openQuickView(product);
             }}
             aria-label={`Quick view ${product.name}`}
-            className="w-full flex items-center justify-center gap-2 bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-sm sm:text-sm tracking-wide transition-colors"
           >
             <svg className="w-4 h-4 shrink-0 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
@@ -146,7 +144,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           </button>
 
           {/* Size selection & Add to Cart — crisp white floating surface */}
-          <div className="bg-white p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
+          <div className="bg-panel p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
             <div className="grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="Choose size">
               {sizes.map((s) => {
                 const available = inStockSizes.has(s);
@@ -162,12 +160,10 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
                     }}
                     aria-pressed={size === s}
                     aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                    className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border transition-colors flex items-center justify-center ${
+                    className={`min-h-[44px] min-w-[44px] px-1 text-xs sm:text-sm font-serif border transition-colors flex items-center justify-center ${
                       size === s
-                        ? isV2
-                          ? 'bg-ink text-paper border-transparent font-semibold shadow-xs'
-                          : 'bg-gold text-on-gold border-transparent font-medium shadow-xs'
-                        : 'bg-white border-stone-deep text-ink hover:border-gold-deep'
+                        ? 'bg-panel-raised text-white border-transparent font-semibold'
+                        : 'bg-panel border-stone-strong text-ink hover:border-accent'
                     } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
                   >
                     {s}
@@ -178,10 +174,8 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <button
               type="button"
               onClick={handleAdd}
-              className={`w-full mt-2 min-h-[44px] py-2 font-serif text-[13px] sm:text-[14px] transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
-                isV2
-                  ? 'bg-ink text-paper hover:bg-black font-sans font-semibold'
-                  : 'bg-gold text-on-gold hover:bg-gold-hover'
+              className={`w-full mt-2 min-h-[44px] py-2 font-serif text-sm sm:text-sm transition-colors flex items-center justify-center tracking-wide shadow-xs active:scale-[0.99] ${
+                'bg-accent text-white hover:bg-accent-hover font-semibold'
               }`}
             >
               Add to Cart — {formatPrice(currentVariant.priceCents)}
@@ -194,12 +188,12 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
       <div className="p-4">
         <div className="flex flex-wrap items-center gap-2">
           {product.embroidery && (
-            <span className="inline-block rounded-full text-[11px] font-serif text-ink bg-cream border border-stone/70 px-3 py-1">
+            <span className="inline-block rounded-full text-xs font-serif text-ink bg-cream border border-stone/70 px-3 py-1">
               {product.embroidery.techniqueLabel}
             </span>
           )}
           {product.handcrafted && (
-            <span className="inline-flex items-center gap-1.5 rounded-full text-[11px] font-serif text-gold-deep border border-gold-deep/50 px-3 py-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full text-xs font-serif text-gold-deep border border-gold-deep/50 px-3 py-1">
               <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold-deep" />
               Handcrafted
             </span>
@@ -212,7 +206,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
           {product.fit ? `${product.fit} | ` : ''}{product.fabricGsm ?? ''}
         </p>
         {product.rating !== undefined && (
-          <p className="flex items-center gap-1.5 mt-1.5 text-[13px] text-ink">
+          <p className="flex items-center gap-1.5 mt-1.5 text-sm text-ink">
             <Stars rating={product.rating} />
             <span className="font-medium">{product.rating.toFixed(1)}</span>
             {product.reviewCount !== undefined && (
@@ -229,19 +223,17 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
             <>
               <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
               <span
-                className={`text-[11px] font-sans px-1.5 py-0.5 ${
-                  isV2
-                    ? 'font-semibold text-emerald-700 bg-emerald-50'
-                    : 'bg-gold-deep/10 text-gold-deep'
+                className={`text-xs font-sans px-1.5 py-0.5 ${
+                  'font-semibold text-success bg-success/10'
                 }`}
               >
-                {isV2 ? `(${offPct}% OFF)` : `${offPct}% OFF`}
+                ({offPct}% off)
               </span>
             </>
           )}
         </p>
         {product.artStyleSlug && (
-          <p className="text-[11px] uppercase tracking-widest text-ink-muted mt-2">
+          <p className="text-xs uppercase tracking-widest text-ink-muted mt-2">
             {product.artStyleSlug.replace(/-/g, ' ')}
           </p>
         )}

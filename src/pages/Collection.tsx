@@ -50,7 +50,7 @@ export const Collection: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <Link to="/collections" className="hover:underline">Collections</Link>
@@ -62,12 +62,12 @@ export const Collection: React.FC = () => {
               {collection.name}
             </h1>
             {collection.universeSlug && (
-              <span className="text-[11px] uppercase tracking-widest bg-gold/10 text-gold-deep border border-gold/25 px-2.5 py-1">
+              <span className="text-xs uppercase tracking-widest bg-gold/10 text-gold-deep border border-gold/25 px-2.5 py-1">
                 {collection.universeSlug}
               </span>
             )}
           </div>
-          <p className="font-serif italic text-lg text-ink-muted mt-2">{collection.tagline}</p>
+          <p className="font-serif text-lg text-ink-muted mt-2">{collection.tagline}</p>
           <p className="text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
             {collection.description}
           </p>

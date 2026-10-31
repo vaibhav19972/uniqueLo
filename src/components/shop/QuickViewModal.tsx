@@ -47,11 +47,11 @@ export const QuickViewModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[420] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         onClick={closeQuickView}
-        className="fixed inset-0 bg-ink/75 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-panel-raised/75 backdrop-blur-md transition-opacity"
       />
 
       {/* Modal Surface */}
@@ -81,7 +81,7 @@ export const QuickViewModal: React.FC = () => {
               className="w-full h-full object-cover"
             />
             {activeImageIndex === 1 && (
-              <div className="absolute top-4 left-4 bg-ink/90 text-cream text-[10px] uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
+              <div className="absolute top-4 left-4 bg-panel-raised/90 text-white text-xs uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
                 ✦ 3x Macro Stitch View
               </div>
             )}
@@ -121,12 +121,12 @@ export const QuickViewModal: React.FC = () => {
         <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+              <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                 {product.categorySlug}
                 {product.garmentType ? ` // ${product.garmentType}` : ''}
               </span>
               {product.embroidery && (
-                <span className="text-[10px] tracking-widest text-ink-muted uppercase border-l border-stone pl-2">
+                <span className="text-xs tracking-widest text-ink-muted uppercase border-l border-stone pl-2">
                   {product.embroidery.artisanHours}h embroidery
                 </span>
               )}
@@ -140,7 +140,7 @@ export const QuickViewModal: React.FC = () => {
               <span className="font-sans text-xl font-medium text-ink">
                 {formatPrice(currentVariant.priceCents)}
               </span>
-              <span className="text-[11px] text-ink-muted">Complimentary Shipping</span>
+              <span className="text-xs text-ink-muted">Complimentary Shipping</span>
             </div>
 
             <p className="text-xs text-ink-muted mt-3 font-light leading-relaxed">
@@ -149,7 +149,7 @@ export const QuickViewModal: React.FC = () => {
 
             {/* Size Selector (no colour option — one colour per piece) */}
             <div className="mt-5">
-              <label className="text-[11px] font-sans tracking-widest uppercase text-ink block mb-2 font-medium">
+              <label className="text-xs font-sans tracking-widest uppercase text-ink block mb-2 font-medium">
                 Size: <span className="text-ink-muted font-normal">{currentVariant.size}</span>
               </label>
               <div className="flex flex-wrap gap-2">
@@ -168,7 +168,7 @@ export const QuickViewModal: React.FC = () => {
                           isOut
                             ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
                             : isSelected
-                              ? 'bg-ink text-cream border-ink font-medium'
+                              ? 'bg-panel-raised text-white border-ink font-medium'
                               : 'bg-paper text-ink border-stone hover:border-ink/60'
                         }`}
                       >
@@ -182,13 +182,13 @@ export const QuickViewModal: React.FC = () => {
             {/* Embroidery Tech Pill */}
             {product.embroidery && (
               <div className="mt-6 p-3 bg-cream border border-stone/60 rounded-sm text-xs">
-                <span className="block text-[9px] uppercase tracking-widest text-accent font-medium mb-1">
+                <span className="block text-xs uppercase tracking-widest text-accent font-medium mb-1">
                   Artisanal Technique
                 </span>
                 <p className="text-ink font-serif text-sm">
                   {product.embroidery.techniqueLabel}
                 </p>
-                <p className="text-ink-muted text-[11px] mt-0.5">
+                <p className="text-ink-muted text-xs mt-0.5">
                   {product.embroidery.threadComposition}
                 </p>
               </div>

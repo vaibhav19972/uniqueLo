@@ -47,24 +47,24 @@ export const CustomizerModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Backdrop */}
       <div
         onClick={closeCustomizer}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-panel-raised/70 backdrop-blur-md transition-opacity"
       />
 
       {/* Atelier Studio Window */}
       <div className="relative w-full max-w-4xl bg-cream border border-stone/80 shadow-2xl rounded-sm overflow-hidden z-10 flex flex-col md:flex-row max-h-[90vh]">
         {/* Left: Interactive Embroidery Canvas Live Preview */}
-        <div className="w-full md:w-1/2 bg-ink p-8 flex flex-col items-center justify-between relative overflow-hidden text-cream border-b md:border-b-0 md:border-r border-stone/20">
+        <div className="w-full md:w-1/2 bg-panel-raised p-8 flex flex-col items-center justify-between relative overflow-hidden text-white border-b md:border-b-0 md:border-r border-stone/20">
           <div className="w-full flex items-center justify-between text-xs tracking-widest text-warm-gray uppercase">
             <span>Atelier Live Canvas</span>
             <span>{placement}</span>
           </div>
 
           {/* Simulated Garment Fabric Texture with Needlework SVG */}
-          <div className="my-8 w-64 h-64 sm:w-72 sm:h-72 rounded-sm bg-ink border border-stone/20 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="my-8 w-64 h-64 sm:w-72 sm:h-72 rounded-sm bg-panel-raised border border-stone/20 flex flex-col items-center justify-center relative overflow-hidden">
             {/* Fabric weave grain */}
             <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(var(--color-paper)_1px,transparent_1px)] [background-size:12px_12px]" />
 
@@ -116,14 +116,14 @@ export const CustomizerModal: React.FC = () => {
               />
             </div>
 
-            <span className="absolute bottom-3 text-[10px] tracking-widest uppercase text-warm-gray/70">
+            <span className="absolute bottom-3 text-xs tracking-widest uppercase text-warm-gray/70">
               {threadColor} Thread
             </span>
           </div>
 
           <div className="text-center">
-            <p className="text-xs font-serif text-cream">{product.name}</p>
-            <p className="text-[10px] text-warm-gray mt-0.5">
+            <p className="text-xs font-serif text-white">{product.name}</p>
+            <p className="text-xs text-warm-gray mt-0.5">
               Hand-guided satin stitch by master artisans
             </p>
           </div>
@@ -185,7 +185,7 @@ export const CustomizerModal: React.FC = () => {
                         className="w-3.5 h-3.5 rounded-full border border-stone flex-shrink-0"
                         style={{ backgroundColor: color.hex }}
                       />
-                      <span className="truncate text-[11px] text-ink">{color.name}</span>
+                      <span className="truncate text-xs text-ink">{color.name}</span>
                     </button>
                   );
                 })}
@@ -204,7 +204,7 @@ export const CustomizerModal: React.FC = () => {
                     onClick={() => setPlacement(item)}
                     className={`py-2 px-3 text-xs border text-center transition-all cursor-pointer ${
                       placement === item
-                        ? 'border-ink bg-ink text-cream'
+                        ? 'border-ink bg-panel-raised text-white'
                         : 'border-stone bg-paper text-ink hover:border-ink/50'
                     }`}
                   >

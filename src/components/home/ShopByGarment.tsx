@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link } from 'react-router';
 import { useProducts } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
@@ -57,6 +58,8 @@ const FEATURED_GARMENTS: GarmentCardDef[] = [
 ];
 
 export const ShopByGarment: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: allProducts } = useProducts();
 
   const counts = useMemo(() => {
@@ -71,8 +74,9 @@ export const ShopByGarment: React.FC = () => {
 
   return (
     <section
+      ref={revealRef}
       aria-labelledby="garments-gateway-heading"
-      className="bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
+      className="reveal bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
@@ -109,20 +113,20 @@ export const ShopByGarment: React.FC = () => {
                       (e.target as HTMLImageElement).src = item.fallbackImage;
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   
                   {/* Eyebrow & Live Count Badge */}
-                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-paper/95 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest font-sans font-semibold px-1.5 sm:px-2.5 py-0.5 border border-stone/60">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-paper/95 text-ink text-xs sm:text-xs uppercase tracking-widest font-sans font-semibold px-1.5 sm:px-2.5 py-0.5 border border-stone/60">
                     {item.eyebrow}
                   </div>
 
-                  <div className="absolute bottom-2 inset-x-2 sm:bottom-3 sm:inset-x-3 text-cream flex items-end justify-between gap-1">
+                  <div className="absolute bottom-2 inset-x-2 sm:bottom-3 sm:inset-x-3 text-white flex items-end justify-between gap-1">
                     <div>
                       <h3 className="font-serif text-sm sm:text-2xl leading-tight line-clamp-1">
                         {item.name}
                       </h3>
                     </div>
-                    <span className="font-mono text-[9px] sm:text-xs uppercase bg-black/60 px-1.5 py-0.5 sm:px-2 text-cream border border-white/20 shrink-0">
+                    <span className="font-mono text-xs sm:text-xs uppercase bg-black/60 px-1.5 py-0.5 sm:px-2 text-white border border-white/20 shrink-0">
                       {count} {count === 1 ? 'Design' : 'Designs'}
                     </span>
                   </div>
@@ -130,12 +134,12 @@ export const ShopByGarment: React.FC = () => {
 
                 {/* Body & Link */}
                 <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
-                  <p className="text-[11px] sm:text-xs text-ink-muted leading-relaxed font-light line-clamp-2">
+                  <p className="text-xs sm:text-xs text-ink-muted leading-relaxed font-light line-clamp-2">
                     {item.description}
                   </p>
                   
                   <div className="pt-2 border-t border-stone/30 flex items-center justify-between">
-                    <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-accent font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
+                    <span className="font-sans text-xs sm:text-xs uppercase tracking-widest text-accent font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
                       Explore {item.name} <span aria-hidden="true">→</span>
                     </span>
                   </div>

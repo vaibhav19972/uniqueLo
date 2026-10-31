@@ -37,7 +37,7 @@ export const Universes: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-14">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <span>Universes</span>
@@ -76,14 +76,14 @@ export const Universes: React.FC = () => {
                 {/* Editorial text stack */}
                 <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
                   <div className="max-w-[92%]">
-                    <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
+                    <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-tight text-ink transition-transform duration-500 group-hover:font-medium truncate">
                       {u.name}
                     </h2>
-                    <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
+                    <p className="font-sans text-xs sm:text-xs uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
                       {u.tagline}
                     </p>
-                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                    <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
+                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-panel-raised/25" />
+                    <p className="font-serif text-xs sm:text-sm text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                       {u.lore}
                     </p>
                   </div>
@@ -91,13 +91,13 @@ export const Universes: React.FC = () => {
                   <div className="mt-auto pt-3 sm:pt-6">
                     <p className="leading-none">
                       <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{count}+ </span>
-                      <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
+                      <span className="font-sans text-xs sm:text-xs uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                         Styles
                       </span>
                     </p>
                     <Link
                       to={`/universes/${u.slug}`}
-                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-sm sm:text-base bg-panel-raised text-white hover:bg-panel-raised/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                       aria-label={`Enter ${u.name}`}
                     >
                       Enter {u.name} <span aria-hidden="true">→</span>
@@ -123,14 +123,14 @@ export const Universes: React.FC = () => {
             </div>
             <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
               <div className="max-w-[92%]">
-                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
+                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-tight text-ink transition-transform duration-500 group-hover:font-medium truncate">
                   The Atelier
                 </h2>
-                <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
+                <p className="font-sans text-xs sm:text-xs uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
                   Pure craftsmanship, no theme
                 </p>
-                <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
+                <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-panel-raised/25" />
+                <p className="font-serif text-xs sm:text-sm text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
                   The base line of the house: artisanal embroidery for its own sake — technique, textile, and construction above every story.
                 </p>
               </div>
@@ -138,14 +138,14 @@ export const Universes: React.FC = () => {
               <div className="mt-auto pt-3 sm:pt-6">
                 <p className="leading-none">
                   <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{atelierCount}+ </span>
-                  <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
+                  <span className="font-sans text-xs sm:text-xs uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                     Styles
                   </span>
                 </p>
                 <button
                   type="button"
                   onClick={enterAtelier}
-                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[15px] sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-sm sm:text-base bg-panel-raised text-white hover:bg-panel-raised/90 min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                   aria-label="Enter The Atelier"
                 >
                   Enter The Atelier <span aria-hidden="true">→</span>

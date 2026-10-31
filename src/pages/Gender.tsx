@@ -28,7 +28,7 @@ export const GenderPage: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <span>{title}</span>

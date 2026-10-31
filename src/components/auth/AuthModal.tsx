@@ -82,11 +82,11 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[350] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center">
       <button
         aria-label="Close account dialog"
         onClick={handleClose}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
+        className="absolute inset-0 bg-panel-raised/40 backdrop-blur-[2px] cursor-default"
       />
 
       <div
@@ -99,7 +99,7 @@ export const AuthModal: React.FC = () => {
       >
         <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-stone">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-ink-muted">Atelier Account</p>
+            <p className="text-xs uppercase tracking-eyebrow text-ink-muted">Atelier Account</p>
             <h2 id="auth-modal-title" className="font-serif text-2xl text-ink mt-1">
               {isSignup ? 'Create your account' : 'Welcome back'}
             </h2>
@@ -143,7 +143,7 @@ export const AuthModal: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignup && (
                 <div>
-                  <label htmlFor="auth-name" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5">
+                  <label htmlFor="auth-name" className="block text-xs uppercase tracking-label text-ink-muted mb-1.5">
                     Name <span className="normal-case tracking-normal">(optional)</span>
                   </label>
                   <input
@@ -159,7 +159,7 @@ export const AuthModal: React.FC = () => {
               )}
 
               <div>
-                <label htmlFor="auth-email" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5">
+                <label htmlFor="auth-email" className="block text-xs uppercase tracking-label text-ink-muted mb-1.5">
                   Email
                 </label>
                 <input
@@ -178,14 +178,14 @@ export const AuthModal: React.FC = () => {
 
               <div>
                 <div className="flex items-baseline justify-between mb-1.5">
-                  <label htmlFor="auth-password" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+                  <label htmlFor="auth-password" className="block text-xs uppercase tracking-label text-ink-muted">
                     Password
                   </label>
                   {!isSignup && (
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-accent transition-colors cursor-pointer"
+                      className="text-xs uppercase tracking-label text-ink-muted hover:text-accent transition-colors cursor-pointer"
                     >
                       Forgot?
                     </button>
@@ -207,29 +207,29 @@ export const AuthModal: React.FC = () => {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-0 top-0 h-full px-3 text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                    className="absolute right-0 top-0 h-full px-3 text-xs uppercase tracking-label text-ink-muted hover:text-ink transition-colors cursor-pointer"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 {isSignup && password.length > 0 && password.length < 8 && (
-                  <p className="text-[11px] text-error mt-1.5">Use at least 8 characters.</p>
+                  <p className="text-xs text-error mt-1.5">Use at least 8 characters.</p>
                 )}
               </div>
 
               {resetSent && (
-                <p className="text-[11px] text-success">If that email exists, a reset link is on its way.</p>
+                <p className="text-xs text-success">If that email exists, a reset link is on its way.</p>
               )}
 
               {error && (
                 <div
                   role="alert"
-                  className={`border p-3 text-[12px] leading-relaxed ${
+                  className={`border p-3 text-xs leading-relaxed ${
                     error.isMailerLimit ? 'border-saffron/60 bg-saffron/10 text-ink' : 'border-error/40 bg-error/5 text-error'
                   }`}
                 >
                   {error.isMailerLimit && (
-                    <span className="block font-medium mb-1 uppercase tracking-wider text-[10px]">Setup incomplete</span>
+                    <span className="block font-medium mb-1 uppercase tracking-wider text-xs">Setup incomplete</span>
                   )}
                   {error.message}
                 </div>
@@ -251,7 +251,7 @@ export const AuthModal: React.FC = () => {
             </button>
           </p>
 
-          <p className="text-[10px] text-warm-gray text-center mt-4 leading-relaxed">
+          <p className="text-xs text-warm-gray text-center mt-4 leading-relaxed">
             No account is required to checkout. Guests can order and track by order ID and email.
           </p>
         </div>

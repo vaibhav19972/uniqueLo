@@ -131,7 +131,7 @@ export const OrderConfirmation: React.FC = () => {
         <nav aria-label="Breadcrumb" className="mb-8">
           <Link
             to="/"
-            className="text-[11px] font-mono tracking-widest uppercase text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5"
+            className="text-xs font-mono tracking-widest uppercase text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5"
           >
             <span>←</span> Return to Atelier Storefront
           </Link>
@@ -209,7 +209,7 @@ export const OrderConfirmation: React.FC = () => {
             <div className="bg-paper border border-stone/50 p-6 sm:p-10 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone/30">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent font-medium">
+                  <span className="text-xs font-mono uppercase tracking-eyebrow text-accent font-medium">
                     Archival Commission Receipt
                   </span>
                   <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1">
@@ -220,7 +220,7 @@ export const OrderConfirmation: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:items-end gap-1.5">
-                  <span className="text-[11px] font-mono text-ink-muted uppercase tracking-wider">
+                  <span className="text-xs font-mono text-ink-muted uppercase tracking-wider">
                     Order Reference
                   </span>
                   <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export const OrderConfirmation: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleCopyId}
-                      className="px-2 py-1 text-[11px] font-mono uppercase tracking-wider bg-ink text-cream hover:bg-ink-light transition-colors"
+                      className="px-2 py-1 text-xs font-mono uppercase tracking-wider bg-panel-raised text-white hover:bg-panel-raised-light transition-colors"
                       title="Copy Reference"
                     >
                       {copied ? 'Copied ✓' : 'Copy'}
@@ -241,46 +241,46 @@ export const OrderConfirmation: React.FC = () => {
 
               {/* 4-Stage Atelier Lifecycle Tracker */}
               <div className="mt-8 pt-2">
-                <p className="text-[11px] font-mono uppercase tracking-widest text-ink-muted mb-4">
+                <p className="text-xs font-mono uppercase tracking-widest text-ink-muted mb-4">
                   Needlecraft & Delivery Trajectory
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-2">
                   <div className="p-3 bg-cream/70 border border-emerald-300/60 rounded-none relative">
                     <div className="w-2 h-2 rounded-full bg-emerald-600 mb-2" />
-                    <span className="text-[11px] font-sans font-medium text-ink block">
+                    <span className="text-xs font-sans font-medium text-ink block">
                       1. Commission Logged
                     </span>
-                    <span className="text-[10px] text-ink-muted block mt-0.5">
+                    <span className="text-xs text-ink-muted block mt-0.5">
                       Confirmed & Vaulted
                     </span>
                   </div>
 
                   <div className="p-3 bg-cream border border-accent/40 rounded-none relative">
                     <div className="w-2 h-2 rounded-full bg-accent animate-pulse mb-2" />
-                    <span className="text-[11px] font-sans font-medium text-ink block">
+                    <span className="text-xs font-sans font-medium text-ink block">
                       2. Loom & Artisan Queue
                     </span>
-                    <span className="text-[10px] text-ink-muted block mt-0.5">
+                    <span className="text-xs text-ink-muted block mt-0.5">
                       Guild master allocated
                     </span>
                   </div>
 
                   <div className="p-3 bg-paper border border-stone/30 rounded-none opacity-60">
                     <div className="w-2 h-2 rounded-full bg-stone/60 mb-2" />
-                    <span className="text-[11px] font-sans font-medium text-ink block">
+                    <span className="text-xs font-sans font-medium text-ink block">
                       3. Macro Relief Audit
                     </span>
-                    <span className="text-[10px] text-ink-muted block mt-0.5">
+                    <span className="text-xs text-ink-muted block mt-0.5">
                       Stitch tension & density
                     </span>
                   </div>
 
                   <div className="p-3 bg-paper border border-stone/30 rounded-none opacity-60">
                     <div className="w-2 h-2 rounded-full bg-stone/60 mb-2" />
-                    <span className="text-[11px] font-sans font-medium text-ink block">
+                    <span className="text-xs font-sans font-medium text-ink block">
                       4. White-Glove Dispatch
                     </span>
-                    <span className="text-[10px] text-ink-muted block mt-0.5">
+                    <span className="text-xs text-ink-muted block mt-0.5">
                       Insured express courier
                     </span>
                   </div>
@@ -309,10 +309,10 @@ export const OrderConfirmation: React.FC = () => {
                         >
                           {item.product_name}
                         </Link>
-                        <p className="text-[11px] font-mono text-ink-muted mt-0.5">
+                        <p className="text-xs font-mono text-ink-muted mt-0.5">
                           Variant: {item.color} • Size {item.size} • Qty {item.quantity}
                         </p>
-                        <p className="text-[10px] font-mono text-ink-muted/80 mt-0.5">
+                        <p className="text-xs font-mono text-ink-muted/80 mt-0.5">
                           SKU: {item.variant_sku}
                         </p>
                       </div>
@@ -321,7 +321,7 @@ export const OrderConfirmation: React.FC = () => {
                           {formatPrice(item.price_cents * item.quantity)}
                         </span>
                         {item.quantity > 1 && (
-                          <span className="text-[10px] font-mono text-ink-muted block">
+                          <span className="text-xs font-mono text-ink-muted block">
                             ({formatPrice(item.price_cents)} each)
                           </span>
                         )}
@@ -333,10 +333,10 @@ export const OrderConfirmation: React.FC = () => {
                 {/* Gift Note if present */}
                 {order.gift_note && (
                   <div className="p-3.5 bg-cream/80 border border-stone/40 mt-4">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-accent font-medium block">
+                    <span className="text-xs font-mono uppercase tracking-wider text-accent font-medium block">
                       Archival Gift Note
                     </span>
-                    <p className="font-serif italic text-xs text-ink mt-1">"{order.gift_note}"</p>
+                    <p className="font-serif text-xs text-ink mt-1">"{order.gift_note}"</p>
                   </div>
                 )}
               </div>
@@ -352,11 +352,11 @@ export const OrderConfirmation: React.FC = () => {
                     <p className="font-medium text-ink">{order.customer_name}</p>
                     <p className="text-ink-muted">{order.customer_email}</p>
                     {deliveryPhone && <p className="text-ink-muted">Tel: {deliveryPhone}</p>}
-                    <p className="text-ink mt-2 pt-2 border-t border-stone/20 leading-relaxed font-mono text-[11px]">
+                    <p className="text-ink mt-2 pt-2 border-t border-stone/20 leading-relaxed font-mono text-xs">
                       {deliveryAddress}
                     </p>
                     {deliveryPincode && (
-                      <p className="text-accent font-mono text-[11px]">PIN: {deliveryPincode}</p>
+                      <p className="text-accent font-mono text-xs">PIN: {deliveryPincode}</p>
                     )}
                   </div>
                 </div>
@@ -397,11 +397,11 @@ export const OrderConfirmation: React.FC = () => {
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-stone/20">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-ink-muted block mb-1">
+                      <span className="text-xs font-mono uppercase tracking-wider text-ink-muted block mb-1">
                         Settlement Method
                       </span>
                       {paymentMethod === 'cod' ? (
-                        <div className="p-2.5 bg-cream border border-stone/40 text-[11px] text-ink font-sans">
+                        <div className="p-2.5 bg-cream border border-stone/40 text-xs text-ink font-sans">
                           <strong>Cash on Delivery (COD):</strong> Please keep exact cash of{' '}
                           <span className="font-mono font-medium text-accent">
                             {formatPrice(order.total_cents)}
@@ -409,13 +409,13 @@ export const OrderConfirmation: React.FC = () => {
                           ready at the time of courier handover.
                         </div>
                       ) : paymentMethod === 'upi' ? (
-                        <div className="p-2.5 bg-cream border border-stone/40 text-[11px] text-ink font-sans">
+                        <div className="p-2.5 bg-cream border border-stone/40 text-xs text-ink font-sans">
                           <strong>UPI Settlement:</strong> Transaction recorded with UniqueLo merchant
                           treasury (<span className="font-mono text-accent">uniquelo@upi</span>).
                           Archival invoice generated.
                         </div>
                       ) : (
-                        <div className="p-2.5 bg-cream border border-stone/40 text-[11px] text-ink font-sans">
+                        <div className="p-2.5 bg-cream border border-stone/40 text-xs text-ink font-sans">
                           <strong>Prepaid Card / Netbanking:</strong> Authorization verified. Zero
                           outstanding balance.
                         </div>

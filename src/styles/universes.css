@@ -1,29 +1,28 @@
-/* src/styles/universes.css — Unified Atelier Design System.
-   Universes share the quiet-luxury editorial palette of The Atelier
-   (cream canvas, crisp paper surfaces, obsidian ink, bullion gold accents).
-   All separate jarring universe themes are retired in favor of one
-   harmonious, elevated brand voice across the entire website. */
+/* src/styles/universes.css — shared shell for every universe page.
+   Universes keep one voice: the dark canvas, the single terracotta accent,
+   Geist throughout. Per-universe identity comes from imagery and content,
+   never from a competing palette. */
 
 :root {
-  /* Quiet-luxury shell: graphite + antique champagne */
-  --brand-gold: #c2a878;
-  --brand-gold-hover: #ab935f;
-  --brand-gold-deep: #7a6234;
-  --brand-coal: #111116;
-  --brand-coal-soft: #1a1a21;
+  /* Legacy brand names, remapped onto the approved ramp and accent. */
+  --brand-gold: #d95d39;
+  --brand-gold-hover: #b84624;
+  --brand-gold-deep: #d95d39;
+  --brand-coal: #000000;
+  --brand-coal-soft: #181818;
   --on-gold: #ffffff;
 
-  /* Unified Atelier tokens used across all universe pages and components */
-  --u-bg: #f7f5f0;
-  --u-surface: #ffffff;
-  --u-ink: #141414;
-  --u-ink-muted: #686560;
-  --u-accent: #cba043;
-  --u-accent-2: #d95d39;
-  --u-product-zone: #f7f5f0;
+  /* Universe page tokens */
+  --u-bg: var(--color-cream);
+  --u-surface: var(--color-paper);
+  --u-ink: var(--color-ink);
+  --u-ink-muted: var(--color-ink-muted);
+  --u-accent: var(--color-accent);
+  --u-accent-2: var(--color-accent);
+  --u-product-zone: var(--color-cream);
   --u-on-accent: #ffffff;
   --u-texture-opacity: 0.04;
-  --u-display-font: var(--font-serif);
+  --u-display-font: var(--font-sans);
   --u-display-weight: 600;
   --u-display-style: normal;
 }

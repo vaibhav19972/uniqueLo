@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link } from 'react-router';
 import { useProducts } from '../../hooks/useCatalog';
 import {
@@ -9,6 +10,8 @@ import {
 import { MarketingHeader } from '../ui/MarketingHeader';
 
 export const FindYourExpression: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: products } = useProducts();
   const [selectedScore, setSelectedScore] = useState<number>(3); // Default to artistic midpoint
 
@@ -33,8 +36,9 @@ export const FindYourExpression: React.FC = () => {
 
   return (
     <section
+      ref={revealRef}
       aria-labelledby="expression-gateway-heading"
-      className="bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
+      className="reveal bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
@@ -77,19 +81,19 @@ export const FindYourExpression: React.FC = () => {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   
                   {/* Active Selection Badge (replaces Level pill) */}
                   {isSelected && (
-                    <div className="absolute top-3 left-3 bg-ink/95 text-gold-zari text-[9px] uppercase tracking-widest font-sans font-semibold px-2 py-0.5 border border-gold-zari/40 shadow-sm flex items-center gap-1.5 animate-fadeIn">
+                    <div className="absolute top-3 left-3 bg-panel-raised/95 text-gold-zari text-xs uppercase tracking-widest font-sans font-semibold px-2 py-0.5 border border-gold-zari/40 shadow-sm flex items-center gap-1.5 animate-fadeIn">
                       <span className="w-1.5 h-1.5 rounded-full bg-gold-zari animate-pulse" />
                       Active
                     </div>
                   )}
 
                   {/* Bottom Image Overlay Details */}
-                  <div className="absolute bottom-3 inset-x-3 text-cream">
-                    <span className="text-[10px] uppercase font-sans tracking-widest text-gold-zari font-semibold block">
+                  <div className="absolute bottom-3 inset-x-3 text-white">
+                    <span className="text-xs uppercase font-sans tracking-widest text-gold-zari font-semibold block">
                       {level.characteristics.split(',')[0]}
                     </span>
                     <h3 className="font-serif text-lg leading-tight mt-0.5">
@@ -101,11 +105,11 @@ export const FindYourExpression: React.FC = () => {
                 {/* Card Editorial Body */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div>
-                    <p className="text-[11px] text-ink-muted leading-relaxed font-light line-clamp-3">
+                    <p className="text-xs text-ink-muted leading-relaxed font-light line-clamp-3">
                       {level.description}
                     </p>
                     {sampleProduct && (
-                      <div className="mt-3 pt-2.5 border-t border-stone/30 text-[10px] text-ink-muted">
+                      <div className="mt-3 pt-2.5 border-t border-stone/30 text-xs text-ink-muted">
                         <span className="uppercase tracking-widest text-ink/70 block">
                           Featured in this style:
                         </span>
@@ -121,10 +125,10 @@ export const FindYourExpression: React.FC = () => {
                     <Link
                       to={`/styles/${level.slug}`}
                       onClick={(e) => e.stopPropagation()}
-                      className={`w-full py-2 px-3 text-center text-[10px] uppercase tracking-widest font-semibold transition-colors block ${
+                      className={`w-full py-2 px-3 text-center text-xs uppercase tracking-widest font-semibold transition-colors block ${
                         isSelected
-                          ? 'bg-accent text-cream hover:bg-accent-hover'
-                          : 'bg-cream text-ink border border-stone/60 hover:bg-ink hover:text-cream hover:border-ink'
+                          ? 'bg-accent text-white hover:bg-accent-hover'
+                          : 'bg-transparent text-ink border border-stone-strong hover:border-ink'
                       }`}
                     >
                       Shop Style ({count}) →
@@ -138,12 +142,12 @@ export const FindYourExpression: React.FC = () => {
 
         {/* Philosophy Footnote */}
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-ink-muted gap-2 pt-4 border-t border-stone/40">
-          <p className="font-serif italic">
+          <p className="font-serif">
             "Your embroidery style should reflect your mood, the setting, and how much of your story you want the world to see."
           </p>
           <Link
             to="/styles"
-            className="text-accent uppercase tracking-widest text-[10px] font-semibold hover:underline shrink-0"
+            className="text-accent uppercase tracking-widest text-xs font-semibold hover:underline shrink-0"
           >
             Read the Atelier Style Guide →
           </Link>

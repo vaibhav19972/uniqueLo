@@ -34,12 +34,12 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="expression-modal-title"
-      className="fixed inset-0 z-[500] flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-60 flex items-center justify-center p-4 sm:p-6"
     >
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-panel-raised/70 backdrop-blur-sm transition-opacity"
       />
 
       {/* Modal Card */}
@@ -47,7 +47,7 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between border-b border-stone/40 pb-4">
           <div>
-            <span className="text-[10px] uppercase font-sans tracking-[0.25em] text-accent font-semibold block">
+            <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-semibold block">
               Atelier Discovery Axis
             </span>
             <h2
@@ -88,7 +88,7 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
                     <span
                       className={`w-7 h-7 flex items-center justify-center font-mono text-xs font-bold ${
                         isCurrent
-                          ? 'bg-accent text-cream'
+                          ? 'bg-accent text-white'
                           : 'bg-stone/20 text-ink'
                       }`}
                     >
@@ -100,12 +100,12 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
                           {level.name}
                         </h3>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 bg-accent text-cream text-[9px] uppercase font-sans tracking-widest font-semibold">
+                          <span className="px-2 py-0.5 bg-accent text-white text-xs uppercase font-sans tracking-widest font-semibold">
                             Current Piece
                           </span>
                         )}
                       </div>
-                      <span className="font-serif italic text-xs text-ink-muted block mt-0.5">
+                      <span className="font-serif text-xs text-ink-muted block mt-0.5">
                         {level.tagline}
                       </span>
                     </div>
@@ -114,7 +114,7 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
                   <Link
                     to={`/styles/${level.slug}`}
                     onClick={onClose}
-                    className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold whitespace-nowrap shrink-0 mt-1"
+                    className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold whitespace-nowrap shrink-0 mt-1"
                   >
                     View Style →
                   </Link>
@@ -124,7 +124,7 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
                   {level.description}
                 </p>
 
-                <div className="mt-2.5 pt-2 border-t border-stone/30 flex items-center justify-between text-[10px] text-ink-muted uppercase tracking-wider font-mono">
+                <div className="mt-2.5 pt-2 border-t border-stone/30 flex items-center justify-between text-xs text-ink-muted uppercase tracking-wider font-mono">
                   <span>Characteristics:</span>
                   <span className="text-ink font-sans font-medium lowercase">
                     {level.characteristics}
@@ -137,13 +137,13 @@ export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
 
         {/* Footer */}
         <div className="pt-4 border-t border-stone/40 flex items-center justify-between">
-          <p className="text-[11px] text-ink-muted font-light">
+          <p className="text-xs text-ink-muted font-light">
             Every garment can also be customized with bespoke initials in our Studio.
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold transition-colors cursor-pointer"
+            className="px-6 py-2 bg-panel-raised text-white hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold transition-colors cursor-pointer"
           >
             Close Guide
           </button>

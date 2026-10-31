@@ -14,7 +14,7 @@ const variantStyles: Record<CtaVariant, string> = {
 };
 
 const base =
-  'inline-flex items-center justify-center gap-2 px-7 py-3.5 font-serif text-[17px] leading-none tracking-normal transition-colors min-h-[48px] select-none';
+  'inline-flex items-center justify-center gap-2 px-7 py-3.5 font-serif text-lg leading-none tracking-normal transition-colors min-h-[48px] select-none';
 
 interface CtaProps {
   variant?: CtaVariant;
@@ -52,7 +52,7 @@ export const TextLink: React.FC<{ to: string; children: React.ReactNode; classNa
 }) => (
   <Link
     to={to}
-    className={`hidden sm:inline-flex items-center gap-2 text-[15px] font-sans font-medium text-ink border-b border-ink/30 hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
+    className={`hidden sm:inline-flex items-center gap-2 text-sm font-sans font-medium text-ink border-b border-ink/30 hover:border-ink pb-1 transition-colors shrink-0 ${className}`}
   >
     {children}
   </Link>

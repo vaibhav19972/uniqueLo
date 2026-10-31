@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link, useNavigate } from 'react-router';
 import { useProducts } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
@@ -19,6 +20,8 @@ const EDIT_IMAGE: Record<EditSlug, string> = {
 };
 
 export const EditsGateway: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: products } = useProducts();
   const setEdit = useFiltersStore((state) => state.setEdit);
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ export const EditsGateway: React.FC = () => {
   const featured = EDITS.filter((e) => e.featured);
 
   return (
-    <section aria-labelledby="edits-heading" className="bg-cream py-16 lg:py-24">
+    <section aria-labelledby="edits-heading" ref={revealRef} className="reveal bg-cream py-16 lg:py-24">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Shop by intent"
@@ -63,16 +66,16 @@ export const EditsGateway: React.FC = () => {
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5 text-cream">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5 text-white">
                   <div className="flex items-end justify-between gap-1.5 sm:gap-3">
                     <div>
-                      <h3 className="font-serif text-sm sm:text-[22px] leading-tight line-clamp-1">{e.title}</h3>
-                      <p className="font-serif italic text-[11px] sm:text-[15px] text-cream/85 mt-0.5 sm:mt-1 line-clamp-1">{e.tagline}</p>
+                      <h3 className="font-serif text-sm sm:text-xl leading-tight line-clamp-1">{e.title}</h3>
+                      <p className="font-serif text-xs sm:text-sm text-white mt-0.5 sm:mt-1 line-clamp-1">{e.tagline}</p>
                     </div>
                     <span className="text-right leading-none shrink-0">
                       <span className="block font-serif text-sm sm:text-xl">{counts[e.slug] ?? 0}</span>
-                      <span className="block font-sans text-[8px] sm:text-[9px] uppercase tracking-widest text-cream/80 mt-0.5 sm:mt-1">
+                      <span className="block font-sans text-xs sm:text-xs uppercase tracking-widest text-white mt-0.5 sm:mt-1">
                         Styles
                       </span>
                     </span>

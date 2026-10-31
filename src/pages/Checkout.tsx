@@ -238,14 +238,14 @@ export const Checkout: React.FC = () => {
     return (
       <div className="bg-cream min-h-screen">
         <div className="max-w-2xl mx-auto px-5 py-24 text-center">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Checkout</p>
+          <p className="text-xs uppercase tracking-eyebrow text-ink-muted">Checkout</p>
           <h1 className="font-serif text-3xl text-ink mt-2">Your bag is empty</h1>
           <p className="text-sm text-ink-muted mt-3 leading-relaxed">
             Nothing to check out yet.
           </p>
           <Link
             to="/shop"
-            className="inline-block mt-8 px-8 py-3 bg-ink text-cream text-[11px] uppercase tracking-[0.18em]"
+            className="inline-block mt-8 px-8 py-3 bg-panel-raised text-white text-xs uppercase tracking-label"
           >
             Browse the collection
           </Link>
@@ -255,17 +255,17 @@ export const Checkout: React.FC = () => {
   }
 
   const field =
-    'w-full border border-ink/15 bg-white px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40';
+    'w-full border border-stone-strong bg-panel px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40';
 
   return (
     <div className="bg-cream min-h-screen">
       <div className="max-w-6xl mx-auto px-5 lg:px-8 py-10">
         <div className="flex items-baseline justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Checkout</p>
+            <p className="text-xs uppercase tracking-eyebrow text-ink-muted">Checkout</p>
             <h1 className="font-serif text-3xl text-ink mt-1">Complete your order</h1>
           </div>
-          <Link to="/shop" className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink">
+          <Link to="/shop" className="text-xs uppercase tracking-label text-ink-muted hover:text-ink">
             Keep shopping
           </Link>
         </div>
@@ -276,7 +276,7 @@ export const Checkout: React.FC = () => {
             {/* Delivery */}
             <section>
               <h2 className="font-serif text-lg text-ink mb-4 flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-ink text-cream text-[11px] flex items-center justify-center">1</span>
+                <span className="w-6 h-6 rounded-full bg-panel-raised text-white text-xs flex items-center justify-center">1</span>
                 Delivery
               </h2>
 
@@ -297,8 +297,8 @@ export const Checkout: React.FC = () => {
                       onClick={() => setSelectedAddressId(a.id)}
                       className={`w-full text-left border p-4 transition-colors ${
                         selectedAddressId === a.id
-                          ? 'border-ink bg-white'
-                          : 'border-ink/15 bg-white/50 hover:border-ink/30'
+                          ? 'border-ink bg-panel'
+                          : 'border-stone-strong bg-panel hover:border-ink-muted'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -306,12 +306,12 @@ export const Checkout: React.FC = () => {
                           <p className="text-sm font-medium text-ink">
                             {a.recipient_name}
                             {a.label && (
-                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted border border-ink/15 px-1.5 py-0.5">
+                              <span className="ml-2 text-xs uppercase tracking-label text-ink-muted border border-stone-strong px-1.5 py-0.5">
                                 {a.label}
                               </span>
                             )}
                             {a.is_default && (
-                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted">
+                              <span className="ml-2 text-xs uppercase tracking-label text-ink-muted">
                                 Default
                               </span>
                             )}
@@ -327,7 +327,7 @@ export const Checkout: React.FC = () => {
                         </div>
                         <span
                           className={`mt-1 w-3.5 h-3.5 rounded-full border shrink-0 ${
-                            selectedAddressId === a.id ? 'border-ink bg-ink' : 'border-ink/30'
+                            selectedAddressId === a.id ? 'border-ink bg-panel-raised' : 'border-ink-muted'
                           }`}
                         />
                       </div>
@@ -336,7 +336,7 @@ export const Checkout: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddressForm(true)}
-                    className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink underline underline-offset-4"
+                    className="text-xs uppercase tracking-label text-ink-muted hover:text-ink underline underline-offset-4"
                   >
                     + Deliver to a different address
                   </button>
@@ -345,12 +345,12 @@ export const Checkout: React.FC = () => {
 
               {/* Address form */}
               {(!user || addresses.length === 0 || showAddressForm) && (
-                <div className="bg-white border border-ink/15 p-5 space-y-3">
+                <div className="bg-panel border border-stone-strong p-5 space-y-3">
                   {user && addresses.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setShowAddressForm(false)}
-                      className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink mb-1"
+                      className="text-xs uppercase tracking-label text-ink-muted hover:text-ink mb-1"
                     >
                       ← Use a saved address
                     </button>
@@ -364,7 +364,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         autoComplete="name"
                       />
-                      {errors.name && <p className="text-[10px] text-red-600 mt-1">{errors.name}</p>}
+                      {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name}</p>}
                     </div>
                     <div>
                       <input
@@ -375,7 +375,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
                         autoComplete="tel"
                       />
-                      {errors.phone && <p className="text-[10px] text-red-600 mt-1">{errors.phone}</p>}
+                      {errors.phone && <p className="text-xs text-red-600 mt-1">{errors.phone}</p>}
                     </div>
                   </div>
                   {!user && (
@@ -388,7 +388,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                         autoComplete="email"
                       />
-                      {errors.email && <p className="text-[10px] text-red-600 mt-1">{errors.email}</p>}
+                      {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
                     </div>
                   )}
                   <div>
@@ -399,7 +399,7 @@ export const Checkout: React.FC = () => {
                       onChange={(e) => setForm({ ...form, address: e.target.value })}
                       autoComplete="street-address"
                     />
-                    {errors.address && <p className="text-[10px] text-red-600 mt-1">{errors.address}</p>}
+                    {errors.address && <p className="text-xs text-red-600 mt-1">{errors.address}</p>}
                   </div>
                   <input
                     className={field}
@@ -416,7 +416,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, city: e.target.value })}
                         autoComplete="address-level2"
                       />
-                      {errors.city && <p className="text-[10px] text-red-600 mt-1">{errors.city}</p>}
+                      {errors.city && <p className="text-xs text-red-600 mt-1">{errors.city}</p>}
                     </div>
                     <div>
                       <input
@@ -426,7 +426,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, state: e.target.value })}
                         autoComplete="address-level1"
                       />
-                      {errors.state && <p className="text-[10px] text-red-600 mt-1">{errors.state}</p>}
+                      {errors.state && <p className="text-xs text-red-600 mt-1">{errors.state}</p>}
                     </div>
                     <div>
                       <input
@@ -438,7 +438,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, pincode: e.target.value })}
                         autoComplete="postal-code"
                       />
-                      {errors.pincode && <p className="text-[10px] text-red-600 mt-1">{errors.pincode}</p>}
+                      {errors.pincode && <p className="text-xs text-red-600 mt-1">{errors.pincode}</p>}
                     </div>
                   </div>
                   {user && (
@@ -459,7 +459,7 @@ export const Checkout: React.FC = () => {
             {/* Payment */}
             <section>
               <h2 className="font-serif text-lg text-ink mb-4 flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-ink text-cream text-[11px] flex items-center justify-center">2</span>
+                <span className="w-6 h-6 rounded-full bg-panel-raised text-white text-xs flex items-center justify-center">2</span>
                 Payment
               </h2>
 
@@ -471,12 +471,12 @@ export const Checkout: React.FC = () => {
                   type="button"
                   onClick={() => setPaymentMethod('upi')}
                   className={`w-full text-left border p-4 ${
-                    paymentMethod === 'upi' ? 'border-ink bg-white' : 'border-ink/15 bg-white/50'
+                    paymentMethod === 'upi' ? 'border-ink bg-panel' : 'border-stone-strong bg-panel'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">UPI / Online transfer</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'upi' ? 'border-ink bg-ink' : 'border-ink/30'}`} />
+                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'upi' ? 'border-ink bg-panel-raised' : 'border-ink-muted'}`} />
                   </div>
                   {quote && quote.payment_method === 'prepaid' && quote.cod_fee_cents === 0 && (
                     <p className="text-xs text-ink-muted mt-1">
@@ -491,15 +491,15 @@ export const Checkout: React.FC = () => {
                   onClick={() => setPaymentMethod('cod')}
                   className={`w-full text-left border p-4 ${
                     !codAvailable
-                      ? 'border-ink/10 bg-white/30 opacity-60 cursor-not-allowed'
+                      ? 'border-stone bg-panel opacity-60 cursor-not-allowed'
                       : paymentMethod === 'cod'
-                        ? 'border-ink bg-white'
-                        : 'border-ink/15 bg-white/50'
+                        ? 'border-ink bg-panel'
+                        : 'border-stone-strong bg-panel'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">Cash on delivery</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'cod' ? 'border-ink bg-ink' : 'border-ink/30'}`} />
+                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'cod' ? 'border-ink bg-panel-raised' : 'border-ink-muted'}`} />
                   </div>
                   <p className="text-xs text-ink-muted mt-1">
                     {!codAvailable
@@ -515,10 +515,10 @@ export const Checkout: React.FC = () => {
 
           {/* ── Right: summary ──────────────────────────────────────── */}
           <aside className="lg:sticky lg:top-[calc(var(--header-height)+2rem)]">
-            <div className="bg-white border border-ink/15">
-              <div className="px-5 py-4 border-b border-ink/10 flex items-baseline justify-between">
+            <div className="bg-panel border border-stone-strong">
+              <div className="px-5 py-4 border-b border-stone flex items-baseline justify-between">
                 <h2 className="font-serif text-lg text-ink">Order summary</h2>
-                <span className="text-[10px] uppercase tracking-[0.14em] text-ink-muted">
+                <span className="text-xs uppercase tracking-label text-ink-muted">
                   {quote ? `${quote.units} item${quote.units === 1 ? '' : 's'}` : '—'}
                 </span>
               </div>
@@ -540,18 +540,18 @@ export const Checkout: React.FC = () => {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-medium text-ink truncate">{line.product.name}</p>
-                        <p className="text-[10px] text-ink-muted mt-0.5">
+                        <p className="text-xs text-ink-muted mt-0.5">
                           {line.variant.color} · {line.variant.size} · Qty {q?.quantity ?? line.quantity}
                         </p>
                         <p className="text-xs text-ink mt-1">
                           {formatPrice(q?.line_total_cents ?? line.lineTotalCents)}
                           {mrp != null && q && (
-                            <span className="ml-2 text-ink-muted line-through text-[10px]">
+                            <span className="ml-2 text-ink-muted line-through text-xs">
                               {formatPrice(mrp * q.quantity)}
                             </span>
                           )}
                           {pct != null && (
-                            <span className="ml-1.5 text-[10px] text-emerald-700">{pct}% off</span>
+                            <span className="ml-1.5 text-xs text-emerald-700">{pct}% off</span>
                           )}
                         </p>
                       </div>
@@ -561,11 +561,11 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Coupon */}
-              <div className="px-5 py-3 border-t border-ink/10">
+              <div className="px-5 py-3 border-t border-stone">
                 {appliedCode ? (
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-ink">
-                      <span className="font-mono bg-cream px-1.5 py-0.5 border border-ink/10">{appliedCode}</span>
+                      <span className="font-mono bg-cream px-1.5 py-0.5 border border-stone">{appliedCode}</span>
                       {quote?.coupon && !quote.coupon.error && (
                         <span className="ml-2 text-emerald-700">
                           −{formatPrice(quote.coupon.discount_cents ?? 0)}
@@ -575,7 +575,7 @@ export const Checkout: React.FC = () => {
                     <button
                       type="button"
                       onClick={removeCoupon}
-                      className="text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink"
+                      className="text-xs uppercase tracking-label text-ink-muted hover:text-ink"
                     >
                       Remove
                     </button>
@@ -584,7 +584,7 @@ export const Checkout: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <input
-                        className="flex-1 border border-ink/15 bg-cream px-3 py-2 text-xs text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40 uppercase"
+                        className="flex-1 border border-stone-strong bg-cream px-3 py-2 text-xs text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40 uppercase"
                         placeholder="Coupon code"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -596,12 +596,12 @@ export const Checkout: React.FC = () => {
                         type="button"
                         disabled={!couponCode.trim()}
                         onClick={() => applyCode(couponCode)}
-                        className="px-4 py-2 bg-ink text-cream text-[10px] uppercase tracking-[0.14em] disabled:opacity-40"
+                        className="px-4 py-2 bg-panel-raised text-white text-xs uppercase tracking-label disabled:opacity-40"
                       >
                         Apply
                       </button>
                     </div>
-                    {couponError && <p className="text-[10px] text-red-600">{couponError}</p>}
+                    {couponError && <p className="text-xs text-red-600">{couponError}</p>}
 
                     {/* Best-coupon prompt. Never auto-applied — the customer
                         clicks. Server-gated, so it cannot fail on click. */}
@@ -611,10 +611,10 @@ export const Checkout: React.FC = () => {
                         onClick={() => applyCode(bestCoupon.code)}
                         className="w-full text-left bg-emerald-50 border border-emerald-200 px-3 py-2 hover:bg-emerald-100/70"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-emerald-800 font-medium">
+                        <p className="text-xs uppercase tracking-label text-emerald-800 font-medium">
                           Save {formatPrice(bestCoupon.value_cents)}
                         </p>
-                        <p className="text-[11px] text-emerald-900/80 mt-0.5">
+                        <p className="text-xs text-emerald-900/80 mt-0.5">
                           Apply <span className="font-mono">{bestCoupon.code}</span>
                           {bestCoupon.min_subtotal_cents > 0
                             ? ` on orders above ${formatPrice(bestCoupon.min_subtotal_cents)}`
@@ -623,7 +623,7 @@ export const Checkout: React.FC = () => {
                       </button>
                     )}
                     {offers.length > 1 && (
-                      <p className="text-[10px] text-ink-muted">
+                      <p className="text-xs text-ink-muted">
                         {offers.length} offers available on this bag.
                       </p>
                     )}
@@ -632,11 +632,11 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Totals — server values only */}
-              <div className="px-5 py-4 border-t border-ink/10 space-y-2 text-xs">
+              <div className="px-5 py-4 border-t border-stone space-y-2 text-xs">
                 {quoteError ? (
-                  <p className="text-[11px] text-red-600 leading-relaxed">{quoteError.message}</p>
+                  <p className="text-xs text-red-600 leading-relaxed">{quoteError.message}</p>
                 ) : isLoading || !quote ? (
-                  <p className="text-[11px] text-ink-muted">Pricing your bag…</p>
+                  <p className="text-xs text-ink-muted">Pricing your bag…</p>
                 ) : (
                   <>
                     <Row label="Subtotal" value={formatPrice(quote.subtotal_cents)} />
@@ -651,16 +651,16 @@ export const Checkout: React.FC = () => {
                       <Row label="COD fee" value={formatPrice(quote.cod_fee_cents)} />
                     )}
                     {remainingFree > 0 && (
-                      <p className="text-[10px] text-ink-muted pt-0.5">
+                      <p className="text-xs text-ink-muted pt-0.5">
                         Add {formatPrice(remainingFree)} for free delivery.
                       </p>
                     )}
-                    <div className="pt-2 mt-1 border-t border-ink/10 flex items-baseline justify-between">
+                    <div className="pt-2 mt-1 border-t border-stone flex items-baseline justify-between">
                       <span className="text-sm font-medium text-ink">Total</span>
                       <span className="font-serif text-xl text-ink">{formatPrice(quote.total_cents)}</span>
                     </div>
                     {savings > 0 && (
-                      <p className="text-[10px] text-emerald-700 pt-1">
+                      <p className="text-xs text-emerald-700 pt-1">
                         You save {formatPrice(savings)} on this order.
                       </p>
                     )}
@@ -673,7 +673,7 @@ export const Checkout: React.FC = () => {
                   type="button"
                   onClick={submit}
                   disabled={submitting || !quote || Boolean(quoteError)}
-                  className="w-full py-3.5 bg-ink text-cream text-[11px] uppercase tracking-[0.2em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink/90 transition-colors"
+                  className="w-full py-3.5 bg-panel-raised text-white text-xs uppercase tracking-eyebrow disabled:opacity-40 disabled:cursor-not-allowed hover:bg-panel-raised/90 transition-colors"
                 >
                   {submitting
                     ? 'Placing order…'
@@ -681,7 +681,7 @@ export const Checkout: React.FC = () => {
                       ? `Place order · ${formatPrice(quote.total_cents)}`
                       : 'Place order'}
                 </button>
-                <p className="text-[10px] text-ink-muted text-center mt-3 leading-relaxed">
+                <p className="text-xs text-ink-muted text-center mt-3 leading-relaxed">
                   {quote && quote.payment_method === 'prepaid'
                     ? 'No card is charged on this page. Your order is recorded and payment is collected via the method arranged with our atelier.'
                     : 'Pay in cash when your order arrives.'}

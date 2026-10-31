@@ -4,18 +4,24 @@
 @import './universes.css';
 
 /* Map design tokens into the Tailwind theme so utilities like `bg-cream`,
-   `text-ink`, `font-serif`, `text-hero`, `bg-gold-zari` resolve from tokens.css. */
+   `text-ink`, `font-serif`, `text-hero` resolve from tokens.css. */
 @theme {
   /* colors */
   --color-cream: var(--color-cream);
   --color-paper: var(--color-paper);
+  --color-panel: var(--color-panel);
+  --color-panel-raised: var(--color-panel-raised);
   --color-ink: var(--color-ink);
   --color-ink-muted: var(--color-ink-muted);
   --color-stone: var(--color-stone);
+  --color-stone-strong: var(--color-stone-strong);
   --color-warm-gray: var(--color-warm-gray);
 
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-accent-border: var(--color-accent-border);
+
   --color-saffron: var(--color-saffron);
   --color-gold-zari: var(--color-gold-zari);
   --color-pistachio: var(--color-pistachio);
@@ -35,9 +41,7 @@
   --color-coal-glass: var(--color-coal-glass);
   --color-stone-deep: var(--color-stone-deep);
 
-  /* render-era marketing shell (chatgpt-v2 targets) — quiet-luxury graphite +
-     champagne (Oct 2026). --on-gold is the text color that passes contrast
-     on champagne; themed scopes remap it to --u-on-accent. */
+  /* Legacy brand aliases, remapped to the ramp in universes.css. */
   --color-gold: var(--brand-gold);
   --color-gold-hover: var(--brand-gold-hover);
   --color-gold-deep: var(--brand-gold-deep);
@@ -48,16 +52,18 @@
   /* fonts */
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
 
-  /* render-era type treatments (chatgpt-v2 targets) */
+  /* type treatments */
   --tracking-eyebrow: var(--tracking-eyebrow);
   --tracking-label: var(--tracking-label);
   --leading-display: var(--leading-display);
   --text-display: var(--text-display);
   --text-display-lg: var(--text-display-lg);
-
-  /* type scale */
   --text-hero: var(--text-hero);
+
+  /* easing + duration tokens so `duration-500` and `ease-base` agree */
+  --ease-base: var(--ease-base);
 
   /* semantic spacing */
   --spacing-section: var(--section-gap);
@@ -70,6 +76,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
@@ -77,21 +84,22 @@
     min-height: 100dvh;
     background-color: var(--color-cream);
     color: var(--color-ink);
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: var(--text-base);
     line-height: var(--leading-normal);
     overflow-x: clip;
   }
 
-  :root[data-theme="v2"] body, html.theme-v2 body {
-    font-family: var(--font-sans);
-    background-color: var(--color-cream);
-    color: var(--color-ink);
+  /* Headings set their own weight; never let the browser italicize. */
+  em,
+  i {
+    font-style: normal;
   }
 
-  /* When v2 is active, re-route font-serif to font-sans for full neo-grotesque coherence */
-  html.theme-v2 .font-serif, [data-theme="v2"] .font-serif {
-    font-family: var(--font-sans) !important;
+  /* Prices, SKUs, and counts hold their width as digits change. */
+  [data-numeric],
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 
   * {
@@ -103,29 +111,64 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
 }
 
 /* ─────────────────────────────────────
-   Stitched Needlework & Playful Utilities
+   Grain — the approved way to keep flat dark surfaces from reading dead.
+   Fixed overlay, no gradient, ignores pointer events.
    ───────────────────────────────────── */
-.stitch-border {
-  border: 1.5px dashed var(--color-stone);
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.stitch-border-gold {
-  border: 1.5px dashed var(--color-gold-zari);
+/* ─────────────────────────────────────
+   Motion — one curve, reveal-on-scroll driven by IntersectionObserver
+   (see lib/motion.ts). Values come from the Design Values section.
+   ───────────────────────────────────── */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.stitch-border-terracotta {
-  border: 1.5px dashed var(--color-accent);
+.reveal {
+  opacity: 0;
 }
 
-/* Subtle Floating Animation for Badges */
+.reveal.is-visible {
+  animation: reveal-up var(--duration-reveal) var(--ease-base) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* Floating badge used by the craft/editorial sections. */
 @keyframes needle-float {
 
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 
   50% {
@@ -137,7 +180,7 @@
   animation: needle-float 4s ease-in-out infinite;
 }
 
-/* Marquee scrolling ticker */
+/* Marquee ticker */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -162,68 +205,6 @@
   animation-play-state: paused !important;
 }
 
-/* Announcement Bar Flashing & Glowing Effects */
-@keyframes flash-beacon {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.35;
-    transform: scale(1.25);
-  }
-}
-
-@keyframes flash-badge-glow {
-  0%, 100% {
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
-    border-color: rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
-    border-color: rgba(52, 211, 153, 0.9);
-  }
-}
-
-@keyframes flash-urgent-glow {
-  0%, 100% {
-    box-shadow: 0 0 4px rgba(244, 63, 94, 0.3);
-    border-color: rgba(244, 63, 94, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(244, 63, 94, 0.85);
-    border-color: rgba(251, 113, 133, 0.95);
-  }
-}
-
-@keyframes flash-text-pulse {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 0px transparent;
-  }
-  50% {
-    opacity: 0.9;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.65);
-  }
-}
-
-.animate-flash-beacon {
-  animation: flash-beacon 1.4s ease-in-out infinite;
-}
-
-.animate-flash-badge-emerald {
-  animation: flash-badge-glow 2s ease-in-out infinite;
-}
-
-.animate-flash-badge-urgent {
-  animation: flash-urgent-glow 1.2s ease-in-out infinite;
-}
-
-.animate-flash-text {
-  animation: flash-text-pulse 2.2s ease-in-out infinite;
-}
-
-/* Marquee edge gradient mask for seamless edge gliding */
 .mask-marquee-fade {
   mask-image: linear-gradient(
     to right,
@@ -252,7 +233,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-stone);
+  background: var(--color-stone-strong);
   border-radius: 3px;
 }
 
@@ -261,12 +242,9 @@
 }
 
 /* ─────────────────────────────────────
-   Reduced motion: intentional alternative
-   Spatial movement snaps instantly (no pan, slide, or parallax);
-   opacity fades keep a brief 150ms so state feedback
-   (drawer, accordion, focus) stays legible.
-   JS mirrors this: Lenis never starts, GSAP reveals
-   early-return, staggers collapse (see lib/motion.ts).
+   Reduced motion: spatial movement snaps, opacity keeps a brief fade so
+   state feedback (drawer, accordion, focus) stays legible.
+   JS mirrors this: Lenis never starts, GSAP reveals early-return.
    ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 

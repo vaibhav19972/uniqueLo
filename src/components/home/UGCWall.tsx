@@ -1,4 +1,5 @@
 import React from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link } from 'react-router';
 import { MarketingHeader } from '../ui/MarketingHeader';
 
@@ -79,8 +80,10 @@ const STAT_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const UGCWall: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   return (
-    <section aria-labelledby="ugc-heading" className="bg-cream py-16 lg:py-24">
+    <section aria-labelledby="ugc-heading" ref={revealRef} className="reveal bg-cream py-16 lg:py-24">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Real people. Real stories."
@@ -104,10 +107,10 @@ export const UGCWall: React.FC = () => {
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
-              <figcaption className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-cream">
-                <p className="font-serif text-xs sm:text-[17px] leading-snug line-clamp-2 sm:line-clamp-none">“{s.quote}”</p>
-                <p className="font-sans text-[11px] sm:text-[13px] mt-1.5 sm:mt-2 font-semibold flex items-center gap-1 sm:gap-1.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <figcaption className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-white">
+                <p className="font-serif text-xs sm:text-lg leading-snug line-clamp-2 sm:line-clamp-none">“{s.quote}”</p>
+                <p className="font-sans text-xs sm:text-sm mt-1.5 sm:mt-2 font-semibold flex items-center gap-1 sm:gap-1.5">
                   {s.name}
                   <span
                     aria-label="Verified customer"
@@ -118,7 +121,7 @@ export const UGCWall: React.FC = () => {
                     </svg>
                   </span>
                 </p>
-                <p className="font-sans text-[9px] sm:text-[11px] text-cream/75 truncate">{s.detail}</p>
+                <p className="font-sans text-xs sm:text-xs text-white truncate">{s.detail}</p>
               </figcaption>
             </figure>
           ))}
@@ -144,7 +147,7 @@ export const UGCWall: React.FC = () => {
         </div>
 
         <div className="mt-6 text-center sm:hidden">
-          <Link to="/shop" className="text-[15px] font-serif text-ink border-b border-ink/30 pb-1">
+          <Link to="/shop" className="text-sm font-serif text-ink border-b border-ink/30 pb-1">
             See more stories →
           </Link>
         </div>

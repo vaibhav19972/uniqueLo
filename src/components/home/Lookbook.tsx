@@ -48,16 +48,16 @@ export const Lookbook: React.FC = () => {
   const activeLook = LOOKS[activeLookIndex];
 
   return (
-    <section className="py-24 bg-ink text-cream border-b border-stone/20 overflow-hidden">
+    <section className="py-24 bg-panel-raised text-white border-b border-stone/20 overflow-hidden">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         {/* Header & Look Selectors */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between pb-10 border-b border-stone/20 gap-6">
           <div>
-            <div className="flex items-center space-x-2 text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+            <div className="flex items-center space-x-2 text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
               <span>✦</span>
               <span>Wardrobe Anthology • Made in India</span>
             </div>
-            <h2 className="font-serif text-4xl sm:text-5xl text-cream mt-2">
+            <h2 className="font-serif text-4xl sm:text-5xl text-white mt-2">
               Everyday Needlecraft in Motion
             </h2>
           </div>
@@ -68,8 +68,8 @@ export const Lookbook: React.FC = () => {
               <button
                 key={look.id}
                 onClick={() => setActiveLookIndex(idx)}
-                className={`py-2 text-xs sm:text-sm uppercase tracking-[0.2em] transition-colors relative cursor-pointer font-medium ${
-                  activeLookIndex === idx ? 'text-accent' : 'text-cream/60 hover:text-cream'
+                className={`py-2 text-xs sm:text-sm uppercase tracking-eyebrow transition-colors relative cursor-pointer font-medium ${
+                  activeLookIndex === idx ? 'text-accent' : 'text-white hover:text-white'
                 }`}
               >
                 {look.volume}
@@ -89,20 +89,20 @@ export const Lookbook: React.FC = () => {
               src={activeLook.image}
               alt={activeLook.title}
               aspectRatio="16/10"
-              className="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-1000 ease-base hover:scale-105"
             />
-            <div className="absolute top-4 left-4 bg-ink/70 backdrop-blur-md px-3 py-1 text-[10px] uppercase tracking-widest text-cream border border-stone/20">
+            <div className="absolute top-4 left-4 bg-panel-raised/70 backdrop-blur-md px-3 py-1 text-xs uppercase tracking-widest text-white border border-stone/20">
               {activeLook.volume} Campaign
             </div>
           </div>
 
           {/* Look Details & Quotes */}
           <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs uppercase tracking-[0.25em] text-accent font-mono">
+            <span className="text-xs uppercase tracking-eyebrow text-accent font-mono">
               Editorial Feature
             </span>
 
-            <h3 className="font-serif text-3xl sm:text-4xl text-cream leading-tight">
+            <h3 className="font-serif text-3xl sm:text-4xl text-white leading-tight">
               {activeLook.title}
             </h3>
 
@@ -110,7 +110,7 @@ export const Lookbook: React.FC = () => {
               {activeLook.subtitle}
             </p>
 
-            <blockquote className="border-l-2 border-accent pl-4 py-1 italic font-serif text-base text-cream/90">
+            <blockquote className="border-l-2 border-accent pl-4 py-1 font-serif text-base text-white">
               {activeLook.quote}
             </blockquote>
 

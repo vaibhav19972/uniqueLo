@@ -254,7 +254,7 @@ export const HeroCarousel: React.FC = () => {
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-neutral-950 select-none"
+      className="relative w-full overflow-hidden bg-cream select-none"
       aria-label="Home campaign carousel"
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -263,9 +263,10 @@ export const HeroCarousel: React.FC = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       style={{
-        // Full viewport minus the header bar, with responsive clamp
-        minHeight: 'clamp(480px, 80vh, 920px)',
-        height: 'calc(100vh - var(--header-height, 64px) - 2.2rem)',
+        // Full viewport minus the header bar, with responsive clamp.
+        // dvh (not vh) so the mobile browser chrome does not cause a jump.
+        minHeight: 'clamp(30rem, 80dvh, 57.5rem)',
+        height: 'calc(100dvh - var(--header-height, 4.5rem) - 2.25rem)',
       }}
     >
       {/* ─────────────────────────────────────────────────────────────
@@ -321,7 +322,7 @@ export const HeroCarousel: React.FC = () => {
           {/* Subtitle / Kicker */}
           <p
             key={`kicker-${activeIndex}`}
-            className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white/95 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-in fade-in duration-500"
+            className="text-xs font-medium tracking-eyebrow uppercase text-white/75 animate-in fade-in duration-500"
           >
             {currentSlide.tagline}
           </p>
@@ -329,8 +330,7 @@ export const HeroCarousel: React.FC = () => {
           {/* Main Collection Headline */}
           <h1
             key={`title-${activeIndex}`}
-            className="mt-3 sm:mt-4 text-2xl sm:text-5xl lg:text-6xl font-black uppercase tracking-wider text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] animate-in fade-in slide-in-from-bottom-2 duration-500"
-            style={{ fontFamily: "'Satoshi', var(--font-sans), sans-serif" }}
+            className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl animate-in fade-in slide-in-from-bottom duration-500"
           >
             {currentSlide.title}
           </h1>
@@ -339,7 +339,7 @@ export const HeroCarousel: React.FC = () => {
           {currentSlide.description && (
             <p
               key={`desc-${activeIndex}`}
-              className="mt-2 text-xs sm:text-sm text-stone-200/80 font-normal max-w-xl hidden sm:block drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] animate-in fade-in duration-700"
+              className="mt-4 hidden max-w-xl text-pretty text-sm text-white/70 sm:block animate-in fade-in duration-700"
             >
               {currentSlide.description}
             </p>
@@ -349,7 +349,7 @@ export const HeroCarousel: React.FC = () => {
           <div className="mt-6 sm:mt-7">
             <Link
               to={currentSlide.ctaLink}
-              className="inline-flex items-center justify-center rounded-full bg-white text-black font-extrabold uppercase tracking-widest text-xs sm:text-sm px-9 py-3.5 sm:px-11 sm:py-4 shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:bg-neutral-100 hover:scale-105 active:scale-95 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-6 py-3 text-base font-semibold text-white transition-colors duration-300 hover:bg-accent-hover active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               {currentSlide.ctaText}
             </Link>
@@ -412,13 +412,13 @@ export const HeroCarousel: React.FC = () => {
                         />
                       </svg>
                       {/* Center white dot inside the circle */}
-                      <span className="absolute w-2 h-2 rounded-full bg-white shadow-sm" />
+                      <span className="absolute h-1.5 w-1.5 rounded-full bg-white" />
                     </div>
                   ) : (
                     /* Inactive Indicator: Clean small white dot */
                     <span
                       aria-hidden="true"
-                      className="w-2.5 h-2.5 rounded-full bg-white/50 group-hover:bg-white/90 group-hover:scale-125 transition-all duration-300"
+                      className="h-2 w-2 rounded-full bg-white/45 transition-colors duration-300 group-hover:bg-white/85"
                     />
                   )}
                 </button>
@@ -446,7 +446,7 @@ export const HeroCarousel: React.FC = () => {
           <button
             onClick={handleDismissQR}
             aria-label="Close download app banner"
-            className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-neutral-200 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-black transition-colors duration-300 hover:bg-accent hover:text-white"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -460,16 +460,16 @@ export const HeroCarousel: React.FC = () => {
           </button>
 
           {/* Dummy QR Code Image */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-sm bg-white p-1.5 shrink-0 flex items-center justify-center text-black shadow-md">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm bg-white p-1.5 text-black shadow-md sm:h-16 sm:w-16">
             <DummyQRCode className="w-full h-full" />
           </div>
 
           {/* Text Information */}
           <div className="flex flex-col pr-2">
-            <span className="text-sm sm:text-base font-bold text-white leading-tight">
+            <span className="text-sm font-semibold leading-tight text-black sm:text-base">
               Download our app
             </span>
-            <span className="text-[11px] text-white/70 font-normal mt-0.5 leading-tight">
+            <span className="mt-0.5 text-xs font-normal leading-tight text-black/60">
               Scan with camera
             </span>
           </div>

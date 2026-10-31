@@ -17,7 +17,6 @@ import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
 import { Image } from '../ui/Image';
 import { Button } from '../ui/Button';
-import { useIsThemeV2 } from '../../config/theme';
 
 interface ProductCardProps {
   product: Product;
@@ -34,7 +33,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const frontImage = product.images[0]?.src || '/images/placeholders/hero.jpg';
   const macroImage = product.images[1]?.src || frontImage;
   const isWish = isWishlisted(product.slug);
-  const isV2 = useIsThemeV2();
 
   const expScore = getExpressionScore(product);
   const expInfo = getExpressionByScore(expScore);
@@ -106,7 +104,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               aspectRatio="3/4"
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-3 left-3 bg-ink/90 text-cream px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans border border-stone/30">
+            <div className="absolute top-3 left-3 bg-panel-raised/90 text-white px-2.5 py-1 text-xs uppercase tracking-widest font-sans border border-stone/30">
               ✦ 3x Macro Stitch
             </div>
           </div>
@@ -118,7 +116,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           aria-label={isWish ? 'Remove from wishlist' : 'Save to wishlist'}
           className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
             isWish
-              ? 'bg-accent text-paper shadow-md scale-105'
+              ? 'bg-accent text-white shadow-md scale-105'
               : 'bg-paper/85 text-ink hover:text-accent hover:scale-110'
           }`}
         >
@@ -129,17 +127,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Technique Badge */}
         {product.embroidery && (
-          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-cream/95 text-ink px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-[10px] tracking-widest uppercase border border-stone/80 font-medium">
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-cream/95 text-ink px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs sm:text-xs tracking-widest uppercase border border-stone/80 font-medium">
             {product.embroidery.techniqueLabel}
           </div>
         )}
 
         {/* Quick Action Flyout - Desktop hover */}
-        <div className="hidden sm:flex absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-gradient-to-t from-ink/90 via-ink/60 to-transparent gap-1.5 z-10">
+        <div className="hidden sm:flex absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-base bg-gradient-to-t from-black/90 via-black/60 to-transparent gap-1.5 z-10">
           <Button
             variant="ghost"
             size="sm"
-            className="bg-paper/90 text-ink hover:bg-paper text-[10px] tracking-wider px-2 py-1.5"
+            className="bg-paper/90 text-ink hover:bg-paper text-xs tracking-wider px-2 py-1.5"
             onClick={handleQuickView}
           >
             Quick View
@@ -148,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Button
             variant="primary"
             size="sm"
-            className="flex-1 text-[10px] tracking-widest bg-ink text-cream hover:bg-accent py-1.5"
+            className="flex-1 text-xs tracking-widest bg-panel-raised text-white hover:bg-accent py-1.5"
             onClick={handleQuickAdd}
           >
             Quick Add
@@ -158,7 +156,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <Button
               variant="accent"
               size="sm"
-              className="text-[10px] tracking-widest px-2.5 py-1.5"
+              className="text-xs tracking-widest px-2.5 py-1.5"
               onClick={handleBespoke}
             >
               Bespoke
@@ -170,7 +168,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Info Body */}
       <div className="p-2.5 sm:p-4 md:p-5 flex-1 flex flex-col justify-between bg-paper">
         <div>
-          <div className="flex items-center justify-between text-[9px] sm:text-[10px] uppercase font-sans tracking-widest text-ink-muted mb-0.5 sm:mb-1">
+          <div className="flex items-center justify-between text-xs sm:text-xs uppercase font-sans tracking-widest text-ink-muted mb-0.5 sm:mb-1">
             <span className="truncate max-w-[120px] sm:max-w-none">
               {formatCountryOfOrigin(product.countryOfOrigin)}
               {product.garmentType ? ` · ${product.garmentType}` : ''}
@@ -182,7 +180,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2">
             <Link to={`/product/${product.slug}`} className="hover:text-accent transition-colors flex-1 min-w-0">
-              <h3 className="font-serif text-[13px] sm:text-base lg:text-lg text-ink font-normal leading-snug line-clamp-2">
+              <h3 className="font-serif text-sm sm:text-base lg:text-lg text-ink font-normal leading-snug line-clamp-2">
                 {product.name}
               </h3>
             </Link>
@@ -192,10 +190,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </span>
               {compareAt && compareAt > defaultVariant.priceCents && (
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[10px] sm:text-[11px] text-ink-muted line-through">{formatPrice(compareAt)}</span>
-                  {isV2 && offPct > 0 && (
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.2 sm:px-1.5 sm:py-0.5">
-                      ({offPct}%)
+                  <span className="text-xs sm:text-xs text-ink-muted line-through">{formatPrice(compareAt)}</span>
+                  {offPct > 0 && (
+                    <span className="bg-success/10 px-1 py-0.5 text-xs font-semibold text-success">
+                      {offPct}% off
                     </span>
                   )}
                 </div>
@@ -205,7 +203,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <p className="text-xs text-ink-muted mt-1.5 font-light line-clamp-2 hidden sm:block">
             {product.subtitle}
           </p>
-          <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 text-[9px] sm:text-[10px] uppercase tracking-wider text-ink-muted">
+          <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 text-xs sm:text-xs uppercase tracking-wider text-ink-muted">
             {expInfo && (
               <span className="font-sans font-medium text-accent">
                 ✦ {expInfo.name}
@@ -232,16 +230,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Footer Meta: Sizes & Embroidery Hours */}
-        <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-stone/40 flex justify-between items-center text-[9px] sm:text-[10px] text-ink-muted uppercase tracking-wider">
+        <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-stone/40 flex justify-between items-center text-xs sm:text-xs text-ink-muted uppercase tracking-wider">
           {/* Available sizes */}
           <div className="flex items-center gap-1">
-            <span className="text-[8px] sm:text-[9px] text-ink-muted truncate max-w-[80px] sm:max-w-none">
+            <span className="text-xs sm:text-xs text-ink-muted truncate max-w-[80px] sm:max-w-none">
               Sizes {Array.from(new Set(product.variants.map((v) => v.size))).slice(0, 4).join('·')}
             </span>
           </div>
 
           {product.embroidery?.artisanHours && (
-            <span className="font-medium text-ink text-[8px] sm:text-[10px] shrink-0">
+            <span className="font-medium text-ink text-xs sm:text-xs shrink-0">
               {product.embroidery.artisanHours}h <span className="hidden sm:inline">embroidery</span>
               {product.handcrafted && <span className="text-gold-deep hidden sm:inline"> · Handcrafted</span>}
             </span>

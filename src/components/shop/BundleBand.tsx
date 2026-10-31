@@ -95,8 +95,8 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <p className="font-serif text-[15px] mt-2.5 leading-tight text-ink group-hover:text-accent transition-colors">{p.name}</p>
-                  <p className="text-[13px] text-ink-muted mt-1">{formatPrice(getDefaultVariant(p).priceCents)}</p>
+                  <p className="font-serif text-sm mt-2.5 leading-tight text-ink group-hover:text-accent transition-colors">{p.name}</p>
+                  <p className="text-sm text-ink-muted mt-1">{formatPrice(getDefaultVariant(p).priceCents)}</p>
                 </Link>
               </div>
             ))}
@@ -108,11 +108,11 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
               <p className="font-serif text-3xl mt-1 text-ink font-medium">
                 {formatPrice(setTotal)}
               </p>
-              <p className="text-[11px] mt-1 text-ink-muted">Unit prices · bundle discount engine lands next</p>
+              <p className="text-xs mt-1 text-ink-muted">Unit prices · bundle discount engine lands next</p>
             </div>
             <button
               onClick={handleAddAll}
-              className="px-6 py-3.5 font-serif text-[16px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm cursor-pointer"
+              className="px-6 py-3.5 font-serif text-base min-h-[48px] bg-panel-raised text-white hover:bg-panel-raised/90 transition-colors rounded-sm cursor-pointer"
             >
               Add All to Cart <span aria-hidden="true">→</span>
             </button>

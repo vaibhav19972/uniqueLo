@@ -96,7 +96,7 @@ export const NewFeatured: React.FC = () => {
       {/* Header */}
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <span>New & Featured</span>
@@ -107,13 +107,13 @@ export const NewFeatured: React.FC = () => {
               </>
             )}
           </nav>
-          <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium mt-4 block">
+          <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium mt-4 block">
             Curated Highlights
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
             {activeTabMeta.name}
           </h1>
-          <p className="font-serif italic text-lg sm:text-xl text-ink-muted mt-2">
+          <p className="font-serif text-lg sm:text-xl text-ink-muted mt-2">
             {activeTabMeta.tagline}
           </p>
           <p className="text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
@@ -131,7 +131,7 @@ export const NewFeatured: React.FC = () => {
                   to={to}
                   aria-current={isActive ? 'page' : undefined}
                   className={`px-4 py-2 text-xs uppercase tracking-widest font-sans border transition-colors ${isActive
-                    ? 'bg-ink text-cream border-transparent font-medium shadow-xs'
+                    ? 'bg-panel-raised text-white border-transparent font-medium shadow-xs'
                     : 'bg-paper text-ink border-stone hover:border-ink'
                     }`}
                 >
@@ -151,7 +151,7 @@ export const NewFeatured: React.FC = () => {
                     <Link
                       key={col.slug}
                       to={`/collections/${col.slug}`}
-                      className="px-2.5 py-1 text-[11px] font-sans uppercase tracking-wider bg-paper border border-stone/60 hover:border-accent text-ink hover:text-accent transition-colors"
+                      className="px-2.5 py-1 text-xs font-sans uppercase tracking-wider bg-paper border border-stone/60 hover:border-accent text-ink hover:text-accent transition-colors"
                     >
                       {col.name} →
                     </Link>
@@ -160,7 +160,7 @@ export const NewFeatured: React.FC = () => {
               </div>
               <Link
                 to="/collections"
-                className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold whitespace-nowrap transition-colors shrink-0"
+                className="px-4 py-2 bg-panel-raised text-white hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold whitespace-nowrap transition-colors shrink-0"
               >
                 All Collections Hub →
               </Link>

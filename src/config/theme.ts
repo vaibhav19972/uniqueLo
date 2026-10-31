@@ -1,55 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 /**
- * ─────────────────────────────────────────────────────────────────────────────
- * UNIQUE LO — GLOBAL THEME CONFIGURATION FLAG
- * ─────────────────────────────────────────────────────────────────────────────
- * 
- * Toggle between the two design systems:
- * 
- * • false -> "v1": The Atelier
- *   Quiet-luxury haute needlecraft, warm canvas cream (#f7f5f0), paper white,
- *   Playfair Display serif headlines, hairline stone rules, obsidian CTAs.
- * 
- * • true  -> "v2": Modern D2C Streetwear & Gokwik-Style Cart Bag
- *   Extracted from sketches/design system.png:
- *   Cool slate ground (#f0f2f5), pure white rounded cards (16px radius),
- *   neo-grotesque sans-serif typography (Satoshi/Inter), high-contrast onyx,
- *   emerald savings green (#059669 / #e6f7ef), multi-tier discount milestone bar,
- *   size-picker cart cards, and fast checkout bar.
- * 
- * Simply toggle USE_THEME_V2 below to switch between v1 and v2 across the entire site.
+ * UNIQUE LO — THEME
+ *
+ * The storefront ships one system: the dark canvas in src/styles/tokens.css
+ * (black ground, #181818 surfaces, a single terracotta accent, Geist).
+ *
+ * The previous v1/v2 switch is retired. It shipped a second palette and a
+ * second typeface side by side, which meant every component carried two
+ * layouts and the light one leaked onto dark surfaces. `useTheme()` now only
+ * keeps the <html> hook in sync for any CSS that still keys off it.
  */
-export const USE_THEME_V2: boolean = true;
-
-/**
- * Hook to read the current theme configuration and ensure the <html> element
- * attributes (data-theme="v2" | "v1") and classnames are synchronized.
- */
-export function useIsThemeV2(): boolean {
-  const [isV2] = useState<boolean>(() => {
-    // Check if query parameter explicitly overrides (e.g. ?theme=v2 or ?theme=v1)
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const urlTheme = params.get('theme');
-      if (urlTheme === 'v2') return true;
-      if (urlTheme === 'v1') return false;
-    }
-    return USE_THEME_V2;
-  });
-
+export function useTheme(): void {
   useEffect(() => {
     const root = document.documentElement;
-    if (isV2) {
-      root.setAttribute('data-theme', 'v2');
-      root.classList.add('theme-v2');
-      root.classList.remove('theme-v1');
-    } else {
-      root.setAttribute('data-theme', 'v1');
-      root.classList.add('theme-v1');
-      root.classList.remove('theme-v2');
-    }
-  }, [isV2]);
-
-  return isV2;
+    root.setAttribute('data-theme', 'dark');
+    root.classList.add('theme-dark');
+  }, []);
 }

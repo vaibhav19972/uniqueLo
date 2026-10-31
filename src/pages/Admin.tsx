@@ -1237,7 +1237,7 @@ INSERT INTO public.embroidery_details (
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+              <div className="flex items-center gap-2 text-xs font-sans tracking-[0.25em] text-accent uppercase font-medium">
                 <Link to="/" className="hover:underline">Home</Link>
                 <span>/</span>
                 <span className="text-ink">Atelier Studio</span>
@@ -1254,13 +1254,13 @@ INSERT INTO public.embroidery_details (
             <div className="flex items-center gap-3">
               <div className="px-3 py-1.5 bg-cream border border-stone/60 text-xs font-sans flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured() ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                <span className="font-medium text-[11px] uppercase tracking-wider">
+                <span className="font-medium text-xs uppercase tracking-wider">
                   {isSupabaseConfigured() ? 'Supabase Connected' : 'Local Fallback Mode'}
                 </span>
               </div>
               <Link
                 to="/shop"
-                className="px-4 py-1.5 bg-ink text-cream hover:bg-ink-muted text-xs font-sans uppercase tracking-widest transition-colors"
+                className="px-4 py-1.5 bg-panel-raised text-white hover:bg-panel-raised-muted text-xs font-sans uppercase tracking-widest transition-colors"
               >
                 View Shop →
               </Link>
@@ -1290,7 +1290,7 @@ INSERT INTO public.embroidery_details (
               }`}
             >
               <span>Catalog Overview</span>
-              <span className="px-1.5 py-0.2 bg-stone/20 text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 bg-stone/20 text-xs font-mono">
                 {existingProducts?.length ?? 0}
               </span>
             </button>
@@ -1319,10 +1319,10 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
                 <div className="border-b border-stone/30 pb-3 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 1</span>
+                    <span className="text-xs uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 1</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Core Product Identity</h2>
                   </div>
-                  <span className="text-[10px] text-accent font-mono font-medium">public.products</span>
+                  <span className="text-xs text-accent font-mono font-medium">public.products</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -1331,7 +1331,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Product Name *
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (name)
                       </span>
                     </div>
@@ -1350,13 +1350,13 @@ INSERT INTO public.embroidery_details (
                         URL Slug *
                       </label>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products (slug PK)
                         </span>
                         <button
                           type="button"
                           onClick={() => setAutoSlug(!autoSlug)}
-                          className="text-[10px] text-accent hover:underline uppercase tracking-wider"
+                          className="text-xs text-accent hover:underline uppercase tracking-wider"
                         >
                           {autoSlug ? '🔒 Auto-Generating' : '🔓 Custom Edit'}
                         </button>
@@ -1383,13 +1383,13 @@ INSERT INTO public.embroidery_details (
                         <button
                           type="button"
                           onClick={() => setShowAddCategoryModal(true)}
-                          className="text-[10px] text-accent hover:underline font-mono"
+                          className="text-xs text-accent hover:underline font-mono"
                           title="Add a new category to public.categories"
                         >
                           + New
                         </button>
                       </div>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.categories
                       </span>
                     </div>
@@ -1404,7 +1404,7 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to /category/{categorySlug} discovery door and database foreign key.
                     </p>
                   </div>
@@ -1414,7 +1414,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Universe (World) *
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.universes
                       </span>
                     </div>
@@ -1441,12 +1441,12 @@ INSERT INTO public.embroidery_details (
                         type="button"
                         onClick={() => setShowAddUniverseModal(true)}
                         title="Create a new universe"
-                        className="px-2.5 py-2 bg-ink text-cream hover:bg-ink-muted text-[11px] font-semibold cursor-pointer shrink-0"
+                        className="px-2.5 py-2 bg-panel-raised text-white hover:bg-panel-raised-muted text-xs font-semibold cursor-pointer shrink-0"
                       >
                         + New
                       </button>
                     </div>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to /universe/{universeSlug} portal and database foreign key.
                     </p>
                   </div>
@@ -1456,7 +1456,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Gender Facet *
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (gender)
                       </span>
                     </div>
@@ -1469,7 +1469,7 @@ INSERT INTO public.embroidery_details (
                       <option value="men">Men Only</option>
                       <option value="women">Women Only</option>
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to /men and /women discovery doorways. Check constraint: ('men', 'women', 'unisex').
                     </p>
                   </div>
@@ -1483,13 +1483,13 @@ INSERT INTO public.embroidery_details (
                         <button
                           type="button"
                           onClick={() => setShowAddCollectionModal(true)}
-                          className="text-[10px] text-accent hover:underline font-mono"
+                          className="text-xs text-accent hover:underline font-mono"
                           title="Add a new collection to public.collections"
                         >
                           + New
                         </button>
                       </div>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.collections
                       </span>
                     </div>
@@ -1504,7 +1504,7 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to /collections/{collectionSlug} discovery door and database foreign key.
                     </p>
                   </div>
@@ -1518,13 +1518,13 @@ INSERT INTO public.embroidery_details (
                         <button
                           type="button"
                           onClick={() => setShowAddGarmentModal(true)}
-                          className="text-[10px] text-accent hover:underline font-mono"
+                          className="text-xs text-accent hover:underline font-mono"
                           title="Add a new silhouette to public.garments"
                         >
                           + New
                         </button>
                       </div>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.garments
                       </span>
                     </div>
@@ -1546,7 +1546,7 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to /clothing/{garmentType} discovery door and database foreign key. Auto-syncs parent category.
                     </p>
                   </div>
@@ -1556,7 +1556,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Foreign Script Tagline
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (foreign_tagline)
                       </span>
                     </div>
@@ -1574,7 +1574,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Lore Motif (Optional)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.motifs
                       </span>
                     </div>
@@ -1590,7 +1590,7 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to IP-cleared motif heraldry and foreign key public.motifs.id.
                     </p>
                   </div>
@@ -1600,7 +1600,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Editorial Subtitle
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (subtitle)
                       </span>
                     </div>
@@ -1618,7 +1618,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Story & Atelier Description
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (description)
                       </span>
                     </div>
@@ -1637,7 +1637,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Edits — Curated Collections (Explore Gateways)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (edits text[])
                       </span>
                     </div>
@@ -1676,10 +1676,10 @@ INSERT INTO public.embroidery_details (
                         Style & Embroidery (1–5 Discovery Axis)
                       </label>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products.expression_score → derived slug
                         </span>
-                        <span className="text-[10px] font-sans text-accent font-semibold uppercase tracking-widest">
+                        <span className="text-xs font-sans text-accent font-semibold uppercase tracking-widest">
                           Level {selectedExpressionScore}: {selectedExpression.name}
                         </span>
                       </div>
@@ -1703,11 +1703,11 @@ INSERT INTO public.embroidery_details (
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-[9px] uppercase tracking-widest font-bold">Level {exp.score}</span>
+                              <span className="text-xs uppercase tracking-widest font-bold">Level {exp.score}</span>
                               {isSel && <span className="text-xs text-accent font-bold">✓</span>}
                             </div>
                             <div className="font-serif text-sm font-semibold text-ink mt-0.5">{exp.name}</div>
-                            <p className="text-[10px] text-ink-muted line-clamp-2 mt-1 leading-tight">{exp.characteristics}</p>
+                            <p className="text-xs text-ink-muted line-clamp-2 mt-1 leading-tight">{exp.characteristics}</p>
                           </button>
                         );
                       })}
@@ -1719,7 +1719,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Tags (Comma separated)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (tags text[])
                       </span>
                     </div>
@@ -1735,7 +1735,7 @@ INSERT INTO public.embroidery_details (
                         const clean = t.trim();
                         if (!clean) return null;
                         return (
-                          <span key={idx} className="px-2 py-0.5 bg-stone/20 text-[10px] text-ink-muted uppercase tracking-wider">
+                          <span key={idx} className="px-2 py-0.5 bg-stone/20 text-xs text-ink-muted uppercase tracking-wider">
                             #{clean}
                           </span>
                         );
@@ -1752,22 +1752,22 @@ INSERT INTO public.embroidery_details (
                         <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Social Proof
                         </span>
-                        <span className="text-[10px] text-accent font-serif italic">★ derived, not typed</span>
+                        <span className="text-xs text-accent font-serif">★ derived, not typed</span>
                       </div>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.reviews → products.rating
                       </span>
                     </div>
                     <div className="bg-cream/40 p-3.5 border border-stone/40 space-y-2">
-                      <p className="text-[11px] text-ink-muted leading-relaxed">
+                      <p className="text-xs text-ink-muted leading-relaxed">
                         Rating and review count are computed from real reviews in
-                        <code className="mx-1 px-1 bg-stone/20 font-mono text-[10px]">public.reviews</code>
+                        <code className="mx-1 px-1 bg-stone/20 font-mono text-xs">public.reviews</code>
                         and rebuilt by trigger. They are not editable here because a
                         hand-typed star score is a fabricated claim, not a measurement.
                       </p>
-                      <p className="text-[11px] text-ink-muted leading-relaxed">
+                      <p className="text-xs text-ink-muted leading-relaxed">
                         A "sold" badge was removed from the schema entirely — it was a
-                        free-text string (<code className="px-1 bg-stone/20 font-mono text-[10px]">"1.2K+"</code>)
+                        free-text string (<code className="px-1 bg-stone/20 font-mono text-xs">"1.2K+"</code>)
                         that could not be summed, audited, or distinguished from a guess.
                       </p>
                     </div>
@@ -1805,7 +1805,7 @@ INSERT INTO public.embroidery_details (
                         <span className="font-medium text-accent">✦ Authentic Handcrafted</span>
                       </label>
                     </div>
-                    <span className="text-[10px] text-accent font-mono font-medium">
+                    <span className="text-xs text-accent font-mono font-medium">
                       public.products (featured, customizable, handcrafted)
                     </span>
                   </div>
@@ -1816,12 +1816,12 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
                 <div className="border-b border-stone/30 pb-3 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 2</span>
+                    <span className="text-xs uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 2</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Embroidery & Craft Provenance</h2>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-accent font-mono font-medium">public.embroidery_details</span>
-                    <span className="text-xs text-ink-muted font-serif italic hidden sm:inline">Indian Atelier Heritage</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.embroidery_details</span>
+                    <span className="text-xs text-ink-muted font-serif hidden sm:inline">Indian Atelier Heritage</span>
                   </div>
                 </div>
 
@@ -1831,7 +1831,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Craft Technique *
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.technique
                       </span>
                     </div>
@@ -1846,7 +1846,7 @@ INSERT INTO public.embroidery_details (
                         </option>
                       ))}
                     </select>
-                    <p className="text-[10px] text-ink-muted mt-1 font-light">
+                    <p className="text-xs text-ink-muted mt-1 font-light">
                       Maps to heritage needlecraft method in public.embroidery_details.
                     </p>
                   </div>
@@ -1856,7 +1856,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Artisan Hand Hours
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.artisan_hours
                       </span>
                     </div>
@@ -1874,7 +1874,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Technique Display Label
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.technique_label
                       </span>
                     </div>
@@ -1891,7 +1891,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Thread Composition
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.thread_composition
                       </span>
                     </div>
@@ -1909,7 +1909,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Stitch Placements (Comma separated)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.placement
                       </span>
                     </div>
@@ -1927,7 +1927,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Motif Story
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.embroidery_details.motif_story
                       </span>
                     </div>
@@ -1945,10 +1945,10 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
                 <div className="border-b border-stone/30 pb-3 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 3</span>
+                    <span className="text-xs uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 3</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Textile & Workshop Batch</h2>
                   </div>
-                  <span className="text-[10px] text-accent font-mono font-medium">
+                  <span className="text-xs text-accent font-mono font-medium">
                     public.products (batch & textile)
                   </span>
                 </div>
@@ -1959,7 +1959,7 @@ INSERT INTO public.embroidery_details (
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Style Code
                         </label>
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products.style_code — UNIQUE
                         </span>
                       </div>
@@ -1970,7 +1970,7 @@ INSERT INTO public.embroidery_details (
                         placeholder="UL-HD-001"
                         className="w-full bg-cream border border-stone/60 px-3.5 py-2 text-xs text-ink font-mono focus:outline-none focus:border-accent"
                       />
-                      <p className="text-[10px] text-ink-muted mt-1">
+                      <p className="text-xs text-ink-muted mt-1">
                         The design family. Sizes and colours hang off it as variants.
                         Both Myntra and Ajio reject a style code reused across unrelated designs.
                       </p>
@@ -1981,12 +1981,12 @@ INSERT INTO public.embroidery_details (
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Category Attributes (validated on insert)
                         </label>
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products.attributes · {requiredAttrs.length} required for {garmentType || 'this garment'}
                         </span>
                       </div>
                       {requiredAttrs.length === 0 ? (
-                        <p className="text-[11px] text-ink-muted bg-cream border border-stone/40 px-3 py-2">
+                        <p className="text-xs text-ink-muted bg-cream border border-stone/40 px-3 py-2">
                           Select a garment type above — it decides which attributes are mandatory.
                         </p>
                       ) : (
@@ -1995,7 +1995,7 @@ INSERT INTO public.embroidery_details (
                             const opts = ATTRIBUTE_OPTIONS[key];
                             return (
                               <div key={key}>
-                                <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">
+                                <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">
                                   {key.replace(/_/g, ' ')}
                                 </label>
                                 {opts ? (
@@ -2029,13 +2029,13 @@ INSERT INTO public.embroidery_details (
                         <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Trust &amp; Logistics
                         </span>
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products (cod · delivery · returns)
                         </span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">COD</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">COD</label>
                           <select
                             value={codAvailable ? 'yes' : 'no'}
                             onChange={(e) => setCodAvailable(e.target.value === 'yes')}
@@ -2046,25 +2046,25 @@ INSERT INTO public.embroidery_details (
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery min (d)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery min (d)</label>
                           <input type="number" min="1" value={deliveryDaysMin}
                             onChange={(e) => setDeliveryDaysMin(parseInt(e.target.value) || 1)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery max (d)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Delivery max (d)</label>
                           <input type="number" min="1" value={deliveryDaysMax}
                             onChange={(e) => setDeliveryDaysMax(parseInt(e.target.value) || 1)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Return window (d)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Return window (d)</label>
                           <input type="number" min="0" value={returnWindowDays}
                             onChange={(e) => setReturnWindowDays(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                       </div>
-                      <p className="text-[10px] text-ink-muted mt-1.5">
+                      <p className="text-xs text-ink-muted mt-1.5">
                         Returns of 0 means non-returnable — the honest value for made-to-order pieces.
                       </p>
                     </div>
@@ -2074,30 +2074,30 @@ INSERT INTO public.embroidery_details (
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Legal Declarations
                         </label>
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           required for online sale in India
                         </span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Country of origin (ISO-2)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Country of origin (ISO-2)</label>
                           <input type="text" maxLength={2} value={countryOfOrigin}
                             onChange={(e) => setCountryOfOrigin(e.target.value.toUpperCase())}
                             placeholder="IN"
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Packed by</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Packed by</label>
                           <input type="text" value={packedBy} onChange={(e) => setPackedBy(e.target.value)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer name</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer name</label>
                           <input type="text" value={manufacturerName} onChange={(e) => setManufacturerName(e.target.value)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer address</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Manufacturer address</label>
                           <input type="text" value={manufacturerAddress} onChange={(e) => setManufacturerAddress(e.target.value)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
                         </div>
@@ -2109,51 +2109,51 @@ INSERT INTO public.embroidery_details (
                         <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                           Shipping & Fit Data
                         </label>
-                        <span className="text-[10px] text-accent font-mono font-medium">
+                        <span className="text-xs text-accent font-mono font-medium">
                           public.products (weight · hsn · package)
                         </span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Weight (g)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Weight (g)</label>
                           <input type="number" min="0" value={weightGrams} onChange={(e) => setWeightGrams(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">HSN</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">HSN</label>
                           <input type="text" value={hsnCode} onChange={(e) => setHsnCode(e.target.value)} placeholder="6109"
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg L (mm)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg L (mm)</label>
                           <input type="number" min="0" value={packageLengthMm} onChange={(e) => setPackageLengthMm(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg W (mm)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg W (mm)</label>
                           <input type="number" min="0" value={packageWidthMm} onChange={(e) => setPackageWidthMm(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg H (mm)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Pkg H (mm)</label>
                           <input type="number" min="0" value={packageHeightMm} onChange={(e) => setPackageHeightMm(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                         <div className="sm:col-span-1">
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Fit notes</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Fit notes</label>
                           <input type="text" value={fitNotes} onChange={(e) => setFitNotes(e.target.value)}
                             placeholder="Relaxed through the body; size down for a closer fit."
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Model height (cm)</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Model height (cm)</label>
                           <input type="number" min="0" value={modelHeightCm} onChange={(e) => setModelHeightCm(parseInt(e.target.value) || 0)}
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink font-mono focus:outline-none focus:border-accent" />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-ink-muted font-medium mb-1">Model worn size</label>
+                          <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium mb-1">Model worn size</label>
                           <input type="text" value={modelWornSize} onChange={(e) => setModelWornSize(e.target.value)} placeholder="M"
                             className="w-full bg-cream border border-stone/60 px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-accent" />
                         </div>
@@ -2165,7 +2165,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Materials Composition (Comma separated)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (material text[])
                       </span>
                     </div>
@@ -2183,7 +2183,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Care Guidelines (Comma separated)
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (care text[])
                       </span>
                     </div>
@@ -2201,7 +2201,7 @@ INSERT INTO public.embroidery_details (
                       <label className="block text-xs uppercase tracking-wider text-ink-muted font-medium">
                         Garment Fit Description
                       </label>
-                      <span className="text-[10px] text-accent font-mono font-medium">
+                      <span className="text-xs text-accent font-mono font-medium">
                         public.products (fit)
                       </span>
                     </div>
@@ -2220,11 +2220,11 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 sm:p-8 border border-stone/60 shadow-sm space-y-6">
                 <div className="border-b border-stone/30 pb-3 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 4</span>
+                    <span className="text-xs uppercase font-sans tracking-[0.2em] text-accent font-semibold">Step 4</span>
                     <h2 className="font-serif text-xl text-ink mt-0.5">Variant Matrix & Pricing</h2>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-accent font-mono font-medium">public.variants</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.variants</span>
                     <span className="text-xs text-ink-muted font-mono">{variants.length} Variants</span>
                   </div>
                 </div>
@@ -2235,13 +2235,13 @@ INSERT INTO public.embroidery_details (
                     <span className="text-xs font-semibold uppercase tracking-wider text-ink block">
                       Quick Variant Generator
                     </span>
-                    <span className="text-[10px] text-accent font-mono font-medium">
+                    <span className="text-xs text-accent font-mono font-medium">
                       public.variants (sku, color, size, price_cents, status, quantity)
                     </span>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-ink-muted uppercase tracking-wider mb-2">
+                    <label className="block text-xs text-ink-muted uppercase tracking-wider mb-2">
                       Choose Colors
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -2271,7 +2271,7 @@ INSERT INTO public.embroidery_details (
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-ink-muted uppercase tracking-wider mb-2">
+                    <label className="block text-xs text-ink-muted uppercase tracking-wider mb-2">
                       Choose Sizes
                     </label>
                     <div className="flex gap-2">
@@ -2289,7 +2289,7 @@ INSERT INTO public.embroidery_details (
                               }
                             }}
                             className={`w-9 h-9 text-xs font-mono font-medium border flex items-center justify-center cursor-pointer transition-colors ${
-                              isSel ? 'border-accent bg-accent text-cream' : 'border-stone/40 bg-paper text-ink-muted'
+                              isSel ? 'border-accent bg-accent text-white' : 'border-stone/40 bg-paper text-ink-muted'
                             }`}
                           >
                             {sz}
@@ -2308,12 +2308,12 @@ INSERT INTO public.embroidery_details (
                         onChange={(e) => setDefaultPrice(parseFloat(e.target.value) || 0)}
                         className="w-24 bg-paper border border-stone/60 px-2 py-1 text-xs font-mono font-bold text-ink"
                       />
-                      <span className="text-[10px] text-accent font-mono">public.variants.price_cents</span>
+                      <span className="text-xs text-accent font-mono">public.variants.price_cents</span>
                     </div>
                     <button
                       type="button"
                       onClick={handleGenerateMatrix}
-                      className="px-4 py-1.5 bg-accent text-cream hover:bg-accent-hover text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors"
+                      className="px-4 py-1.5 bg-accent text-white hover:bg-accent-hover text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors"
                     >
                       ✦ Re-Generate Variants
                     </button>
@@ -2323,35 +2323,35 @@ INSERT INTO public.embroidery_details (
                 {/* Variants Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs font-sans">
-                    <thead className="bg-cream border-y border-stone/30 text-[10px] uppercase tracking-widest text-ink-muted font-medium">
+                    <thead className="bg-cream border-y border-stone/30 text-xs uppercase tracking-widest text-ink-muted font-medium">
                       <tr>
                         <th className="py-2.5 px-3">
                           <div>SKU</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">sku PK</div>
+                          <div className="text-xs text-accent font-mono font-normal">sku PK</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Color</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">color_hex</div>
+                          <div className="text-xs text-accent font-mono font-normal">color_hex</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Size</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">size</div>
+                          <div className="text-xs text-accent font-mono font-normal">size</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Price</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">price_cents</div>
+                          <div className="text-xs text-accent font-mono font-normal">price_cents</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Status</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">public.variants.status</div>
+                          <div className="text-xs text-accent font-mono font-normal">public.variants.status</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Qty</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">quantity</div>
+                          <div className="text-xs text-accent font-mono font-normal">quantity</div>
                         </th>
                         <th className="py-2.5 px-3">
                           <div>Barcode</div>
-                          <div className="text-[9px] text-accent font-mono font-normal">barcode · UNIQUE</div>
+                          <div className="text-xs text-accent font-mono font-normal">barcode · UNIQUE</div>
                         </th>
                         <th className="py-2.5 px-3 text-right">Action</th>
                       </tr>
@@ -2359,7 +2359,7 @@ INSERT INTO public.embroidery_details (
                     <tbody className="divide-y divide-stone/20">
                       {variants.map((v, idx) => (
                         <tr key={idx} className="hover:bg-cream/50 transition-colors">
-                          <td className="py-2 px-3 font-mono text-[11px] font-medium text-ink">
+                          <td className="py-2 px-3 font-mono text-xs font-medium text-ink">
                             <input
                               type="text"
                               value={v.sku}
@@ -2401,7 +2401,7 @@ INSERT INTO public.embroidery_details (
                                 copy[idx].status = e.target.value as any;
                                 setVariants(copy);
                               }}
-                              className="bg-transparent border border-stone/40 px-1.5 py-0.5 text-[11px]"
+                              className="bg-transparent border border-stone/40 px-1.5 py-0.5 text-xs"
                               title="public.variants (status)"
                             >
                               <option value="in-stock">In Stock</option>
@@ -2435,14 +2435,14 @@ INSERT INTO public.embroidery_details (
                               placeholder="8901234567890"
                               maxLength={13}
                               title="Physical EAN-13. Must be unique across all variants — the same code on two sizes is rejected by the database."
-                              className={`w-28 bg-transparent border-b border-dashed font-mono text-[11px] focus:outline-none ${
+                              className={`w-28 bg-transparent border-b border-dashed font-mono text-xs focus:outline-none ${
                                 v.barcode && v.barcode.length !== 13
                                   ? 'border-red-500 text-red-600'
                                   : 'border-stone/50 focus:border-accent'
                               }`}
                             />
                             {v.barcode && v.barcode.length !== 13 && (
-                              <div className="text-[9px] text-red-600 mt-0.5">{v.barcode.length}/13</div>
+                              <div className="text-xs text-red-600 mt-0.5">{v.barcode.length}/13</div>
                             )}
                           </td>
                           <td className="py-2 px-3 text-right">
@@ -2469,14 +2469,14 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-6">
                 <div className="border-b border-stone/30 pb-2.5 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-semibold">Visuals</span>
+                    <span className="text-xs uppercase font-sans tracking-[0.2em] text-accent font-semibold">Visuals</span>
                     <h3 className="font-serif text-lg text-ink">Product Imagery & Upload</h3>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-accent font-mono font-medium">
+                    <span className="text-xs text-accent font-mono font-medium">
                       public.product_images
                     </span>
-                    <span className="text-[10px] text-ink-muted uppercase tracking-wider font-mono">
+                    <span className="text-xs text-ink-muted uppercase tracking-wider font-mono">
                       CDN Linked
                     </span>
                   </div>
@@ -2489,12 +2489,12 @@ INSERT INTO public.embroidery_details (
                       ✦ All-in-One Spec Board → 6 Slots
                     </span>
                     {boardCrops && boardIssues.length === 0 && (
-                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
+                      <span className="text-xs bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
                         6 crops ready
                       </span>
                     )}
                   </div>
-                  <p className="text-[10px] text-ink-muted leading-relaxed font-light">
+                  <p className="text-xs text-ink-muted leading-relaxed font-light">
                     Upload one v1 board PNG (3×2 cells + numbered labels). It is split
                     into the six slots below in cell order; label strips are excluded
                     automatically. Review previews, Apply, then upload all to the CDN.
@@ -2524,7 +2524,7 @@ INSERT INTO public.embroidery_details (
                   {boardIssues.length > 0 && (
                     <div className="p-2.5 bg-amber-50 border border-amber-300 space-y-1">
                       {boardIssues.map((issue, i) => (
-                        <p key={i} className="text-[10px] text-amber-800 font-medium">
+                        <p key={i} className="text-xs text-amber-800 font-medium">
                           Slot {issue.slotIndex >= 0 ? issue.slotIndex + 1 : '—'}: {issue.message}
                         </p>
                       ))}
@@ -2541,7 +2541,7 @@ INSERT INTO public.embroidery_details (
                               alt={`${crop.def.label} preview`}
                               className="w-full h-full object-cover"
                             />
-                            <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 font-mono">
+                            <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 font-mono">
                               {crop.def.index + 1} · {crop.width}×{crop.height}
                             </span>
                           </div>
@@ -2551,7 +2551,7 @@ INSERT INTO public.embroidery_details (
                         <button
                           type="button"
                           onClick={applyBoardCrops}
-                          className="flex-1 px-3 py-2 bg-paper border border-ink/30 hover:border-ink text-ink text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors"
+                          className="flex-1 px-3 py-2 bg-paper border border-ink/30 hover:border-ink text-ink text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors"
                         >
                           Apply previews to slots
                         </button>
@@ -2559,14 +2559,14 @@ INSERT INTO public.embroidery_details (
                           type="button"
                           onClick={uploadBoardCrops}
                           disabled={isBoardUploading}
-                          className="flex-1 px-3 py-2 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-widest font-medium cursor-pointer transition-colors disabled:opacity-50"
+                          className="flex-1 px-3 py-2 bg-accent text-white hover:bg-accent-hover text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors disabled:opacity-50"
                         >
                           {isBoardUploading ? 'Uploading 6...' : 'Apply + upload all 6 to CDN'}
                         </button>
                         <button
                           type="button"
                           onClick={clearBoard}
-                          className="px-3 py-2 text-ink-muted hover:text-ink text-[11px] uppercase tracking-wider cursor-pointer transition-colors"
+                          className="px-3 py-2 text-ink-muted hover:text-ink text-xs uppercase tracking-wider cursor-pointer transition-colors"
                         >
                           ✕
                         </button>
@@ -2586,7 +2586,7 @@ INSERT INTO public.embroidery_details (
                           {def.index + 1}. {def.label}
                         </span>
                         {img.src.startsWith('http') && (
-                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
+                          <span className="text-xs bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
                             CDN Active
                           </span>
                         )}
@@ -2614,7 +2614,7 @@ INSERT INTO public.embroidery_details (
                       </label>
 
                       <div>
-                        <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1 font-mono">
                           Slot {def.index + 1} URL (Embedded in JSON):
                         </label>
                         <input
@@ -2622,12 +2622,12 @@ INSERT INTO public.embroidery_details (
                           value={img.src}
                           onChange={(e) => updateSlot(def.index, { src: e.target.value })}
                           placeholder="/images/products/... or https://..."
-                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-accent"
+                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-xs font-mono text-ink focus:outline-none focus:border-accent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[10px] uppercase tracking-wider text-ink-muted mb-1 font-mono">
+                        <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1 font-mono">
                           Slot {def.index + 1} alt text:
                         </label>
                         <input
@@ -2635,20 +2635,20 @@ INSERT INTO public.embroidery_details (
                           value={img.alt}
                           onChange={(e) => updateSlot(def.index, { alt: e.target.value })}
                           placeholder={def.altSuffix}
-                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-[11px] text-ink focus:outline-none focus:border-accent"
+                          className="w-full bg-paper border border-stone/60 px-2.5 py-1 text-xs text-ink focus:outline-none focus:border-accent"
                         />
                       </div>
 
                       {/* Preset quick picker (slot 1 only) */}
                       {def.index === 0 && (
                         <div className="flex flex-wrap gap-1 pt-1">
-                          <span className="text-[9px] text-ink-muted uppercase self-center mr-1">Presets:</span>
+                          <span className="text-xs text-ink-muted uppercase self-center mr-1">Presets:</span>
                           {PRESET_IMAGES.slice(0, 3).map((p, i) => (
                             <button
                               key={i}
                               type="button"
                               onClick={() => updateSlot(0, { src: p.src })}
-                              className="text-[9px] px-1.5 py-0.5 bg-paper border border-stone/40 hover:border-accent text-ink-muted"
+                              className="text-xs px-1.5 py-0.5 bg-paper border border-stone/40 hover:border-accent text-ink-muted"
                             >
                               {p.label.split(' ')[0]} {i + 1}
                             </button>
@@ -2665,7 +2665,7 @@ INSERT INTO public.embroidery_details (
                             (e.target as HTMLImageElement).src = '/images/placeholders/hero.jpg';
                           }}
                         />
-                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1.5 py-0.5 uppercase tracking-wider">
+                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 uppercase tracking-wider">
                           Slot {def.index + 1} (3:4)
                         </span>
                       </div>
@@ -2678,12 +2678,12 @@ INSERT INTO public.embroidery_details (
               <div className="bg-paper p-6 border border-stone/60 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-stone/30 pb-2">
                   <h3 className="font-serif text-lg text-ink">Publish</h3>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-medium">
+                  <span className="text-xs uppercase font-sans tracking-widest text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-200 font-medium">
                     ✦ Admin-only · RLS enforced
                   </span>
                 </div>
 
-                <p className="text-[11px] text-ink-muted leading-relaxed font-light">
+                <p className="text-xs text-ink-muted leading-relaxed font-light">
                   Writes all four tables — product, images, variants and craft provenance — in
                   one transaction. A failure anywhere rolls back the whole publish, so you can
                   never end up with a product that has no variants and no price.
@@ -2694,7 +2694,7 @@ INSERT INTO public.embroidery_details (
                   type="button"
                   onClick={handlePublishToDatabase}
                   disabled={isPublishing}
-                  className="w-full py-3 bg-emerald-700 text-cream hover:bg-emerald-800 transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-emerald-700 text-white hover:bg-emerald-800 transition-colors text-xs uppercase tracking-widest font-semibold cursor-pointer flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>{isPublishing ? '⏳' : '✦'}</span>
                   <span>{isPublishing ? 'Publishing…' : 'Publish to Database'}</span>
@@ -2702,7 +2702,7 @@ INSERT INTO public.embroidery_details (
 
                 {publishResult && (
                   <div
-                    className={`text-[11px] px-3 py-2 border leading-relaxed ${
+                    className={`text-xs px-3 py-2 border leading-relaxed ${
                       publishResult.ok
                         ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
                         : 'bg-red-50 border-red-300 text-red-900'
@@ -2714,7 +2714,7 @@ INSERT INTO public.embroidery_details (
                 )}
 
                 <div className="pt-2 border-t border-stone/20">
-                  <p className="text-[10px] text-ink-muted mb-2 leading-relaxed">
+                  <p className="text-xs text-ink-muted mb-2 leading-relaxed">
                     Fallback: the same operation as SQL, if you would rather review it first
                     or apply it to a different environment.
                   </p>
@@ -2724,7 +2724,7 @@ INSERT INTO public.embroidery_details (
                 <button
                   type="button"
                   onClick={() => copyToClipboard(generatedSQL, 'Ready-to-run multi-table SQL query')}
-                  className="w-full py-2.5 bg-accent text-cream hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-medium cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 bg-accent text-white hover:bg-accent-hover transition-colors text-xs uppercase tracking-widest font-medium cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>📋</span>
                   <span>Copy equivalent SQL</span>
@@ -2735,14 +2735,14 @@ INSERT INTO public.embroidery_details (
                   href={`https://supabase.com/dashboard/project/${(import.meta.env.VITE_SUPABASE_URL || '').replace(/^https?:\/\//, '').split('.')[0] || 'heimnfjuwmmmejqcjbbd'}/sql/new`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 bg-ink text-cream hover:bg-ink-muted transition-colors text-xs uppercase tracking-widest font-medium flex items-center justify-center gap-2 text-center"
+                  className="w-full py-2.5 bg-panel-raised text-white hover:bg-panel-raised-muted transition-colors text-xs uppercase tracking-widest font-medium flex items-center justify-center gap-2 text-center"
                 >
                   <span>Open Supabase SQL Editor ↗</span>
                 </a>
 
                 {/* Copy JSON snippet */}
                 {hasUnpublishedSlots && (
-                  <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-300 px-2.5 py-1.5 font-medium">
+                  <p className="text-xs text-amber-800 bg-amber-50 border border-amber-300 px-2.5 py-1.5 font-medium">
                     Some slots still hold local previews — upload all images to
                     the CDN before copying SQL/JSON, or the snippets will embed
                     unusable local URLs.
@@ -2758,20 +2758,20 @@ INSERT INTO public.embroidery_details (
 
                 {/* JSON Preview Collapsible */}
                 <details className="pt-1 text-xs text-ink-muted">
-                  <summary className="cursor-pointer uppercase tracking-wider text-[10px] font-semibold text-accent hover:underline select-none">
+                  <summary className="cursor-pointer uppercase tracking-wider text-xs font-semibold text-accent hover:underline select-none">
                     Preview Generated JSON Object
                   </summary>
-                  <pre className="mt-2 p-3 bg-ink text-cream font-mono text-[10px] rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
+                  <pre className="mt-2 p-3 bg-panel-raised text-white font-mono text-xs rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
                     {generatedJSON}
                   </pre>
                 </details>
 
                 {/* SQL Code Preview Collapsible */}
                 <details className="pt-2 border-t border-stone/20 text-xs text-ink-muted">
-                  <summary className="cursor-pointer uppercase tracking-wider text-[10px] font-semibold text-accent hover:underline select-none">
+                  <summary className="cursor-pointer uppercase tracking-wider text-xs font-semibold text-accent hover:underline select-none">
                     View Generated SQL Statement
                   </summary>
-                  <pre className="mt-2 p-3 bg-ink text-cream font-mono text-[10px] rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
+                  <pre className="mt-2 p-3 bg-panel-raised text-white font-mono text-xs rounded max-h-60 overflow-y-auto leading-relaxed border border-stone/40">
                     {generatedSQL}
                   </pre>
                 </details>
@@ -2803,7 +2803,7 @@ INSERT INTO public.embroidery_details (
               <button
                 type="button"
                 onClick={() => setActiveTab('create')}
-                className="px-4 py-2 bg-accent text-cream hover:bg-accent-hover text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors"
+                className="px-4 py-2 bg-accent text-white hover:bg-accent-hover text-xs uppercase tracking-widest font-medium cursor-pointer transition-colors"
               >
                 + Add Another Product
               </button>
@@ -2814,47 +2814,47 @@ INSERT INTO public.embroidery_details (
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs font-sans">
-                  <thead className="bg-cream border-y border-stone/30 text-[10px] uppercase tracking-widest text-ink-muted font-medium">
+                  <thead className="bg-cream border-y border-stone/30 text-xs uppercase tracking-widest text-ink-muted font-medium">
                     <tr>
                       <th className="py-3 px-3">
                         <div>Product</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.products</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.products</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Category</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.categories</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.categories</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Garment</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.garments</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.garments</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Collection</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.collections</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.collections</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Expression</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">expression_score</span>
+                        <span className="text-xs text-accent font-mono font-normal">expression_score</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Technique</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.embroidery_details</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.embroidery_details</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Price</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">price_cents</span>
+                        <span className="text-xs text-accent font-mono font-normal">price_cents</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Variants</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">public.variants</span>
+                        <span className="text-xs text-accent font-mono font-normal">public.variants</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Batch</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">style_code</span>
+                        <span className="text-xs text-accent font-mono font-normal">style_code</span>
                       </th>
                       <th className="py-3 px-3">
                         <div>Rating & Reviews</div>
-                        <span className="text-[9px] text-accent font-mono font-normal">rating, review_count</span>
+                        <span className="text-xs text-accent font-mono font-normal">rating, review_count</span>
                       </th>
                       <th className="py-3 px-3 text-right">View Live</th>
                     </tr>
@@ -2871,27 +2871,27 @@ INSERT INTO public.embroidery_details (
                             />
                             <div>
                               <span className="font-serif font-bold text-ink block">{product.name}</span>
-                              <span className="font-mono text-[10px] text-ink-muted">{product.slug}</span>
+                              <span className="font-mono text-xs text-ink-muted">{product.slug}</span>
                             </div>
                           </div>
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 bg-cream border border-stone/40 text-[10px] uppercase tracking-wider">
+                          <span className="px-2 py-0.5 bg-cream border border-stone/40 text-xs uppercase tracking-wider">
                             {product.categorySlug}
                           </span>
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-[10px] uppercase font-mono tracking-wider font-semibold text-ink whitespace-nowrap">
+                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-xs uppercase font-mono tracking-wider font-semibold text-ink whitespace-nowrap">
                             {product.garmentType || '—'}
                           </span>
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-[10px] uppercase font-mono tracking-wider font-medium text-ink whitespace-nowrap">
+                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-xs uppercase font-mono tracking-wider font-medium text-ink whitespace-nowrap">
                             {product.collectionSlug || product.artStyleSlug || '—'}
                           </span>
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-[10px] uppercase tracking-wider text-accent font-medium whitespace-nowrap">
+                          <span className="px-2 py-0.5 bg-paper border border-stone/40 text-xs uppercase tracking-wider text-accent font-medium whitespace-nowrap">
                             ✦ L{product.expressionScore ?? 3} · {(product.expressionSlug || 'cult').replace(/-/g, ' ')}
                           </span>
                         </td>
@@ -2904,14 +2904,14 @@ INSERT INTO public.embroidery_details (
                         <td className="py-3 px-3 font-mono">
                           {product.variants.length} SKUs
                         </td>
-                        <td className="py-3 px-3 text-[11px] text-ink-muted">
+                        <td className="py-3 px-3 text-xs text-ink-muted">
                           {product.codAvailable ? 'COD' : 'Prepaid'}
                         </td>
-                        <td className="py-3 px-3 text-[11px] font-mono text-ink whitespace-nowrap">
+                        <td className="py-3 px-3 text-xs font-mono text-ink whitespace-nowrap">
                           ★ {product.rating ? Number(product.rating).toFixed(1) : '5.0'}
                           <span className="text-ink-muted ml-1">({product.reviewCount ?? 0})</span>
                           {product.styleCode && (
-                            <span className="ml-1.5 px-1.5 py-0.5 bg-stone/20 text-ink-muted text-[9px] font-mono">
+                            <span className="ml-1.5 px-1.5 py-0.5 bg-stone/20 text-ink-muted text-xs font-mono">
                               {product.styleCode}
                             </span>
                           )}
@@ -2919,7 +2919,7 @@ INSERT INTO public.embroidery_details (
                         <td className="py-3 px-3 text-right">
                           <Link
                             to={`/product/${product.slug}`}
-                            className="text-accent hover:underline font-medium uppercase text-[11px] tracking-wider"
+                            className="text-accent hover:underline font-medium uppercase text-xs tracking-wider"
                           >
                             View PDP ↗
                           </Link>
@@ -2939,10 +2939,10 @@ INSERT INTO public.embroidery_details (
             {/* Header */}
             <div className="border-b border-stone/30 pb-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] font-sans tracking-[0.2em] text-accent font-semibold uppercase">
+                <div className="flex items-center gap-2 text-xs font-sans tracking-[0.2em] text-accent font-semibold uppercase">
                   Production Database Schema & Incremental Migration Hub
                 </div>
-                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-mono font-semibold rounded">
+                <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-mono font-semibold rounded">
                   ✦ Production Protected (Zero Wipes)
                 </span>
               </div>
@@ -2958,9 +2958,9 @@ INSERT INTO public.embroidery_details (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Workflow 1</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">Workflow 1</span>
                   <h3 className="font-serif text-base text-ink font-semibold">Add New Master Taxonomy (Universes, Categories, Garments, Collections, Motifs)</h3>
-                  <p className="text-[11px] text-ink-muted">
+                  <p className="text-xs text-ink-muted">
                     Idempotent upsert queries that add new taxonomies or update existing descriptions without foreign key constraint violations.
                   </p>
                 </div>
@@ -2968,7 +2968,7 @@ INSERT INTO public.embroidery_details (
                   href={`https://supabase.com/dashboard/project/${(import.meta.env.VITE_SUPABASE_URL || '').replace(/^https?:\/\//, '').split('.')[0] || 'heimnfjuwmmmejqcjbbd'}/sql/new`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 bg-ink text-cream hover:bg-ink-muted text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
+                  className="px-3.5 py-1.5 bg-panel-raised text-white hover:bg-panel-raised-muted text-xs uppercase tracking-wider font-semibold cursor-pointer shrink-0"
                 >
                   Open Supabase SQL Editor ↗
                 </a>
@@ -2981,9 +2981,9 @@ INSERT INTO public.embroidery_details (
                 <div className="p-4 bg-cream border border-stone/40 space-y-2 md:col-span-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">0. Add Universe (root of the taxonomy)</span>
-                    <span className="text-[10px] text-accent font-mono font-medium">public.universes</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.universes</span>
                   </div>
-                  <p className="text-[10px] text-ink-muted leading-relaxed">
+                  <p className="text-xs text-ink-muted leading-relaxed">
                     A universe is a whole world — its own route, hero, lore, motifs and
                     product set. Adding one here makes <code className="bg-stone/20 px-1 font-mono">/universe/&lt;slug&gt;</code> live.
                     Display copy lives in <code className="bg-stone/20 px-1 font-mono">theme_tokens</code>, not in twelve typed columns.
@@ -2991,11 +2991,11 @@ INSERT INTO public.embroidery_details (
                   <button
                     type="button"
                     onClick={() => setShowAddUniverseModal(true)}
-                    className="w-full py-2 bg-ink text-cream hover:bg-ink-muted text-[10px] uppercase font-semibold cursor-pointer"
+                    className="w-full py-2 bg-panel-raised text-white hover:bg-panel-raised-muted text-xs uppercase font-semibold cursor-pointer"
                   >
                     ✦ Create New Universe
                   </button>
-                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-32">
+                  <pre className="bg-panel-raised text-white p-3 text-xs font-mono overflow-x-auto rounded leading-relaxed max-h-32">
 {`INSERT INTO public.universes
   (slug, name, tagline, lore, drop_cadence, is_active, order_num)
 VALUES (
@@ -3024,7 +3024,7 @@ ON CONFLICT (slug) DO UPDATE SET
                         'Add Universe SQL'
                       )
                     }
-                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-xs uppercase font-semibold text-ink cursor-pointer"
                   >
                     📋 Copy Add Universe SQL
                   </button>
@@ -3034,9 +3034,9 @@ ON CONFLICT (slug) DO UPDATE SET
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">1. Add New Category</span>
-                    <span className="text-[10px] text-accent font-mono font-medium">public.categories</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.categories</span>
                   </div>
-                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+                  <pre className="bg-panel-raised text-white p-3 text-xs font-mono overflow-x-auto rounded leading-relaxed max-h-36">
 {`INSERT INTO public.categories (slug, name, label, description, image, order_num)
 VALUES (
   'kimonos', 'Kimonos & Haori', 'Kimonos',
@@ -3063,7 +3063,7 @@ ON CONFLICT (slug) DO UPDATE SET
                         'Add Category SQL'
                       )
                     }
-                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-xs uppercase font-semibold text-ink cursor-pointer"
                   >
                     📋 Copy Add Category SQL
                   </button>
@@ -3073,9 +3073,9 @@ ON CONFLICT (slug) DO UPDATE SET
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">2. Add Garment Silhouette</span>
-                    <span className="text-[10px] text-accent font-mono font-medium">public.garments</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.garments</span>
                   </div>
-                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+                  <pre className="bg-panel-raised text-white p-3 text-xs font-mono overflow-x-auto rounded leading-relaxed max-h-36">
 {`INSERT INTO public.garments (slug, name, category_slug, description, order_num)
 VALUES (
   'haori', 'Haori Jackets', 'outerwear',
@@ -3100,7 +3100,7 @@ ON CONFLICT (slug) DO UPDATE SET
                         'Add Garment Silhouette SQL'
                       )
                     }
-                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-xs uppercase font-semibold text-ink cursor-pointer"
                   >
                     📋 Copy Add Garment SQL
                   </button>
@@ -3110,9 +3110,9 @@ ON CONFLICT (slug) DO UPDATE SET
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">3. Add Collection (Seasonal Drop)</span>
-                    <span className="text-[10px] text-accent font-mono font-medium">public.collections</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.collections</span>
                   </div>
-                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+                  <pre className="bg-panel-raised text-white p-3 text-xs font-mono overflow-x-auto rounded leading-relaxed max-h-36">
 {`INSERT INTO public.collections (slug, name, tagline, description, universe_slug, featured, order_num)
 VALUES (
   'samurai-twilight', 'Samurai Twilight Collection',
@@ -3141,7 +3141,7 @@ ON CONFLICT (slug) DO UPDATE SET
                         'Add Collection SQL'
                       )
                     }
-                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-xs uppercase font-semibold text-ink cursor-pointer"
                   >
                     📋 Copy Add Collection SQL
                   </button>
@@ -3151,9 +3151,9 @@ ON CONFLICT (slug) DO UPDATE SET
                 <div className="p-4 bg-cream border border-stone/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-serif font-bold text-ink">4. Add Motif</span>
-                    <span className="text-[10px] text-accent font-mono font-medium">public.motifs</span>
+                    <span className="text-xs text-accent font-mono font-medium">public.motifs</span>
                   </div>
-                  <pre className="bg-ink text-cream p-3 text-[10px] font-mono overflow-x-auto rounded leading-relaxed max-h-36">
+                  <pre className="bg-panel-raised text-white p-3 text-xs font-mono overflow-x-auto rounded leading-relaxed max-h-36">
 {`INSERT INTO public.motifs (id, universe_slug, name, meaning, symbol_notes, ip_cleared)
 VALUES (
   'katana-arc', 'animeverse', 'Katana Arc Blade',
@@ -3178,7 +3178,7 @@ ON CONFLICT (id) DO UPDATE SET
                         'Add Motif SQL'
                       )
                     }
-                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-[10px] uppercase font-semibold text-ink cursor-pointer"
+                    className="w-full py-1.5 bg-paper border border-stone/60 hover:bg-stone/10 text-xs uppercase font-semibold text-ink cursor-pointer"
                   >
                     📋 Copy Add Motif SQL
                   </button>
@@ -3192,9 +3192,9 @@ ON CONFLICT (id) DO UPDATE SET
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Coverage</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">Coverage</span>
                   <h3 className="font-serif text-base text-ink font-semibold">What this panel can manage</h3>
-                  <p className="text-[11px] text-ink-muted">
+                  <p className="text-xs text-ink-muted">
                     The database is the contract; this is how much of it the Studio can actually reach.
                   </p>
                 </div>
@@ -3218,18 +3218,18 @@ ON CONFLICT (id) DO UPDATE SET
                 ].map((row) => (
                   <div
                     key={row.table}
-                    className={`p-2.5 border text-[11px] leading-snug ${
+                    className={`p-2.5 border text-xs leading-snug ${
                       row.ok ? 'border-stone/40 bg-cream' : 'border-amber-300 bg-amber-50'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium text-ink">{row.label}</span>
-                      <span className={`text-[9px] font-mono shrink-0 ${row.ok ? 'text-accent' : 'text-amber-700'}`}>
+                      <span className={`text-xs font-mono shrink-0 ${row.ok ? 'text-accent' : 'text-amber-700'}`}>
                         {row.ok ? '✓' : '!'} {row.how}
                       </span>
                     </div>
-                    <code className="block text-[9px] text-ink-muted font-mono mt-0.5">{row.table}</code>
-                    <p className="text-[10px] text-ink-muted mt-1">{row.note}</p>
+                    <code className="block text-xs text-ink-muted font-mono mt-0.5">{row.table}</code>
+                    <p className="text-xs text-ink-muted mt-1">{row.note}</p>
                   </div>
                 ))}
               </div>
@@ -3239,9 +3239,9 @@ ON CONFLICT (id) DO UPDATE SET
             <div className="space-y-3 pt-4 border-t border-stone/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Workflow 2</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">Workflow 2</span>
                   <h3 className="font-serif text-base text-ink font-semibold">Database Integrity & Row Count Diagnostics</h3>
-                  <p className="text-[11px] text-ink-muted">
+                  <p className="text-xs text-ink-muted">
                     Run these queries in Supabase SQL editor to inspect row counts across all 9 catalog tables and verify zero orphan records.
                   </p>
                 </div>
@@ -3279,13 +3279,13 @@ SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public';`,
                       'Health Diagnostic SQL Queries'
                     )
                   }
-                  className="px-3.5 py-1.5 bg-accent text-cream hover:bg-accent-hover text-[11px] uppercase tracking-wider font-semibold cursor-pointer shrink-0"
+                  className="px-3.5 py-1.5 bg-accent text-white hover:bg-accent-hover text-xs uppercase tracking-wider font-semibold cursor-pointer shrink-0"
                 >
                   📋 Copy Health Check Queries
                 </button>
               </div>
 
-              <pre className="bg-ink text-cream p-4 text-[11px] font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed max-h-48">
+              <pre className="bg-panel-raised text-white p-4 text-xs font-mono overflow-x-auto rounded border border-stone/30 leading-relaxed max-h-48">
 {`-- Row Counts:
 SELECT 'universes' as tbl, count(*) FROM public.universes UNION ALL
 SELECT 'motifs', count(*) FROM public.motifs UNION ALL
@@ -3306,9 +3306,9 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
             <div className="space-y-3 pt-4 border-t border-stone/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">Documentation</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">Documentation</span>
                   <h3 className="font-serif text-base text-ink font-semibold">Official Database Migration Guide</h3>
-                  <p className="text-[11px] text-ink-muted">
+                  <p className="text-xs text-ink-muted">
                     Full architectural manual on adding columns, creating new tables, zero-downtime migrations, and RLS security policies.
                   </p>
                 </div>
@@ -3317,9 +3317,9 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
               <div className="p-4 bg-cream border border-stone/40 text-xs text-ink space-y-2">
                 <span className="font-semibold block">✦ Synchronized in Repository:</span>
                 <p className="text-ink-muted leading-relaxed">
-                  Refer to <code className="bg-stone/20 px-1.5 py-0.5 font-mono text-[11px]">docs/DATABASE_MIGRATION_GUIDE.md</code> for the complete step-by-step operating runbook, 4-level topological foreign key dependency graphs, and TypeScript synchronization checklists.
+                  Refer to <code className="bg-stone/20 px-1.5 py-0.5 font-mono text-xs">docs/DATABASE_MIGRATION_GUIDE.md</code> for the complete step-by-step operating runbook, 4-level topological foreign key dependency graphs, and TypeScript synchronization checklists.
                 </p>
-                <div className="pt-2 flex items-center gap-4 text-[11px] font-mono text-ink-muted">
+                <div className="pt-2 flex items-center gap-4 text-xs font-mono text-ink-muted">
                   <span>File: docs/DATABASE_MIGRATION_GUIDE.md (19 KB)</span>
                   <span>DDL Blueprint: backend/schema.sql</span>
                   <span>Baseline Seed: backend/production-seed.sql</span>
@@ -3335,15 +3335,15 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
             <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
               <div className="flex items-center justify-between border-b border-stone/30 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
                   <h3 className="font-serif text-lg text-ink font-semibold">Add New Category</h3>
                 </div>
-                <span className="text-[10px] text-accent font-mono font-medium">public.categories</span>
+                <span className="text-xs text-accent font-mono font-medium">public.categories</span>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Category Name *
                   </label>
                   <input
@@ -3366,7 +3366,7 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Slug (Primary Key) *
                     </label>
                     <input
@@ -3378,7 +3378,7 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
                     />
                   </div>
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Short Label
                     </label>
                     <input
@@ -3392,7 +3392,7 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Description
                   </label>
                   <textarea
@@ -3404,7 +3404,7 @@ WHERE p.category_slug IS NOT NULL AND c.slug IS NULL;`}
                   />
                 </div>
 
-                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                <div className="p-3 bg-cream border border-stone/40 text-xs text-ink-muted space-y-1">
                   <span className="font-semibold text-ink block">✦ Target Database Table:</span>
                   <p>
                     Inserts into <code className="font-mono text-accent">public.categories</code> via authenticated client. Immediately available in Admin Studio and navigation doors without wiping or rebuilding the database.
@@ -3423,7 +3423,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                       'Idempotent Category SQL'
                     )
                   }
-                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                  className="text-xs text-ink-muted hover:text-ink font-mono underline"
                 >
                   📋 Copy SQL
                 </button>
@@ -3431,7 +3431,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                   <button
                     type="button"
                     onClick={() => setShowAddCategoryModal(false)}
-                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-xs uppercase tracking-wider font-semibold"
                   >
                     Cancel
                   </button>
@@ -3439,7 +3439,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                     type="button"
                     onClick={handleSaveNewCategory}
                     disabled={isSavingTaxonomy}
-                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs uppercase tracking-wider font-semibold disabled:opacity-50"
                   >
                     {isSavingTaxonomy ? 'Saving...' : 'Save to public.categories'}
                   </button>
@@ -3455,15 +3455,15 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
             <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
               <div className="flex items-center justify-between border-b border-stone/30 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
                   <h3 className="font-serif text-lg text-ink font-semibold">Add Garment Silhouette</h3>
                 </div>
-                <span className="text-[10px] text-accent font-mono font-medium">public.garments</span>
+                <span className="text-xs text-accent font-mono font-medium">public.garments</span>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Silhouette Name *
                   </label>
                   <input
@@ -3483,7 +3483,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Slug (Primary Key) *
                     </label>
                     <input
@@ -3496,10 +3496,10 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium">
+                      <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium">
                         Category *
                       </label>
-                      <span className="text-[9px] text-accent font-mono">FK public.categories</span>
+                      <span className="text-xs text-accent font-mono">FK public.categories</span>
                     </div>
                     <select
                       value={newGarmentCategory}
@@ -3516,7 +3516,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Description
                   </label>
                   <textarea
@@ -3528,7 +3528,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, label = EXCLUDED.label, d
                   />
                 </div>
 
-                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                <div className="p-3 bg-cream border border-stone/40 text-xs text-ink-muted space-y-1">
                   <span className="font-semibold text-ink block">✦ Target Database Table:</span>
                   <p>
                     Inserts into <code className="font-mono text-accent">public.garments</code> with foreign key link to <code className="font-mono text-accent">category_slug = '{newGarmentCategory}'</code>.
@@ -3547,7 +3547,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                       'Idempotent Garment SQL'
                     )
                   }
-                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                  className="text-xs text-ink-muted hover:text-ink font-mono underline"
                 >
                   📋 Copy SQL
                 </button>
@@ -3555,7 +3555,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                   <button
                     type="button"
                     onClick={() => setShowAddGarmentModal(false)}
-                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-xs uppercase tracking-wider font-semibold"
                   >
                     Cancel
                   </button>
@@ -3563,7 +3563,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                     type="button"
                     onClick={handleSaveNewGarment}
                     disabled={isSavingTaxonomy}
-                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs uppercase tracking-wider font-semibold disabled:opacity-50"
                   >
                     {isSavingTaxonomy ? 'Saving...' : 'Save to public.garments'}
                   </button>
@@ -3579,15 +3579,15 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
             <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-stone/30 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
                   <h3 className="font-serif text-lg text-ink font-semibold">Add Universe</h3>
                 </div>
-                <span className="text-[10px] text-accent font-mono font-medium">public.universes</span>
+                <span className="text-xs text-accent font-mono font-medium">public.universes</span>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Universe Name *
                   </label>
                   <input
@@ -3606,8 +3606,8 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
-                    Slug * <span className="font-mono text-[10px] normal-case">→ /universe/{newUniSlug || 'slug'}</span>
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
+                    Slug * <span className="font-mono text-xs normal-case">→ /universe/{newUniSlug || 'slug'}</span>
                   </label>
                   <input
                     type="text"
@@ -3616,14 +3616,14 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                     placeholder="noirverse"
                     className="w-full bg-cream border border-stone/60 px-3 py-2 text-ink font-mono focus:outline-none focus:border-accent"
                   />
-                  <p className="text-[10px] text-ink-muted mt-1">
+                  <p className="text-xs text-ink-muted mt-1">
                     Lowercase, hyphens only. This becomes the URL and the value every
                     collection, motif and product stores in <code className="font-mono">universe_slug</code>.
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Tagline
                   </label>
                   <input
@@ -3636,7 +3636,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Lore
                   </label>
                   <textarea
@@ -3650,7 +3650,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Lore heading
                     </label>
                     <input
@@ -3662,7 +3662,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                     />
                   </div>
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Drop cadence
                     </label>
                     <input
@@ -3677,7 +3677,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
 
                 <div className="grid grid-cols-2 gap-3 items-end">
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Portal title colour
                     </label>
                     <div className="flex items-center gap-2">
@@ -3691,7 +3691,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                         type="text"
                         value={newUniPortalColor}
                         onChange={(e) => setNewUniPortalColor(e.target.value)}
-                        className="flex-1 bg-cream border border-stone/60 px-2 py-2 text-ink font-mono text-[11px] focus:outline-none focus:border-accent"
+                        className="flex-1 bg-cream border border-stone/60 px-2 py-2 text-ink font-mono text-xs focus:outline-none focus:border-accent"
                       />
                     </div>
                   </div>
@@ -3711,7 +3711,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                 <button
                   type="button"
                   onClick={() => setShowAddUniverseModal(false)}
-                  className="px-3 py-2 text-[11px] uppercase tracking-wider text-ink-muted hover:text-ink cursor-pointer"
+                  className="px-3 py-2 text-xs uppercase tracking-wider text-ink-muted hover:text-ink cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -3719,7 +3719,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                   type="button"
                   onClick={handleSaveNewUniverse}
                   disabled={isSavingTaxonomy}
-                  className="px-4 py-2 bg-ink text-cream hover:bg-ink-muted text-[11px] uppercase tracking-wider font-semibold cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-panel-raised text-white hover:bg-panel-raised-muted text-xs uppercase tracking-wider font-semibold cursor-pointer disabled:opacity-50"
                 >
                   {isSavingTaxonomy ? 'Saving...' : 'Save to public.universes'}
                 </button>
@@ -3733,15 +3733,15 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
             <div className="bg-paper border border-stone/60 max-w-lg w-full p-6 shadow-2xl relative space-y-4">
               <div className="flex items-center justify-between border-b border-stone/30 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
+                  <span className="text-xs uppercase font-sans tracking-widest text-accent font-semibold">New Entry</span>
                   <h3 className="font-serif text-lg text-ink font-semibold">Add Collection / Drop</h3>
                 </div>
-                <span className="text-[10px] text-accent font-mono font-medium">public.collections</span>
+                <span className="text-xs text-accent font-mono font-medium">public.collections</span>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Collection Title *
                   </label>
                   <input
@@ -3761,7 +3761,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                    <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                       Slug (Primary Key) *
                     </label>
                     <input
@@ -3774,10 +3774,10 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium">
+                      <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium">
                         Universe
                       </label>
-                      <span className="text-[9px] text-accent font-mono">FK public.universes</span>
+                      <span className="text-xs text-accent font-mono">FK public.universes</span>
                     </div>
                     <select
                       value={newColUniverse}
@@ -3795,7 +3795,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Tagline
                   </label>
                   <input
@@ -3808,7 +3808,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                 </div>
 
                 <div>
-                  <label className="block text-ink-muted uppercase tracking-wider text-[11px] font-medium mb-1">
+                  <label className="block text-ink-muted uppercase tracking-wider text-xs font-medium mb-1">
                     Description
                   </label>
                   <textarea
@@ -3820,7 +3820,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, category_slug = EXCLUDED.
                   />
                 </div>
 
-                <div className="p-3 bg-cream border border-stone/40 text-[11px] text-ink-muted space-y-1">
+                <div className="p-3 bg-cream border border-stone/40 text-xs text-ink-muted space-y-1">
                   <span className="font-semibold text-ink block">✦ Target Database Table:</span>
                   <p>
                     Inserts into <code className="font-mono text-accent">public.collections</code> with optional foreign key to <code className="font-mono text-accent">universe_slug</code>.
@@ -3839,7 +3839,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, tagline = EXCLUDED.taglin
                       'Idempotent Collection SQL'
                     )
                   }
-                  className="text-[11px] text-ink-muted hover:text-ink font-mono underline"
+                  className="text-xs text-ink-muted hover:text-ink font-mono underline"
                 >
                   📋 Copy SQL
                 </button>
@@ -3847,7 +3847,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, tagline = EXCLUDED.taglin
                   <button
                     type="button"
                     onClick={() => setShowAddCollectionModal(false)}
-                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-[11px] uppercase tracking-wider font-semibold"
+                    className="px-3.5 py-1.5 border border-stone/50 hover:bg-stone/10 text-xs uppercase tracking-wider font-semibold"
                   >
                     Cancel
                   </button>
@@ -3855,7 +3855,7 @@ ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name, tagline = EXCLUDED.taglin
                     type="button"
                     onClick={handleSaveNewCollection}
                     disabled={isSavingTaxonomy}
-                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-cream text-[11px] uppercase tracking-wider font-semibold disabled:opacity-50"
+                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover text-white text-xs uppercase tracking-wider font-semibold disabled:opacity-50"
                   >
                     {isSavingTaxonomy ? 'Saving...' : 'Save to public.collections'}
                   </button>
@@ -3974,7 +3974,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <div className="min-h-screen bg-cream flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-paper border border-stone/50 p-8 sm:p-10 shadow-sm text-ink">
           <div className="text-center mb-8">
-            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent font-medium block">
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent font-medium block">
               UniqueLo Atelier Studio
             </span>
             <h1 className="font-serif text-3xl font-normal text-ink mt-2">Staff Portal</h1>
@@ -3991,7 +3991,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1.5">
+              <label className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-1.5">
                 Staff Email
               </label>
               <input
@@ -4006,7 +4006,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1.5">
+              <label className="block text-xs font-mono uppercase tracking-wider text-ink-muted mb-1.5">
                 Password
               </label>
               <input
@@ -4023,7 +4023,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 bg-ink text-cream hover:bg-ink-light text-xs font-mono uppercase tracking-widest transition-colors disabled:opacity-50 mt-2"
+              className="w-full py-2.5 bg-panel-raised text-white hover:bg-panel-raised-light text-xs font-mono uppercase tracking-widest transition-colors disabled:opacity-50 mt-2"
             >
               {isSubmitting ? 'Verifying Credentials…' : 'Enter Atelier Studio →'}
             </button>
@@ -4032,7 +4032,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="mt-8 pt-6 border-t border-stone/30 text-center">
             <Link
               to="/"
-              className="text-[11px] font-mono text-ink-muted hover:text-ink transition-colors uppercase tracking-wider"
+              className="text-xs font-mono text-ink-muted hover:text-ink transition-colors uppercase tracking-wider"
             >
               ← Return to Public Storefront
             </Link>
@@ -4058,7 +4058,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-paper border border-stone/50 p-8 sm:p-10 shadow-sm text-ink">
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent font-medium block">
+          <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent font-medium block">
             UniqueLo Atelier Studio
           </span>
           <h1 className="font-serif text-2xl text-ink mt-2">Not a staff account</h1>
@@ -4069,7 +4069,7 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="mt-6 flex flex-col gap-2">
             <Link
               to="/"
-              className="w-full py-2.5 bg-ink text-cream text-xs font-mono uppercase tracking-widest text-center hover:bg-ink/90 transition-colors"
+              className="w-full py-2.5 bg-panel-raised text-white text-xs font-mono uppercase tracking-widest text-center hover:bg-panel-raised/90 transition-colors"
             >
               Return to storefront
             </Link>
@@ -4088,16 +4088,16 @@ const AdminAuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div>
       {/* Authenticated Staff Top Bar */}
-      <div className="bg-ink text-cream px-4 sm:px-6 py-2 text-[11px] font-mono flex items-center justify-between border-b border-stone/30">
+      <div className="bg-panel-raised text-white px-4 sm:px-6 py-2 text-xs font-mono flex items-center justify-between border-b border-stone/30">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Atelier Session: <strong className="text-white font-medium">{session.user.email}</strong></span>
-          <span className="text-stone-400 text-[10px] hidden sm:inline">• Authenticated Admin Active</span>
+          <span className="text-stone-400 text-xs hidden sm:inline">• Authenticated Admin Active</span>
         </div>
         <button
           type="button"
           onClick={handleSignOut}
-          className="text-stone-300 hover:text-white underline underline-offset-2 transition-colors uppercase tracking-wider text-[10px]"
+          className="text-stone-300 hover:text-white underline underline-offset-2 transition-colors uppercase tracking-wider text-xs"
         >
           Sign Out ↗
         </button>

@@ -111,7 +111,7 @@ export const Universe: React.FC = () => {
       {/* Editorial Hero — unified Atelier quiet-luxury layout */}
       <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-20 relative z-10">
-          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="font-sans text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <Link to="/universes" className="hover:underline">Universes</Link>
@@ -126,14 +126,14 @@ export const Universe: React.FC = () => {
             </svg>
           )}
           {universe.hero_kicker && (
-            <p className="font-serif text-xl mt-5 tracking-[0.2em] text-accent" aria-hidden="true">
+            <p className="font-serif text-xl mt-5 tracking-eyebrow text-accent" aria-hidden="true">
               {universe.hero_kicker}
             </p>
           )}
 
           {/* Headline */}
           <h1
-            className={`font-serif font-semibold tracking-tight leading-[1.02] mt-2 ${isCaps ? 'uppercase text-5xl sm:text-7xl lg:text-8xl' : 'text-5xl sm:text-6xl lg:text-7xl max-w-3xl'}`}
+            className={`font-serif font-semibold tracking-tight leading-display mt-2 ${isCaps ? 'uppercase text-5xl sm:text-7xl lg:text-8xl' : 'text-5xl sm:text-6xl lg:text-7xl max-w-3xl'}`}
           >
             {accentWord ? (
               <>
@@ -154,7 +154,7 @@ export const Universe: React.FC = () => {
             )}
           </h1>
 
-          <p className="font-serif italic text-xl sm:text-2xl mt-3 text-ink-muted">{universe.tagline}</p>
+          <p className="font-serif text-xl sm:text-2xl mt-3 text-ink-muted">{universe.tagline}</p>
           <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed text-ink/85">
             {universe.lore}
           </p>
@@ -162,13 +162,13 @@ export const Universe: React.FC = () => {
           <div className="flex flex-wrap gap-3 mt-8">
             <a
               href="#collection"
-              className="inline-flex items-center gap-2 px-8 py-3.5 font-serif text-[17px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm"
+              className="inline-flex items-center gap-2 px-8 py-3.5 font-serif text-lg min-h-[48px] bg-panel-raised text-white hover:bg-panel-raised/90 transition-colors rounded-sm"
             >
               Explore Collection <span aria-hidden="true">→</span>
             </a>
             <a
               href="#lore"
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-[15px] font-serif border border-stone min-h-[48px] text-ink hover:border-ink transition-colors rounded-sm"
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-serif border border-stone min-h-[48px] text-ink hover:border-ink transition-colors rounded-sm"
             >
               Read the Lore <span aria-hidden="true">↓</span>
             </a>
@@ -177,7 +177,7 @@ export const Universe: React.FC = () => {
 
         {/* Handwritten-style annotation */}
         {universe.hero_note && (
-          <p className="hidden lg:block absolute top-8 right-10 font-sans text-[12px] uppercase tracking-[0.25em] text-ink-muted rotate-2 opacity-80" aria-hidden="true">
+          <p className="hidden lg:block absolute top-8 right-10 font-sans text-xs uppercase tracking-eyebrow text-ink-muted rotate-2 opacity-80" aria-hidden="true">
             {universe.hero_note}
           </p>
         )}
@@ -197,7 +197,7 @@ export const Universe: React.FC = () => {
       {/* Lore strip — unified Atelier parchment panels */}
       <section id="lore" aria-label={`${universe.name} lore`} className="bg-cream border-b border-stone/60">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
+          <p className="text-xs font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
             The {universe.name} lore
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 font-medium leading-display tracking-tight">
@@ -221,7 +221,7 @@ export const Universe: React.FC = () => {
                     </h3>
                     <p className="font-serif text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 leading-relaxed line-clamp-2">{m.meaning}</p>
                   </div>
-                  <span className="inline-flex items-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
+                  <span className="inline-flex items-center gap-1 mt-2 sm:mt-3 text-xs sm:text-xs uppercase tracking-widest text-ink font-medium">
                     Shop · {count} <span aria-hidden="true">→</span>
                   </span>
                 </Link>
@@ -248,7 +248,7 @@ export const Universe: React.FC = () => {
               aria-pressed={garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                 garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
+                  ? 'bg-panel-raised text-white border border-transparent font-medium'
                   : 'text-ink border border-stone bg-paper hover:border-ink'
               }`}
             >
@@ -261,7 +261,7 @@ export const Universe: React.FC = () => {
                 aria-pressed={garment === g}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                   garment === g
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink border border-stone bg-paper hover:border-ink'
                 }`}
               >
@@ -277,7 +277,7 @@ export const Universe: React.FC = () => {
                 title={e.tagline}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-sans min-h-[44px] transition-colors cursor-pointer ${
                   expression === e.score
-                    ? 'bg-accent text-cream border border-transparent font-medium shadow-sm'
+                    ? 'bg-accent text-white border border-transparent font-medium shadow-sm'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >
@@ -293,7 +293,7 @@ export const Universe: React.FC = () => {
                 title={m.meaning}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                   character === m.id
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >
@@ -309,7 +309,7 @@ export const Universe: React.FC = () => {
                 title={s.tagline}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                   artStyle === s.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >

@@ -1,4 +1,5 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'accent';
@@ -18,19 +19,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        'bg-ink text-cream hover:bg-ink/90 active:scale-[0.99] border border-ink',
+        'bg-accent text-white hover:bg-accent-hover active:translate-y-px border border-accent',
       secondary:
         'bg-transparent text-ink border border-stone hover:border-ink hover:bg-stone/20 active:scale-[0.99]',
       ghost:
         'bg-transparent text-ink hover:bg-stone/30 active:scale-[0.99] border border-transparent',
       accent:
-        'bg-accent text-paper hover:bg-accent/90 active:scale-[0.99] border border-accent',
+        'bg-accent text-white hover:bg-accent/90 active:scale-[0.99] border border-accent',
     }[variant];
 
     return (
       <button
         ref={ref}
-        className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className}`}
+        className={twMerge(baseStyles, sizeStyles, variantStyles, className)}
         {...props}
       >
         {children}

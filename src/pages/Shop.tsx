@@ -67,7 +67,7 @@ export const Shop: React.FC = () => {
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+              <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                 {currentCategory ? `Curated Category • ${currentCategory.label}` : 'Permanent & Capsule Editions'}
               </span>
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
@@ -83,12 +83,12 @@ export const Shop: React.FC = () => {
             {/* Needlework Metrics Badge */}
             <div className="flex items-center gap-4 py-2 px-4 bg-cream border border-stone/80 text-xs text-ink font-sans">
               <div>
-                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Available Edits</span>
+                <span className="block text-xs uppercase tracking-widest text-ink-muted">Available Edits</span>
                 <span className="font-serif text-lg font-medium text-ink">{filteredProducts.length} Garments</span>
               </div>
               <div className="h-8 w-px bg-stone/80" />
               <div>
-                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Craft</span>
+                <span className="block text-xs uppercase tracking-widest text-ink-muted">Craft</span>
                 <span className="font-serif text-lg font-medium text-accent">Detailed Embroidery</span>
               </div>
             </div>

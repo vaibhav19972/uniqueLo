@@ -59,7 +59,7 @@ export const Garment: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <Link to="/clothing" className="hover:underline">Clothing</Link>
@@ -73,7 +73,7 @@ export const Garment: React.FC = () => {
 
           {/* Context-Sensitive Filter Chips: World & Expression */}
           <div className="mt-8 flex flex-wrap items-center gap-2 pt-6 border-t border-stone/40">
-            <span className="text-[10px] uppercase font-sans tracking-widest text-ink-muted font-semibold mr-1">
+            <span className="text-xs uppercase font-sans tracking-widest text-ink-muted font-semibold mr-1">
               Filter By:
             </span>
 
@@ -86,7 +86,7 @@ export const Garment: React.FC = () => {
               aria-pressed={universeFilter === 'all' && expressionFilter === 'all'}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                 universeFilter === 'all' && expressionFilter === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
+                  ? 'bg-panel-raised text-white border border-transparent font-medium'
                   : 'text-ink border border-stone bg-paper hover:border-ink'
               }`}
             >
@@ -101,7 +101,7 @@ export const Garment: React.FC = () => {
                 aria-pressed={universeFilter === u.slug}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                   universeFilter === u.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >
@@ -120,7 +120,7 @@ export const Garment: React.FC = () => {
                 title={e.tagline}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-sans min-h-[44px] transition-colors cursor-pointer ${
                   expressionFilter === e.score
-                    ? 'bg-accent text-cream border border-transparent font-medium shadow-sm'
+                    ? 'bg-accent text-white border border-transparent font-medium shadow-sm'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
                 }`}
               >

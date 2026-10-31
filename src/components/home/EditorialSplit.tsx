@@ -30,7 +30,7 @@ export const EditorialSplit: React.FC = () => {
                 className="w-full object-cover"
               />
               <div className="p-2 text-center">
-                <span className="text-[9px] uppercase tracking-[0.25em] text-accent font-sans">
+                <span className="text-xs uppercase tracking-eyebrow text-accent font-sans">
                   Master Zardozi Needlecraft
                 </span>
               </div>
@@ -39,12 +39,12 @@ export const EditorialSplit: React.FC = () => {
 
           {/* Right Column: Atelier Craft Narrative */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center space-x-2 text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+            <div className="inline-flex items-center space-x-2 text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
               <span>✦</span>
               <span>Everyday Essentials • Made in India</span>
             </div>
 
-            <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.08] tracking-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink leading-tight tracking-tight">
               Thread, Drawn Through Cloth.
             </h2>
 
@@ -76,7 +76,7 @@ export const EditorialSplit: React.FC = () => {
 
             <div className="pt-6">
               <Link to="/shop">
-                <Button variant="primary" size="md" className="text-xs tracking-[0.2em] uppercase">
+                <Button variant="primary" size="md" className="text-xs tracking-eyebrow uppercase">
                   Explore Everyday Essentials
                 </Button>
               </Link>

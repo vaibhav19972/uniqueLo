@@ -55,7 +55,7 @@ export const Hero: React.FC = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-ink text-cream"
+      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-panel-raised text-white"
     >
       {/* Background Campaign Visual */}
       <div
@@ -66,13 +66,13 @@ export const Hero: React.FC = () => {
         }}
       >
         {/* Subtle Gradient & Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/30" />
       </div>
 
       {/* Floating Atelier Spec Sheet Tag */}
       <div
         ref={badgeRef}
-        className="absolute top-8 sm:top-12 left-4 sm:left-8 z-10 hidden sm:flex items-center space-x-3 text-[11px] uppercase tracking-[0.22em] text-cream/80 border border-stone/30 bg-ink/50 backdrop-blur-md px-4 py-1.5"
+        className="absolute top-8 sm:top-12 left-4 sm:left-8 z-10 hidden sm:flex items-center space-x-3 text-xs uppercase tracking-eyebrow text-white/80 border border-stone/30 bg-panel-raised/50 backdrop-blur-md px-4 py-1.5"
       >
         <span className="w-2 h-2 rounded-full bg-accent" />
         <span>Atelier Edition 2026 — Zardozi & Botanical Stitch</span>
@@ -80,13 +80,13 @@ export const Hero: React.FC = () => {
 
       {/* Hero Editorial Typography & CTAs */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center pt-8">
-        <span className="text-xs sm:text-sm font-sans tracking-[0.25em] uppercase text-accent mb-4 font-medium">
+        <span className="text-xs sm:text-sm font-sans tracking-eyebrow uppercase text-accent mb-4 font-medium">
           Embroidered Essentials • Made in India
         </span>
 
         <h1
           ref={headlineRef}
-          className="font-serif text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-[1.05] text-cream max-w-4xl"
+          className="font-serif text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-tight text-white max-w-4xl"
         >
           Needlecraft for Everyday Living.
         </h1>
@@ -107,7 +107,7 @@ export const Hero: React.FC = () => {
             <Button
               variant="accent"
               size="lg"
-              className="w-full sm:w-auto text-xs tracking-[0.2em] px-10 py-4"
+              className="w-full sm:w-auto text-xs tracking-eyebrow px-10 py-4"
             >
               Explore Collection
             </Button>
@@ -117,7 +117,7 @@ export const Hero: React.FC = () => {
             <Button
               variant="secondary"
               size="lg"
-              className="w-full sm:w-auto text-xs tracking-[0.2em] border-stone/40 text-cream hover:bg-paper/10 hover:border-cream"
+              className="w-full sm:w-auto text-xs tracking-eyebrow border-stone/40 text-white hover:bg-paper/10 hover:border-white/20"
             >
               Craft Provenance
             </Button>
@@ -125,22 +125,22 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* Micro Credential Grid */}
-        <div className="mt-16 grid grid-cols-3 gap-6 sm:gap-12 text-left border-t border-stone/20 pt-6 w-full max-w-2xl text-cream/70 text-xs">
+        <div className="mt-16 grid grid-cols-3 gap-6 sm:gap-12 text-left border-t border-stone/20 pt-6 w-full max-w-2xl text-white text-xs">
           <div>
-            <div className="font-serif text-base text-cream">100% Pure</div>
-            <div className="text-[10px] uppercase tracking-wider text-warm-gray mt-0.5">
+            <div className="font-serif text-base text-white">100% Pure</div>
+            <div className="text-xs uppercase tracking-wider text-warm-gray mt-0.5">
               Mulberry Silk Floss
             </div>
           </div>
           <div>
-            <div className="font-serif text-base text-cream">18–32 Hours</div>
-            <div className="text-[10px] uppercase tracking-wider text-warm-gray mt-0.5">
+            <div className="font-serif text-base text-white">18–32 Hours</div>
+            <div className="text-xs uppercase tracking-wider text-warm-gray mt-0.5">
               Embroidery Time
             </div>
           </div>
           <div>
-            <div className="font-serif text-base text-cream">Bespoke</div>
-            <div className="text-[10px] uppercase tracking-wider text-warm-gray mt-0.5">
+            <div className="font-serif text-base text-white">Bespoke</div>
+            <div className="text-xs uppercase tracking-wider text-warm-gray mt-0.5">
               Monogram Studio
             </div>
           </div>

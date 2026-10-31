@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { useProducts, useUniverses } from '../../hooks/useCatalog';
 import { useHorizontalRailGuard, RAIL_PREVENT_ATTR } from '../../hooks/useHorizontalRailGuard';
 import { MarketingHeader } from '../ui/MarketingHeader';
@@ -15,6 +16,8 @@ const TRUST = [
 ];
 
 export const Bestsellers: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: products } = useProducts();
   const { data: universes } = useUniverses();
   const [tab, setTab] = useState<string>('all');
@@ -76,7 +79,7 @@ export const Bestsellers: React.FC = () => {
   };
 
   return (
-    <section aria-labelledby="best-heading" className="bg-cream py-16 lg:py-24 overflow-x-clip">
+    <section aria-labelledby="best-heading" ref={revealRef} className="reveal bg-cream py-16 lg:py-24 overflow-x-clip">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Bestsellers"
@@ -98,7 +101,7 @@ export const Bestsellers: React.FC = () => {
                     role="tab"
                     aria-selected={tab === t.slug}
                     onClick={() => setTab(t.slug)}
-                    className={`relative pb-2 text-[16px] font-serif min-h-[44px] transition-colors ${
+                    className={`relative pb-2 text-base font-serif min-h-[44px] transition-colors ${
                       tab === t.slug ? 'text-gold-deep font-medium' : 'text-ink-muted hover:text-gold-deep'
                     }`}
                   >
@@ -157,7 +160,7 @@ export const Bestsellers: React.FC = () => {
               </span>
               <div>
                 <p className="font-serif text-lg text-ink">{t.title}</p>
-                <p className="font-serif text-[13px] text-ink-muted">{t.detail}</p>
+                <p className="font-serif text-sm text-ink-muted">{t.detail}</p>
               </div>
             </div>
           ))}

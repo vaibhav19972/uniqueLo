@@ -33,16 +33,16 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
   const currentRows = sizeData[category] || sizeData.outerwear;
 
   return (
-    <div className="fixed inset-0 z-[460] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-panel-raised/70 backdrop-blur-md transition-opacity"
       />
 
       <div className="relative w-full max-w-xl bg-paper border border-stone shadow-2xl rounded-sm p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-200">
         <div className="flex items-start justify-between pb-4 border-b border-stone/60">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-accent font-medium font-sans">
+            <span className="text-xs uppercase tracking-widest text-accent font-medium font-sans">
               Tailoring Standards
             </span>
             <h3 className="font-serif text-2xl text-ink mt-0.5">
@@ -66,16 +66,16 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
           <div className="inline-flex border border-stone rounded-sm p-0.5 bg-cream">
             <button
               onClick={() => setUnit('inches')}
-              className={`px-3 py-1 text-[10px] font-sans uppercase tracking-wider font-medium transition-colors ${
-                unit === 'inches' ? 'bg-ink text-cream' : 'text-ink-muted hover:text-ink'
+              className={`px-3 py-1 text-xs font-sans uppercase tracking-wider font-medium transition-colors ${
+                unit === 'inches' ? 'bg-panel-raised text-white' : 'text-ink-muted hover:text-ink'
               }`}
             >
               Inches
             </button>
             <button
               onClick={() => setUnit('cm')}
-              className={`px-3 py-1 text-[10px] font-sans uppercase tracking-wider font-medium transition-colors ${
-                unit === 'cm' ? 'bg-ink text-cream' : 'text-ink-muted hover:text-ink'
+              className={`px-3 py-1 text-xs font-sans uppercase tracking-wider font-medium transition-colors ${
+                unit === 'cm' ? 'bg-panel-raised text-white' : 'text-ink-muted hover:text-ink'
               }`}
             >
               Centimeters
@@ -86,7 +86,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border border-stone/60">
-            <thead className="bg-cream border-b border-stone/60 text-[10px] uppercase tracking-widest text-ink">
+            <thead className="bg-cream border-b border-stone/60 text-xs uppercase tracking-widest text-ink">
               <tr>
                 <th className="py-2.5 px-3 font-medium">Garment Size</th>
                 <th className="py-2.5 px-3 font-medium">Chest Circumference</th>
@@ -107,7 +107,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
           </table>
         </div>
 
-        <div className="mt-5 p-3.5 bg-cream border border-stone/60 text-[11px] text-ink-muted flex items-start gap-2.5">
+        <div className="mt-5 p-3.5 bg-cream border border-stone/60 text-xs text-ink-muted flex items-start gap-2.5">
           <span className="text-accent text-sm">✦</span>
           <p className="leading-relaxed">
             Need bespoke tailored dimensions or sleeve adjustment? Contact our atelier master stitcher for complimentary pre-dispatch adjustments.

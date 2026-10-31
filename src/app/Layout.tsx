@@ -9,15 +9,12 @@ import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { AuthModal } from '../components/auth/AuthModal';
 import { ToastContainer } from '../components/ui/Toast';
-import { useIsThemeV2 } from '../config/theme';
+import { useTheme } from '../config/theme';
 import { useAuthStore } from '../stores/auth';
 
-/**
- * Unified site layout supporting both v1 (The Atelier) and v2 (Modern D2C Streetwear
- * with exact Gokwik-style cart bag from sketches/design system.png) via USE_THEME_V2.
- */
+/** Site shell: skip link, header, routed main, overlays, grain. */
 export const Layout: React.FC = () => {
-  useIsThemeV2();
+  useTheme();
 
   // One auth subscription for the whole app. Without this, no component sees
   // session state and a refresh silently signs the customer out of the UI while
@@ -29,10 +26,13 @@ export const Layout: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-cream text-ink selection:bg-accent/20 selection:text-ink">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[500] focus:bg-ink focus:text-cream focus:px-4 focus:py-2 focus:rounded-sm"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-60 focus:bg-panel-raised focus:text-white focus:px-4 focus:py-2 focus:rounded-sm"
       >
         Skip to content
       </a>
+      {/* Flat dark surfaces stay alive with grain, not gradients. Fixed,
+          pointer-events-none, and below every interactive layer. */}
+      <div className="grain-overlay" aria-hidden="true" />
       <Header />
       <main id="main-content" className="flex-1 pt-[calc(var(--header-height)+2.2rem)]">
         <Outlet />

@@ -44,16 +44,16 @@ export const Footer: React.FC = () => {
   const { data: universes } = useUniverses();
 
   return (
-    <footer className="bg-coal text-cream">
+    <footer className="border-t border-stone bg-cream text-ink">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-14 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 pb-12 border-b border-cream/15">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 pb-12 border-b border-stone">
           {/* Brand */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Link to="/" className="font-serif text-3xl text-cream">
+            <Link to="/" className="font-serif text-3xl text-ink">
               UniqueLo
             </Link>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-gold mt-1">Wear the universe</p>
-            <p className="text-sm text-cream/70 leading-relaxed mt-4 max-w-xs font-light">
+            <p className="text-xs tracking-eyebrow uppercase text-accent mt-1">Wear the universe</p>
+            <p className="text-sm text-ink-muted leading-relaxed mt-4 max-w-xs font-light">
               Indian stories, global universes — embroidered for your everyday.
             </p>
             <div className="flex items-center gap-2 mt-5">
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
                   href="#atelier-list"
                   aria-label={`UniqueLo on ${s}`}
                   title={s}
-                  className="w-10 h-10 rounded-full border border-cream/25 flex items-center justify-center text-cream/80 hover:text-cream hover:border-cream/60 transition-colors text-xs font-sans"
+                  className="w-10 h-10 rounded-full border border-stone-strong flex items-center justify-center text-ink-muted hover:text-accent hover:border-ink-muted transition-colors text-xs font-sans"
                 >
                   {s[0]}
                 </a>
@@ -75,29 +75,29 @@ export const Footer: React.FC = () => {
 
           {/* Universes (data-driven) */}
           <nav aria-label="Universes">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Universes</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-cream/75 font-light">
+            <h3 className="text-xs uppercase tracking-eyebrow text-accent">Universes</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
               {(universes ?? []).map((u) => (
                 <li key={u.slug}>
-                  <Link to={`/universes/${u.slug}`} className="hover:text-cream transition-colors">
+                  <Link to={`/universes/${u.slug}`} className="hover:text-accent transition-colors">
                     {u.name}
                   </Link>
                 </li>
               ))}
               {EDITS.filter((e) => e.featured).map((e) => (
                 <li key={e.slug}>
-                  <Link to={`/shop?edit=${e.slug}`} className="hover:text-cream transition-colors">
+                  <Link to={`/shop?edit=${e.slug}`} className="hover:text-accent transition-colors">
                     {e.title}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link to="/collections" className="hover:text-cream transition-colors">
+                <Link to="/collections" className="hover:text-accent transition-colors">
                   Capsule Collections
                 </Link>
               </li>
               <li>
-                <Link to="/shop" className="hover:text-cream transition-colors">
+                <Link to="/shop" className="hover:text-accent transition-colors">
                   All Products
                 </Link>
               </li>
@@ -106,11 +106,11 @@ export const Footer: React.FC = () => {
 
           {/* Craft */}
           <nav aria-label="Craft">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Craft</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-cream/75 font-light">
+            <h3 className="text-xs uppercase tracking-eyebrow text-accent">Craft</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
               {CRAFT_LINKS.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="hover:text-cream transition-colors">
+                  <Link to={l.to} className="hover:text-accent transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -120,16 +120,16 @@ export const Footer: React.FC = () => {
 
           {/* Care */}
           <nav aria-label="Care">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Care</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-cream/75 font-light">
+            <h3 className="text-xs uppercase tracking-eyebrow text-accent">Care</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
               {CARE_LINKS.map((l) => (
                 <li key={l}>
                   {l === 'Track Your Order' ? (
-                    <Link to="/track-order" className="hover:text-cream transition-colors">
+                    <Link to="/track-order" className="hover:text-accent transition-colors">
                       {l}
                     </Link>
                   ) : (
-                    <span className="hover:text-cream transition-colors cursor-pointer">{l}</span>
+                    <span className="hover:text-accent transition-colors cursor-pointer">{l}</span>
                   )}
                 </li>
               ))}
@@ -138,16 +138,16 @@ export const Footer: React.FC = () => {
 
           {/* Company */}
           <nav aria-label="Company">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Company</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-cream/75 font-light">
+            <h3 className="text-xs uppercase tracking-eyebrow text-accent">Company</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
               {COMPANY_LINKS.map((l) => (
                 <li key={l}>
                   {l === 'Atelier List' ? (
-                    <a href="#atelier-list" className="hover:text-cream transition-colors">
+                    <a href="#atelier-list" className="hover:text-accent transition-colors">
                       {l}
                     </a>
                   ) : (
-                    <span className="hover:text-cream transition-colors cursor-pointer">{l}</span>
+                    <span className="hover:text-accent transition-colors cursor-pointer">{l}</span>
                   )}
                 </li>
               ))}
@@ -156,7 +156,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* India craft strip — circled gold line-icons (render 07) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-8 border-b border-cream/15">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-8 border-b border-stone">
           {[
             {
               title: 'Proudly rooted in India',
@@ -180,25 +180,25 @@ export const Footer: React.FC = () => {
             },
           ].map((b) => (
             <div key={b.title} className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center shrink-0 text-gold" aria-hidden="true">
+              <span className="w-10 h-10 rounded-full border border-accent-border flex items-center justify-center shrink-0 text-accent" aria-hidden="true">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {b.icon}
                 </svg>
               </span>
               <div>
-                <p className="font-serif text-base text-cream">{b.title}</p>
-                <p className="font-serif text-xs text-cream/60 mt-1">{b.detail}</p>
+                <p className="font-serif text-base text-ink">{b.title}</p>
+                <p className="font-serif text-xs text-ink-muted mt-1">{b.detail}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-6 flex flex-col lg:flex-row items-center justify-between gap-5 text-xs text-cream/55">
+        <div className="pt-6 flex flex-col lg:flex-row items-center justify-between gap-5 text-xs text-ink-muted">
           <p>© 2026 UniqueLo. All rights reserved.</p>
           <div className="flex items-center gap-5">
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((l) => (
-              <span key={l} className="hover:text-cream transition-colors cursor-pointer">
+              <span key={l} className="hover:text-accent transition-colors cursor-pointer">
                 {l}
               </span>
             ))}
@@ -211,14 +211,14 @@ export const Footer: React.FC = () => {
               Secure Payments
             </span>
             {PAYMENTS.map((p) => (
-              <span key={p} className="px-2 py-1 bg-paper/90 text-ink/75 text-[10px] rounded-sm">
+              <span key={p} className="px-2 py-1 border border-stone bg-panel text-ink-muted text-xs rounded-sm">
                 {p}
               </span>
             ))}
           </div>
-          <p className="font-serif text-sm text-cream/80 text-center lg:text-right">
+          <p className="font-serif text-sm text-ink-muted text-center lg:text-right">
             Supporting Indian Craft Heritage
-            <span className="block text-[11px] font-sans text-cream/50">Craft. Culture. Continuity.</span>
+            <span className="block text-xs font-sans text-ink-muted">Craft. Culture. Continuity.</span>
           </p>
         </div>
       </div>

@@ -23,7 +23,7 @@ export const Collections: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <span>Collections</span>
@@ -44,7 +44,7 @@ export const Collections: React.FC = () => {
             className="group bg-paper border border-stone/70 p-3.5 sm:p-8 hover:border-ink transition-all flex flex-col justify-between shadow-xs hover:shadow-md"
           >
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-1 text-[8px] sm:text-[10px] uppercase font-sans tracking-[0.15em] sm:tracking-[0.2em] text-accent font-medium mb-2 sm:mb-3">
+              <div className="flex flex-wrap items-center justify-between gap-1 text-xs sm:text-xs uppercase font-sans tracking-label sm:tracking-eyebrow text-accent font-medium mb-2 sm:mb-3">
                 <span className="truncate">{col.universeSlug ? `${col.universeSlug} Capsule` : 'Atelier Release'}</span>
                 {col.featured && (
                   <span className="bg-gold/10 text-gold-deep px-1.5 sm:px-2 py-0.5 border border-gold/20 shrink-0">
@@ -55,18 +55,18 @@ export const Collections: React.FC = () => {
               <h2 className="font-serif text-base sm:text-2xl lg:text-3xl text-ink group-hover:text-accent transition-colors line-clamp-1">
                 {col.name}
               </h2>
-              <p className="font-serif italic text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">
+              <p className="font-serif text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 line-clamp-1">
                 {col.tagline}
               </p>
-              <p className="text-[11px] sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+              <p className="text-xs sm:text-xs text-ink-muted mt-2 sm:mt-3 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
                 {col.description}
               </p>
             </div>
             <div className="pt-3 sm:pt-6 border-t border-stone/40 mt-3 sm:mt-6 flex items-center justify-between">
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
+              <span className="text-xs sm:text-xs uppercase tracking-widest text-ink font-medium">
                 {counts[col.slug] ?? 0} {counts[col.slug] === 1 ? 'Garment' : 'Garments'}
               </span>
-              <span className="text-[10px] sm:text-xs text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true">
+              <span className="text-xs sm:text-xs text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true">
                 Explore →
               </span>
             </div>

@@ -17,7 +17,7 @@ export const CategoryTabs: React.FC = () => {
             <button
               key={cat.slug}
               onClick={() => setCategory(cat.slug)}
-              className={`relative py-4 text-xs sm:text-sm font-sans uppercase tracking-[0.2em] transition-colors cursor-pointer focus-visible:outline-accent font-medium ${
+              className={`relative py-4 text-xs sm:text-sm font-sans uppercase tracking-eyebrow transition-colors cursor-pointer focus-visible:outline-accent font-medium ${
                 isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'
               }`}
             >

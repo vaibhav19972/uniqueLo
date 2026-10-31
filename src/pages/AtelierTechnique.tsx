@@ -43,7 +43,7 @@ export const AtelierTechnique: React.FC = () => {
             <span className="text-accent font-medium">{craft.region}</span>
           </div>
 
-          <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+          <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
             Regional Guild // {craft.cluster}
           </span>
           <h1 className="font-serif text-4xl sm:text-6xl text-ink font-normal mt-2 tracking-tight">
@@ -62,7 +62,7 @@ export const AtelierTechnique: React.FC = () => {
           {/* Left: Origin Essay */}
           <div className="lg:col-span-5 space-y-6">
             <div className="p-6 bg-paper border border-stone">
-              <span className="text-[10px] uppercase tracking-widest text-accent font-medium block mb-2">
+              <span className="text-xs uppercase tracking-widest text-accent font-medium block mb-2">
                 Historical Context & Provenance
               </span>
               <h3 className="font-serif text-2xl text-ink font-normal">
@@ -75,15 +75,15 @@ export const AtelierTechnique: React.FC = () => {
 
             <div className="p-6 bg-paper border border-stone space-y-3 text-xs">
               <div className="flex justify-between pb-2 border-b border-stone/50">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Stitch Mechanism</span>
+                <span className="text-ink-muted uppercase tracking-wider text-xs">Stitch Mechanism</span>
                 <span className="font-medium text-ink">{craft.stitchType}</span>
               </div>
               <div className="flex justify-between pb-2 border-b border-stone/50">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Pace of Work</span>
+                <span className="text-ink-muted uppercase tracking-wider text-xs">Pace of Work</span>
                 <span className="font-medium text-ink">{craft.artisanPace}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Regional Cluster</span>
+                <span className="text-ink-muted uppercase tracking-wider text-xs">Regional Cluster</span>
                 <span className="font-medium text-ink">{craft.region}</span>
               </div>
             </div>
@@ -91,7 +91,7 @@ export const AtelierTechnique: React.FC = () => {
 
           {/* Right: Craft Process Steps */}
           <div className="lg:col-span-7">
-            <span className="text-[10px] uppercase tracking-widest text-ink-muted font-medium block mb-4">
+            <span className="text-xs uppercase tracking-widest text-ink-muted font-medium block mb-4">
               The Four Atelier Phases
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -133,7 +133,7 @@ export const AtelierTechnique: React.FC = () => {
         {/* Matching Garments from this Guild */}
         <div className="mt-20 pt-12 border-t border-stone/60">
           <div className="mb-8">
-            <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+            <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
               Permanent Edit
             </span>
             <h2 className="font-serif text-3xl text-ink mt-1">

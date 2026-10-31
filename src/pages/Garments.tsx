@@ -23,7 +23,7 @@ export const Garments: React.FC = () => {
     <div className="w-full bg-cream min-h-screen">
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <span>Garments</span>
@@ -45,9 +45,9 @@ export const Garments: React.FC = () => {
           >
             <div>
               <h2 className="font-serif text-base sm:text-2xl text-ink group-hover:text-accent transition-colors truncate">{g.name}</h2>
-              <p className="text-[11px] sm:text-xs text-ink-muted mt-1 font-light line-clamp-2 sm:line-clamp-none">{g.description}</p>
+              <p className="text-xs sm:text-xs text-ink-muted mt-1 font-light line-clamp-2 sm:line-clamp-none">{g.description}</p>
             </div>
-            <span className="inline-flex items-center gap-1 mt-2.5 sm:mt-4 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
+            <span className="inline-flex items-center gap-1 mt-2.5 sm:mt-4 text-xs sm:text-xs uppercase tracking-widest text-ink font-medium">
               {counts[g.slug] ?? 0} pieces <span aria-hidden="true">→</span>
             </span>
           </Link>

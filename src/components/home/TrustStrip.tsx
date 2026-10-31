@@ -50,7 +50,7 @@ export const TrustStrip: React.FC = () => {
             </svg>
             <div>
               <p className="font-serif text-xs sm:text-base text-ink font-medium leading-tight">{item.title}</p>
-              <p className="font-serif text-[10px] sm:text-sm text-ink-muted leading-tight mt-0.5">{item.detail}</p>
+              <p className="font-serif text-xs sm:text-sm text-ink-muted leading-tight mt-0.5">{item.detail}</p>
             </div>
           </div>
         ))}

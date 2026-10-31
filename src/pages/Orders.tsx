@@ -53,7 +53,7 @@ export const Orders: React.FC = () => {
     return (
       <div className="bg-cream min-h-screen">
         <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Atelier Account</p>
+          <p className="text-xs uppercase tracking-eyebrow text-ink-muted">Atelier Account</p>
           <h1 className="font-serif text-3xl text-ink mt-2">Sign in to see your orders</h1>
           <p className="text-sm text-ink-muted mt-3 max-w-md mx-auto leading-relaxed">
             Your order history lives with your account. Ordered as a guest? Track it with your order ID and email.
@@ -76,7 +76,7 @@ export const Orders: React.FC = () => {
   return (
     <div className="bg-cream min-h-screen">
       <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Account</p>
+        <p className="text-xs uppercase tracking-eyebrow text-ink-muted">Account</p>
         <h1 className="font-serif text-3xl sm:text-4xl text-ink mt-1">Order history</h1>
 
         {orders === null && (
@@ -110,18 +110,18 @@ export const Orders: React.FC = () => {
               <li key={o.id} className="border border-stone bg-paper">
                 <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-stone">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+                    <p className="text-xs uppercase tracking-label text-ink-muted">
                       {new Date(o.created_at).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric',
                       })}
                     </p>
-                    <p className="font-mono text-[11px] text-ink-muted mt-0.5">{o.id}</p>
+                    <p className="font-mono text-xs text-ink-muted mt-0.5">{o.id}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-ink font-medium">{formatPrice(o.total_cents)}</p>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-muted mt-0.5">{o.status}</p>
+                    <p className="text-xs uppercase tracking-label text-ink-muted mt-0.5">{o.status}</p>
                   </div>
                 </div>
 
@@ -130,9 +130,9 @@ export const Orders: React.FC = () => {
                     <li key={item.id} className="px-5 py-3 flex items-baseline justify-between gap-4 text-sm">
                       <span className="text-ink min-w-0">
                         {item.product_name}
-                        <span className="text-ink-muted text-[11px] ml-2">{item.variant_sku}</span>
+                        <span className="text-ink-muted text-xs ml-2">{item.variant_sku}</span>
                       </span>
-                      <span className="text-ink-muted text-[12px] shrink-0">
+                      <span className="text-ink-muted text-xs shrink-0">
                         ×{item.quantity} · {formatPrice(item.price_cents)}
                       </span>
                     </li>
@@ -142,7 +142,7 @@ export const Orders: React.FC = () => {
                 <div className="px-5 py-3 border-t border-stone">
                   <Link
                     to={`/order-confirmation/${o.id}`}
-                    className="text-[10px] uppercase tracking-[0.16em] text-accent hover:text-accent-hover transition-colors"
+                    className="text-xs uppercase tracking-label text-accent hover:text-accent-hover transition-colors"
                   >
                     View order →
                   </Link>

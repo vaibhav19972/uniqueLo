@@ -62,10 +62,10 @@ export const WishlistDrawer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[310] flex justify-end" role="dialog" aria-modal="true" aria-label="Saved Pieces">
+    <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label="Saved Pieces">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-ink/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-panel-raised/40 backdrop-blur-xs transition-opacity"
         onClick={closeWishlist}
         aria-hidden="true"
       />
@@ -73,13 +73,13 @@ export const WishlistDrawer: React.FC = () => {
       {/* Drawer */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-md bg-cream text-ink h-full shadow-2xl flex flex-col justify-between border-l border-ink/10 animate-in slide-in-from-right duration-300"
+        className="relative z-10 w-full max-w-md bg-cream text-ink h-full shadow-2xl flex flex-col justify-between border-l border-stone animate-in slide-in-from-right duration-300"
       >
         {/* Header */}
-        <div className="p-6 border-b border-ink/10 flex items-center justify-between">
+        <div className="p-6 border-b border-stone flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h2 className="font-serif text-xl tracking-wide">Saved Pieces</h2>
-            <span className="text-xs uppercase tracking-widest text-ink/50 bg-ink/5 px-2 py-0.5 rounded-full font-mono">
+            <span className="text-xs uppercase tracking-widest text-ink/50 bg-panel-raised/5 px-2 py-0.5 rounded-full font-mono">
               {savedSlugs.length}
             </span>
           </div>
@@ -110,7 +110,7 @@ export const WishlistDrawer: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {savedProducts.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-16 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-ink/5 flex items-center justify-center text-ink/40">
+              <div className="w-16 h-16 rounded-full bg-panel-raised/5 flex items-center justify-center text-ink/40">
                 <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -127,7 +127,7 @@ export const WishlistDrawer: React.FC = () => {
               <Link
                 to="/shop"
                 onClick={closeWishlist}
-                className="mt-4 px-6 py-2.5 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
+                className="mt-4 px-6 py-2.5 bg-panel-raised text-white hover:bg-gold hover:text-ink transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
               >
                 Explore Catalogue
               </Link>
@@ -141,12 +141,12 @@ export const WishlistDrawer: React.FC = () => {
               return (
                 <div
                   key={product.slug}
-                  className="flex gap-4 p-3 bg-white/70 border border-ink/5 rounded-sm hover:border-ink/15 transition-colors"
+                  className="flex gap-4 p-3 bg-panel border border-stone rounded-sm hover:border-stone-strong transition-colors"
                 >
                   <Link
                     to={`/product/${product.slug}`}
                     onClick={closeWishlist}
-                    className="w-20 h-24 bg-ink/5 shrink-0 overflow-hidden rounded-xs"
+                    className="w-20 h-24 bg-panel-raised/5 shrink-0 overflow-hidden rounded-xs"
                   >
                     <img
                       src={primaryImg}
@@ -185,7 +185,7 @@ export const WishlistDrawer: React.FC = () => {
                       <div className="flex items-center gap-2 mt-1.5 font-mono text-xs">
                         <span className="font-medium">{formatPrice(defaultVariant?.priceCents || 0)}</span>
                         {product.codAvailable && (
-                          <span className="text-[10px] uppercase tracking-wider text-olive bg-olive/10 px-1.5 py-0.5 rounded-xs">
+                          <span className="text-xs uppercase tracking-wider text-olive bg-olive/10 px-1.5 py-0.5 rounded-xs">
                             COD
                           </span>
                         )}
@@ -212,11 +212,11 @@ export const WishlistDrawer: React.FC = () => {
 
         {/* Footer */}
         {savedProducts.length > 0 && (
-          <div className="p-6 border-t border-ink/10 bg-white/50">
+          <div className="p-6 border-t border-stone bg-panel">
             <Link
               to="/shop"
               onClick={closeWishlist}
-              className="block w-full py-2.5 text-center border border-ink/20 text-ink hover:bg-ink hover:text-cream transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
+              className="block w-full py-2.5 text-center border border-ink/20 text-ink hover:bg-panel-raised hover:text-white transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
             >
               Continue Exploring
             </Link>

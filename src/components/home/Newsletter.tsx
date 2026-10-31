@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { subscribeNewsletter } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
 import { CtaButton } from '../ui/Cta';
-import { useIsThemeV2 } from '../../config/theme';
 
 /**
  * Render target 07 (top): Join the Atelier List (chatgpt-v2).
@@ -31,11 +31,12 @@ const BENEFITS = [
 ];
 
 export const Newsletter: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const showToast = useToastStore((s) => s.showToast);
-  const isV2 = useIsThemeV2();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,18 +55,18 @@ export const Newsletter: React.FC = () => {
   };
 
   return (
-    <section id="atelier-list" aria-labelledby="nl-heading" className="bg-cream border-t border-stone/60 overflow-hidden">
+    <section ref={revealRef} id="atelier-list" aria-labelledby="nl-heading" className="reveal bg-cream border-t border-stone/60 overflow-hidden">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 items-center py-16 lg:py-24">
         {/* Copy + form */}
         <div>
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
-            {isV2 ? 'Insider Access' : 'Join the Atelier List'}
+          <p className="text-xs font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
+            Insider Access
           </p>
           <h2
             id="nl-heading"
             className="font-serif font-medium text-ink mt-3 leading-display tracking-tight text-4xl sm:text-5xl"
           >
-            {isV2 ? 'Get 10% Off Your First Drop.' : 'Get 10% Off Your First Universe Order.'}
+            Get 10% off your first drop.
           </h2>
           <p className="font-serif text-lg text-ink-muted mt-4 max-w-md">
             Early access to new drops, behind-the-scenes craft stories and members-only offers.
@@ -100,7 +101,7 @@ export const Newsletter: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
+                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-sm text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
                 />
               </div>
               <CtaButton
@@ -108,7 +109,7 @@ export const Newsletter: React.FC = () => {
                 disabled={isLoading}
                 className="disabled:opacity-60 px-6 rounded-sm"
               >
-                {isLoading ? 'Joining…' : isV2 ? 'Get 10% Off' : 'Join the Atelier List'} <span aria-hidden="true">→</span>
+                {isLoading ? 'Joining…' : 'Get 10% off'} <span aria-hidden="true">→</span>
               </CtaButton>
             </form>
           )}
@@ -125,7 +126,7 @@ export const Newsletter: React.FC = () => {
                 <svg className="w-5 h-5 shrink-0 text-gold-deep mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   {b.icon}
                 </svg>
-                <span className="font-serif text-[13px] leading-snug text-ink/85">{b.title}</span>
+                <span className="font-serif text-sm leading-snug text-ink/85">{b.title}</span>
               </li>
             ))}
           </ul>
@@ -140,10 +141,9 @@ export const Newsletter: React.FC = () => {
               loading="lazy"
               className="w-full h-full object-cover"
             />
-            <div aria-hidden="true" className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cream to-transparent" />
           </div>
           <div className="absolute -bottom-6 -left-6 bg-paper shadow-lg px-6 py-5 max-w-[240px] rotate-[-2deg]">
-            <p className="font-serif italic text-lg text-ink leading-snug">A more meaningful wardrobe awaits.</p>
+            <p className="font-serif text-lg text-ink leading-snug">A more meaningful wardrobe awaits.</p>
           </div>
         </div>
       </div>

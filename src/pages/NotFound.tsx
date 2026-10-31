@@ -7,7 +7,7 @@ export const NotFound: React.FC = () => {
     <div className="min-h-[80vh] bg-cream flex items-center justify-center px-4 py-20">
       <div className="max-w-xl mx-auto text-center space-y-6">
         {/* Needlework Monogram Identifier */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-paper border border-stone text-[10px] uppercase tracking-[0.25em] text-accent font-medium">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-paper border border-stone text-xs uppercase tracking-eyebrow text-accent font-medium">
           <span>✦</span>
           <span>404 // Archive Exception</span>
         </div>

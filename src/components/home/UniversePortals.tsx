@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link, useNavigate } from 'react-router';
 import { useUniverses, useProducts } from '../../hooks/useCatalog';
 import { useFiltersStore } from '../../stores/filters';
@@ -22,6 +23,8 @@ interface PortalItem {
 }
 
 export const UniversePortals: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: universes } = useUniverses();
   const { data: products } = useProducts();
   const setUniverse = useFiltersStore((state) => state.setUniverse);
@@ -72,7 +75,7 @@ export const UniversePortals: React.FC = () => {
   }, [universes, counts, atelierCount, enterAtelier]);
 
   return (
-    <section aria-labelledby="universes-heading" className="relative overflow-hidden bg-cream py-16 lg:py-24">
+    <section aria-labelledby="universes-heading" ref={revealRef} className="reveal relative overflow-hidden bg-cream py-16 lg:py-24">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Universes"
@@ -123,14 +126,14 @@ export const UniversePortals: React.FC = () => {
                 {/* Editorial text stack */}
                 <div className="relative z-10 flex flex-1 flex-col p-3.5 sm:p-6 min-h-[170px] sm:min-h-[300px]">
                   <div className="max-w-[96%] sm:max-w-[92%]">
-                    <h3 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium">
+                    <h3 className="font-serif text-base sm:text-2xl lg:text-3xl leading-tight text-ink transition-transform duration-500 group-hover:font-medium">
                       {item.name}
                     </h3>
-                    <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 line-clamp-1">
+                    <p className="font-sans text-xs sm:text-xs uppercase tracking-label text-ink-muted mt-1 sm:mt-2 line-clamp-1">
                       {item.tagline}
                     </p>
-                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                    <p className="font-serif text-xs sm:text-[14px] text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3 hidden sm:block">
+                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-panel-raised/25" />
+                    <p className="font-serif text-xs sm:text-sm text-ink/85 mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3 hidden sm:block">
                       {item.lore}
                     </p>
                   </div>
@@ -138,14 +141,14 @@ export const UniversePortals: React.FC = () => {
                   <div className="mt-auto pt-3 sm:pt-6">
                     <p className="leading-none">
                       <span className="font-serif font-semibold text-base sm:text-2xl text-ink">{item.count}+ </span>
-                      <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
+                      <span className="font-sans text-xs sm:text-xs uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
                         Styles
                       </span>
                     </p>
                     {item.to ? (
                       <Link
                         to={item.to}
-                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3"
+                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-base bg-panel-raised text-white hover:bg-panel-raised/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3"
                         aria-label={`Enter ${item.name}`}
                       >
                         Enter {item.name} <span aria-hidden="true">→</span>
@@ -154,7 +157,7 @@ export const UniversePortals: React.FC = () => {
                       <button
                         type="button"
                         onClick={item.onEnter}
-                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-[16px] bg-ink text-cream hover:bg-ink/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
+                        className="mt-2.5 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-serif text-xs sm:text-base bg-panel-raised text-white hover:bg-panel-raised/90 min-h-[38px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
                         aria-label={`Enter ${item.name}`}
                       >
                         Enter {item.name} <span aria-hidden="true">→</span>

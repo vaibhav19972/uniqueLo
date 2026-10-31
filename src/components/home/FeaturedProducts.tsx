@@ -55,7 +55,7 @@ export const FeaturedProducts: React.FC = () => {
         {/* Header */}
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex flex-col sm:flex-row sm:items-end justify-between mb-12">
           <div>
-            <div className="flex items-center space-x-2 text-accent text-[11px] font-sans tracking-[0.25em] uppercase font-medium">
+            <div className="flex items-center space-x-2 text-accent text-xs font-sans tracking-eyebrow uppercase font-medium">
               <span>✦</span>
               <span>Limited Atelier Run</span>
             </div>
@@ -102,7 +102,7 @@ export const FeaturedProducts: React.FC = () => {
                         aspectRatio="3/4"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-3 left-3 bg-ink/80 text-cream px-2.5 py-1 text-[9px] uppercase tracking-widest font-sans">
+                      <div className="absolute top-3 left-3 bg-panel-raised/80 text-white px-2.5 py-1 text-xs uppercase tracking-widest font-sans">
                         ✦ 3x Macro Stitch
                       </div>
                     </div>
@@ -110,17 +110,17 @@ export const FeaturedProducts: React.FC = () => {
 
                   {/* Craft Technique Tag */}
                   {product.embroidery && (
-                    <div className="absolute bottom-3 left-3 bg-cream/90 text-ink px-2.5 py-1 text-[10px] tracking-widest uppercase border border-stone/80">
+                    <div className="absolute bottom-3 left-3 bg-cream/90 text-ink px-2.5 py-1 text-xs tracking-widest uppercase border border-stone/80">
                       {product.embroidery.techniqueLabel}
                     </div>
                   )}
 
                   {/* Quick Action Overlay */}
-                  <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] bg-gradient-to-t from-ink/80 to-transparent flex gap-2">
+                  <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-base bg-gradient-to-t from-black/80 to-transparent flex gap-2">
                     <Button
                       variant="primary"
                       size="sm"
-                      className="flex-1 text-[10px] tracking-widest"
+                      className="flex-1 text-xs tracking-widest"
                       onClick={() => addItem(product.slug, defaultVariant.sku, 1)}
                     >
                       Quick Add
@@ -130,7 +130,7 @@ export const FeaturedProducts: React.FC = () => {
                       <Button
                         variant="accent"
                         size="sm"
-                        className="text-[10px] tracking-widest px-3"
+                        className="text-xs tracking-widest px-3"
                         title="Bespoke Monogram Studio"
                         onClick={() => openCustomizer(product)}
                       >
@@ -159,7 +159,7 @@ export const FeaturedProducts: React.FC = () => {
                   </div>
 
                   {product.embroidery?.artisanHours && (
-                    <div className="mt-4 pt-3 border-t border-stone/50 flex justify-between items-center text-[10px] text-ink-muted uppercase tracking-wider">
+                    <div className="mt-4 pt-3 border-t border-stone/50 flex justify-between items-center text-xs text-ink-muted uppercase tracking-wider">
                       <span>Embroidery</span>
                       <span className="font-medium text-ink">
                         {product.embroidery.artisanHours} Hours Threadwork

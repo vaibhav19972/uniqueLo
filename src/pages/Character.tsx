@@ -70,7 +70,7 @@ export const Character: React.FC = () => {
       {/* Editorial Hero — unified Atelier quiet-luxury layout */}
       <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
-          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="font-sans text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <Link to="/universes" className="hover:underline">Universes</Link>
@@ -79,10 +79,10 @@ export const Character: React.FC = () => {
             <span className="mx-2">›</span>
             <span>{character.name}</span>
           </nav>
-          <h1 className="font-serif font-medium tracking-tight leading-[1.05] mt-4 text-5xl sm:text-6xl lg:text-7xl max-w-3xl text-ink">
+          <h1 className="font-serif font-medium tracking-tight leading-tight mt-4 text-5xl sm:text-6xl lg:text-7xl max-w-3xl text-ink">
             {character.name}
           </h1>
-          <p className="font-serif italic text-xl sm:text-2xl mt-3 text-ink-muted">{character.meaning}</p>
+          <p className="font-serif text-xl sm:text-2xl mt-3 text-ink-muted">{character.meaning}</p>
           {character.symbol_notes && (
             <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed text-ink/80">
               {character.symbol_notes}
@@ -114,7 +114,7 @@ export const Character: React.FC = () => {
               aria-pressed={garment === 'all' && artStyle === 'all'}
               className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                 garment === 'all' && artStyle === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
+                  ? 'bg-panel-raised text-white border border-transparent font-medium'
                   : 'text-ink border border-stone bg-paper hover:border-ink'
               }`}
             >
@@ -127,7 +127,7 @@ export const Character: React.FC = () => {
                 aria-pressed={garment === g}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer capitalize ${
                   garment === g
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink border border-stone bg-paper hover:border-ink'
                 }`}
               >
@@ -147,7 +147,7 @@ export const Character: React.FC = () => {
                 title={s.tagline}
                 className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
                   artStyle === s.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
+                    ? 'bg-panel-raised text-white border border-transparent font-medium'
                     : 'text-ink-muted border border-stone bg-paper hover:border-ink'
                 }`}
               >

@@ -102,7 +102,7 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[200] bg-cream/90 backdrop-blur-md border-b border-stone/60 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`fixed top-0 left-0 right-0 z-30 bg-cream/90 backdrop-blur-md border-b border-stone/60 transition-transform duration-500 ease-base ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
@@ -133,7 +133,7 @@ export const Header: React.FC = () => {
             aria-label="UniqueLo home"
           >
             <span aria-hidden="true" className="text-gold-deep text-lg leading-none">✳</span>
-            <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent">
+            <span className="font-serif text-2xl sm:text-3xl text-ink font-bold transition-colors group-hover:text-accent">
               UniqueLo
             </span>
           </Link>
@@ -151,7 +151,7 @@ export const Header: React.FC = () => {
             <Link
               to="/worlds"
               onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+              className={`relative py-1 text-sm lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
                 isWorldsActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
@@ -168,7 +168,7 @@ export const Header: React.FC = () => {
               <div className="absolute top-full left-0 pt-3 w-80">
                 <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
                   <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                    <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-medium">
                       Thematic Collections
                     </span>
                   </div>
@@ -182,7 +182,7 @@ export const Header: React.FC = () => {
                       <span className="block font-serif text-lg text-ink group-hover:text-accent transition-colors">
                         {u.name}
                       </span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                      <span className="block text-xs text-ink-muted mt-0.5 line-clamp-1">
                         {u.tagline}
                       </span>
                     </Link>
@@ -191,11 +191,11 @@ export const Header: React.FC = () => {
                   <div className="px-5 py-3 border-t border-stone/40 opacity-70 bg-cream/40">
                     <div className="flex items-center justify-between">
                       <span className="font-serif text-base text-ink">Cosmic & Mythos</span>
-                      <span className="text-[9px] uppercase tracking-widest text-accent font-medium bg-accent/10 px-2 py-0.5">
+                      <span className="text-xs uppercase tracking-widest text-accent font-medium bg-accent/10 px-2 py-0.5">
                         Coming Soon
                       </span>
                     </div>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                    <span className="block text-xs text-ink-muted mt-0.5">
                       Celestial folklore & cosmic legends
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export const Header: React.FC = () => {
             <Link
               to="/styles"
               onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+              className={`relative py-1 text-sm lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
                 isStylesActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
@@ -237,7 +237,7 @@ export const Header: React.FC = () => {
               <div className="absolute top-full left-0 pt-3 w-88">
                 <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
                   <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                    <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-medium">
                       Embroidery Style & Density (1–5)
                     </span>
                   </div>
@@ -252,11 +252,11 @@ export const Header: React.FC = () => {
                         <span className="font-serif text-base text-ink group-hover:text-accent transition-colors">
                           {exp.name}
                         </span>
-                        <span className="text-[10px] font-sans uppercase tracking-widest text-ink-muted">
+                        <span className="text-xs font-sans uppercase tracking-widest text-ink-muted">
                           Level {exp.score}
                         </span>
                       </div>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                      <span className="block text-xs text-ink-muted mt-0.5 line-clamp-1">
                         {exp.tagline}
                       </span>
                     </Link>
@@ -282,7 +282,7 @@ export const Header: React.FC = () => {
             <Link
               to="/clothing"
               onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+              className={`relative py-1 text-sm lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
                 isClothingActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
@@ -299,7 +299,7 @@ export const Header: React.FC = () => {
               <div className="absolute top-full left-0 pt-3 w-72">
                 <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
                   <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                    <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-medium">
                       Shop by Garment Type
                     </span>
                   </div>
@@ -313,7 +313,7 @@ export const Header: React.FC = () => {
                       <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
                         {g.name}
                       </span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+                      <span className="block text-xs text-ink-muted mt-0.5 line-clamp-1">
                         {g.description}
                       </span>
                     </Link>
@@ -348,7 +348,7 @@ export const Header: React.FC = () => {
             <Link
               to="/new-featured"
               onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
+              className={`relative py-1 text-sm lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
                 isNewActive ? 'text-ink font-semibold' : 'text-ink-muted'
               }`}
             >
@@ -365,7 +365,7 @@ export const Header: React.FC = () => {
               <div className="absolute top-full left-0 pt-3 w-72">
                 <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
                   <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
+                    <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-medium">
                       Curated Editions
                     </span>
                   </div>
@@ -377,7 +377,7 @@ export const Header: React.FC = () => {
                     <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
                       New Arrivals
                     </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                    <span className="block text-xs text-ink-muted mt-0.5">
                       Fresh threadwork from our atelier
                     </span>
                   </Link>
@@ -389,7 +389,7 @@ export const Header: React.FC = () => {
                     <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
                       Bestsellers
                     </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                    <span className="block text-xs text-ink-muted mt-0.5">
                       Most coveted garments in the archive
                     </span>
                   </Link>
@@ -401,7 +401,7 @@ export const Header: React.FC = () => {
                     <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
                       Limited Editions
                     </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                    <span className="block text-xs text-ink-muted mt-0.5">
                       Hand-numbered, small batch runs
                     </span>
                   </Link>
@@ -413,7 +413,7 @@ export const Header: React.FC = () => {
                     <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
                       Collections (Seasonal Drops)
                     </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
+                    <span className="block text-xs text-ink-muted mt-0.5">
                       Themed capsules across universes & garments
                     </span>
                   </Link>
@@ -432,7 +432,7 @@ export const Header: React.FC = () => {
           {/* 5. OUR CRAFT */}
           <Link
             to="/our-craft"
-            className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink ${
+            className={`relative py-1 text-sm lg:text-base font-normal transition-colors hover:text-ink ${
               isCraftActive ? 'text-ink font-semibold' : 'text-ink-muted'
             }`}
           >
@@ -486,7 +486,7 @@ export const Header: React.FC = () => {
               />
             </svg>
             {wishlistCount > 0 && (
-              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-white text-xs font-sans font-bold flex items-center justify-center">
                 {wishlistCount}
               </span>
             )}
@@ -507,7 +507,7 @@ export const Header: React.FC = () => {
               />
             </svg>
             {totalItems > 0 && (
-              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-white text-xs font-sans font-bold flex items-center justify-center">
                 {totalItems}
               </span>
             )}
@@ -537,7 +537,7 @@ export const Header: React.FC = () => {
             />
             <button
               type="submit"
-              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-ink text-cream text-[10px] sm:text-xs uppercase tracking-[0.18em] hover:bg-gold hover:text-on-gold transition-colors min-h-[40px] sm:min-h-[44px] shrink-0"
+              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-panel-raised text-white text-xs sm:text-xs uppercase tracking-label hover:bg-gold hover:text-on-gold transition-colors min-h-[40px] sm:min-h-[44px] shrink-0"
             >
               Search
             </button>
@@ -698,7 +698,7 @@ export const Header: React.FC = () => {
               <div className="bg-paper border border-stone/60 p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-accent font-medium block">Atelier Account</span>
+                    <span className="text-xs uppercase tracking-wider text-accent font-medium block">Atelier Account</span>
                     <p className="font-serif text-base text-ink truncate mt-0.5">
                       {(user.user_metadata?.full_name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Customer'}
                     </p>
@@ -728,7 +728,7 @@ export const Header: React.FC = () => {
             ) : (
               <div className="bg-paper border border-stone/60 p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-[10px] uppercase tracking-wider text-ink-muted block">Atelier Account</span>
+                  <span className="text-xs uppercase tracking-wider text-ink-muted block">Atelier Account</span>
                   <p className="text-xs text-ink mt-0.5">Sign in to sync pieces & track orders</p>
                 </div>
                 <button
@@ -737,7 +737,7 @@ export const Header: React.FC = () => {
                     setMobileOpen(false);
                     openAuthModal('signin');
                   }}
-                  className="px-3.5 py-2 bg-ink text-cream hover:bg-gold hover:text-ink text-xs font-mono uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+                  className="px-3.5 py-2 bg-panel-raised text-white hover:bg-gold hover:text-ink text-xs font-mono uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
                 >
                   Sign In
                 </button>
@@ -752,7 +752,7 @@ export const Header: React.FC = () => {
                 setMobileOpen(false);
                 setSearchOpen(true);
               }}
-              className="flex-1 text-center px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
+              className="flex-1 text-center px-2 py-3 text-xs uppercase tracking-label text-ink border border-stone"
             >
               Search
             </button>
@@ -761,7 +761,7 @@ export const Header: React.FC = () => {
                 setMobileOpen(false);
                 handleWishlistClick();
               }}
-              className="flex-1 px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
+              className="flex-1 px-2 py-3 text-xs uppercase tracking-label text-ink border border-stone"
             >
               Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
             </button>

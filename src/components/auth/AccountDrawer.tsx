@@ -78,11 +78,11 @@ export const AccountDrawer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[320] flex justify-end" role="dialog" aria-modal="true" aria-labelledby="account-title">
+    <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="account-title">
       <button
         aria-label="Close account panel"
         onClick={closeDrawer}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
+        className="absolute inset-0 bg-panel-raised/40 backdrop-blur-[2px] cursor-default"
       />
       <div
         ref={dialogRef}
@@ -90,7 +90,7 @@ export const AccountDrawer: React.FC = () => {
         className="relative h-full w-full sm:max-w-[420px] bg-paper border-l border-stone overflow-y-auto focus:outline-none animate-in slide-in-from-right duration-300"
       >
         <div className="sticky top-0 bg-paper border-b border-stone px-5 py-4 flex items-center justify-between z-10">
-          <h2 id="account-title" className="text-[10px] uppercase tracking-[0.22em] text-ink font-medium">
+          <h2 id="account-title" className="text-xs uppercase tracking-eyebrow text-ink font-medium">
             {adding ? 'Add address' : 'Your account'}
           </h2>
           <button
@@ -118,7 +118,7 @@ export const AccountDrawer: React.FC = () => {
                   ] as const
                 ).map(([key, label, ac, type]) => (
                   <div key={key}>
-                    <label htmlFor={`addr-${key}`} className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1">
+                    <label htmlFor={`addr-${key}`} className="block text-xs uppercase tracking-label text-ink-muted mb-1">
                       {label}
                     </label>
                     <input
@@ -135,7 +135,7 @@ export const AccountDrawer: React.FC = () => {
                   </div>
                 ))}
                 {error && !error.isMailerLimit && (
-                  <p role="alert" className="text-[12px] text-error">
+                  <p role="alert" className="text-xs text-error">
                     {error.message}
                   </p>
                 )}
@@ -175,12 +175,12 @@ export const AccountDrawer: React.FC = () => {
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                    <h3 className="text-xs uppercase tracking-eyebrow text-ink-muted">
                       Saved addresses {addresses.length > 0 && `(${addresses.length})`}
                     </h3>
                     <button
                       onClick={() => setAdding(true)}
-                      className="text-[10px] uppercase tracking-[0.14em] text-accent hover:text-accent-hover transition-colors cursor-pointer"
+                      className="text-xs uppercase tracking-label text-accent hover:text-accent-hover transition-colors cursor-pointer"
                     >
                       + Add
                     </button>
@@ -199,12 +199,12 @@ export const AccountDrawer: React.FC = () => {
                               <p className="text-sm text-ink font-medium flex items-center gap-2">
                                 {a.recipient_name}
                                 {a.is_default && (
-                                  <span className="text-[9px] uppercase tracking-widest text-accent border border-accent/40 px-1.5 py-0.5">
+                                  <span className="text-xs uppercase tracking-widest text-accent border border-accent/40 px-1.5 py-0.5">
                                     Default
                                   </span>
                                 )}
                               </p>
-                              <p className="text-[12px] text-ink-muted leading-relaxed mt-1">
+                              <p className="text-xs text-ink-muted leading-relaxed mt-1">
                                 {a.address_line}
                                 {a.landmark ? `, ${a.landmark}` : ''}<br />
                                 {a.city}, {a.state} {a.pincode}

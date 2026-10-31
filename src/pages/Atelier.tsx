@@ -49,7 +49,7 @@ export const Atelier: React.FC = () => {
             >
               {/* Numeral & Identity */}
               <div className="lg:col-span-4">
-                <span className="font-sans text-xs font-medium tracking-[0.25em] text-ink-muted uppercase block">
+                <span className="font-sans text-xs font-medium tracking-eyebrow text-ink-muted uppercase block">
                   0{idx + 1} // {craft.region}
                 </span>
                 <h3 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1 group-hover:text-accent transition-colors">
@@ -92,19 +92,19 @@ export const Atelier: React.FC = () => {
                     alt={craft.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                   
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-cream">
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
                     <div>
-                      <span className="text-[10px] uppercase tracking-widest text-cream/80 block">
+                      <span className="text-xs uppercase tracking-widest text-white block">
                         Stitch Architecture
                       </span>
-                      <span className="font-serif text-lg text-cream">
+                      <span className="font-serif text-lg text-white">
                         {craft.stitchType}
                       </span>
                     </div>
 
-                    <span className="text-[11px] font-sans tracking-widest uppercase bg-cream/90 text-ink px-3 py-1 font-medium">
+                    <span className="text-xs font-sans tracking-widest uppercase bg-cream/90 text-ink px-3 py-1 font-medium">
                       Explore Guild →
                     </span>
                   </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link } from 'react-router';
 import { MarketingHeader } from '../ui/MarketingHeader';
 
@@ -75,8 +76,10 @@ const BADGES = [
 ];
 
 export const CraftStory: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   return (
-    <section aria-labelledby="craft-heading" className="bg-cream py-16 lg:py-24">
+    <section aria-labelledby="craft-heading" ref={revealRef} className="reveal bg-cream py-16 lg:py-24">
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
           eyebrow="Our Craft"
@@ -107,7 +110,7 @@ export const CraftStory: React.FC = () => {
                   {/* Number row — the → separators live here so every arrow
                       sits on one shared baseline (render 04) */}
                   <div className="flex items-center justify-between">
-                    <span className="font-serif text-[32px] leading-none text-gold-deep">{s.n}</span>
+                    <span className="font-serif text-4xl leading-none text-gold-deep">{s.n}</span>
                     {i < STEPS.length - 1 && (
                       <span aria-hidden="true" className="text-gold-deep/70 text-xl leading-none">
                         →
@@ -115,7 +118,7 @@ export const CraftStory: React.FC = () => {
                     )}
                   </div>
                   <p className="font-serif text-lg text-ink mt-2 leading-snug">{s.title}</p>
-                  <p className="font-serif text-[13px] text-ink-muted mt-1 leading-relaxed">
+                  <p className="font-serif text-sm text-ink-muted mt-1 leading-relaxed">
                     {s.detail}
                   </p>
                   {/* mt-auto pins every thumbnail to the bottom of the tallest
@@ -143,12 +146,12 @@ export const CraftStory: React.FC = () => {
                 </div>
               </div>
               <div className="sm:col-span-5">
-                <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed">
+                <blockquote className="font-serif text-lg sm:text-xl text-ink leading-relaxed">
                   “{ATELIER_NOTE.quote}”
                 </blockquote>
-                {/* Script signature face not self-hosted — italic serif stands in (logged) */}
-                <p className="font-serif italic text-[28px] text-ink mt-3 leading-none">{ATELIER_NOTE.name}</p>
-                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mt-2">
+                {/* Script signature face not self-hosted — serif stands in (logged) */}
+                <p className="font-serif text-3xl text-ink mt-3 leading-none">{ATELIER_NOTE.name}</p>
+                <p className="font-sans text-xs uppercase tracking-eyebrow text-ink-muted mt-2">
                   {ATELIER_NOTE.name} · {ATELIER_NOTE.role}
                 </p>
               </div>
@@ -156,12 +159,12 @@ export const CraftStory: React.FC = () => {
                 <svg aria-hidden="true" className="w-8 h-8 text-gold-deep/70" fill="none" stroke="currentColor" strokeWidth="1.25" viewBox="0 0 32 32">
                   <path strokeLinecap="round" d="M16 28C16 20 16 12 16 4M16 12c-3 0-6-2-7-5 3 0 6 2 7 5zm0 6c3 0 6-2 7-5-3 0-6 2-7 5zm0 4c-3 0-6-2-7-5 3 0 6 2 7 5z" />
                 </svg>
-                <p className="font-serif text-[15px] text-ink leading-relaxed mt-2">
+                <p className="font-serif text-sm text-ink leading-relaxed mt-2">
                   Over 30+ artisans across India bring UniqueLo to life.
                 </p>
                 <Link
                   to="/atelier"
-                  className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold-deep border-b border-gold-deep/40 hover:border-gold-deep transition-colors"
+                  className="self-start mt-2 pb-0.5 font-serif text-sm text-gold-deep border-b border-gold-deep/40 hover:border-gold-deep transition-colors"
                 >
                   Meet our artisans <span aria-hidden="true">→</span>
                 </Link>
@@ -181,7 +184,7 @@ export const CraftStory: React.FC = () => {
               </span>
               <div>
                 <p className="font-serif text-lg text-ink">{b.title}</p>
-                <p className="font-serif text-[13px] text-ink-muted">{b.detail}</p>
+                <p className="font-serif text-sm text-ink-muted">{b.detail}</p>
               </div>
             </div>
           ))}

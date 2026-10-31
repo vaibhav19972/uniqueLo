@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useReveal } from '../../hooks/useReveal';
 import { Link } from 'react-router';
 import { useProducts, useCollections } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
@@ -31,6 +32,8 @@ const TABS: TabConfig[] = [
 ];
 
 export const NewAndFeaturedSection: React.FC = () => {
+  const revealRef = useReveal<HTMLElement>();
+
   const { data: allProducts } = useProducts();
   const { data: collections } = useCollections();
   const [activeTab, setActiveTab] = useState<FeaturedTab>('new-arrivals');
@@ -89,8 +92,9 @@ export const NewAndFeaturedSection: React.FC = () => {
 
   return (
     <section
+      ref={revealRef}
       aria-labelledby="new-featured-heading"
-      className="bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
+      className="reveal bg-cream py-16 lg:py-24 border-b border-stone/50 overflow-hidden"
     >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
@@ -123,7 +127,7 @@ export const NewAndFeaturedSection: React.FC = () => {
                     }
                   }}
                   className={`px-4 py-2 text-xs uppercase font-sans tracking-widest font-semibold transition-all border cursor-pointer whitespace-nowrap ${isSelected
-                      ? 'bg-ink text-cream border-ink shadow-sm'
+                      ? 'bg-accent text-white border-accent'
                       : 'bg-paper text-ink border-stone/60 hover:border-accent hover:text-accent'
                     }`}
                 >
@@ -133,7 +137,7 @@ export const NewAndFeaturedSection: React.FC = () => {
             })}
           </div>
 
-          <p className="font-serif italic text-xs sm:text-sm text-ink-muted">
+          <p className="font-serif text-xs sm:text-sm text-ink-muted">
             {currentTabConfig.tagline}
           </p>
         </div>
@@ -142,14 +146,14 @@ export const NewAndFeaturedSection: React.FC = () => {
         {activeTab === 'collections' && (
           <div className="mt-5 p-3.5 sm:p-4 bg-paper border border-stone/60 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-300">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium mr-1">
+              <span className="text-xs uppercase font-sans tracking-eyebrow text-accent font-medium mr-1">
                 Capsule Drops:
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedCollectionSlug('all')}
                 className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${selectedCollectionSlug === 'all'
-                    ? 'bg-ink text-cream border-ink font-semibold'
+                    ? 'bg-panel-raised text-white border-ink font-semibold'
                     : 'bg-cream text-ink border-stone/60 hover:border-ink'
                   }`}
               >
@@ -163,7 +167,7 @@ export const NewAndFeaturedSection: React.FC = () => {
                     type="button"
                     onClick={() => setSelectedCollectionSlug(col.slug)}
                     className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${isColActive
-                        ? 'bg-accent text-paper border-accent font-semibold shadow-xs'
+                        ? 'bg-accent text-white border-accent font-semibold shadow-xs'
                         : 'bg-cream text-ink border-stone/60 hover:border-accent hover:text-accent'
                       }`}
                   >
@@ -192,7 +196,7 @@ export const NewAndFeaturedSection: React.FC = () => {
         <div className="mt-10 text-center">
           <Link
             to={bottomCtaTo}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-paper border border-stone/80 hover:border-ink text-ink text-xs uppercase font-sans tracking-widest font-semibold hover:bg-ink hover:text-cream transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-paper border border-stone/80 hover:border-ink text-ink text-xs uppercase font-sans tracking-widest font-semibold hover:bg-panel-raised hover:text-white transition-all shadow-sm"
           >
             {bottomCtaLabel}
             <span aria-hidden="true">→</span>

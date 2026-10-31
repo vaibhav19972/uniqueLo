@@ -49,7 +49,7 @@ export const Expression: React.FC = () => {
       {/* Editorial Header */}
       <section className="bg-paper border-b border-stone/50">
         <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
+          <nav aria-label="Breadcrumb" className="text-xs uppercase tracking-eyebrow text-ink-muted">
             <Link to="/" className="hover:underline">Home</Link>
             <span className="mx-2">›</span>
             <Link to="/styles" className="hover:underline">Styles</Link>
@@ -60,18 +60,18 @@ export const Expression: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mt-4">
             <div>
               <div className="flex items-center gap-3">
-                <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                   Intensity Level {currentExp?.score} of 5
                 </span>
                 <span className="h-3 w-px bg-stone" />
-                <span className="text-[11px] font-sans text-ink-muted tracking-wide">
+                <span className="text-xs font-sans text-ink-muted tracking-wide">
                   {currentExp?.characteristics}
                 </span>
               </div>
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
                 {currentExp?.name ?? 'Style'}
               </h1>
-              <p className="font-serif italic text-lg sm:text-xl text-ink-muted mt-2">{currentExp?.tagline}</p>
+              <p className="font-serif text-lg sm:text-xl text-ink-muted mt-2">{currentExp?.tagline}</p>
               <p className="text-xs sm:text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
                 {currentExp?.description}
               </p>
@@ -79,7 +79,7 @@ export const Expression: React.FC = () => {
 
             {/* Intensity Level Pill Selector */}
             <div className="flex flex-wrap items-center gap-1.5 p-2 bg-cream border border-stone/80 self-start lg:self-end">
-              <span className="text-[9px] uppercase tracking-widest text-ink-muted font-medium px-2">
+              <span className="text-xs uppercase tracking-widest text-ink-muted font-medium px-2">
                 Levels:
               </span>
               {(expressions ?? []).map((exp) => {
@@ -91,7 +91,7 @@ export const Expression: React.FC = () => {
                     aria-current={isActive ? 'page' : undefined}
                     className={`px-3 py-1.5 text-xs font-sans border transition-all ${
                       isActive
-                        ? 'border-ink bg-ink text-cream font-medium shadow-xs'
+                        ? 'border-ink bg-panel-raised text-white font-medium shadow-xs'
                         : 'border-transparent bg-paper text-ink hover:border-stone'
                     }`}
                   >

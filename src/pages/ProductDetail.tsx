@@ -20,7 +20,6 @@ import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
 import { ExpressionGuideModal } from '../components/shop/ExpressionGuideModal';
 import { CtaButton } from '../components/ui/Cta';
-import { useIsThemeV2 } from '../config/theme';
 
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -32,7 +31,6 @@ export const ProductDetail: React.FC = () => {
   const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((state) => state.showToast);
-  const isV2 = useIsThemeV2();
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -382,7 +380,7 @@ export const ProductDetail: React.FC = () => {
                       backgroundRepeat: 'no-repeat',
                     }}
                   >
-                    <div className="absolute top-4 left-4 bg-ink/90 text-cream px-3 py-1 text-[10px] tracking-widest uppercase font-sans backdrop-blur-md border border-stone/30">
+                    <div className="absolute top-4 left-4 bg-panel-raised/90 text-white px-3 py-1 text-xs tracking-widest uppercase font-sans backdrop-blur-md border border-stone/30">
                       3x Macro Thread Inspection
                     </div>
                   </div>
@@ -390,12 +388,12 @@ export const ProductDetail: React.FC = () => {
 
                 {/* Badges on Image */}
                 {product.embroidery && (
-                  <div className="absolute bottom-4 left-4 bg-cream/95 text-ink backdrop-blur-md px-3 py-1.5 text-[11px] tracking-widest uppercase border border-stone shadow-sm">
+                  <div className="absolute bottom-4 left-4 bg-cream/95 text-ink backdrop-blur-md px-3 py-1.5 text-xs tracking-widest uppercase border border-stone shadow-sm">
                     {product.embroidery.techniqueLabel}
                   </div>
                 )}
 
-                <div className="absolute top-4 right-4 bg-ink/75 text-cream text-[10px] px-2.5 py-1 tracking-widest uppercase backdrop-blur-xs">
+                <div className="absolute top-4 right-4 bg-panel-raised/75 text-white text-xs px-2.5 py-1 tracking-widest uppercase backdrop-blur-xs">
                   Hover to Inspect Stitches
                 </div>
               </div>
@@ -411,7 +409,7 @@ export const ProductDetail: React.FC = () => {
                       {product.embroidery.artisanHours} hours of embroidery threadwork
                     </span>
                   </div>
-                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold-deep' : 'text-ink'}`}>
+                  <span className={`text-xs uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold-deep' : 'text-ink'}`}>
                     {product.handcrafted ? 'Handcrafted piece' : 'Atelier finish'}
                   </span>
                 </div>
@@ -428,7 +426,7 @@ export const ProductDetail: React.FC = () => {
                   {universe && (
                     <Link
                       to={`/universes/${universe.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-gold-deep/10 text-gold-deep font-sans tracking-[0.18em] uppercase px-2.5 py-1"
+                      className="inline-flex items-center gap-1.5 bg-gold-deep/10 text-gold-deep font-sans tracking-label uppercase px-2.5 py-1"
                     >
                       <span aria-hidden="true">◉</span> {universe.name}
                     </Link>
@@ -449,7 +447,7 @@ export const ProductDetail: React.FC = () => {
               {/* Category, Craft Region & Batch Scarcity Marker */}
               <div className="flex flex-col gap-1.5 mb-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
+                  <span className="font-sans text-xs tracking-eyebrow text-accent uppercase font-medium">
                     {formatCountryOfOrigin(product.countryOfOrigin)} // {product.garmentType ?? product.categorySlug}
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-ink">
@@ -459,16 +457,16 @@ export const ProductDetail: React.FC = () => {
                           {'★'.repeat(Math.round(displayRating.value))}
                         </span>
                         <span className="font-medium">{displayRating.value.toFixed(1)}</span>
-                        <span className="text-ink-muted text-[11px]">({displayRating.count} reviews)</span>
+                        <span className="text-ink-muted text-xs">({displayRating.count} reviews)</span>
                       </>
                     ) : (
-                      <span className="text-ink-muted text-[11px]">No reviews yet</span>
+                      <span className="text-ink-muted text-xs">No reviews yet</span>
                     )}
                   </div>
                 </div>
 
                 {/* Collection + Craft provenance strip */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] uppercase font-sans tracking-widest">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs uppercase font-sans tracking-widest">
                   {(product.collectionSlug || product.artStyleSlug) && (
                     <span className="inline-flex items-center gap-2 text-ink">
                       <span className="text-ink-muted font-medium">Collection</span>
@@ -495,7 +493,7 @@ export const ProductDetail: React.FC = () => {
                 {/* Trust row — replaces the old batch/cluster scarcity strip.
                     These are the surfaces a first-time tier-2/3 buyer checks
                     before adding to bag (docs/11-data-model §5). */}
-                <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
+                <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase font-sans tracking-widest text-ink-muted">
                   {product.codAvailable && (
                     <span className="text-ink font-medium">Cash on delivery</span>
                   )}
@@ -514,10 +512,10 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               {/* Title & Subtitle */}
-              <h1 className="font-serif text-4xl sm:text-5xl text-ink font-normal leading-[1.05] tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-5xl text-ink font-normal leading-tight tracking-tight">
                 {product.name}
               </h1>
-              <p className="font-serif italic text-lg text-ink-muted mt-2 leading-relaxed">
+              <p className="font-serif text-lg text-ink-muted mt-2 leading-relaxed">
                 {product.subtitle}
               </p>
 
@@ -525,19 +523,19 @@ export const ProductDetail: React.FC = () => {
               <div className="mt-4 p-3.5 bg-paper border border-stone/70 space-y-2.5">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 bg-ink text-cream text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 bg-panel-raised text-white text-xs font-mono font-bold flex items-center justify-center shrink-0">
                       {expScore}
                     </span>
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] uppercase font-sans tracking-widest text-ink-muted">
+                        <span className="text-xs uppercase font-sans tracking-widest text-ink-muted">
                           Expression
                         </span>
                         <span className="text-xs font-serif font-semibold text-accent">
                           Level {expScore} / 5 · {expInfo?.name ?? 'Artistic'}
                         </span>
                       </div>
-                      <p className="text-[11px] text-ink-muted leading-tight font-light mt-0.5">
+                      <p className="text-xs text-ink-muted leading-tight font-light mt-0.5">
                         {expInfo?.tagline ?? 'Medium compositions, illustrative designs.'}
                       </p>
                     </div>
@@ -545,18 +543,18 @@ export const ProductDetail: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsExpressionModalOpen(true)}
-                    className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold cursor-pointer shrink-0 ml-2"
+                    className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold cursor-pointer shrink-0 ml-2"
                   >
                     Explain Scale ↗
                   </button>
                 </div>
 
                 {product.embroidery?.placement && product.embroidery.placement.length > 0 && (
-                  <div className="pt-2 border-t border-stone/30 flex items-center gap-2 text-[10px] text-ink-muted">
+                  <div className="pt-2 border-t border-stone/30 flex items-center gap-2 text-xs text-ink-muted">
                     <span className="uppercase tracking-wider font-medium text-ink/70">
                       Placement Zones:
                     </span>
-                    <span className="font-serif italic text-ink">
+                    <span className="font-serif text-ink">
                       {product.embroidery.placement.join(' • ')}
                     </span>
                   </div>
@@ -576,34 +574,31 @@ export const ProductDetail: React.FC = () => {
                           {formatPrice(currentVariant.compareAtPriceCents)}
                         </span>
                         <span
-                          className={`text-[12px] font-sans px-2 py-0.5 ${
-                            isV2
-                              ? 'font-semibold text-emerald-700 bg-emerald-50'
-                              : 'bg-gold-deep/10 text-gold-deep'
+                          className={`text-xs font-sans px-2 py-0.5 ${
+                            'font-semibold text-success bg-success/10'
                           }`}
                         >
-                          {isV2 ? `(${discountPct}% OFF)` : `${discountPct}% OFF`}
+                          ({discountPct}% off)
                         </span>
                       </>
                     )}
                 </div>
 
-                {/* V2 D2C Promo Callout matching bag design system */}
-                {isV2 && (
-                  <div className="mt-3 p-3 bg-emerald-50/80 border border-emerald-200/90 flex items-center justify-between text-xs text-emerald-950 font-sans">
+                {/* Checkout promo callout */}
+                <div className="mt-3 flex items-center justify-between gap-3 border border-stone-strong bg-panel p-3 text-xs text-ink">
                     <div className="flex items-center gap-2">
-                      <span className="text-base text-emerald-600">⚡</span>
+                      <span aria-hidden="true" className="text-accent">✦</span>
                       <span>
-                        Get extra 10% OFF with code <strong className="font-mono font-bold text-emerald-800">HUSTLE10</strong> at checkout
+                        Get an extra 10% off with code{' '}
+                        <strong className="font-mono font-semibold text-accent">HUSTLE10</strong> at checkout
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold bg-emerald-700 text-white px-2 py-0.5">
-                      APPLY IN BAG
-                    </span>
-                  </div>
-                )}
+                  <span className="shrink-0 bg-accent px-2 py-0.5 text-xs font-semibold text-white">
+                    Apply in bag
+                  </span>
+                </div>
 
-                <p className="text-[11px] text-ink-muted mt-2 font-light">
+                <p className="text-xs text-ink-muted mt-2 font-light">
                   Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
                 </p>
                 {/* EMI line (render 09) — figure computed from variant price; the
@@ -620,25 +615,25 @@ export const ProductDetail: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   {product.fabricGsm && (
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
+                      <span className="text-xs uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
                       <span className="text-ink font-medium">{product.fabricGsm}</span>
                     </div>
                   )}
                   {product.embroidery?.artisanHours != null && (
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Embroidery Time</span>
+                      <span className="text-xs uppercase tracking-wider text-ink-muted block font-medium">Embroidery Time</span>
                       <span className="text-ink font-medium">{product.embroidery.artisanHours} hours of threadwork</span>
                     </div>
                   )}
                   {product.embroidery?.techniqueLabel && (
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
+                      <span className="text-xs uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
                       <span className="text-ink font-medium">{product.embroidery.techniqueLabel}</span>
                     </div>
                   )}
                   {product.fit && (
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
+                      <span className="text-xs uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
                       <span className="text-ink font-medium">{product.fit}</span>
                     </div>
                   )}
@@ -653,7 +648,7 @@ export const ProductDetail: React.FC = () => {
                   </span>
                   <button
                     onClick={() => setIsSizeGuideOpen(true)}
-                    className="text-[11px] uppercase tracking-widest text-accent hover:underline font-medium"
+                    className="text-xs uppercase tracking-widest text-accent hover:underline font-medium"
                   >
                     India & International Sizing →
                   </button>
@@ -684,7 +679,7 @@ export const ProductDetail: React.FC = () => {
                           }`}
                         >
                           <span>{sizeLabel}</span>
-                          {isOut && <span className="text-[9px] no-underline">Sold out</span>}
+                          {isOut && <span className="text-xs no-underline">Sold out</span>}
                         </button>
                       );
                     })}
@@ -692,7 +687,7 @@ export const ProductDetail: React.FC = () => {
                 {/* Stock Indicator */}
                 <div className="mt-2.5 flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-ink-muted text-[11px]">
+                  <span className="text-ink-muted text-xs">
                     {currentVariant.quantity && currentVariant.quantity <= 2
                       ? `Small batch alert: Only ${currentVariant.quantity} pieces left in atelier`
                       : 'In stock — ready for dispatch from regional workshop'}
@@ -744,12 +739,12 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               {/* Trust row (render 09) — line-icon SVGs, no emoji */}
-              <div className="mt-4 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
+              <div className="mt-4 flex items-center justify-between gap-2 text-xs text-ink-muted">
                 <span className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                   </svg>
-                  {isV2 ? 'Free shipping on orders above ₹500' : 'Free shipping on orders above ₹29,050'}
+                  Free shipping on orders above ₹500
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -768,10 +763,10 @@ export const ProductDetail: React.FC = () => {
               {/* India Pincode Delivery ETA & Trust Block (Task S1.9) */}
               <div className="mt-5 p-4 bg-paper border border-stone/80 rounded-sm space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-sans uppercase tracking-widest text-ink font-medium">
+                  <span className="text-xs font-sans uppercase tracking-widest text-ink font-medium">
                     Estimated Delivery & Pincode Checker
                   </span>
-                  <span className="text-[10px] text-accent font-medium">Pan-India Express</span>
+                  <span className="text-xs text-accent font-medium">Pan-India Express</span>
                 </div>
                 <div className="flex gap-2">
                   <input
@@ -785,7 +780,7 @@ export const ProductDetail: React.FC = () => {
                   <button
                     type="button"
                     onClick={checkPincode}
-                    className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase tracking-wider transition-colors font-medium"
+                    className="px-4 py-2 bg-panel-raised text-white hover:bg-accent text-xs uppercase tracking-wider transition-colors font-medium"
                   >
                     Check
                   </button>
@@ -795,7 +790,7 @@ export const ProductDetail: React.FC = () => {
                     ✦ {pincodeEta}
                   </p>
                 )}
-                <div className="pt-2 border-t border-stone/40 grid grid-cols-2 gap-2 text-[10px] text-ink-muted uppercase tracking-wider font-light">
+                <div className="pt-2 border-t border-stone/40 grid grid-cols-2 gap-2 text-xs text-ink-muted uppercase tracking-wider font-light">
                   <span>✓ Cash on Delivery (COD)</span>
                   <span>✓ UPI / NetBanking / Cards</span>
                   <span>✓ Free Express Shipping</span>
@@ -808,7 +803,7 @@ export const ProductDetail: React.FC = () => {
                 <div className="mt-4 p-4 bg-paper border border-stone/80 rounded-sm">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-medium block">
+                      <span className="text-xs uppercase font-sans tracking-widest text-accent font-medium block">
                         ✦ Bespoke Studio Available
                       </span>
                       <p className="text-xs text-ink font-serif mt-0.5">
@@ -819,7 +814,7 @@ export const ProductDetail: React.FC = () => {
                       variant="accent"
                       size="sm"
                       onClick={() => openCustomizer(product)}
-                      className="text-[10px] tracking-widest px-3"
+                      className="text-xs tracking-widest px-3"
                     >
                       Customize
                     </Button>
@@ -848,15 +843,15 @@ export const ProductDetail: React.FC = () => {
                         {product.embroidery.techniqueLabel}
                       </p>
                       <p>{product.embroidery.motifStory}</p>
-                      <div className="pt-2 grid grid-cols-2 gap-2 text-[11px] text-ink">
+                      <div className="pt-2 grid grid-cols-2 gap-2 text-xs text-ink">
                         <div>
-                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-[9px]">
+                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-xs">
                             Thread Composition
                           </strong>
                           {product.embroidery.threadComposition}
                         </div>
                         <div>
-                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-[9px]">
+                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-xs">
                             Placement Zones
                           </strong>
                           {product.embroidery.placement.join(', ')}
@@ -932,7 +927,7 @@ export const ProductDetail: React.FC = () => {
                     )}
 
                     {product.countryOfOrigin && (
-                      <p className="pt-1 text-[11px] uppercase tracking-widest text-ink-muted">
+                      <p className="pt-1 text-xs uppercase tracking-widest text-ink-muted">
                         {formatCountryOfOrigin(product.countryOfOrigin)}
                       </p>
                     )}
@@ -996,15 +991,15 @@ export const ProductDetail: React.FC = () => {
                 )}
               </div>
               <figcaption className="p-3">
-                <p className="font-serif text-[15px] text-ink flex items-center gap-2 flex-wrap">
+                <p className="font-serif text-sm text-ink flex items-center gap-2 flex-wrap">
                   {d.title}
                   {d.badge && (
-                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold-deep border border-gold-deep/50 rounded-full px-2 py-0.5">
+                    <span className="text-xs font-sans uppercase tracking-label text-gold-deep border border-gold-deep/50 rounded-full px-2 py-0.5">
                       {d.badge}
                     </span>
                   )}
                 </p>
-                <p className="text-[11px] text-ink-muted mt-0.5">{d.detail}</p>
+                <p className="text-xs text-ink-muted mt-0.5">{d.detail}</p>
               </figcaption>
             </figure>
           ))}
@@ -1014,7 +1009,7 @@ export const ProductDetail: React.FC = () => {
         {(motif || product.embroidery?.motifStory) && (
           <section aria-label="The story behind this motif" className="mt-14 bg-paper border border-stone/60 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
             <div>
-              <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold-deep">
+              <p className="text-xs font-sans uppercase tracking-eyebrow text-gold-deep">
                 {universe?.name ?? 'UniqueLo'} lore
               </p>
               <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 tracking-tight">
@@ -1031,7 +1026,7 @@ export const ProductDetail: React.FC = () => {
               {universe && (
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-ink/30 hover:border-ink transition-colors min-h-[48px]"
+                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-base text-ink border border-ink/30 hover:border-ink transition-colors min-h-[48px]"
                 >
                   Explore {universe.name} <span aria-hidden="true">→</span>
                 </Link>
@@ -1070,7 +1065,7 @@ export const ProductDetail: React.FC = () => {
         <section className="mt-20 pt-16 border-t border-stone/60">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-stone/40">
             <div>
-              <span className="text-[10px] font-sans tracking-[0.25em] text-gold-deep uppercase font-medium">
+              <span className="text-xs font-sans tracking-eyebrow text-gold-deep uppercase font-medium">
                 Worn & reviewed
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-1 tracking-tight">
@@ -1098,14 +1093,14 @@ export const ProductDetail: React.FC = () => {
               <div key={rev.id} className="p-6 bg-paper border border-stone/70 rounded-sm">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-accent text-sm">{'★'.repeat(rev.rating)}</span>
-                  <span className="text-[10px] text-ink-muted uppercase tracking-wider">{rev.createdAt}</span>
+                  <span className="text-xs text-ink-muted uppercase tracking-wider">{rev.createdAt}</span>
                 </div>
                 <h4 className="font-serif text-base text-ink font-medium">{rev.title}</h4>
                 <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">{rev.comment}</p>
-                <div className="mt-4 pt-3 border-t border-stone/40 flex items-center justify-between text-[11px]">
+                <div className="mt-4 pt-3 border-t border-stone/40 flex items-center justify-between text-xs">
                   <span className="text-ink font-medium">{rev.author}</span>
                   {rev.verified && (
-                    <span className="text-accent text-[10px] uppercase tracking-wider">
+                    <span className="text-accent text-xs uppercase tracking-wider">
                       Verified Collector ✓
                     </span>
                   )}
@@ -1122,7 +1117,7 @@ export const ProductDetail: React.FC = () => {
             <section aria-labelledby="universe-recs-heading">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
                 <div>
-                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                  <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                     Curated Universe
                   </span>
                   <h2 id="universe-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
@@ -1156,11 +1151,11 @@ export const ProductDetail: React.FC = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-xs sm:text-xs uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
-                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
+                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-xs sm:text-xs uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
                           ✦ L{getExpressionScore(rel)}
                         </span>
                       </div>
@@ -1169,7 +1164,7 @@ export const ProductDetail: React.FC = () => {
                           <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
                             {rel.name}
                           </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
+                          <span className="font-sans text-xs sm:text-xs text-ink-muted block mt-0.5 truncate">
                             {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
                           </span>
                         </div>
@@ -1189,7 +1184,7 @@ export const ProductDetail: React.FC = () => {
             <section aria-labelledby="expression-recs-heading">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
                 <div>
-                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                  <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                     The Expression Spectrum
                   </span>
                   <h2 id="expression-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
@@ -1223,11 +1218,11 @@ export const ProductDetail: React.FC = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-xs sm:text-xs uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
-                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
+                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-xs sm:text-xs uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
                           ✦ L{getExpressionScore(rel)}
                         </span>
                       </div>
@@ -1236,7 +1231,7 @@ export const ProductDetail: React.FC = () => {
                           <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
                             {rel.name}
                           </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
+                          <span className="font-sans text-xs sm:text-xs text-ink-muted block mt-0.5 truncate">
                             {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
                           </span>
                         </div>
@@ -1255,7 +1250,7 @@ export const ProductDetail: React.FC = () => {
           {!universeProducts.length && !expressionProducts.length && relatedProducts.length > 0 && (
             <section>
               <div className="mb-8">
-                <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
+                <span className="text-xs font-sans tracking-eyebrow text-accent uppercase font-medium">
                   Curated Wardrobe
                 </span>
                 <h2 className="font-serif text-3xl text-ink mt-1">
@@ -1279,7 +1274,7 @@ export const ProductDetail: React.FC = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
+                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-xs sm:text-xs uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
                             {rel.embroidery.techniqueLabel}
                           </span>
                         )}
@@ -1289,7 +1284,7 @@ export const ProductDetail: React.FC = () => {
                           <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
                             {rel.name}
                           </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
+                          <span className="font-sans text-xs sm:text-xs text-ink-muted block mt-0.5 truncate">
                             {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
                           </span>
                         </div>
@@ -1322,10 +1317,10 @@ export const ProductDetail: React.FC = () => {
 
       {/* Review Submission Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-[480] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             onClick={() => setIsReviewModalOpen(false)}
-            className="fixed inset-0 bg-ink/70 backdrop-blur-md"
+            className="fixed inset-0 bg-panel-raised/70 backdrop-blur-md"
           />
           <div className="relative w-full max-w-lg bg-paper border border-stone shadow-2xl rounded-sm p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-200">
             <h3 className="font-serif text-2xl text-ink">Submit Connoisseur Review</h3>
@@ -1333,7 +1328,7 @@ export const ProductDetail: React.FC = () => {
             
             <form onSubmit={handleReviewSubmit} className="mt-5 space-y-3.5">
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                <label className="block text-xs uppercase tracking-wider text-ink font-medium mb-1">
                   Your Name
                 </label>
                 <input
@@ -1347,7 +1342,7 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                <label className="block text-xs uppercase tracking-wider text-ink font-medium mb-1">
                   Rating (1 to 5 Stars)
                 </label>
                 <div className="flex gap-2">
@@ -1357,7 +1352,7 @@ export const ProductDetail: React.FC = () => {
                       key={star}
                       onClick={() => setReviewRating(star)}
                       className={`px-3 py-1 text-xs border ${
-                        reviewRating === star ? 'bg-ink text-cream border-ink' : 'border-stone text-ink'
+                        reviewRating === star ? 'bg-panel-raised text-white border-ink' : 'border-stone text-ink'
                       }`}
                     >
                       {star} ★
@@ -1367,7 +1362,7 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                <label className="block text-xs uppercase tracking-wider text-ink font-medium mb-1">
                   Review Headline
                 </label>
                 <input
@@ -1381,7 +1376,7 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
+                <label className="block text-xs uppercase tracking-wider text-ink font-medium mb-1">
                   Detailed Experience
                 </label>
                 <textarea
@@ -1431,7 +1426,7 @@ export const ProductDetail: React.FC = () => {
                 <span className="font-serif text-sm text-ink block leading-tight font-medium">
                   {product.name}
                 </span>
-                <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
+                <span className="text-xs text-ink-muted uppercase tracking-widest font-sans">
                   {currentVariant.size}
                 </span>
               </div>
@@ -1442,7 +1437,7 @@ export const ProductDetail: React.FC = () => {
                 <span className="font-sans text-base sm:text-lg font-medium text-ink block leading-none">
                   {formatPrice(currentVariant.priceCents)}
                 </span>
-                <span className="text-[10px] text-accent font-medium font-sans">
+                <span className="text-xs text-accent font-medium font-sans">
                   Express Dispatch Included
                 </span>
               </div>

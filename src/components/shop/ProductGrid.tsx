@@ -57,7 +57,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                 <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-parchment border border-dashed border-stone/80 relative overflow-hidden">
                   <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
                     <div className="space-y-3 max-w-xl">
-                      <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
+                      <div className="flex items-center gap-2 text-xs font-sans uppercase tracking-eyebrow text-accent font-medium">
                         <span>01 // Craft Provenance</span>
                         <span>•</span>
                         <span>Lucknow, Uttar Pradesh</span>
@@ -82,19 +82,19 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/60 sm:pl-6 w-full md:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-stone/40">
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Craft Collective</span>
+                        <span className="text-xs uppercase tracking-wider text-ink-muted block">Craft Collective</span>
                         <span className="font-medium text-ink">Old City Collective</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Embroidery Time</span>
+                        <span className="text-xs uppercase tracking-wider text-ink-muted block">Embroidery Time</span>
                         <span className="font-medium text-ink">14–20 Hours / Piece</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Yarn Core</span>
+                        <span className="text-xs uppercase tracking-wider text-ink-muted block">Yarn Core</span>
                         <span className="font-medium text-ink">Mulberry Silk Floss</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Stabilizer</span>
+                        <span className="text-xs uppercase tracking-wider text-ink-muted block">Stabilizer</span>
                         <span className="font-medium text-ink">Zero Synthetic Backing</span>
                       </div>
                     </div>
@@ -104,15 +104,15 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
               {/* Craft Interlude 2: Jaipur Zardozi Guild */}
               {showInterludeTwo && (
-                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-ink text-cream border border-stone/30 relative overflow-hidden">
+                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-panel-raised text-white border border-stone/30 relative overflow-hidden">
                   <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
                     <div className="space-y-3 max-w-xl">
-                      <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
+                      <div className="flex items-center gap-2 text-xs font-sans uppercase tracking-eyebrow text-accent font-medium">
                         <span>02 // Craft Provenance</span>
                         <span>•</span>
                         <span>Jaipur & Agra Guilds</span>
                       </div>
-                      <h3 className="font-serif text-2xl sm:text-3xl text-cream leading-tight">
+                      <h3 className="font-serif text-2xl sm:text-3xl text-white leading-tight">
                         24K Bullion Metallic Wirework on Heavyweight Outerwear.
                       </h3>
                       <p className="text-xs sm:text-sm text-stone/80 font-light leading-relaxed">
@@ -122,7 +122,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                       <div className="pt-1">
                         <a
                           href="/atelier/hand-zardozi"
-                          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-cream hover:text-accent transition-colors"
+                          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-white hover:text-accent transition-colors"
                         >
                           <span>Inspect Zardozi Process</span>
                           <span>→</span>
@@ -130,22 +130,22 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/30 sm:pl-6 w-full md:w-auto text-cream pt-4 sm:pt-0 border-t sm:border-t-0 border-white/20">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/30 sm:pl-6 w-full md:w-auto text-white pt-4 sm:pt-0 border-t sm:border-t-0 border-white/20">
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Craft Collective</span>
-                        <span className="font-medium text-cream">Pink City Bullion Guild</span>
+                        <span className="text-xs uppercase tracking-wider text-stone/60 block">Craft Collective</span>
+                        <span className="font-medium text-white">Pink City Bullion Guild</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Embroidery Time</span>
-                        <span className="font-medium text-cream">28–34 Hours / Piece</span>
+                        <span className="text-xs uppercase tracking-wider text-stone/60 block">Embroidery Time</span>
+                        <span className="font-medium text-white">28–34 Hours / Piece</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Wirework</span>
-                        <span className="font-medium text-cream">24K Bullion Metallic Zari</span>
+                        <span className="text-xs uppercase tracking-wider text-stone/60 block">Wirework</span>
+                        <span className="font-medium text-white">24K Bullion Metallic Zari</span>
                       </div>
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Base Cloth</span>
-                        <span className="font-medium text-cream">450 GSM Heavy Melton Wool</span>
+                        <span className="text-xs uppercase tracking-wider text-stone/60 block">Base Cloth</span>
+                        <span className="font-medium text-white">450 GSM Heavy Melton Wool</span>
                       </div>
                     </div>
                   </div>

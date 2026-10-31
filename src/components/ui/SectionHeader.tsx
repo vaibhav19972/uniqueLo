@@ -22,7 +22,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   if (archetype === 'statement') {
     return (
       <div className={`mb-12 pb-6 border-b border-stone/50 ${className}`}>
-        <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.08]">
+        <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-tight">
           {title}
         </h2>
         {subtitle && (
@@ -38,7 +38,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   if (archetype === 'utility') {
     return (
       <div className={`flex items-center justify-between pb-3 border-b border-stone/60 ${className}`}>
-        <span className="text-[10px] font-sans tracking-[0.22em] uppercase font-medium text-ink">
+        <span className="text-xs font-sans tracking-eyebrow uppercase font-medium text-ink">
           {title}
         </span>
         {action && <div>{action}</div>}
@@ -52,12 +52,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           {numeral && (
-            <span className="block text-[11px] font-sans tracking-[0.25em] text-ink-muted uppercase font-medium mb-1">
+            <span className="block text-xs font-sans tracking-eyebrow text-ink-muted uppercase font-medium mb-1">
               {numeral}
             </span>
           )}
           {eyebrow && !numeral && (
-            <span className="block text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium mb-1">
+            <span className="block text-xs font-sans tracking-eyebrow text-accent uppercase font-medium mb-1">
               {eyebrow}
             </span>
           )}
