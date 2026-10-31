@@ -514,7 +514,7 @@ export const Checkout: React.FC = () => {
                       onClick={() => setSelectedAddressId(a.id)}
                       className={`w-full text-left border p-4 transition-colors ${
                         selectedAddressId === a.id
-                          ? 'border-ink bg-white'
+                          ? 'border-ink bg-paper'
                           : 'border-stone bg-paper/50 hover:border-stone-strong'
                       }`}
                     >
@@ -695,7 +695,7 @@ export const Checkout: React.FC = () => {
                     !onlinePayable
                       ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'upi'
-                        ? 'border-ink bg-white'
+                        ? 'border-ink bg-paper'
                         : 'border-stone bg-paper/50'
                   }`}
                 >
@@ -718,7 +718,7 @@ export const Checkout: React.FC = () => {
                     !codAvailable
                       ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'cod'
-                        ? 'border-ink bg-white'
+                        ? 'border-ink bg-paper'
                         : 'border-stone bg-paper/50'
                   }`}
                 >
@@ -776,7 +776,7 @@ export const Checkout: React.FC = () => {
                             </span>
                           )}
                           {pct != null && (
-                            <span className="ml-1.5 text-[10px] text-emerald-700">{pct}% off</span>
+                            <span className="ml-1.5 text-[10px] text-success">{pct}% off</span>
                           )}
                         </p>
                       </div>
@@ -792,7 +792,7 @@ export const Checkout: React.FC = () => {
                     <span className="text-xs text-ink">
                       <span className="font-mono bg-cream px-1.5 py-0.5 border border-stone">{appliedCode}</span>
                       {quote?.coupon && !quote.coupon.error && (
-                        <span className="ml-2 text-emerald-700">
+                        <span className="ml-2 text-success">
                           −{formatPrice(quote.coupon.discount_cents ?? 0)}
                         </span>
                       )}
@@ -834,12 +834,12 @@ export const Checkout: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => applyCode(bestCoupon.code)}
-                        className="w-full text-left bg-emerald-50 border border-emerald-200 px-3 py-2 hover:bg-emerald-100/70"
+                        className="w-full text-left bg-accent-soft border border-stone px-3 py-2 hover:bg-panel-raised"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-emerald-800 font-medium">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-success font-medium">
                           Save {formatPrice(bestCoupon.value_cents)}
                         </p>
-                        <p className="text-[11px] text-emerald-900/80 mt-0.5">
+                        <p className="text-[11px] text-ink-muted mt-0.5">
                           Apply <span className="font-mono">{bestCoupon.code}</span>
                           {bestCoupon.min_subtotal_cents > 0
                             ? ` on orders above ${formatPrice(bestCoupon.min_subtotal_cents)}`
@@ -885,7 +885,7 @@ export const Checkout: React.FC = () => {
                       <span className="font-serif text-xl text-ink">{formatPrice(quote.total_cents)}</span>
                     </div>
                     {savings > 0 && (
-                      <p className="text-[10px] text-emerald-700 pt-1">
+                      <p className="text-[10px] text-success pt-1">
                         You save {formatPrice(savings)} on this order.
                       </p>
                     )}
@@ -964,6 +964,6 @@ const Row: React.FC<{ label: string; value: string; accent?: boolean }> = ({
 }) => (
   <div className="flex items-baseline justify-between">
     <span className="text-ink-muted">{label}</span>
-    <span className={accent ? 'text-emerald-700' : 'text-ink'}>{value}</span>
+    <span className={accent ? 'text-success' : 'text-ink'}>{value}</span>
   </div>
 );

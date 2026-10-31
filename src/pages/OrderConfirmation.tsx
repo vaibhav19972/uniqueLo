@@ -245,8 +245,8 @@ export const OrderConfirmation: React.FC = () => {
                   Needlecraft & Delivery Trajectory
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-2">
-                  <div className="p-3 bg-cream/70 border border-emerald-300/60 rounded-none relative">
-                    <div className="w-2 h-2 rounded-full bg-emerald-600 mb-2" />
+                  <div className="p-3 bg-cream/70 border border-accent-border rounded-none relative">
+                    <div className="w-2 h-2 rounded-full bg-success mb-2" />
                     <span className="text-[11px] font-sans font-medium text-ink block">
                       1. Commission Logged
                     </span>
@@ -374,7 +374,7 @@ export const OrderConfirmation: React.FC = () => {
                     </div>
 
                     {order.discount_cents > 0 && (
-                      <div className="flex justify-between text-emerald-700">
+                      <div className="flex justify-between text-success">
                         <span>
                           Atelier Promotion {order.coupon_code ? `(${order.coupon_code})` : ''}
                         </span>
