@@ -56,6 +56,7 @@ interface AuthState {
   signUp: (email: string, password: string, fullName?: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<boolean>;
+  updatePassword: (password: string) => Promise<boolean>;
 
   loadAddresses: () => Promise<void>;
   saveAddress: (input: Omit<CustomerAddress, 'id' | 'is_default'> & { is_default?: boolean }) => Promise<boolean>;
@@ -214,11 +215,46 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   resetPassword: async (email) => {
     if (!supabase) return false;
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+    // The link MUST land on the page that can actually set a new password.
+    // Without an explicit redirectTo, Supabase falls back to the dashboard's
+    // Site URL — the customer arrives holding a recovery session on the home
+    // page, with no way to use it.
+    //
+    // This origin also has to be allowlisted in Supabase → Authentication →
+    // URL Configuration → Redirect URLs. An un-allowlisted redirect is
+    // silently replaced by the Site URL, which makes the reset page look
+    // broken while the mail itself is fine.
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     if (error) {
       set({ error: toAuthError(error) });
       return false;
     }
+    return true;
+  },
+
+  updatePassword: async (password) => {
+    if (!supabase) {
+      set({
+        error: {
+          code: 'not_configured',
+          message: 'Accounts are unavailable: database not configured.',
+          isMailerLimit: false,
+        },
+      });
+      return false;
+    }
+    set({ status: 'loading', error: null });
+    // Relies on the recovery session established by the link. If it has
+    // expired, Supabase answers 401 and toAuthError surfaces it verbatim
+    // rather than pretending the password changed.
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      set({ status: 'error', error: toAuthError(error) });
+      return false;
+    }
+    set({ status: 'idle', error: null });
     return true;
   },
 

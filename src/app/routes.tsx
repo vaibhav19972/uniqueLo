@@ -24,6 +24,7 @@ const Admin = lazy(() => import('../pages/Admin').then((m) => ({ default: m.Admi
 const OrderConfirmation = lazy(() => import('../pages/OrderConfirmation').then((m) => ({ default: m.OrderConfirmation })));
 const Orders = lazy(() => import('../pages/Orders').then((m) => ({ default: m.Orders })));
 const Checkout = lazy(() => import('../pages/Checkout').then((m) => ({ default: m.Checkout })));
+const ResetPassword = lazy(() => import('../pages/ResetPassword').then((m) => ({ default: m.ResetPassword })));
 
 const PageFallback: React.FC = () => (
   <div className="min-h-[50vh] flex items-center justify-center bg-cream">
@@ -181,6 +182,13 @@ export const routes: RouteObject[] = [
       {
         path: 'orders',
         element: withSuspense(<Orders />),
+      },
+      {
+        // Landing target for the password-recovery email. Must stay in sync
+        // with the `redirectTo` in stores/auth.ts AND the Redirect URLs
+        // allowlist in Supabase → Authentication → URL Configuration.
+        path: 'reset-password',
+        element: withSuspense(<ResetPassword />),
       },
       {
         path: '*',
