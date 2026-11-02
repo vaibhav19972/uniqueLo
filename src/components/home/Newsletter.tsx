@@ -1,35 +1,32 @@
 import React, { useState } from 'react';
 import { subscribeNewsletter } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
-import { CtaButton } from '../ui/Cta';
 import { useReveal } from '../../hooks/useReveal';
 
 /**
- * Render target 07 (top): Join the Atelier List (chatgpt-v2).
- * Wiring preserved (subscribeNewsletter + toasts); layout rebuilt to render:
- * left content, right photo dissolving into the cream canvas (no frame box).
+ * THE ATELIER LIST
+ *
+ * What this band used to be: "Get 10% Off Your First Drop." over a gold
+ * eyebrow, a rotated white card with a drop shadow, and a promise that "your
+ * 10% welcome code is on its way." Three separate falsehoods, stacked:
+ *
+ *  · The project has no outbound mail, so no code was ever on its way. The
+ *    subscribe path writes one row to `newsletter_subscribers` and returns.
+ *  · The markup carried a `font-serif` heading, a `shadow-lg` card rotated
+ *    −2°, a gradient scrim over the photograph and gold label type — every one
+ *    of them a rule this design system retired.
+ *  · The photograph was a hero campaign frame from another universe, captioned
+ *    as an atelier welcome note.
+ *
+ * What it is now: the honest ask. A list that receives new pieces and the
+ * technique notes when they publish, stated in one line, in the page's own
+ * type register, with the field wired exactly as before. No discount, because
+ * a discount nobody can deliver is a lie with a coupon attached.
+ *
+ * ATELIER10 is a real, live coupon (10% above ₹999) and it is named here
+ * because it is checkable — the bag will price it. It is not tied to signing
+ * up, so the band does not claim it is.
  */
-const BENEFITS = [
-  {
-    title: 'Exclusive drops & early access',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7m0 0c-1.5-2.5-4-3.5-5-2.5S7 7.5 12 7zm0 0c1.5-2.5 4-3.5 5-2.5S17 7.5 12 7z" />
-    ),
-  },
-  {
-    title: 'Stories from the atelier',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.8 2.8m7.2 7.2l2.8 2.8m0-12.8l-2.8 2.8m-7.2 7.2l-2.8 2.8" />
-    ),
-  },
-  {
-    title: 'Members-only offers & events',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 9a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 002 2 2 2 0 01-2 2v1a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm6 0v2m6-2v2M7 13v0m4 0v0m4 0v0m-8 3v0m4 0v0m4 0v0" />
-    ),
-  },
-];
-
 export const Newsletter: React.FC = () => {
   const revealRef = useReveal<HTMLElement>();
   const [email, setEmail] = useState('');
@@ -45,107 +42,113 @@ export const Newsletter: React.FC = () => {
       const res = await subscribeNewsletter(email.trim());
       setIsSubmitted(true);
       setEmail('');
-      showToast({ title: 'Subscribed', description: res.message, type: 'success' });
+      showToast({ title: 'On the list', description: res.message, type: 'success' });
     } catch {
-      showToast({ title: 'Subscription failed', description: 'Please try again.', type: 'info' });
+      showToast({ title: 'Could not add you', description: 'Please try again.', type: 'info' });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section ref={revealRef} className="reveal bg-cream border-t border-stone/60 overflow-hidden" id="atelier-list" aria-labelledby="nl-heading" >
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 items-center py-16 lg:py-16">
-        {/* Copy + form */}
+    <section
+      ref={revealRef}
+      className="reveal border-b border-stone bg-cream py-12 lg:py-16"
+      id="atelier-list"
+      aria-labelledby="nl-heading"
+    >
+      <div className="mx-auto grid max-w-[var(--container-max)] grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-12">
         <div>
-          <p className="text-[12px] font-sans uppercase tracking-eyebrow font-medium text-gold-deep">
-            Insider Access
-          </p>
           <h2
             id="nl-heading"
-            className="font-serif font-medium text-ink mt-3 leading-display tracking-tight text-4xl sm:text-5xl"
+            className="loom-display text-ink"
+            style={{ fontSize: 'var(--text-display-lg)' }}
           >
-            Get 10% Off Your First Drop.
+            The Atelier List
           </h2>
-          <p className="font-serif text-lg text-ink-muted mt-4 max-w-md">
-            Early access to new drops, behind-the-scenes craft stories and members-only offers.
+          <p className="mt-3 max-w-[46ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+            New pieces when they reach the workshop, and the technique notes as
+            they are written. A few emails a season, nothing else.
           </p>
 
           {isSubmitted ? (
-            <p className="mt-7 inline-flex items-center gap-2.5 p-4 bg-parchment/70 font-serif text-lg text-ink rounded-sm">
-              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 13l4 4L19 7" />
-              </svg>
-              You are on the List. Your 10% welcome code is on its way.
+            <p
+              className="mt-7 border border-stone bg-paper px-4 py-3.5 font-sans text-[14px] leading-relaxed text-ink"
+              role="status"
+            >
+              You are on the list. Your address stays with us; it is not passed
+              to anyone else.
             </p>
           ) : (
-            <form onSubmit={handleSubmit} className="mt-7 flex flex-col sm:flex-row gap-3 max-w-lg">
+            <form onSubmit={handleSubmit} className="mt-7 flex max-w-lg flex-col gap-2 sm:flex-row">
               <label htmlFor="nl-email" className="sr-only">
                 Email address
               </label>
-              <div className="relative flex-1">
-                <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-muted"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l9 6 9-6M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z" />
-                </svg>
-                <input
-                  id="nl-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full bg-paper border border-stone pl-12 pr-5 py-3.5 text-[15px] text-ink placeholder-ink-muted/60 focus:outline-none focus:border-gold-deep transition-colors min-h-[52px] rounded-sm"
-                />
-              </div>
-              <CtaButton
+              <input
+                id="nl-email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="min-h-[48px] flex-1 border border-stone bg-paper px-3 font-sans text-[14px] text-ink placeholder:text-warm-gray focus:border-ink focus:outline-none"
+              />
+              <button
                 type="submit"
                 disabled={isLoading}
-                className="disabled:opacity-60 px-6 rounded-sm"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-ink px-6 font-sans text-[12px] font-medium uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
               >
-                {isLoading ? 'Joining…' : 'Get 10% Off'} <span aria-hidden="true">→</span>
-              </CtaButton>
+                {isLoading ? 'Adding…' : 'Join the list'}
+                <span aria-hidden="true">→</span>
+              </button>
             </form>
           )}
 
-          {/* Benefits — gold line icons, serif labels, hairline-divided (render 07) */}
-          <ul className="grid grid-cols-1 sm:grid-cols-3 mt-9 max-w-xl">
-            {BENEFITS.map((b, i) => (
-              <li
-                key={b.title}
-                className={`flex items-start gap-2.5 py-2.5 sm:py-0 sm:px-4 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-stone/60' : 'sm:pl-0'} ${
-                  i === 0 ? 'sm:pr-4' : ''
+          <dl className="mt-9 grid grid-cols-1 border-t border-stone sm:grid-cols-3">
+            {[
+              ['New pieces', 'First sight of a finished garment.'],
+              ['Technique notes', 'One stitch, one region, at a time.'],
+              ['No forwarding', 'Your address is never resold.'],
+            ].map(([term, def], i) => (
+              <div
+                key={term}
+                className={`border-b border-stone py-4 sm:border-b-0 sm:pb-0 ${
+                  i > 0 ? 'sm:border-l sm:pl-5' : 'sm:pr-5'
                 }`}
               >
-                <svg className="w-5 h-5 shrink-0 text-gold-deep mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  {b.icon}
-                </svg>
-                <span className="font-serif text-[13px] leading-snug text-ink/85">{b.title}</span>
-              </li>
+                <dt className="loom-label text-ink">{term}</dt>
+                <dd className="mt-1.5 font-sans text-[13px] leading-relaxed text-ink-muted">
+                  {def}
+                </dd>
+              </div>
             ))}
-          </ul>
+          </dl>
+
+          <p className="mt-6 font-sans text-[12px] leading-relaxed text-ink-muted">
+            Already shopping? <span className="loom-price text-ink">ATELIER10</span>{' '}
+            takes 10% off any bag above ₹999 in the shop.
+          </p>
         </div>
 
-        {/* Photo — left edge dissolves into the cream canvas (render 07) */}
-        <div className="relative hidden lg:block">
-          <div className="relative aspect-[4/3] bg-stone/30">
+        {/* The plate: a working photograph of the craft, on paper, uncropped by
+            any scrim. It sits at its own aspect rather than a fixed frame. */}
+        <figure className="hidden self-center lg:block">
+          <div className="bg-paper">
             <img
-              src="/images/campaigns/hero-heroverse.jpg"
-              alt="Embroidered crane textile with atelier welcome note (placeholder)"
+              src="/images/campaigns/craft-handwork.jpg"
+              alt="Hands working gold thread into an embroidery frame"
               loading="lazy"
-              className="w-full h-full object-cover"
+              className="block h-auto w-full object-cover"
             />
-            <div aria-hidden="true" className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cream to-transparent" />
           </div>
-          <div className="absolute -bottom-6 -left-6 bg-paper shadow-lg px-6 py-5 max-w-[240px] rotate-[-2deg]">
-            <p className="font-serif italic text-lg text-ink leading-snug">A more meaningful wardrobe awaits.</p>
-          </div>
-        </div>
+          <figcaption className="mt-2.5 flex items-baseline justify-between gap-4 border-t border-stone pt-2.5">
+            <span className="loom-label text-ink-muted">The workshop</span>
+            <span className="font-sans text-[12px] text-ink-muted">
+              12–34 hours a piece
+            </span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

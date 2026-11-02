@@ -11,6 +11,27 @@ import { AnnouncementBar } from './AnnouncementBar';
 
 type NavMenuKey = 'worlds' | 'styles' | 'clothing' | 'new-featured' | 'our-craft' | null;
 
+/** Nav items in reading order. A storefront's first five destinations, no more. */
+const NAV = [
+  { key: 'worlds' as const, label: 'Worlds', to: '/worlds' },
+  { key: 'styles' as const, label: 'Presence', to: '/styles' },
+  { key: 'clothing' as const, label: 'Clothing', to: '/clothing' },
+  { key: 'new-featured' as const, label: 'New', to: '/new-featured' },
+  { key: 'our-craft' as const, label: 'The craft', to: '/our-craft' },
+];
+
+/**
+ * THE MASTHEAD
+ *
+ * Two bands, both hairline-ruled, on the cotton ground. The wordmark is set in
+ * the same condensed grotesque as every other display line on the site, so the
+ * brand is part of the page rather than a logotype dropped onto it — the old
+ * header set "UniqueLo" in a serif with a gold asterisk, which is the one
+ * combination the replacement world rules out.
+ *
+ * Navigation is a row of labels, not a row of sentences. Each opens a ruled
+ * panel of the things inside it — no shadow, no rounded corner, no gold.
+ */
 export const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [activeMenu, setActiveMenu] = useState<NavMenuKey>(null);
@@ -36,7 +57,6 @@ export const Header: React.FC = () => {
   const { data: expressions } = useExpressions();
   const { data: garments } = useGarments();
 
-  // Focus the overlay input whenever it opens.
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
   }, [searchOpen]);
@@ -52,22 +72,17 @@ export const Header: React.FC = () => {
     if (prefersReducedMotion()) return;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY < 40) {
-        setIsVisible(true);
-      } else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      lastScrollY.current = currentScrollY;
+      const y = window.scrollY;
+      if (y < 40) setIsVisible(true);
+      else if (y > lastScrollY.current && y > 100) setIsVisible(false);
+      else setIsVisible(true);
+      lastScrollY.current = y;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menus on Escape or route change
   useEffect(() => {
     setActiveMenu(null);
     setMobileOpen(false);
@@ -87,431 +102,275 @@ export const Header: React.FC = () => {
 
   const closeMenu = () => setActiveMenu(null);
 
-  const handleWishlistClick = () => {
-    openWishlist();
+  const isActive = (key: string) => {
+    const p = location.pathname;
+    switch (key) {
+      case 'worlds':
+        return p.startsWith('/worlds') || p.startsWith('/universes');
+      case 'styles':
+        return p.startsWith('/styles') || p.startsWith('/expression');
+      case 'clothing':
+        return p.startsWith('/clothing') || p.startsWith('/garments') || p === '/shop';
+      case 'new-featured':
+        return p.startsWith('/new-featured') || p.startsWith('/collections');
+      case 'our-craft':
+        return p.startsWith('/our-craft') || p.startsWith('/atelier');
+      default:
+        return false;
+    }
   };
 
-  // Active path helpers
-  const isWorldsActive = location.pathname.startsWith('/worlds') || location.pathname.startsWith('/universes');
-  const isStylesActive = location.pathname.startsWith('/styles') || location.pathname.startsWith('/expression');
-  const isClothingActive = location.pathname.startsWith('/clothing') || location.pathname.startsWith('/garments') || location.pathname === '/shop';
-  const isNewActive = location.pathname.startsWith('/new-featured');
-  const isCraftActive = location.pathname.startsWith('/our-craft') || location.pathname.startsWith('/atelier');
-
-  // Garment highlights for dropdown (tops & main silhouettes)
   const coreGarments = (garments ?? []).slice(0, 6);
+
+  const panelShell = 'absolute left-0 top-full w-[min(22rem,calc(100vw-2rem))] pt-2';
+  const panelBody = 'border border-stone bg-paper';
+  const panelHead = 'border-b border-stone px-4 py-2';
+  const rowLink = 'block px-4 py-2.5 transition-colors hover:bg-panel';
+  const rowName = 'block font-sans text-[13px] font-medium text-ink transition-colors group-hover:text-accent';
+  const rowMeta = 'mt-0.5 block font-sans text-[11px] text-ink-muted line-clamp-1';
+
+  const navButton = (key: NavMenuKey, label: string, to: string, hasPanel: boolean) => {
+    const active = isActive(key!);
+    return (
+      <div
+        key={key}
+        className="relative"
+        onMouseEnter={() => setActiveMenu(hasPanel ? key : null)}
+        onMouseLeave={() => setActiveMenu(null)}
+      >
+        <Link
+          to={to}
+          onClick={closeMenu}
+          aria-current={active ? 'page' : undefined}
+          className={`relative flex h-[var(--header-height)] items-center gap-1.5 font-sans text-[12px] uppercase tracking-[0.12em] transition-colors ${
+            active ? 'text-ink' : 'text-ink-muted hover:text-ink'
+          }`}
+        >
+          {label}
+          {hasPanel && (
+            <svg
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+              className={`h-2 w-2 transition-transform duration-200 ${
+                activeMenu === key ? 'rotate-180' : ''
+              }`}
+            >
+              <path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+            </svg>
+          )}
+          {active && <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-ink" />}
+        </Link>
+
+        {hasPanel && activeMenu === key && (
+          <div className={panelShell}>
+            {key === 'worlds' && (
+              <div className={panelBody}>
+                <div className={panelHead}>
+                  <span className="loom-label text-ink-muted">Worlds</span>
+                </div>
+                {(universes ?? []).map((u) => (
+                  <Link key={u.slug} to={`/worlds/${u.slug}`} onClick={closeMenu} className={`group ${rowLink}`}>
+                    <span className={rowName}>{u.name}</span>
+                    <span className={rowMeta}>{u.tagline}</span>
+                  </Link>
+                ))}
+                <Link
+                  to="/worlds"
+                  onClick={closeMenu}
+                  className="block border-t border-stone px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                >
+                  All worlds →
+                </Link>
+              </div>
+            )}
+
+            {key === 'styles' && (
+              <div className={panelBody}>
+                <div className={panelHead}>
+                  <span className="loom-label text-ink-muted">How loudly it wears</span>
+                </div>
+                {(expressions ?? []).map((exp) => (
+                  <Link key={exp.slug} to={`/styles/${exp.slug}`} onClick={closeMenu} className={`group ${rowLink}`}>
+                    <span className="flex items-baseline justify-between gap-3">
+                      <span className={rowName}>{exp.name}</span>
+                      <span className="loom-price shrink-0 text-[11px] text-ink-muted">{exp.score}/5</span>
+                    </span>
+                    <span className={rowMeta}>{exp.tagline}</span>
+                  </Link>
+                ))}
+                <Link
+                  to="/styles"
+                  onClick={closeMenu}
+                  className="block border-t border-stone px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                >
+                  All levels →
+                </Link>
+              </div>
+            )}
+
+            {key === 'clothing' && (
+              <div className={panelBody}>
+                <div className={panelHead}>
+                  <span className="loom-label text-ink-muted">By garment</span>
+                </div>
+                {coreGarments.map((g) => (
+                  <Link key={g.slug} to={`/clothing/${g.slug}`} onClick={closeMenu} className={`group ${rowLink}`}>
+                    <span className={rowName}>{g.name}</span>
+                  </Link>
+                ))}
+                <Link
+                  to="/clothing"
+                  onClick={closeMenu}
+                  className="block border-t border-stone px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                >
+                  Every garment →
+                </Link>
+                <Link
+                  to="/shop"
+                  onClick={closeMenu}
+                  className="block border-t border-stone bg-panel px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:text-accent"
+                >
+                  The full collection →
+                </Link>
+              </div>
+            )}
+
+            {key === 'new-featured' && (
+              <div className={panelBody}>
+                <div className={panelHead}>
+                  <span className="loom-label text-ink-muted">Recent</span>
+                </div>
+                {[
+                  ['/new-featured/new-arrivals', 'New arrivals', 'The latest pieces added'],
+                  ['/new-featured/limited-editions', 'Collector pieces', 'Handcrafted and collector-edited'],
+                  ['/collections', 'Collections', 'Capsules across the worlds'],
+                ].map(([to, name, meta]) => (
+                  <Link key={to} to={to} onClick={closeMenu} className={`group ${rowLink}`}>
+                    <span className={rowName}>{name}</span>
+                    <span className={rowMeta}>{meta}</span>
+                  </Link>
+                ))}
+                <Link
+                  to="/new-featured"
+                  onClick={closeMenu}
+                  className="block border-t border-stone px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                >
+                  All featured →
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[200] bg-cream/90 backdrop-blur-md border-b border-stone/60 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`fixed inset-x-0 top-0 z-[200] border-b border-stone bg-cream/95 backdrop-blur-md transition-transform duration-300 ease-[var(--ease-base)] ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
       <AnnouncementBar />
 
-      <div className="max-w-[var(--container-max)] mx-auto h-[var(--header-height)] px-4 sm:px-6 lg:px-12 flex items-center justify-between">
-        {/* Mobile menu button */}
+      <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--container-max)] items-center px-4 sm:px-6 lg:px-12">
+        {/* Mobile menu trigger */}
         <button
+          type="button"
           onClick={() => setMobileOpen((v) => !v)}
           aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          className="md:hidden p-2 -ml-2 text-ink min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="-ml-2 flex min-h-[44px] min-w-[44px] items-center justify-center text-ink md:hidden"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
             {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+              <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 7h16M4 12h16M4 17h16" />
+              <path d="M4 8h16M4 16h16" strokeLinecap="round" />
             )}
           </svg>
         </button>
 
-        {/* Left: Brand Wordmark */}
-        <div className="flex-1 md:flex-initial min-w-0 md:mr-8 lg:mr-12">
-          <Link
-            to="/"
-            className="group inline-flex items-center gap-1.5 tracking-tight focus-visible:outline-accent"
-            aria-label="UniqueLo home"
+        {/* Wordmark — same face as every display line on the site. */}
+        <Link
+          to="/"
+          className="ml-1 mr-6 shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent md:ml-0 lg:mr-12"
+          aria-label="UniqueLo — home"
+        >
+          <span
+            className="loom-display block text-ink transition-colors hover:text-accent"
+            style={{ fontSize: '1.375rem', fontWeight: 700, letterSpacing: '-0.03em' }}
           >
-            <span aria-hidden="true" className="text-gold-deep text-lg leading-none">✳</span>
-            <span className="font-serif text-2xl sm:text-[28px] text-ink font-bold transition-colors group-hover:text-accent">
-              UniqueLo
-            </span>
-          </Link>
-        </div>
+            UniqueLo
+          </span>
+        </Link>
 
-        {/* Center: Primary Navigation (Spec Section 2) */}
-        <nav aria-label="Primary" className="hidden md:flex items-center space-x-6 lg:space-x-8">
-          
-          {/* 1. WORLDS */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveMenu('worlds')}
-            onMouseLeave={() => setActiveMenu(null)}
-          >
-            <Link
-              to="/worlds"
-              onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
-                isWorldsActive ? 'text-ink font-semibold' : 'text-ink-muted'
-              }`}
-            >
-              Worlds
-              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'worlds' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-              {isWorldsActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
-              )}
-            </Link>
-
-            {activeMenu === 'worlds' && (
-              <div className="absolute top-full left-0 pt-3 w-80">
-                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
-                  <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
-                      Thematic Collections
-                    </span>
-                  </div>
-                  {(universes ?? []).map((u) => (
-                    <Link
-                      key={u.slug}
-                      to={`/worlds/${u.slug}`}
-                      onClick={closeMenu}
-                      className="block px-5 py-3 hover:bg-cream transition-colors group"
-                    >
-                      <span className="block font-serif text-lg text-ink group-hover:text-accent transition-colors">
-                        {u.name}
-                      </span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
-                        {u.tagline}
-                      </span>
-                    </Link>
-                  ))}
-                  {/* Cosmic & Mythos teaser */}
-                  <div className="px-5 py-3 border-t border-stone/40 opacity-70 bg-cream/40">
-                    <div className="flex items-center justify-between">
-                      <span className="font-serif text-base text-ink">Cosmic & Mythos</span>
-                      <span className="text-[9px] uppercase tracking-widest text-accent font-medium bg-accent/10 px-2 py-0.5">
-                        Coming Soon
-                      </span>
-                    </div>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
-                      Celestial folklore & cosmic legends
-                    </span>
-                  </div>
-                  <Link
-                    to="/worlds"
-                    onClick={closeMenu}
-                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
-                  >
-                    All Worlds →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 2. STYLES (Signature System) */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveMenu('styles')}
-            onMouseLeave={() => setActiveMenu(null)}
-          >
-            <Link
-              to="/styles"
-              onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
-                isStylesActive ? 'text-ink font-semibold' : 'text-ink-muted'
-              }`}
-            >
-              Styles
-              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'styles' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-              {isStylesActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
-              )}
-            </Link>
-
-            {activeMenu === 'styles' && (
-              <div className="absolute top-full left-0 pt-3 w-88">
-                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
-                  <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
-                      Embroidery Style & Density (1–5)
-                    </span>
-                  </div>
-                  {(expressions ?? []).map((exp) => (
-                    <Link
-                      key={exp.slug}
-                      to={`/styles/${exp.slug}`}
-                      onClick={closeMenu}
-                      className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-serif text-base text-ink group-hover:text-accent transition-colors">
-                          {exp.name}
-                        </span>
-                        <span className="text-[10px] font-sans uppercase tracking-widest text-ink-muted">
-                          Level {exp.score}
-                        </span>
-                      </div>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
-                        {exp.tagline}
-                      </span>
-                    </Link>
-                  ))}
-                  <Link
-                    to="/styles"
-                    onClick={closeMenu}
-                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
-                  >
-                    Explore All Styles →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 3. CLOTHING */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveMenu('clothing')}
-            onMouseLeave={() => setActiveMenu(null)}
-          >
-            <Link
-              to="/clothing"
-              onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
-                isClothingActive ? 'text-ink font-semibold' : 'text-ink-muted'
-              }`}
-            >
-              Clothing
-              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'clothing' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-              {isClothingActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
-              )}
-            </Link>
-
-            {activeMenu === 'clothing' && (
-              <div className="absolute top-full left-0 pt-3 w-72">
-                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
-                  <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
-                      Shop by Garment Type
-                    </span>
-                  </div>
-                  {coreGarments.map((g) => (
-                    <Link
-                      key={g.slug}
-                      to={`/clothing/${g.slug}`}
-                      onClick={closeMenu}
-                      className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                    >
-                      <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
-                        {g.name}
-                      </span>
-                      <span className="block text-[11px] text-ink-muted mt-0.5 line-clamp-1">
-                        {g.description}
-                      </span>
-                    </Link>
-                  ))}
-                  <div className="border-t border-stone/60">
-                    <Link
-                      to="/clothing"
-                      onClick={closeMenu}
-                      className="block px-5 py-2.5 text-xs font-serif text-ink hover:text-accent hover:bg-cream transition-colors"
-                    >
-                      All Garments →
-                    </Link>
-                    <Link
-                      to="/shop"
-                      onClick={closeMenu}
-                      className="block px-5 py-2.5 bg-cream/80 text-xs font-sans font-medium uppercase tracking-wider text-ink hover:text-accent transition-colors"
-                    >
-                      Shop All Catalog →
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 4. NEW & FEATURED */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveMenu('new-featured')}
-            onMouseLeave={() => setActiveMenu(null)}
-          >
-            <Link
-              to="/new-featured"
-              onClick={closeMenu}
-              className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink inline-flex items-center gap-1 ${
-                isNewActive ? 'text-ink font-semibold' : 'text-ink-muted'
-              }`}
-            >
-              New & Featured
-              <svg className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'new-featured' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-              {isNewActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
-              )}
-            </Link>
-
-            {activeMenu === 'new-featured' && (
-              <div className="absolute top-full left-0 pt-3 w-72">
-                <div className="bg-paper border border-stone/70 shadow-2xl py-2 animate-in fade-in duration-200">
-                  <div className="px-5 py-2 border-b border-stone/40">
-                    <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium">
-                      Curated Editions
-                    </span>
-                  </div>
-                  <Link
-                    to="/new-featured/new-arrivals"
-                    onClick={closeMenu}
-                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                  >
-                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
-                      New Arrivals
-                    </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
-                      Fresh threadwork from our atelier
-                    </span>
-                  </Link>
-                  <Link
-                    to="/new-featured/bestsellers"
-                    onClick={closeMenu}
-                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                  >
-                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
-                      Bestsellers
-                    </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
-                      Most coveted garments in the archive
-                    </span>
-                  </Link>
-                  <Link
-                    to="/new-featured/limited-editions"
-                    onClick={closeMenu}
-                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                  >
-                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
-                      Limited Editions
-                    </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
-                      Hand-numbered, small batch runs
-                    </span>
-                  </Link>
-                  <Link
-                    to="/collections"
-                    onClick={closeMenu}
-                    className="block px-5 py-2.5 hover:bg-cream transition-colors group"
-                  >
-                    <span className="block font-serif text-base text-ink group-hover:text-accent transition-colors">
-                      Collections (Seasonal Drops)
-                    </span>
-                    <span className="block text-[11px] text-ink-muted mt-0.5">
-                      Themed capsules across universes & garments
-                    </span>
-                  </Link>
-                  <Link
-                    to="/new-featured"
-                    onClick={closeMenu}
-                    className="block px-5 py-3 border-t border-stone/60 text-xs font-serif text-ink-muted hover:text-ink hover:bg-cream transition-colors"
-                  >
-                    All Featured Pieces →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 5. OUR CRAFT */}
-          <Link
-            to="/our-craft"
-            className={`relative py-1 text-[15px] lg:text-base font-normal transition-colors hover:text-ink ${
-              isCraftActive ? 'text-ink font-semibold' : 'text-ink-muted'
-            }`}
-          >
-            Our Craft
-            {isCraftActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent animate-in fade-in duration-300" />
-            )}
-          </Link>
+        {/* Desktop navigation */}
+        <nav aria-label="Primary" className="hidden items-center gap-7 md:flex lg:gap-9">
+          {NAV.map((item) => navButton(item.key, item.label, item.to, item.key !== 'our-craft'))}
         </nav>
 
-        {/* Right: Utility actions */}
-        <div className="ml-auto flex items-center gap-0.5 sm:gap-1.5">
-          {/* Search trigger */}
+        {/* Utilities */}
+        <div className="ml-auto flex items-center gap-0 sm:gap-0.5">
           <button
+            type="button"
             onClick={() => setSearchOpen((v) => !v)}
             aria-expanded={searchOpen}
             aria-label={searchOpen ? 'Close search' : 'Search the collection'}
-            className="flex p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] items-center justify-center cursor-pointer"
+            className="flex min-h-[44px] min-w-[40px] items-center justify-center text-ink transition-colors hover:text-accent sm:min-w-[44px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4.5 4.5" strokeLinecap="round" />
             </svg>
           </button>
 
-          {/* Account: sign-in trigger when signed out, account panel when signed in */}
           <button
+            type="button"
             onClick={() => (user ? openAccountDrawer() : openAuthModal('signin'))}
-            aria-label={user ? 'Open account panel' : 'Sign in to your account'}
-            className="relative flex p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] items-center justify-center cursor-pointer"
+            aria-label={user ? 'Open your account' : 'Sign in'}
+            className="relative flex min-h-[44px] min-w-[40px] items-center justify-center text-ink transition-colors hover:text-accent sm:min-w-[44px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" />
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M5 20a7 7 0 0 1 14 0" strokeLinecap="round" />
             </svg>
             {user && (
-              <span className="absolute bottom-1 sm:bottom-1.5 right-1 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-success" aria-hidden="true" />
+              <span className="absolute bottom-2 right-2 h-1 w-1 rounded-full bg-success" aria-hidden="true" />
             )}
           </button>
 
-          {/* Light ⇄ dark */}
-          <ThemeToggle className="-mr-1" />
+          <ThemeToggle />
 
-          {/* Wishlist Button */}
           <button
-            onClick={handleWishlistClick}
-            aria-label={`Wishlist with ${wishlistCount} items`}
-            className="flex group relative items-center p-2 text-ink hover:text-accent transition-colors focus-visible:outline-accent min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] justify-center cursor-pointer"
+            type="button"
+            onClick={openWishlist}
+            aria-label={`Saved pieces (${wishlistCount})`}
+            className="relative flex min-h-[44px] min-w-[40px] items-center justify-center text-ink transition-colors hover:text-accent sm:min-w-[44px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <path d="M12 20.5 4.9 13.6a4.5 4.5 0 0 1 6.4-6.3l.7.7.7-.7a4.5 4.5 0 0 1 6.4 6.3Z" strokeLinejoin="round" />
             </svg>
             {wishlistCount > 0 && (
-              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="loom-price absolute right-1 top-2 text-[10px] leading-none text-accent">
                 {wishlistCount}
               </span>
             )}
           </button>
 
-          {/* Shopping Bag */}
           <button
+            type="button"
             onClick={openCart}
-            aria-label={`Cart with ${totalItems} items`}
-            className="relative flex items-center p-2 text-ink hover:text-accent transition-colors min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] justify-center cursor-pointer"
+            aria-label={`Bag (${totalItems})`}
+            className="relative ml-0.5 flex min-h-[44px] min-w-[40px] items-center justify-center text-ink transition-colors hover:text-accent sm:min-w-[44px]"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <path d="M6 8h12l1 12H5L6 8Z" strokeLinejoin="round" />
+              <path d="M9.5 8V6.5a2.5 2.5 0 0 1 5 0V8" strokeLinecap="round" />
             </svg>
             {totalItems > 0 && (
-              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-4 h-4 rounded-full bg-accent text-paper text-[10px] font-sans font-bold flex items-center justify-center">
+              <span className="loom-price absolute right-0.5 top-2 text-[10px] leading-none text-accent">
                 {totalItems}
               </span>
             )}
@@ -519,29 +378,30 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Expanding search overlay - Works on both mobile & desktop */}
+      {/* Search — a ruled drawer, not a modal. */}
       {searchOpen && (
-        <div className="border-t border-stone/60 bg-cream animate-in fade-in duration-200">
+        <div className="border-t border-stone bg-cream">
           <form
             onSubmit={submitSearch}
             role="search"
-            className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3"
+            className="mx-auto flex max-w-[var(--container-max)] items-center gap-3 px-4 py-3 sm:px-6 lg:px-12"
           >
-            <svg className="w-5 h-5 shrink-0 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] shrink-0 text-ink-muted" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4.5 4.5" strokeLinecap="round" />
             </svg>
             <input
               ref={searchInputRef}
               type="search"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search anime, heroes, stitches, garments…"
+              placeholder="Search a garment, a technique, a world"
               aria-label="Search the collection"
-              className="flex-1 bg-transparent font-serif text-sm sm:text-lg text-ink placeholder:text-ink-muted/70 focus:outline-none min-h-[40px] sm:min-h-[44px] min-w-0"
+              className="min-h-[44px] min-w-0 flex-1 bg-transparent font-sans text-[15px] text-ink placeholder:text-ink-muted focus:outline-none"
             />
             <button
               type="submit"
-              className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-ink text-cream text-[10px] sm:text-xs uppercase tracking-[0.18em] hover:bg-gold hover:text-on-gold transition-colors min-h-[40px] sm:min-h-[44px] shrink-0"
+              className="inline-flex min-h-[44px] shrink-0 items-center bg-ink px-5 font-sans text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent"
             >
               Search
             </button>
@@ -549,226 +409,142 @@ export const Header: React.FC = () => {
               type="button"
               onClick={() => setSearchOpen(false)}
               aria-label="Close search"
-              className="p-1.5 sm:p-2 text-ink-muted hover:text-ink min-w-[36px] sm:min-w-[44px] min-h-[36px] sm:min-h-[44px] flex items-center justify-center shrink-0"
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center text-ink-muted transition-colors hover:text-ink"
             >
-              ✕
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" />
+              </svg>
             </button>
           </form>
         </div>
       )}
 
-      {/* Mobile navigation drawer */}
+      {/* Mobile drawer — the same five destinations, ruled, nothing hidden. */}
       {mobileOpen && (
-        <nav aria-label="Mobile" className="md:hidden bg-cream border-t border-stone/60 px-4 py-4 space-y-2 max-h-[85vh] overflow-y-auto">
-          {/* Worlds Accordion */}
-          <div className="border-b border-stone/40 pb-2">
-            <button
-              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'worlds' ? null : 'worlds')}
-              className="w-full py-2.5 flex items-center justify-between text-left"
-            >
-              <span className="font-serif text-2xl text-ink">Worlds</span>
-              <span className="text-sm font-sans">{mobileExpandedSection === 'worlds' ? '–' : '+'}</span>
-            </button>
-            {mobileExpandedSection === 'worlds' && (
-              <div className="pl-3 py-1 space-y-2">
-                {(universes ?? []).map((u) => (
-                  <Link
-                    key={u.slug}
-                    to={`/worlds/${u.slug}`}
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-1 text-sm font-serif text-ink"
-                  >
-                    {u.name}
-                  </Link>
-                ))}
-                <Link
-                  to="/worlds"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
-                >
-                  All Worlds →
-                </Link>
-              </div>
-            )}
-          </div>
+        <nav
+          id="mobile-nav"
+          aria-label="Primary"
+          className="max-h-[calc(100svh-var(--header-height)-2rem)] overflow-y-auto border-t border-stone bg-cream px-4 pb-8 md:hidden"
+        >
+          {[
+            {
+              key: 'worlds' as const,
+              label: 'Worlds',
+              rows: (universes ?? []).map((u) => ({ to: `/worlds/${u.slug}`, name: u.name })),
+              moreTo: '/worlds',
+              moreLabel: 'All worlds',
+            },
+            {
+              key: 'styles' as const,
+              label: 'Presence',
+              rows: (expressions ?? []).map((e) => ({ to: `/styles/${e.slug}`, name: `${e.score}/5 — ${e.name}` })),
+              moreTo: '/styles',
+              moreLabel: 'All levels',
+            },
+            {
+              key: 'clothing' as const,
+              label: 'Clothing',
+              rows: coreGarments.map((g) => ({ to: `/clothing/${g.slug}`, name: g.name })),
+              moreTo: '/clothing',
+              moreLabel: 'Every garment',
+            },
+          ].map((section) => (
+            <div key={section.key} className="border-b border-stone">
+              <button
+                type="button"
+                onClick={() =>
+                  setMobileExpandedSection(mobileExpandedSection === section.key ? null : section.key)
+                }
+                aria-expanded={mobileExpandedSection === section.key}
+                className="flex min-h-[56px] w-full items-center justify-between text-left"
+              >
+                <span className="loom-display text-xl text-ink">{section.label}</span>
+                <span aria-hidden="true" className="relative h-3 w-3 shrink-0 text-ink-muted">
+                  <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-current" />
+                  <span
+                    className={`absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-current transition-opacity ${
+                      mobileExpandedSection === section.key ? 'opacity-0' : 'opacity-100'
+                    }`}
+                  />
+                </span>
+              </button>
+              {mobileExpandedSection === section.key && (
+                <ul className="pb-3">
+                  {section.rows.map((row) => (
+                    <li key={row.to}>
+                      <Link
+                        to={row.to}
+                        onClick={() => setMobileOpen(false)}
+                        className="block py-2.5 font-sans text-[14px] text-ink-muted transition-colors hover:text-ink"
+                      >
+                        {row.name}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      to={section.moreTo}
+                      onClick={() => setMobileOpen(false)}
+                      className="block py-2.5 font-sans text-[11px] uppercase tracking-[0.14em] text-ink"
+                    >
+                      {section.moreLabel} →
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </div>
+          ))}
 
-          {/* Styles Accordion */}
-          <div className="border-b border-stone/40 pb-2">
-            <button
-              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'styles' ? null : 'styles')}
-              className="w-full py-2.5 flex items-center justify-between text-left"
-            >
-              <span className="font-serif text-2xl text-ink">Styles</span>
-              <span className="text-sm font-sans">{mobileExpandedSection === 'styles' ? '–' : '+'}</span>
-            </button>
-            {mobileExpandedSection === 'styles' && (
-              <div className="pl-3 py-1 space-y-2">
-                {(expressions ?? []).map((exp) => (
-                  <Link
-                    key={exp.slug}
-                    to={`/styles/${exp.slug}`}
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-1 text-sm font-serif text-ink"
-                  >
-                    Level {exp.score}: {exp.name}
-                  </Link>
-                ))}
-                <Link
-                  to="/styles"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
-                >
-                  All Styles →
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Clothing Accordion */}
-          <div className="border-b border-stone/40 pb-2">
-            <button
-              onClick={() => setMobileExpandedSection(mobileExpandedSection === 'clothing' ? null : 'clothing')}
-              className="w-full py-2.5 flex items-center justify-between text-left"
-            >
-              <span className="font-serif text-2xl text-ink">Clothing</span>
-              <span className="text-sm font-sans">{mobileExpandedSection === 'clothing' ? '–' : '+'}</span>
-            </button>
-            {mobileExpandedSection === 'clothing' && (
-              <div className="pl-3 py-1 space-y-2">
-                {coreGarments.map((g) => (
-                  <Link
-                    key={g.slug}
-                    to={`/clothing/${g.slug}`}
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-1 text-sm font-serif text-ink"
-                  >
-                    {g.name}
-                  </Link>
-                ))}
-                <Link
-                  to="/clothing"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-1 text-xs uppercase tracking-wider text-accent font-medium"
-                >
-                  All Garments →
-                </Link>
-                <Link
-                  to="/shop"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-1 text-xs uppercase tracking-wider text-ink font-semibold"
-                >
-                  Shop All Catalog →
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* New & Featured */}
-          <div className="border-b border-stone/40 pb-2">
+          {[
+            { to: '/new-featured', label: 'New' },
+            { to: '/collections', label: 'Collections' },
+            { to: '/our-craft', label: 'The craft' },
+            { to: '/shop', label: 'The full collection' },
+          ].map((row) => (
             <Link
-              to="/new-featured"
+              key={row.to}
+              to={row.to}
               onClick={() => setMobileOpen(false)}
-              className="block py-2.5 font-serif text-2xl text-ink"
+              className="flex min-h-[56px] items-center border-b border-stone"
             >
-              New & Featured
+              <span className="loom-display text-xl text-ink">{row.label}</span>
             </Link>
-          </div>
+          ))}
 
-          {/* Collections */}
-          <div className="border-b border-stone/40 pb-2">
-            <Link
-              to="/collections"
-              onClick={() => setMobileOpen(false)}
-              className="block py-2.5 font-serif text-2xl text-ink"
-            >
-              Collections
-            </Link>
-          </div>
-
-          {/* Our Craft */}
-          <div className="border-b border-stone/40 pb-2">
-            <Link
-              to="/our-craft"
-              onClick={() => setMobileOpen(false)}
-              className="block py-2.5 font-serif text-2xl text-ink"
-            >
-              Our Craft
-            </Link>
-          </div>
-
-          {/* Account Section in Mobile Menu */}
-          <div className="border-b border-stone/40 pb-3 pt-2">
+          <div className="mt-6 border border-stone bg-paper p-4">
             {user ? (
-              <div className="bg-paper border border-stone/60 p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-accent font-medium block">Atelier Account</span>
-                    <p className="font-serif text-base text-ink truncate mt-0.5">
-                      {(user.user_metadata?.full_name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Customer'}
-                    </p>
-                  </div>
-                  <span className="w-2 h-2 rounded-full bg-success shrink-0" aria-label="Signed in" />
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone/30">
-                  <Link
-                    to="/orders"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-center py-2 px-2 text-xs font-mono tracking-wider uppercase text-ink border border-stone/60 hover:bg-cream transition-colors"
-                  >
-                    My Orders
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileOpen(false);
-                      openAccountDrawer();
-                    }}
-                    className="text-center py-2 px-2 text-xs font-mono tracking-wider uppercase text-ink border border-stone/60 hover:bg-cream transition-colors cursor-pointer"
-                  >
-                    Addresses
-                  </button>
-                </div>
-              </div>
+              <>
+                <p className="font-sans text-[12px] text-ink-muted">Signed in as</p>
+                <p className="mt-0.5 truncate font-sans text-[14px] font-medium text-ink">
+                  {(user.user_metadata?.full_name as string | undefined)?.trim() ||
+                    user.email?.split('@')[0] ||
+                    'Customer'}
+                </p>
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-3 inline-flex min-h-[44px] items-center border border-stone-strong px-4 font-sans text-[11px] uppercase tracking-[0.14em] text-ink"
+                >
+                  Your orders
+                </Link>
+              </>
             ) : (
-              <div className="bg-paper border border-stone/60 p-3 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <span className="text-[10px] uppercase tracking-wider text-ink-muted block">Atelier Account</span>
-                  <p className="text-xs text-ink mt-0.5">Sign in to sync pieces & track orders</p>
-                </div>
+              <>
+                <p className="font-sans text-[13px] text-ink-muted">
+                  Sign in to keep your bag and saved pieces across devices.
+                </p>
                 <button
                   type="button"
                   onClick={() => {
                     setMobileOpen(false);
                     openAuthModal('signin');
                   }}
-                  className="px-3.5 py-2 bg-ink text-cream hover:bg-gold hover:text-ink text-xs font-mono uppercase tracking-wider transition-colors shrink-0 cursor-pointer"
+                  className="mt-3 inline-flex min-h-[44px] items-center bg-ink px-5 font-sans text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent"
                 >
-                  Sign In
+                  Sign in
                 </button>
-              </div>
+              </>
             )}
-          </div>
-
-          {/* Action Row */}
-          <div className="flex items-center gap-2 pt-3">
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                setSearchOpen(true);
-              }}
-              className="flex-1 text-center px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
-            >
-              Search
-            </button>
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                handleWishlistClick();
-              }}
-              className="flex-1 px-2 py-3 text-xs uppercase tracking-[0.18em] text-ink border border-stone"
-            >
-              Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ''}
-            </button>
           </div>
         </nav>
       )}

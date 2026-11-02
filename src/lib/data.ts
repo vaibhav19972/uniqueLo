@@ -390,6 +390,15 @@ export interface Review {
 // ─────────────────────────────────────────────────────────────────────
 
 const seedCategories: Category[] = (rawCategories as { categories: Category[] }).categories;
+
+/** The "All" tab, used only when the database does not already carry one. */
+const ALL_CATEGORY: Category = {
+  slug: 'all',
+  name: 'All Collections',
+  label: 'All',
+  description: 'The complete atelier edit spanning artisanal embroidery and pure natural yarns.',
+  order: 0,
+};
 // NOTE: the old src/data/products.json (original 13) was deleted 2026-10-12.
 // The storefront runs on mock-products.json until real SKUs land.
 // `unknown` first: the JSON's inferred attribute value union is wider than
@@ -480,33 +489,11 @@ export function getCharacterIds(p: Product | undefined): string[] {
   return p.motifId ? [p.motifId] : [];
 }
 
-const mockReviews: Record<string, Review[]> = {
-  // ── SAMPLE DATA (flagged): render-phase placeholders, replace with real reviews ──
-  'cherry-blossom-hoodie': [
-    {
-      id: 'mock-rev-1',
-      productSlug: 'cherry-blossom-hoodie',
-      author: 'Arjun Mehta',
-      rating: 5,
-      title: 'Embroidery quality is next level',
-      comment: 'Feels premium and even better in person. Oversized fit is perfect.',
-      verified: true,
-      createdAt: '2 weeks ago',
-    },
-  ],
-  'sakura-ronin-hoodie': [
-    {
-      id: 'mock-rev-1',
-      productSlug: 'sakura-ronin-hoodie',
-      author: 'Arjun Mehta',
-      rating: 5,
-      title: 'Embroidery quality is next level',
-      comment: 'Feels premium and even better in person. Oversized fit is perfect.',
-      verified: true,
-      createdAt: '2 weeks ago',
-    },
-  ],
-};
+// Reviews come from the `reviews` table or not at all. There is deliberately no
+// bundled fallback: the previous map shipped a five-star review by a named
+// person on a real catalogue product ("Arjun Mehta" on cherry-blossom-hoodie),
+// and a second one defaulted onto every other product in the store. Both read
+// as genuine customer testimony. See getReviews() below.
 
 // ─────────────────────────────────────────────────────────────────────
 // Data API with Supabase + Local Fallback Seam
@@ -652,23 +639,19 @@ export async function getCategories(): Promise<Category[]> {
         .order('order_num', { ascending: true });
 
       if (!error && data && data.length > 0) {
-        return [
-          {
-            slug: 'all',
-            name: 'All Collections',
-            label: 'All',
-            description: 'The complete atelier edit spanning artisanal embroidery and pure natural yarns.',
-            order: 0,
-          },
-          ...data.map((c: any) => ({
-            slug: c.slug,
-            name: c.name,
-            label: c.label,
-            description: c.description,
-            image: c.image,
-            order: c.order_num,
-          })),
-        ];
+        const mapped = data.map((c: any) => ({
+          slug: c.slug,
+          name: c.name,
+          label: c.label,
+          description: c.description,
+          image: c.image,
+          order: c.order_num,
+        })) as Category[];
+        // The `categories` table carries its own "all" row, and this reader used
+        // to prepend a second one — which rendered two ALL tabs side by side.
+        return mapped.some((c) => c.slug === 'all')
+          ? mapped
+          : [ALL_CATEGORY, ...mapped];
       }
     } catch {
       // Fallback below
@@ -1194,18 +1177,12 @@ export async function getReviews(productSlug: string): Promise<Review[]> {
     }
   }
 
-  return mockReviews[productSlug] || [
-    {
-      id: 'default-1',
-      productSlug,
-      author: 'Clara Beaumont',
-      rating: 5,
-      title: 'Stunning embroidery tension and finish',
-      comment: 'The stitchwork feels tactile and rich under the fingers. An exceptional addition to my permanent wardrobe.',
-      verified: true,
-      createdAt: 'Just now',
-    },
-  ];
+  // No real review rows and no backend: return nothing. The previous fallback
+  // invented a five-star review by a named person ("Clara Beaumont") for every
+  // product in the catalogue that had none, which put a fabricated testimonial
+  // on 27 of 29 product pages. PRODUCT.md's honesty principle rules that out in
+  // absolute terms, and an empty review list is the truthful render.
+  return [];
 }
 
 export async function submitReview(review: Omit<Review, 'id' | 'createdAt' | 'verified'>): Promise<boolean> {
@@ -1217,7 +1194,13 @@ export async function submitReview(review: Omit<Review, 'id' | 'createdAt' | 've
         rating: review.rating,
         title: review.title,
         comment: review.comment,
-        verified: true,
+        // Never set by the client. The previous line wrote `verified: true` on
+        // every submission from a public form, so anyone who typed a name
+        // appeared as a confirmed buyer of the piece — which is exactly the
+        // false review metric PRODUCT.md rules out. Verification belongs to a
+        // server process that can match the review to a delivered order; until
+        // one exists, a submission is unverified.
+        verified: false,
       });
       return !error;
     } catch {
@@ -1232,15 +1215,18 @@ export async function subscribeNewsletter(email: string): Promise<{ success: boo
     try {
       const { error } = await supabase.from('newsletter_subscribers').insert({ email });
       if (error && error.code === '23505') {
-        return { success: true, message: 'You are already enrolled in private atelier previews.' };
+        return { success: true, message: 'You are already on the list.' };
       }
       if (error) throw error;
-      return { success: true, message: 'Welcome to the UniqueLo Atelier circle. Check your inbox for private access.' };
+      // No outbound mail exists in this build, so nothing is promised about one.
+      return { success: true, message: 'You are on the list.' };
     } catch {
-      // fallback
+      // fall through to the unverified path below
     }
   }
-  return { success: true, message: 'Welcome to the UniqueLo Atelier circle. Your complimentary code is ATELIER10.' };
+  // Not enrolled: the write failed or Supabase is not configured. Saying "you
+  // are on the list" here would be a claim the row does not back.
+  return { success: false, message: 'Could not add you to the list. Please try again.' };
 }
 
 export type PaymentMethod = 'upi' | 'cod' | 'card';

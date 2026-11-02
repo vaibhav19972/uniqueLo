@@ -1,46 +1,256 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-13T00:00:00+05:30",
+  "generatedAt": "2026-11-02T00:00:00.000Z",
   "title": "Design System: UniqueLo",
   "extensions": {
     "colorMeta": {
-      "canvas-cream": { "role": "neutral", "displayName": "Atelier Canvas Cream", "canonical": "#f7f5f0" },
-      "card-paper": { "role": "neutral", "displayName": "Card Paper", "canonical": "#ffffff" },
-      "ink-obsidian": { "role": "neutral", "displayName": "Obsidian Ink", "canonical": "#141414" },
-      "ink-muted-warm": { "role": "neutral", "displayName": "Warm Ink Muted", "canonical": "#686560" },
-      "hairline-stone": { "role": "neutral", "displayName": "Stone Hairline", "canonical": "#e5e1d8" },
-      "placeholder-warm-gray": { "role": "neutral", "displayName": "Warm Gray Placeholder", "canonical": "#9e9b94" },
-      "accent-terracotta": { "role": "primary", "displayName": "Burnt Terracotta", "canonical": "#d95d39", "tonalRamp": ["#4a1a0c", "#7c2c13", "#a83a1c", "#d95d39", "#e98a68", "#f2b39c", "#f8d6c7", "#fdefe8"] },
-      "bullion-gold": { "role": "secondary", "displayName": "Bullion Zari Gold", "canonical": "#cba043", "tonalRamp": ["#463211", "#6b4c17", "#9a712c", "#cba043", "#d8b96d", "#e4cf98", "#efe4c4", "#f8f2e2"] },
-      "saffron-marigold": { "role": "tertiary", "displayName": "Marigold Saffron", "canonical": "#e69526" },
-      "botanical-pistachio": { "role": "tertiary", "displayName": "Botanical Pistachio", "canonical": "#315e45" },
-      "midnight-indigo": { "role": "tertiary", "displayName": "Midnight Indigo", "canonical": "#1c2b3d" },
-      "silk-blush": { "role": "neutral", "displayName": "Silk Petal Blush", "canonical": "#fbf1ec" },
-      "parchment": { "role": "neutral", "displayName": "Parchment", "canonical": "#faf8f5" },
-      "anime-deep": { "role": "secondary", "displayName": "Torii Sakura-Maroon", "canonical": "#7a1f23" },
-      "hero-crimson": { "role": "secondary", "displayName": "Heroverse Issue-Red", "canonical": "#c0392b" },
-      "itihaas-bronze": { "role": "secondary", "displayName": "Darbar Arch Bronze", "canonical": "#5d3a1a" },
-      "champagne": { "role": "neutral", "displayName": "Champagne Sticker Text", "canonical": "#d4af37" },
-      "ivory": { "role": "neutral", "displayName": "Ivory Sticker Text", "canonical": "#f6efe3" },
-      "coal-glass": { "role": "neutral", "displayName": "Warm Coal Glass", "canonical": "#201c18" },
-      "stone-deep": { "role": "neutral", "displayName": "Deep Stone Border", "canonical": "#ded8cf" }
+      "cotton": {
+        "role": "neutral",
+        "displayName": "Unbleached Cotton",
+        "canonical": "#f4efe4",
+        "tonalRamp": [
+          "#2b2620",
+          "#524a3f",
+          "#7a7163",
+          "#a39a8a",
+          "#c9c0b0",
+          "#e5ddce",
+          "#f4efe4",
+          "#fbf8f1"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Sized Cotton Paper",
+        "canonical": "#fbf8f1",
+        "tonalRamp": [
+          "#2a2620",
+          "#514b40",
+          "#797264",
+          "#a29a8a",
+          "#c9c1b1",
+          "#e6dfd2",
+          "#f4efe7",
+          "#fbf8f1"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "#ebe4d5",
+        "tonalRamp": [
+          "#292420",
+          "#4f483c",
+          "#756d5c",
+          "#9c9280",
+          "#c2b8a4",
+          "#ddd4c3",
+          "#ebe4d5",
+          "#f7f2e8"
+        ]
+      },
+      "indigo-ink": {
+        "role": "primary",
+        "displayName": "Dyed Indigo",
+        "canonical": "#141a2e",
+        "tonalRamp": [
+          "#141a2e",
+          "#232b45",
+          "#36405e",
+          "#4f5a7a",
+          "#71809e",
+          "#9aa6bd",
+          "#c7cfe0",
+          "#eef1f7"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "canonical": "#5f5747",
+        "tonalRamp": [
+          "#241f19",
+          "#3d372c",
+          "#5f5747",
+          "#837a67",
+          "#a49b88",
+          "#c3baa8",
+          "#ded7c8",
+          "#f3efe6"
+        ]
+      },
+      "stone": {
+        "role": "neutral",
+        "displayName": "Loom Rule",
+        "canonical": "#ddd4c3",
+        "tonalRamp": [
+          "#2c2721",
+          "#514a3f",
+          "#786e5d",
+          "#9d9382",
+          "#c0b6a2",
+          "#ddd4c3",
+          "#ebe5d8",
+          "#f7f3ea"
+        ]
+      },
+      "madder": {
+        "role": "primary",
+        "displayName": "Madder Red",
+        "canonical": "#a4322a",
+        "tonalRamp": [
+          "#2c0a08",
+          "#4d1512",
+          "#6f2220",
+          "#942e28",
+          "#b94339",
+          "#d76d61",
+          "#efa093",
+          "#fbd6ce"
+        ]
+      },
+      "night-canvas": {
+        "role": "neutral",
+        "displayName": "Dyeworks Night",
+        "canonical": "#0f1216",
+        "tonalRamp": [
+          "#0f1216",
+          "#1a1f26",
+          "#262d37",
+          "#363f4b",
+          "#4d5866",
+          "#6d7887",
+          "#9aa4b1",
+          "#d7dde5"
+        ]
+      },
+      "anime-sakura": {
+        "role": "secondary",
+        "displayName": "Animeverse Sakura",
+        "canonical": "#9c2f5a",
+        "tonalRamp": [
+          "#2b0a18",
+          "#4a1327",
+          "#6b1f39",
+          "#8b2a4c",
+          "#a94464",
+          "#c66d8b",
+          "#e0a3b7",
+          "#f7d9e3"
+        ]
+      },
+      "hero-crimson": {
+        "role": "secondary",
+        "displayName": "Heroverse Crimson",
+        "canonical": "#a52a20",
+        "tonalRamp": [
+          "#2c0a07",
+          "#4b120d",
+          "#6b1c14",
+          "#8b241a",
+          "#ab3a2c",
+          "#c76554",
+          "#e29c8c",
+          "#f7d7d0"
+        ]
+      },
+      "itihaas-wine": {
+        "role": "secondary",
+        "displayName": "Itihaas Wine",
+        "canonical": "#7a2331",
+        "tonalRamp": [
+          "#260a0f",
+          "#40131a",
+          "#5c1c26",
+          "#7a2331",
+          "#97384a",
+          "#b25f6f",
+          "#cf94a0",
+          "#eed3d9"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Hero headlines, universe portals; tight-tracked, may be caps-mode." },
-      "section-title": { "displayName": "Section Title", "purpose": "Lore headings and collection titles." },
-      "body": { "displayName": "Body", "purpose": "Editorial copy and functional text — Playfair carries both." },
-      "label": { "displayName": "Label", "purpose": "Satoshi tracked-caps eyebrows, badges, counts, facet chips ONLY." }
+      "display": {
+        "displayName": "Loom Display",
+        "purpose": "Section headings and the craft statement; Archivo at 78% width."
+      },
+      "hero": {
+        "displayName": "Hero",
+        "purpose": "First-viewport brand line only."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Product names, drawer headings, band subtitles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading copy at 62–68ch."
+      },
+      "body-small": {
+        "displayName": "Dense Body",
+        "purpose": "Prose inside dense panels, PDP specs, disclosures."
+      },
+      "label": {
+        "displayName": "Loom Label",
+        "purpose": "Field names, tabs, metadata rows — Archivo at 62% width, uppercase."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Every rupee figure and count, tabular so columns align."
+      }
     },
     "shadows": [
-      { "name": "ambient-hover", "value": "0 6px 16px rgba(20, 20, 20, 0.06)", "purpose": "Card hover lift, paired with translate-y." },
-      { "name": "focus-float", "value": "0 28px 70px rgba(20, 20, 20, 0.14)", "purpose": "Focused portal cards and drawers." },
-      { "name": "universe-glow-gold", "value": "0 0 25px rgba(203, 160, 67, 0.28)", "purpose": "Universe-card identity glow only — never ambient." }
+      {
+        "name": "shadow-lg",
+        "value": "0 18px 48px rgba(58, 44, 24, 0.13)",
+        "purpose": "Open bag and dialogs only; nothing at rest."
+      },
+      {
+        "name": "shadow-float",
+        "value": "0 28px 70px rgba(58, 44, 24, 0.18)",
+        "purpose": "Full-screen overlay surfaces while open."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-base",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "The single easing curve: state changes, macro cross-fades, drawer entry."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Colour and border on hover/focus."
+      },
+      {
+        "name": "duration-base",
+        "value": "300ms",
+        "purpose": "Panels, accordions, underline movement."
+      },
+      {
+        "name": "duration-slow",
+        "value": "500ms",
+        "purpose": "Photograph cross-fade to macro detail."
+      }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ]
   },
   "components": [
@@ -48,76 +258,157 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Ink-on-paper commerce CTA — the quiet choice.",
-      "html": "<button class=\"ds-btn-primary\">Add to Atelier Bag</button>",
-      "css": ".ds-btn-primary { background: var(--color-ink, #141414); color: var(--color-cream, #f7f5f0); font-family: var(--font-serif, 'Playfair Display', Georgia, serif); font-size: 17px; padding: 12px 28px; border: none; border-radius: 4px; cursor: pointer; transition: background .2s ease-out; } .ds-btn-primary:hover { background: #333; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
+      "description": "The single action on a surface: indigo fill, cotton text, hover to madder.",
+      "html": "<button class=\"ds-btn-primary\">Add to bag →</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:48px; padding:0 1.5rem; background:var(--color-ink,#141a2e); color:var(--color-cream,#f4efe4); border:1px solid var(--color-ink,#141a2e); border-radius:4px; font-family:'Archivo',system-ui,sans-serif; font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:.14em; cursor:pointer; transition:background-color 150ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background:var(--color-accent,#a4322a); border-color:var(--color-accent,#a4322a); } .ds-btn-primary:focus-visible { outline:2px solid var(--color-accent,#a4322a); outline-offset:2px; }"
     },
     {
-      "name": "Universe Gold Button",
+      "name": "Outline Button",
       "kind": "button",
-      "refersTo": "universe-gold-cta",
-      "description": "Themed-zone CTA — gold remaps to the active universe's accent.",
-      "html": "<button class=\"ds-btn-gold\">Enter Animeverse →</button>",
-      "css": ".ds-btn-gold { background: var(--color-gold, #cba043); color: var(--on-gold, #f7f5f0); font-family: var(--font-serif, 'Playfair Display', Georgia, serif); font-size: 17px; padding: 12px 28px; border: none; border-radius: 4px; cursor: pointer; transition: background .2s ease-out, gap .3s ease-out; } .ds-btn-gold:hover { background: var(--color-gold-hover, #b8b043); } .ds-btn-gold:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
+      "refersTo": "button-outline",
+      "description": "The second action in a pair. Square, hairline, darkens on hover.",
+      "html": "<button class=\"ds-btn-outline\">How it is made</button>",
+      "css": ".ds-btn-outline { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 1.25rem; background:transparent; color:var(--color-ink,#141a2e); border:1px solid var(--color-stone-strong,#c6bba6); border-radius:0; font-family:'Archivo',system-ui,sans-serif; font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:.14em; cursor:pointer; transition:border-color 150ms ease; } .ds-btn-outline:hover { border-color:var(--color-ink,#141a2e); } .ds-btn-outline:focus-visible { outline:2px solid var(--color-accent,#a4322a); outline-offset:2px; }"
     },
     {
-      "name": "Facet Chip",
+      "name": "Size Chip",
       "kind": "chip",
-      "refersTo": "chip-filter",
-      "description": "Fully-round pill; selected state is ink inversion (base) or gold fill (themed zones).",
-      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-chip\" aria-pressed=\"false\">Quiet</button><button class=\"ds-chip ds-chip-active\" aria-pressed=\"true\">Loud</button></div>",
-      "css": ".ds-chip { background: var(--color-paper, #fff); color: var(--color-ink, #141414); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 9999px; font-family: var(--font-sans, 'Satoshi', sans-serif); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; padding: 8px 16px; min-height: 44px; cursor: pointer; transition: border-color .2s, background .2s; } .ds-chip:hover { border-color: var(--color-ink, #141414); } .ds-chip-active { background: var(--color-ink, #141414); color: var(--color-cream, #f7f5f0); border-color: transparent; } .ds-chip:focus-visible { outline: 2px solid var(--color-accent, #d95d39); outline-offset: 2px; }"
-    },
-    {
-      "name": "Intensity Meter",
-      "kind": "custom",
-      "refersTo": "card-product",
-      "description": "Signature metadata component — 3-segment Quiet↔Loud position, never a rating.",
-      "html": "<span class=\"ds-meter\" title=\"Intensity: Loud\" aria-label=\"Intensity: Loud\"><span class=\"ds-segment ds-on\"></span><span class=\"ds-segment ds-on\"></span><span class=\"ds-segment ds-on\"></span><span style=\"font-family: var(--font-sans, sans-serif); font-size: 10px; text-transform: uppercase; letter-spacing: .12em;\">Loud</span></span>",
-      "css": ".ds-meter { display: inline-flex; align-items: center; gap: 6px; } .ds-segment { display: block; width: 4px; height: 3px; background: var(--color-stone, #e5e1d8); } .ds-on { background: var(--color-gold-zari, #cba043); }"
+      "refersTo": "size-chip",
+      "description": "Square size selector; the selected chip is a solid ink block, not a tint.",
+      "html": "<div class=\"ds-chip-row\"><button class=\"ds-chip\">XS</button><button class=\"ds-chip ds-chip--on\">S</button><button class=\"ds-chip\">M</button><button class=\"ds-chip ds-chip--out\">XL</button></div>",
+      "css": ".ds-chip-row { display:flex; gap:8px; } .ds-chip { display:inline-flex; align-items:center; justify-content:center; min-width:56px; height:44px; border:1px solid var(--color-stone-strong,#c6bba6); background:transparent; color:var(--color-ink,#141a2e); border-radius:0; font-family:system-ui,sans-serif; font-size:13px; cursor:pointer; transition:border-color 150ms ease, background-color 150ms ease, color 150ms ease; } .ds-chip:hover { border-color:var(--color-ink,#141a2e); } .ds-chip--on { background:var(--color-ink,#141a2e); border-color:var(--color-ink,#141a2e); color:var(--color-cream,#f4efe4); } .ds-chip--out { border-color:var(--color-stone,#ddd4c3); color:var(--color-ink-muted,#5f5747); text-decoration:line-through; cursor:not-allowed; }"
     },
     {
       "name": "Product Card",
       "kind": "card",
       "refersTo": "card-product",
-      "description": "Paper card over cream, hairline border, lift earned on hover only.",
-      "html": "<article class=\"ds-card\"><div class=\"ds-media\"></div><div class=\"ds-body\"><h3>Sakura Ronin Hoodie</h3></div></article>",
-      "css": ".ds-card { background: var(--color-paper, #fff); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 2px; transition: transform .5s cubic-bezier(.25,1,.5,1), box-shadow .5s cubic-bezier(.25,1,.5,1), border-color .5s; } .ds-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(20,20,20,.06); border-color: rgba(20,20,20,.5); } .ds-media { aspect-ratio: 3/4; background: var(--color-stone, #e5e1d8); } .ds-body { padding: 16px 20px; font-family: var(--font-serif, Georgia, serif); }"
+      "description": "Photograph on paper, then name, technique label, and price in mono. No border, no shadow, no badges.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card__plate\"><img alt=\"\" src=\"data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27400%27%3E%3Crect width=%27300%27 height=%27400%27 fill=%27%23e2d9c7%27/%3E%3C/svg%3E\" /></div><h3 class=\"ds-card__name\">Sage Linen Embroidered Shirt</h3><p class=\"ds-card__meta\">Chikankari &amp; botanical chain · Balanced</p><p class=\"ds-card__price\">₹1,199</p></article>",
+      "css": ".ds-card { display:flex; flex-direction:column; background:transparent; } .ds-card__plate { aspect-ratio:3/4; background:var(--color-paper,#fbf8f1); overflow:hidden; } .ds-card__plate img { width:100%; height:100%; object-fit:contain; display:block; } .ds-card__name { margin:12px 0 0; font-family:system-ui,sans-serif; font-size:14px; font-weight:500; line-height:1.3; color:var(--color-ink,#141a2e); } .ds-card__meta { margin:4px 0 0; font-family:'Archivo',system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--color-ink-muted,#5f5747); } .ds-card__price { margin:6px 0 0; font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:15px; color:var(--color-ink,#141a2e); }"
     },
     {
-      "name": "Search Input",
+      "name": "Loom Label",
+      "kind": "custom",
+      "description": "The tracked-out condensed micro-label used for every field name and metadata row.",
+      "html": "<p class=\"ds-label\">Named embroidery techniques</p>",
+      "css": ".ds-label { margin:0; font-family:'Archivo',system-ui,sans-serif; font-variation-settings:'wght' 600,'wdth' 62; font-weight:600; font-size:11.5px; line-height:1.2; text-transform:uppercase; letter-spacing:.16em; color:var(--color-ink-muted,#5f5747); }"
+    },
+    {
+      "name": "Segmented Tabs",
+      "kind": "chip",
+      "refersTo": "tab-segment",
+      "description": "Adjacent square cells sharing a hairline; the selected cell fills ink.",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab ds-tab--on\">All 29</button><button class=\"ds-tab\">Animeverse 15</button><button class=\"ds-tab\">Itihaas 10</button></div>",
+      "css": ".ds-tabs { display:inline-flex; border:1px solid var(--color-stone,#ddd4c3); } .ds-tab { min-height:44px; padding:0 16px; border:0; border-right:1px solid var(--color-stone,#ddd4c3); background:transparent; color:var(--color-ink-muted,#5f5747); font-family:system-ui,sans-serif; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.14em; cursor:pointer; transition:background-color 150ms ease, color 150ms ease; } .ds-tab:last-child { border-right:0; } .ds-tab:hover { color:var(--color-ink,#141a2e); } .ds-tab--on { background:var(--color-ink,#141a2e); color:var(--color-cream,#f4efe4); }"
+    },
+    {
+      "name": "Text Field",
       "kind": "input",
-      "refersTo": "button-primary",
-      "description": "Square field, drawn SVG icon, terracotta focus.",
-      "html": "<div class=\"ds-input\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path stroke-linecap=\"round\" d=\"M16.5 16.5L21 21\"/></svg><input placeholder=\"Search stitches, coats, flora...\"></div>",
-      "css": ".ds-input { position: relative; display: flex; align-items: center; gap: 6px; background: var(--color-paper, #fff); border: 1px solid var(--color-stone, #e5e1d8); border-radius: 4px; padding: 6px 12px; } .ds-input svg { color: var(--color-stone, #e5e1d8); } .ds-input input { border: none; outline: none; font-family: var(--font-sans, sans-serif); font-size: 12px; color: var(--color-ink, #141414); background: transparent; } .ds-input:focus-within { border-color: var(--color-accent, #d95d39); }"
+      "refersTo": "input",
+      "description": "Square cotton field with a hairline that darkens to ink on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Mobile (10-digit)</span><input class=\"ds-input\" type=\"text\" placeholder=\"98100 12345\" /></label>",
+      "css": ".ds-field { display:block; } .ds-field__label { display:block; margin-bottom:6px; font-family:'Archivo',system-ui,sans-serif; font-size:11px; font-variation-settings:'wght' 600,'wdth' 62; text-transform:uppercase; letter-spacing:.14em; color:var(--color-ink-muted,#5f5747); } .ds-input { width:100%; min-height:44px; padding:0 12px; background:var(--color-cream,#f4efe4); border:1px solid var(--color-stone,#ddd4c3); border-radius:0; font-family:system-ui,sans-serif; font-size:13px; color:var(--color-ink,#141a2e); transition:border-color 150ms ease; } .ds-input::placeholder { color:var(--color-warm-gray,#9b9283); } .ds-input:focus { border-color:var(--color-ink,#141a2e); outline:none; }"
+    },
+    {
+      "name": "Navigation Masthead",
+      "kind": "nav",
+      "description": "Terms strip, condensed wordmark, five tracked-out labels, four icons. One hairline underline marks the active route.",
+      "html": "<div class=\"ds-nav\"><div class=\"ds-nav__terms\">Dispatch 4–7 days · Cash on delivery, pan-India · ₹99 carriage, free above ₹1,499</div><div class=\"ds-nav__bar\"><span class=\"ds-nav__mark\">UniqueLo</span><nav class=\"ds-nav__links\"><a class=\"ds-nav__link ds-nav__link--on\">Worlds</a><a class=\"ds-nav__link\">Presence</a><a class=\"ds-nav__link\">Clothing</a><a class=\"ds-nav__link\">New</a><a class=\"ds-nav__link\">The craft</a></nav></div></div>",
+      "css": ".ds-nav { background:var(--color-cream,#f4efe4); border-bottom:1px solid var(--color-stone,#ddd4c3); } .ds-nav__terms { padding:6px 20px; background:var(--color-panel,#ebe4d5); border-bottom:1px solid var(--color-stone,#ddd4c3); font-family:system-ui,sans-serif; font-size:11px; letter-spacing:.06em; color:var(--color-ink-muted,#5f5747); } .ds-nav__bar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:68px; } .ds-nav__mark { font-family:'Archivo',system-ui,sans-serif; font-variation-settings:'wght' 700,'wdth' 78; font-size:22px; letter-spacing:-.03em; color:var(--color-ink,#141a2e); } .ds-nav__links { display:flex; gap:28px; } .ds-nav__link { position:relative; padding:24px 0; font-family:system-ui,sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--color-ink-muted,#5f5747); text-decoration:none; cursor:pointer; } .ds-nav__link:hover { color:var(--color-ink,#141a2e); } .ds-nav__link--on { color:var(--color-ink,#141a2e); } .ds-nav__link--on::after { content:''; position:absolute; left:0; right:0; bottom:0; height:1px; background:var(--color-ink,#141a2e); }"
+    },
+    {
+      "name": "Notification",
+      "kind": "custom",
+      "description": "Global confirmation toast: square ink ground, 1px stone border, one drawn status rule, mono-free label title. The only element that appears over every surface.",
+      "html": "<div class=\"ds-toast\"><span class=\"ds-toast__rule\"></span><div><p class=\"ds-toast__title\">Added to bag</p><p class=\"ds-toast__body\">Sage Linen Embroidered Shirt (size S)</p></div></div>",
+      "css": ".ds-toast { display:flex; align-items:flex-start; gap:12px; padding:16px; background:var(--color-ink,#141a2e); color:var(--color-cream,#f4efe4); border:1px solid var(--color-stone,#ddd4c3); box-shadow:0 28px 70px rgba(58,44,24,.18); } .ds-toast__rule { margin-top:7px; width:16px; height:3px; flex:none; background:var(--color-success,#2f6247); } .ds-toast__title { margin:0; font-family:'Archivo',system-ui,sans-serif; font-variation-settings:'wght' 600,'wdth' 62; font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:.16em; line-height:1.2; color:var(--color-cream,#f4efe4); } .ds-toast__body { margin:4px 0 0; font-family:system-ui,sans-serif; font-size:12.5px; line-height:1.6; color:rgba(244,239,228,.75); }"
+    },
+    {
+      "name": "Bag Drawer",
+      "kind": "custom",
+      "description": "The only rounded surface in the product: paper ground, 14px radius, mono totals, one full-width checkout action.",
+      "html": "<aside class=\"ds-bag\"><header class=\"ds-bag__head\"><h2 class=\"ds-bag__title\">Bag</h2><span class=\"ds-bag__count\">2 pieces</span></header><div class=\"ds-bag__meter\"><p>Add ₹302 for free carriage.</p><div class=\"ds-bag__track\"><span style=\"width:82%\"></span></div></div><dl class=\"ds-bag__totals\"><div><dt>Subtotal</dt><dd>₹2,698</dd></div><div><dt>Carriage</dt><dd>Free</dd></div><div class=\"ds-bag__total\"><dt>Total</dt><dd>₹2,698</dd></div></dl><button class=\"ds-bag__cta\">Checkout →</button></aside>",
+      "css": ".ds-bag { width:100%; max-width:432px; background:var(--color-paper,#fbf8f1); border-radius:14px; padding:20px; font-family:system-ui,sans-serif; color:var(--color-ink,#141a2e); } .ds-bag__head { display:flex; align-items:baseline; gap:8px; padding-bottom:12px; border-bottom:1px solid var(--color-stone,#ddd4c3); } .ds-bag__title { margin:0; font-family:'Archivo',system-ui,sans-serif; font-variation-settings:'wght' 650,'wdth' 78; font-size:20px; letter-spacing:-.02em; } .ds-bag__count { font-family:ui-monospace,monospace; font-size:12px; color:var(--color-ink-muted,#5f5747); } .ds-bag__meter p { margin:12px 0 8px; font-size:12px; } .ds-bag__track { height:1px; background:var(--color-stone,#ddd4c3); } .ds-bag__track span { display:block; height:1px; background:var(--color-ink,#141a2e); } .ds-bag__totals { margin:16px 0 0; padding-top:12px; border-top:1px solid var(--color-stone,#ddd4c3); } .ds-bag__totals div { display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px; } .ds-bag__totals dt { color:var(--color-ink-muted,#5f5747); } .ds-bag__totals dd { margin:0; font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums; } .ds-bag__total { padding-top:10px; border-top:1px solid var(--color-stone,#ddd4c3); } .ds-bag__total dd { font-size:17px; } .ds-bag__cta { width:100%; min-height:52px; margin-top:16px; background:var(--color-ink,#141a2e); color:var(--color-cream,#f4efe4); border:0; border-radius:4px; font-family:'Archivo',system-ui,sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.16em; cursor:pointer; transition:background-color 150ms ease; } .ds-bag__cta:hover { background:var(--color-accent,#a4322a); }"
     }
   ],
   "narrative": {
-    "northStar": "The Quiet-Luxury Atelier",
-    "overview": "A two-layer world: a stable cream-and-obsidian editorial base carrying every page's ergonomics, with per-universe ambient theming morphing accents and atmosphere without unmounting anything. Whitespace separates, hairlines group, depth is earned by interaction. Facet UI answers one question per filter: universe is where you are, garment chips are what kind of thing, intensity is how loudly you wear it, craft technique is provenance, edits are why you're shopping.",
+    "northStar": "The Loom Card",
+    "overview": "The catalogue is the composition. UniqueLo sells hand-embroidered garments between ₹899 and ₹1,899 to buyers who arrive from Instagram on a mid-range Android in daylight, so the storefront is built like a woven index rather than a campaign: unbleached cotton ground, a dense grid of garments each carrying its real price, hairline rules doing all the separating, and one dyed-indigo band allowed to interrupt the page for the craft story. Nothing rests on a shadow; nothing floats in a card. The palette is cloth, not luxury — cotton ground, dyed-indigo foreground rather than black, and exactly one saturated colour, madder red, which marks action and price and never decoration. Typography is the label on the garment: Archivo's width axis does the shouting, Geist carries reading text, and Geist Mono is reserved for prices so digits line up down a grid.",
     "keyCharacteristics": [
-      "Cream editorial canvas, hairline stone rules, zero hard borders by default",
-      "One serif does everything (Playfair Display); Satoshi exists only as tracked-out caps micro-labels",
-      "Depth is earned by interaction, never baked into rest state",
-      "Universe theming is ambient scope, not page replacement",
-      "Facet chips are fully-round pills; selected state = ink inversion (base) or gold fill (themed)"
+      "Unbleached cotton canvas (#f4efe4), paper surfaces (#fbf8f1), dyed-indigo ink (#141a2e) — never pure black or pure white.",
+      "One saturated colour: madder red, for primary actions, price emphasis, and nothing else.",
+      "Condensed Archivo display at 78% width; Geist for reading; Geist Mono for every price and count.",
+      "Square corners everywhere except controls (4px) and the bag (14px).",
+      "Hairline loom rules carry the entire layout; resting shadows do not exist.",
+      "Photography sits directly on paper with no frame, scrim, or overlay."
     ],
     "rules": [
-      { "name": "The Champagne Rule", "body": "Gold (#cba043) is never body text on light surfaces — light-ground gold appears only with gold-deep contrast tokens or as fills carrying on-gold text.", "section": "colors" },
-      { "name": "The One-Serif Rule", "body": "Never introduce a second editorial face; new voices come from weight, size, case, or italic — not family swaps.", "section": "typography" },
-      { "name": "The Earned-Lift Rule", "body": "Rest state: border only. Shadow + translate + scale arrive together as one interaction response. No resting shadows on cards.", "section": "elevation" }
+      {
+        "name": "The One Saturated Colour Rule",
+        "body": "Madder is the only saturated colour in the base system. If a surface needs a second hue, it is a universe block — and then the hue comes from that universe's accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Colour Is Never The Only Signal Rule",
+        "body": "Every universe band, sale state, and stock state prints its name in words beside the colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dyed-Not-Black Rule",
+        "body": "Foreground is #141a2e, never #000; canvas is #f4efe4, never #fff.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Width Rule",
+        "body": "Display type gets its power from Archivo's width axis, not from a second family. 78% for headings, 62% for labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Serif Is Retired Rule",
+        "body": "Playfair and every serif voice are gone as a design decision; no new surface may name a serif.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono-For-Money Rule",
+        "body": "Prices, counts, and figures are Geist Mono with tabular-nums. Body copy and headings are never mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Resting Shadow Rule",
+        "body": "A surface at rest is flat and delineated by a hairline or a tonal step. If a component needs a shadow to read as a component, the component is wrong.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Dark Band Rule",
+        "body": "Exactly one section per page inverts to bg-ink. Inversion is attention, and attention is not free.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Rule",
+        "body": "Corners are 0 everywhere except controls (4px) and the bag (14px).",
+        "section": "shapes"
+      },
+      {
+        "name": "The No-Scrim Rule",
+        "body": "Text never sits on a photograph behind a gradient. Captions sit beneath the image on paper at the label size.",
+        "section": "shapes"
+      }
     ],
     "dos": [
-      "Do theme through tokens only: new universes = one JSON row + one [data-universe] CSS scope, zero component edits.",
-      "Do keep facet answers orthogonal — one question per filter.",
-      "Do carry aria-pressed on every chip, aria-label on every icon button, and 44px minimum touch targets."
+      "Do set every price and count in loom-price (Geist Mono, tabular) so figures align in a column.",
+      "Do separate sections with 1px border-stone and a py-12 lg:py-16 rhythm rather than with cards, shadows, or background changes.",
+      "Do keep the dark theme a structural equal: same components, same rules, [data-mode='dark'] values only.",
+      "Do state a claim only when a catalogue field or the pricing function backs it; otherwise omit it.",
+      "Do carry aria-pressed on toggles, aria-label on icon buttons, and 44px minimum on every target.",
+      "Do let one section per page invert to ink, and let that be the craft story."
     ],
     "donts": [
-      "Don't use gold as text on light grounds or gold CTAs without the paired on-gold token.",
-      "Don't fabricate scarcity, ratings, or provenance — numbers render from catalog data or not at all.",
-      "Don't add Google Fonts or icon-font/emoji icons — self-hosted faces and drawn SVGs only.",
-      "Don't let universe theming leak into checkout/account surfaces."
+      "Don't reintroduce a serif display voice, gold/zari accents, terracotta, or 16–20px portal cards.",
+      "Don't put text on a photograph behind a scrim, and don't crop a garment to a fixed portrait frame.",
+      "Don't fabricate scarcity, ratings, review counts, artisan names, shipping thresholds, or return windows.",
+      "Don't add resting shadows, rounded product cards, or hover lift-and-scale.",
+      "Don't add a marquee, a scrolling announcement ticker, or any continuously animating chrome.",
+      "Don't use pure black, pure white, or a second saturated hue outside a universe block."
     ]
   }
 }

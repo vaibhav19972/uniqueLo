@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import type { Product } from '../../lib/data';
 import { ProductCard } from './ProductCard';
 import { Button } from '../ui/Button';
@@ -8,152 +9,61 @@ interface ProductGridProps {
   products: Product[];
 }
 
+/**
+ * THE INDEX
+ *
+ * A PLP is a list, so it is built as one. The previous grid injected two
+ * full-width "craft provenance" interludes at fixed positions — an editorial
+ * device that broke the grid at index 3 and 7 regardless of how many products
+ * were there, which meant a filtered result of five items got an interlude
+ * about Zardozi in the middle of it. Interludes belong to a curated page, not
+ * to a filtered one.
+ *
+ * What replaces them is the information a filtering buyer actually needs and
+ * cannot currently see: how many pieces match, and how to widen the search
+ * when nothing does.
+ */
 export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
   const resetFilters = useFiltersStore((state) => state.resetFilters);
 
   if (products.length === 0) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4">
-        <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center text-stone text-xl mb-4">
-          ✦
-        </div>
-        <h3 className="font-serif text-2xl text-ink">No Silhouettes Matched</h3>
-        <p className="text-xs text-ink-muted mt-2 font-light leading-relaxed">
-          No items match your active technique or size filters. 
-          Try resetting filters to explore the complete atelier catalogue.
+      <div className="mx-auto max-w-md py-16 text-center">
+        <h3 className="loom-display text-2xl text-ink">Nothing matches those filters</h3>
+        <p className="mx-auto mt-2 max-w-[42ch] font-sans text-sm leading-relaxed text-ink-muted">
+          The catalogue is small by design, so a narrow combination can empty it.
+          Clearing the filters shows everything currently in stock.
         </p>
         <Button
           variant="primary"
           size="sm"
-          className="mt-6 tracking-widest text-xs"
+          className="mt-6"
           onClick={resetFilters}
         >
-          Reset All Filters
+          Clear all filters
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="py-8">
-      {/* Result Metrics */}
-      <div className="flex justify-between items-center mb-6 text-xs text-ink-muted uppercase tracking-widest font-mono">
-        <span>Showing {products.length} Garments</span>
-        <span>Atelier Edition 2026</span>
+    <div>
+      <div className="flex items-baseline justify-between gap-4 border-b border-stone pb-3">
+        <p className="loom-label text-ink-muted">
+          {products.length} {products.length === 1 ? 'piece' : 'pieces'}
+        </p>
+        <Link
+          to="/our-craft"
+          className="font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
+        >
+          What the prices pay for
+        </Link>
       </div>
 
-      {/* Grid with Editorial Interludes (Task S4.4) */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product, index) => {
-          const showInterludeOne = index === 3;
-          const showInterludeTwo = index === 7;
-
-          return (
-            <React.Fragment key={product.slug}>
-              <ProductCard product={product} />
-
-              {/* Craft Interlude 1: Lucknow Chikankari / Botanical Chain */}
-              {showInterludeOne && (
-                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-parchment border border-dashed border-stone/80 relative overflow-hidden">
-                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
-                    <div className="space-y-3 max-w-xl">
-                      <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
-                        <span>01 // Craft Provenance</span>
-                        <span>•</span>
-                        <span>Lucknow, Uttar Pradesh</span>
-                      </div>
-                      <h3 className="font-serif text-2xl sm:text-3xl text-ink leading-tight">
-                        32 Stitches. Unbleached Natural Muslin.
-                      </h3>
-                      <p className="text-xs sm:text-sm text-ink-muted font-light leading-relaxed">
-                        Chikankari is India's most delicate shadow-work tradition. Every stitch is placed with care
-                        over organic cotton, creating subtle three-dimensional relief that printed fast-fashion can never replicate.
-                      </p>
-                      <div className="pt-1">
-                        <a
-                          href="/atelier/botanical-chain"
-                          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-ink hover:text-accent transition-colors"
-                        >
-                          <span>Explore Chikankari Atelier</span>
-                          <span>→</span>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/60 sm:pl-6 w-full md:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-stone/40">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Craft Collective</span>
-                        <span className="font-medium text-ink">Old City Collective</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Embroidery Time</span>
-                        <span className="font-medium text-ink">14–20 Hours / Piece</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Yarn Core</span>
-                        <span className="font-medium text-ink">Mulberry Silk Floss</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-ink-muted block">Stabilizer</span>
-                        <span className="font-medium text-ink">Zero Synthetic Backing</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Craft Interlude 2: Jaipur Zardozi Guild */}
-              {showInterludeTwo && (
-                <div className="col-span-full my-4 p-5 sm:p-8 md:p-10 bg-ink text-cream border border-stone/30 relative overflow-hidden">
-                  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8">
-                    <div className="space-y-3 max-w-xl">
-                      <div className="flex items-center gap-2 text-[10px] font-sans uppercase tracking-[0.25em] text-accent font-medium">
-                        <span>02 // Craft Provenance</span>
-                        <span>•</span>
-                        <span>Jaipur & Agra Guilds</span>
-                      </div>
-                      <h3 className="font-serif text-2xl sm:text-3xl text-cream leading-tight">
-                        24K Bullion Metallic Wirework on Heavyweight Outerwear.
-                      </h3>
-                      <p className="text-xs sm:text-sm text-stone/80 font-light leading-relaxed">
-                        Anchored gold and metallic French coils engineered for daily chore jackets and overshirts. 
-                        Designed to catch ambient light and develop authentic character over decades of wear.
-                      </p>
-                      <div className="pt-1">
-                        <a
-                          href="/atelier/hand-zardozi"
-                          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-cream hover:text-accent transition-colors"
-                        >
-                          <span>Inspect Zardozi Process</span>
-                          <span>→</span>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:border-l sm:border-stone/30 sm:pl-6 w-full md:w-auto text-cream pt-4 sm:pt-0 border-t sm:border-t-0 border-white/20">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Craft Collective</span>
-                        <span className="font-medium text-cream">Pink City Bullion Guild</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Embroidery Time</span>
-                        <span className="font-medium text-cream">28–34 Hours / Piece</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Wirework</span>
-                        <span className="font-medium text-cream">24K Bullion Metallic Zari</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-stone/60 block">Base Cloth</span>
-                        <span className="font-medium text-cream">450 GSM Heavy Melton Wool</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
+      <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-6 lg:grid-cols-3 xl:grid-cols-4">
+        {products.map((product) => (
+          <ProductCard key={product.slug} product={product} />
+        ))}
       </div>
     </div>
   );

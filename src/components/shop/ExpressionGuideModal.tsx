@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 import { EXPRESSION_LEVELS } from '../../lib/data';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 interface ExpressionGuideModalProps {
   isOpen: boolean;
@@ -8,144 +9,133 @@ interface ExpressionGuideModalProps {
   currentScore?: number;
 }
 
+/**
+ * WHAT "LOUDLY" MEASURES
+ *
+ * The guide behind the five-level presence axis on every product page. It was a
+ * `shadow-2xl` card with a blurred backdrop, a gold eyebrow reading "Atelier
+ * Discovery Axis", a serif heading, per-level cards that ringed themselves in
+ * accent on the current piece, and a footer promising "bespoke initials in our
+ * Studio" to every buyer whether or not the piece is customizable.
+ *
+ * Now it is the same five-row ruled index as `/styles`, at dialog scale: mono
+ * score, display name, tagline, description, characteristics. The current piece
+ * is marked with an ink rule and the word "This piece" — not a coloured ring,
+ * because presence is an axis, not a state.
+ */
 export const ExpressionGuideModal: React.FC<ExpressionGuideModalProps> = ({
   isOpen,
   onClose,
   currentScore,
 }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="expression-modal-title"
-      className="fixed inset-0 z-[500] flex items-center justify-center p-4 sm:p-6"
-    >
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-sm transition-opacity"
-      />
+  const levels = EXPRESSION_LEVELS.slice().sort((a, b) => a.score - b.score);
 
-      {/* Modal Card */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper border border-stone/80 shadow-2xl p-6 sm:p-8 z-10 space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-stone/40 pb-4">
+  return (
+    <div className="fixed inset-0 z-[500] flex items-end justify-center sm:items-center sm:p-6">
+      <div onClick={onClose} className="fixed inset-0 bg-ink/70" aria-hidden="true" />
+
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="expression-modal-title"
+        tabIndex={-1}
+        className="relative z-10 flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden border border-stone bg-paper"
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-stone px-5 py-4">
           <div>
-            <span className="text-[10px] uppercase font-sans tracking-[0.25em] text-accent font-semibold block">
-              Atelier Discovery Axis
-            </span>
+            <p className="loom-label text-ink-muted">Presence</p>
             <h2
               id="expression-modal-title"
-              className="font-serif text-2xl sm:text-3xl text-ink mt-1"
+              className="loom-display mt-1 text-[1.375rem] text-ink"
             >
-              The Expression Spectrum
+              How loudly it wears
             </h2>
-            <p className="text-xs text-ink-muted mt-1 leading-relaxed max-w-lg font-light">
-              UniqueLo measures embroidery by visual presence, thread density, and narrative impact rather than generic sizing. Choose how loud you want your clothing to speak.
+            <p className="mt-1.5 max-w-[52ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+              One question, five answers: how much of the garment the embroidery
+              takes. Every piece sits on exactly one level.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close expression guide"
-            className="w-8 h-8 flex items-center justify-center border border-stone/60 hover:border-ink text-ink text-sm transition-colors cursor-pointer shrink-0 ml-4"
+            aria-label="Close presence guide"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center text-ink transition-colors hover:text-accent"
           >
-            ✕
+            <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        {/* 5 Levels Stack */}
-        <div className="space-y-3.5">
-          {EXPRESSION_LEVELS.map((level) => {
-            const isCurrent = level.score === currentScore;
-            return (
-              <div
-                key={level.score}
-                className={`p-4 border transition-all ${
-                  isCurrent
-                    ? 'border-accent bg-accent/5 ring-1 ring-accent/40'
-                    : 'border-stone/60 bg-paper hover:border-stone/90'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
+        <div className="flex-1 overflow-y-auto px-5">
+          <ol className="border-t border-stone">
+            {levels.map((level) => {
+              const isCurrent = level.score === currentScore;
+              return (
+                <li
+                  key={level.score}
+                  className={`border-b border-stone py-3.5 ${isCurrent ? 'bg-accent-soft' : ''}`}
+                >
+                  <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-x-3 gap-y-1">
                     <span
-                      className={`w-7 h-7 flex items-center justify-center font-mono text-xs font-bold ${
-                        isCurrent
-                          ? 'bg-accent text-cream'
-                          : 'bg-stone/20 text-ink'
+                      className={`loom-price pt-0.5 text-[11px] ${
+                        isCurrent ? 'text-accent' : 'text-ink-muted'
                       }`}
                     >
-                      0{level.score}
+                      {String(level.score).padStart(2, '0')}
                     </span>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-serif text-base font-semibold text-ink">
-                          {level.name}
-                        </h3>
+
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                        <h3 className="loom-display text-[1.0625rem] text-ink">{level.name}</h3>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 bg-accent text-cream text-[9px] uppercase font-sans tracking-widest font-semibold">
-                            Current Piece
-                          </span>
+                          <span className="loom-label text-accent">This piece</span>
                         )}
+                        <Link
+                          to={`/styles/${level.slug}`}
+                          onClick={onClose}
+                          className="ml-auto font-sans text-[11.5px] text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                        >
+                          See the shop →
+                        </Link>
                       </div>
-                      <span className="font-serif italic text-xs text-ink-muted block mt-0.5">
+
+                      <p className="mt-0.5 font-sans text-[12.5px] leading-snug text-ink">
                         {level.tagline}
-                      </span>
+                      </p>
+                      <p className="mt-1 font-sans text-[12px] leading-relaxed text-ink-muted">
+                        {level.description}
+                      </p>
+                      <p className="loom-label mt-1.5 text-ink-muted">
+                        Reads as{' '}
+                        <span className="normal-case tracking-normal text-ink">
+                          {level.characteristics}
+                        </span>
+                      </p>
                     </div>
                   </div>
-
-                  <Link
-                    to={`/styles/${level.slug}`}
-                    onClick={onClose}
-                    className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold whitespace-nowrap shrink-0 mt-1"
-                  >
-                    View Style →
-                  </Link>
-                </div>
-
-                <p className="text-xs text-ink-muted font-light leading-relaxed mt-2.5">
-                  {level.description}
-                </p>
-
-                <div className="mt-2.5 pt-2 border-t border-stone/30 flex items-center justify-between text-[10px] text-ink-muted uppercase tracking-wider font-mono">
-                  <span>Characteristics:</span>
-                  <span className="text-ink font-sans font-medium lowercase">
-                    {level.characteristics}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+                </li>
+              );
+            })}
+          </ol>
         </div>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-stone/40 flex items-center justify-between">
-          <p className="text-[11px] text-ink-muted font-light">
-            Every garment can also be customized with bespoke initials in our Studio.
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone px-5 py-3">
+          <p className="max-w-[42ch] font-sans text-[12px] leading-relaxed text-ink-muted">
+            Monograms are available on the pieces whose record says so, not on
+            every piece in the shop.
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold transition-colors cursor-pointer"
+            className="min-h-[44px] bg-ink px-5 font-sans text-[11px] uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent"
           >
-            Close Guide
+            Close
           </button>
         </div>
       </div>

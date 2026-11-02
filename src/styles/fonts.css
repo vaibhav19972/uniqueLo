@@ -1,16 +1,32 @@
 /* src/styles/fonts.css — self-hosted brand fonts.
    TWO roles, deliberately split:
 
-   • Display  — Playfair Display (OFL). Headlines, hero, editorial pull-quotes.
-                Only ever used at text-2xl and above.
-   • UI       — Geist (OFL). Body, navigation, buttons, prices, labels, tables.
-                Anything a customer reads at reading size or interacts with.
+   • Display  — Archivo (OFL). The brand voice: a grotesque with a variable
+                width axis, pushed narrow (62–100) for headlines and labels.
+                It reads as garment labelling — woven tape, not calligraphy.
+   • UI       — Geist (OFL). Body, navigation, buttons, form controls, tables.
 
-   Geist Mono is kept for prices, SKUs and tracked micro-labels so numbers hold
-   their width. Melodrama stays behind Playfair as a last-resort serif fallback.
+   Geist Mono is reserved for prices and measured values so digits hold their
+   width as they change. Playfair Display is retained on disk and in the
+   @font-face list for the cart's legacy surfaces only; no page in The Loom
+   Card world sets a serif glyph as its voice.
 
    All files are self-hosted in /public/fonts. Do NOT add Google Fonts to
    index.html — the font files below are the only loading path. */
+
+/* ═══════════════════════════════════════════════════════════════════
+   Archivo — the display face. Variable wght 100–900, wdth 62–125.
+   Headlines run at wdth 78–88; labels at wdth 62. The width axis is what
+   makes a 7rem headline read as woven tape instead of a poster.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/Archivo-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    Geist — the functional face. Variable wght 100–900.
@@ -35,9 +51,9 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Playfair Display — the display face. Variable wght 400–900, true italic.
-   Reserved for text-2xl and above so the brand voice stays editorial
-   without making body copy hard to read.
+   Playfair Display — RETIRED as a voice. Kept declared only so any legacy
+   surface that still names the family degrades to a real face instead of
+   a fallback serif. Not part of The Loom Card.
    ═══════════════════════════════════════════════════════════════════ */
 @font-face {
   font-family: 'Playfair Display';

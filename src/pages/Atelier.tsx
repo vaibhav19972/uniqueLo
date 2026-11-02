@@ -1,118 +1,151 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
 import { useCraftTechniques, useProducts } from '../hooks/useCatalog';
-import { SectionHeader } from '../components/ui/SectionHeader';
+import { piecesInTechnique, distinctPiecesInTechniques } from '../lib/techniques';
 
+
+/**
+ * THE CRAFT — /our-craft
+ *
+ * Was the retired world in its most confident form: an archetype="statement"
+ * header, a serif title, three `rounded-full` accent-dot bullets, and then nine
+ * rows whose photograph sat under a `bg-gradient-to-t from-ink/70` scrim with an
+ * "EXPLORE GUILD →" chip pinned to it, a `shadow-sm` plate that grew a
+ * `shadow-lg` on hover, and a serif name that turned accent on hover.
+ *
+ * The bullets also carried three claims this catalogue cannot support:
+ *
+ *  · "6 Verifiable Craft Guilds" — the registry holds nine techniques.
+ *  · "14 to 34 Hand Needle Hours Per Piece" — the registry's own pace figures
+ *    run 6–34 hours, and the product records run lower still.
+ *  · "100% Natural Yarns (Mulberry Silk, Zari, Ringspun Cotton)" — true of some
+ *    pieces, not of the range; zari is metallic, not a natural yarn.
+ *
+ * Now: the same ruled index as /worlds and /styles — a mono numeral, the name
+ * at display size, the stitch mechanism, the region and cluster, the registry's
+ * own pace for that technique, and the live count of pieces in the shop. No
+ * card, no scrim, no chip, no hover shadow. The photograph is a small plate on
+ * paper, framed by a hairline, the way every other raster in this world sits.
+ */
 export const Atelier: React.FC = () => {
   const { data: techniques } = useCraftTechniques();
   const { data: products } = useProducts();
 
-  return (
-    <div className="bg-cream min-h-screen">
-      {/* Editorial Hero Header */}
-      <section className="pt-16 pb-12 bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
-          <SectionHeader
-            archetype="statement"
-            title="The Indian Craft Taxonomy"
-            subtitle="Embroidery is not ceremony—it belongs on the essentials you live in. We work with specialized artisan guilds from Jaipur to Lucknow, translating centuries of hand-needle heritage into modern silhouettes built for daily wear."
-          />
+  const rows = useMemo(
+    () =>
+      (techniques ?? []).map((craft) => {
+        const matching = piecesInTechnique(products, craft.slug);
+        return { craft, count: matching.length, sample: matching[0] ?? null };
+      }),
+    [techniques, products],
+  );
 
-          <div className="flex flex-wrap items-center gap-6 text-xs text-ink-muted">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-              6 Verifiable Craft Guilds
+  const inProduction = rows.filter((r) => r.count > 0).length;
+  // A piece can carry more than one technique, so the row counts add up to more
+  // than the catalogue. The head states distinct pieces.
+  const placedPieces = useMemo(() => distinctPiecesInTechniques(products), [products]);
+
+  return (
+    <div className="min-h-screen w-full bg-cream">
+      <section className="border-b border-stone bg-cream pb-8 pt-10">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
+            <Link to="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span aria-hidden="true" className="mx-2">
+              /
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-              14 to 34 Hand Needle Hours Per Piece
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-              100% Natural Yarns (Mulberry Silk, Zari, Ringspun Cotton)
-            </span>
+            <span className="text-ink">The craft</span>
+          </nav>
+
+          <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
+                The Indian craft taxonomy
+              </h1>
+              <p className="mt-2 max-w-[58ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+                Nine needlecraft traditions, named for the region they come from
+                and the stitch that carries them. Each piece in the shop is filed
+                under the technique it was actually worked in — the record, not a
+                mood.
+              </p>
+            </div>
+            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
+              <span className="loom-price text-[15px] text-ink">{inProduction}</span> techniques in
+              production, <span className="loom-price text-[15px] text-ink">{placedPieces}</span>{' '}
+              pieces placed
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Craft Taxonomy Rows */}
-      <section className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 divide-y divide-stone/60">
-        {(techniques || []).map((craft, idx) => {
-          const linkedCount = (products || []).filter(
-            (p) => p.embroidery?.technique === craft.slug || p.tags.includes(craft.slug)
-          ).length;
-
-          return (
-            <div
-              key={craft.slug}
-              className="py-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center group"
-            >
-              {/* Numeral & Identity */}
-              <div className="lg:col-span-4">
-                <span className="font-sans text-xs font-medium tracking-[0.25em] text-ink-muted uppercase block">
-                  0{idx + 1} // {craft.region}
+      <section className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12">
+        <ol className="border-t border-stone">
+          {rows.map(({ craft, count, sample }, i) => (
+            // No plate on these rows. The registry's `image` is a gradient on
+            // seven of nine techniques, and the catalogue photography it would
+            // fall back to is garment-on-cream — cropped to a 3.5rem square it
+            // reads as an empty cell, not as cloth. /worlds and /styles are
+            // type-only indexes for the same reason; the photograph of a
+            // technique belongs at the scale the detail page gives it.
+            <li key={craft.slug} className="border-b border-stone">
+              <div className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-4 gap-y-3 py-6 sm:grid-cols-[2rem_minmax(0,15rem)_minmax(0,1fr)_auto] sm:gap-x-6 sm:gap-y-4">
+                <span className="loom-price pt-1 text-[11px] text-ink-muted">
+                  {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="font-serif text-3xl sm:text-4xl text-ink font-normal mt-1 group-hover:text-accent transition-colors">
-                  {craft.name}
-                </h3>
-                <p className="text-xs font-sans text-accent font-medium mt-1">
-                  {craft.cluster} • {craft.artisanPace}
-                </p>
 
-                <p className="text-xs sm:text-sm text-ink-muted font-light mt-4 leading-relaxed">
-                  {craft.historicalContext}
-                </p>
+                <div>
+                  <h2 className="loom-display text-ink" style={{ fontSize: '1.5rem' }}>
+                    <Link
+                      to={`/our-craft/${craft.slug}`}
+                      className="transition-colors hover:text-accent"
+                    >
+                      {craft.name}
+                    </Link>
+                  </h2>
+                  <p className="loom-label mt-1.5 text-ink-muted">{craft.region}</p>
+                  <p className="mt-0.5 font-sans text-[12px] text-ink-muted">{craft.cluster}</p>
+                </div>
 
-                <div className="mt-6 flex items-center gap-4">
-                  <Link
-                    to={`/atelier/${craft.slug}`}
-                    className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-ink hover:text-accent font-medium transition-colors"
-                  >
-                    <span>Inspect Craft Process</span>
-                    <span>→</span>
-                  </Link>
+                <div className="col-span-2 min-w-0 sm:col-span-1">
+                  <p className="font-sans text-[14px] leading-snug text-ink">{craft.stitchType}</p>
+                  <p className="mt-1 max-w-[62ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+                    {craft.description}
+                  </p>
+                </div>
 
-                  <Link
-                    to="/shop"
-                    className="text-xs text-ink-muted hover:text-ink font-light underline underline-offset-4"
-                  >
-                    View Available Garments ({linkedCount})
-                  </Link>
+                <div className="col-span-2 flex shrink-0 flex-col gap-1.5 sm:col-span-1 sm:items-end sm:text-right">
+                  <span className="loom-price text-[12px] text-ink">{craft.artisanPace}</span>
+                  <span className="loom-label text-ink-muted">
+                    {count === 0 ? 'Not in stock' : `${count} ${count === 1 ? 'piece' : 'pieces'}`}
+                  </span>
+                  {sample && count > 0 ? (
+                    <Link
+                      to={`/product/${sample.slug}`}
+                      className="font-sans text-[12px] text-ink-muted transition-colors hover:text-ink"
+                    >
+                      eg. {sample.name}
+                    </Link>
+                  ) : (
+                    <Link
+                      to={`/our-craft/${craft.slug}`}
+                      className="font-sans text-[12px] text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                    >
+                      Read the method →
+                    </Link>
+                  )}
                 </div>
               </div>
+            </li>
+          ))}
+        </ol>
 
-              {/* Texture Hero Imagery */}
-              <div className="lg:col-span-8">
-                <Link
-                  to={`/atelier/${craft.slug}`}
-                  className="block relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden bg-stone/20 border border-stone shadow-sm group-hover:shadow-lg transition-shadow"
-                >
-                  <img
-                    src={craft.image}
-                    alt={craft.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                  
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-cream">
-                    <div>
-                      <span className="text-[10px] uppercase tracking-widest text-cream/80 block">
-                        Stitch Architecture
-                      </span>
-                      <span className="font-serif text-lg text-cream">
-                        {craft.stitchType}
-                      </span>
-                    </div>
-
-                    <span className="text-[11px] font-sans tracking-widest uppercase bg-cream/90 text-ink px-3 py-1 font-medium">
-                      Explore Guild →
-                    </span>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          );
-        })}
+        <p className="mt-6 max-w-[70ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+          Working time is the registry's range for that technique, not a promise
+          about any single garment. A piece that is not in stock is still
+          documented — the method does not change with the season.
+        </p>
       </section>
     </div>
   );

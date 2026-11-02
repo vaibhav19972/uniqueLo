@@ -1,116 +1,176 @@
 import React, { useState } from 'react';
+import type { Product } from '../../lib/data';
+import { sortSizes } from '../../lib/sizes';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  category?: string;
+  /**
+   * The product whose measurements this guide shows. Required: the previous
+   * version took a category string and printed a hard-coded table per category,
+   * so a knitwear blouse and a knitwear cardigan advertised identical chests and
+   * lengths that neither product's record contains. Every product in the
+   * catalogue carries its own `size_chart`, and that is what this reads.
+   */
+  product: Product;
 }
 
-export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose, category = 'outerwear' }) => {
-  const [unit, setUnit] = useState<'inches' | 'cm'>('inches');
+type ChartRow = Record<string, unknown>;
+type Chart = Record<string, ChartRow>;
+
+/** Ordered so the table reads XS → 3XL wherever those keys exist. */
+const MEASUREMENT_LABELS: Record<string, string> = {
+  chest: 'Chest',
+  length: 'Length',
+  sleeve: 'Sleeve',
+  shoulder: 'Shoulder',
+  width: 'Width',
+  waist: 'Waist',
+  hip: 'Hip',
+};
+
+const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+
+/**
+ * GARMENT MEASUREMENTS
+ *
+ * Shape: the same ruled dialog grammar as the bag and the quick view — paper
+ * ground, square corners, a mono table, label type for the field names. The old
+ * version was a `shadow-2xl` rounded card with a blurred backdrop, a serif
+ * "Atelier Fit & Dimensions", a gold ✦ notice promising complimentary bespoke
+ * tailoring from a "master stitcher", and three invented measurement tables
+ * selected by category.
+ *
+ * What remains is the product's own record: every variant's `size_chart` entry,
+ * printed as it is stored, with the unit stated. Sizes with no recorded
+ * measurement are listed as "Not recorded" rather than filled in.
+ */
+export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose, product }) => {
+  const [unit, setUnit] = useState<'cm' | 'in'>('cm');
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
-  const sizeData: Record<string, { size: string; chest: string; length: string; shoulder: string }[]> = {
-    outerwear: [
-      { size: 'S / 38', chest: unit === 'inches' ? '41.5"' : '105 cm', length: unit === 'inches' ? '28.5"' : '72 cm', shoulder: unit === 'inches' ? '18.0"' : '46 cm' },
-      { size: 'M / 40', chest: unit === 'inches' ? '43.5"' : '110 cm', length: unit === 'inches' ? '29.5"' : '75 cm', shoulder: unit === 'inches' ? '18.8"' : '48 cm' },
-      { size: 'L / 42', chest: unit === 'inches' ? '46.0"' : '117 cm', length: unit === 'inches' ? '30.2"' : '77 cm', shoulder: unit === 'inches' ? '19.5"' : '50 cm' },
-      { size: 'XL / 44', chest: unit === 'inches' ? '48.5"' : '123 cm', length: unit === 'inches' ? '31.0"' : '79 cm', shoulder: unit === 'inches' ? '20.2"' : '51 cm' },
-    ],
-    knitwear: [
-      { size: 'S', chest: unit === 'inches' ? '40.0"' : '102 cm', length: unit === 'inches' ? '26.0"' : '66 cm', shoulder: unit === 'inches' ? '17.5"' : '44 cm' },
-      { size: 'M', chest: unit === 'inches' ? '42.0"' : '107 cm', length: unit === 'inches' ? '27.0"' : '68 cm', shoulder: unit === 'inches' ? '18.2"' : '46 cm' },
-      { size: 'L', chest: unit === 'inches' ? '44.5"' : '113 cm', length: unit === 'inches' ? '28.0"' : '71 cm', shoulder: unit === 'inches' ? '19.0"' : '48 cm' },
-    ],
-    tops: [
-      { size: 'S', chest: unit === 'inches' ? '39.0"' : '99 cm', length: unit === 'inches' ? '27.0"' : '68 cm', shoulder: unit === 'inches' ? '17.5"' : '44 cm' },
-      { size: 'M', chest: unit === 'inches' ? '41.5"' : '105 cm', length: unit === 'inches' ? '28.0"' : '71 cm', shoulder: unit === 'inches' ? '18.2"' : '46 cm' },
-      { size: 'L', chest: unit === 'inches' ? '44.0"' : '112 cm', length: unit === 'inches' ? '29.0"' : '74 cm', shoulder: unit === 'inches' ? '19.0"' : '48 cm' },
-    ],
+  const chart = (product.sizeChart ?? {}) as Chart;
+  const sizes = sortSizes(Object.keys(chart));
+
+  // Every measurement key that appears on any size, in a stable order.
+  const fields = Array.from(
+    new Set(sizes.flatMap((s) => Object.keys(chart[s] ?? {}))),
+  ).filter((k) => isNum((chart[sizes[0]] ?? {})[k]) || sizes.some((s) => isNum(chart[s]?.[k])));
+
+  const format = (value: unknown) => {
+    if (!isNum(value)) return 'Not recorded';
+    // Records are stored in centimetres.
+    return unit === 'cm' ? `${value} cm` : `${(value / 2.54).toFixed(1)}"`;
   };
 
-  const currentRows = sizeData[category] || sizeData.outerwear;
+  const hasAnyValue = fields.length > 0;
 
   return (
-    <div className="fixed inset-0 z-[460] flex items-center justify-center p-4">
-      <div
-        onClick={onClose}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-md transition-opacity"
-      />
+    <div className="fixed inset-0 z-[460] flex items-end justify-center sm:items-center sm:p-6">
+      <div onClick={onClose} className="fixed inset-0 bg-ink/70" aria-hidden="true" />
 
-      <div className="relative w-full max-w-xl bg-paper border border-stone shadow-2xl rounded-sm p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-200">
-        <div className="flex items-start justify-between pb-4 border-b border-stone/60">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="size-guide-title"
+        tabIndex={-1}
+        className="relative z-10 flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden border border-stone bg-paper"
+      >
+        <div className="flex items-baseline justify-between gap-4 border-b border-stone px-5 py-4">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-accent font-medium font-sans">
-              Tailoring Standards
-            </span>
-            <h3 className="font-serif text-2xl text-ink mt-0.5">
-              Atelier Fit & Dimensions
+            <p className="loom-label text-ink-muted">Garment measurements</p>
+            <h3 id="size-guide-title" className="loom-display mt-1 text-[1.25rem] text-ink">
+              {product.name}
             </h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Close size guide"
-            className="p-1 text-ink-muted hover:text-ink text-sm transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-accent"
           >
-            ✕
+            <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
-        {/* Unit Switcher */}
-        <div className="my-5 flex items-center justify-between">
-          <p className="text-xs text-ink-muted">
-            All pieces cut relaxed with natural ease for movement.
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone px-5 py-3">
+          <p className="max-w-[46ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+            This is the piece's own measurement record. Garment figures, not body
+            figures — compare them against something you already own.
           </p>
-          <div className="inline-flex border border-stone rounded-sm p-0.5 bg-cream">
-            <button
-              onClick={() => setUnit('inches')}
-              className={`px-3 py-1 text-[10px] font-sans uppercase tracking-wider font-medium transition-colors ${
-                unit === 'inches' ? 'bg-ink text-cream' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              Inches
-            </button>
-            <button
-              onClick={() => setUnit('cm')}
-              className={`px-3 py-1 text-[10px] font-sans uppercase tracking-wider font-medium transition-colors ${
-                unit === 'cm' ? 'bg-ink text-cream' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              Centimeters
-            </button>
+          <div
+            className="inline-flex shrink-0 border border-stone"
+            role="group"
+            aria-label="Measurement unit"
+          >
+            {(['cm', 'in'] as const).map((u) => (
+              <button
+                key={u}
+                type="button"
+                onClick={() => setUnit(u)}
+                aria-pressed={unit === u}
+                className={`min-h-[44px] min-w-[52px] px-3 font-sans text-[11px] uppercase tracking-[0.1em] transition-colors ${
+                  unit === u ? 'bg-ink text-cream' : 'text-ink hover:text-accent'
+                }`}
+              >
+                {u === 'cm' ? 'CM' : 'IN'}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border border-stone/60">
-            <thead className="bg-cream border-b border-stone/60 text-[10px] uppercase tracking-widest text-ink">
-              <tr>
-                <th className="py-2.5 px-3 font-medium">Garment Size</th>
-                <th className="py-2.5 px-3 font-medium">Chest Circumference</th>
-                <th className="py-2.5 px-3 font-medium">Back Length</th>
-                <th className="py-2.5 px-3 font-medium">Shoulder Width</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone/40">
-              {currentRows.map((row) => (
-                <tr key={row.size} className="hover:bg-cream/40 transition-colors">
-                  <td className="py-2.5 px-3 font-medium text-ink">{row.size}</td>
-                  <td className="py-2.5 px-3 text-ink-muted">{row.chest}</td>
-                  <td className="py-2.5 px-3 text-ink-muted">{row.length}</td>
-                  <td className="py-2.5 px-3 text-ink-muted">{row.shoulder}</td>
+        <div className="flex-1 overflow-auto px-5 py-4">
+          {hasAnyValue ? (
+            <table className="w-full border-collapse text-left">
+              <caption className="sr-only">
+                Measurements for {product.name} by size, in {unit === 'cm' ? 'centimetres' : 'inches'}
+              </caption>
+              <thead>
+                <tr className="border-b border-stone">
+                  <th scope="col" className="py-2 pr-3 loom-label text-ink-muted">
+                    Size
+                  </th>
+                  {fields.map((f) => (
+                    <th key={f} scope="col" className="py-2 pr-3 loom-label text-ink-muted">
+                      {MEASUREMENT_LABELS[f] ?? f}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sizes.map((size) => (
+                  <tr key={size} className="border-b border-stone last:border-b-0">
+                    <th scope="row" className="py-2 pr-3 font-sans text-[13px] text-ink">
+                      {size}
+                    </th>
+                    {fields.map((f) => (
+                      <td key={f} className="py-2 pr-3 loom-price text-[12.5px] text-ink-muted">
+                        {format(chart[size]?.[f])}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="font-sans text-[13px] leading-relaxed text-ink-muted">
+              No measurements are recorded for this piece yet. The size run is on
+              the product page; ask before ordering if the fit matters and we will
+              measure one.
+            </p>
+          )}
         </div>
 
-        <div className="mt-5 p-3.5 bg-cream border border-stone/60 text-[11px] text-ink-muted flex items-start gap-2.5">
-          <span className="text-accent text-sm">✦</span>
-          <p className="leading-relaxed">
-            Need bespoke tailored dimensions or sleeve adjustment? Contact our atelier master stitcher for complimentary pre-dispatch adjustments.
+        <div className="border-t border-stone px-5 py-3">
+          <p className="font-sans text-[12px] leading-relaxed text-ink-muted">
+            Measurements are recorded per size in the catalogue. Anything absent
+            above is absent from the record, not rounded to a guess.
           </p>
         </div>
       </div>

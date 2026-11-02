@@ -2,52 +2,66 @@ import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router';
 import { useProducts, useCollections } from '../hooks/useCatalog';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { hasLicensedMark } from '../lib/licensed-marks';
 
-type TabKey = 'all' | 'new-arrivals' | 'bestsellers' | 'limited-editions' | 'collections';
+/**
+ * NEW & FEATURED — /new-featured
+ *
+ * Was five tabs of card-grid under a gold "Curated Highlights" kicker, an
+ * italic serif tagline and a third paragraph of marketing prose. Two of its
+ * five tabs were dishonest:
+ *
+ *  · "Limited Editions — strictly numbered runs with zero mass reproduction"
+ *    filtered on `edits.includes('collector') || handcrafted`. Nothing in the
+ *    catalogue is numbered, and `handcrafted` is true on nearly every piece.
+ *  · "Bestsellers — ranked by collector adoption and sales performance" sorted
+ *    by `tags.includes('bestseller') || rating >= 4.7` — a rating the catalogue
+ *    does not have for most products, so the tab mostly rendered tag order.
+ *
+ * Both are renamed to what they actually select, and the prose is replaced by
+ * a count. The tabs are the same ruled segmented cells the rest of the site
+ * uses; the grid is the same ProductGrid as the shop.
+ */
+type TabKey = 'all' | 'new-arrivals' | 'hand-worked' | 'collector-edit' | 'collections';
 
 interface TabMeta {
   key: TabKey;
   slug: string;
   name: string;
-  tagline: string;
-  description: string;
+  /** What this tab actually selects, in the buyer's words. */
+  basis: string;
 }
 
 const TABS: TabMeta[] = [
   {
     key: 'all',
     slug: 'all',
-    name: 'All Featured',
-    tagline: 'Curated highlights across every universe and craft.',
-    description: 'Fresh releases, archival bestsellers, and limited-run pieces brought together in one curated edit.',
+    name: 'All featured',
+    basis: 'Pieces the house has chosen to lead with.',
   },
   {
     key: 'new-arrivals',
     slug: 'new-arrivals',
-    name: 'New Arrivals',
-    tagline: 'The freshest needlework straight from our artisan clusters.',
-    description: 'Recent additions to the atelier collection, featuring newly landed motifs and seasonal silhouettes.',
+    name: 'New arrivals',
+    basis: 'Newest listings first, by publication date.',
   },
   {
-    key: 'bestsellers',
-    slug: 'bestsellers',
-    name: 'Bestsellers',
-    tagline: 'The most coveted garments in the UniqueLo archives.',
-    description: 'Ranked by collector adoption and sales performance across India and abroad.',
+    key: 'hand-worked',
+    slug: 'hand-worked',
+    name: 'Hand-worked',
+    basis: 'Pieces whose record names hand embroidery as the method.',
   },
   {
-    key: 'limited-editions',
+    key: 'collector-edit',
     slug: 'limited-editions',
-    name: 'Limited Editions',
-    tagline: 'Small-batch, numbered runs with rare bullion and silk threadwork.',
-    description: 'Strictly limited releases featuring high artisan hours, hand-numbered certificates, and non-repeating thread palettes.',
+    name: 'Collector edit',
+    basis: 'The pieces the catalogue files under its collector edit.',
   },
   {
     key: 'collections',
     slug: 'collections',
     name: 'Collections',
-    tagline: 'Thematic seasonal drops curated across worlds & silhouettes.',
-    description: 'Explore our curated thematic drops where singular embroidery stories unite diverse apparel silhouettes into unified aesthetic capsules.',
+    basis: 'Pieces that belong to a named seasonal capsule.',
   },
 ];
 
@@ -56,84 +70,92 @@ export const NewFeatured: React.FC = () => {
   const { data: allProducts } = useProducts();
   const { data: collections } = useCollections();
 
-  const activeTabKey: TabKey = useMemo(() => {
-    if (!tabSlug) return 'all';
-    const found = TABS.find((t) => t.slug === tabSlug);
-    return found ? found.key : 'all';
+  const activeTab: TabMeta = useMemo(() => {
+    if (!tabSlug) return TABS[0];
+    return TABS.find((t) => t.slug === tabSlug) ?? TABS[0];
   }, [tabSlug]);
 
-  const activeTabMeta = TABS.find((t) => t.key === activeTabKey) || TABS[0];
-
   const filteredProducts = useMemo(() => {
-    const list = allProducts ?? [];
-    switch (activeTabKey) {
+    // A curated rail presents pieces as the brand's own work.
+    const list = (allProducts ?? []).filter((p) => !hasLicensedMark(p));
+    switch (activeTab.key) {
       case 'new-arrivals':
-        // Sort by newest createdAt timestamp descending, including all newly landed products
-        return [...list]
-          .sort((a, b) => {
-            if (a.createdAt && b.createdAt) {
-              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            }
-            if (b.createdAt) return 1;
-            if (a.createdAt) return -1;
-            return 0;
-          })
-          .filter((p) => p.featured || p.tags.includes('new') || Boolean(p.createdAt));
-      case 'bestsellers':
-        return list.filter((p) => p.tags.includes('bestseller') || (p.rating && p.rating >= 4.7));
-      case 'limited-editions':
-        return list.filter((p) => p.edits?.includes('collector') || p.handcrafted);
+        return [...list].sort((a, b) => {
+          if (a.createdAt && b.createdAt) {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }
+          if (b.createdAt) return 1;
+          if (a.createdAt) return -1;
+          return 0;
+        });
+      case 'hand-worked':
+        return list.filter((p) => p.handcrafted);
+      case 'collector-edit':
+        return list.filter((p) => p.edits?.includes('collector'));
       case 'collections':
         return list.filter((p) => Boolean(p.collectionSlug));
       case 'all':
       default:
-        return list.filter((p) => p.featured || p.tags.includes('bestseller'));
+        return list.filter((p) => p.featured);
     }
-  }, [allProducts, activeTabKey]);
+  }, [allProducts, activeTab.key]);
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      {/* Header */}
-      <section className="bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <span>New & Featured</span>
-            {activeTabKey !== 'all' && (
+    <div className="min-h-screen w-full bg-cream">
+      <section className="border-b border-stone bg-cream pb-6 pt-10">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
+            <Link to="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span aria-hidden="true" className="mx-2">
+              /
+            </span>
+            <span className="text-ink">New &amp; featured</span>
+            {activeTab.key !== 'all' && (
               <>
-                <span className="mx-2">›</span>
-                <span>{activeTabMeta.name}</span>
+                <span aria-hidden="true" className="mx-2">
+                  /
+                </span>
+                <span>{activeTab.name}</span>
               </>
             )}
           </nav>
-          <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium mt-4 block">
-            Curated Highlights
-          </span>
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
-            {activeTabMeta.name}
-          </h1>
-          <p className="font-serif italic text-lg sm:text-xl text-ink-muted mt-2">
-            {activeTabMeta.tagline}
-          </p>
-          <p className="text-sm text-ink-muted mt-3 max-w-2xl font-light leading-relaxed">
-            {activeTabMeta.description}
-          </p>
 
-          {/* Segmented Tabs */}
-          <div className="mt-8 flex flex-wrap gap-2 pt-4 border-t border-stone/40">
-            {TABS.map((t) => {
-              const isActive = t.key === activeTabKey;
+          <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
+                {activeTab.name}
+              </h1>
+              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+                {activeTab.basis}
+              </p>
+            </div>
+            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
+              <span className="loom-price text-[15px] text-ink">{filteredProducts.length}</span>{' '}
+              {filteredProducts.length === 1 ? 'piece' : 'pieces'}
+            </p>
+          </div>
+
+          {/* Segmented cells: adjacent square tabs sharing borders, the selected
+              one filled with ink. Same control as the shop's category row. */}
+          <div className="mt-7 flex w-fit flex-wrap border border-stone">
+            {TABS.map((t, i) => {
+              const isActive = t.key === activeTab.key;
               const to = t.slug === 'all' ? '/new-featured' : `/new-featured/${t.slug}`;
               return (
                 <Link
                   key={t.key}
                   to={to}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`px-4 py-2 text-xs uppercase tracking-widest font-sans border transition-colors ${isActive
-                    ? 'bg-ink text-cream border-transparent font-medium shadow-xs'
-                    : 'bg-paper text-ink border-stone hover:border-ink'
-                    }`}
+                  className={`min-h-[44px] px-4 font-sans text-[11px] uppercase tracking-[0.12em] transition-colors ${
+                    i > 0 ? 'border-l border-stone' : ''
+                  } ${
+                    isActive
+                      ? 'bg-ink text-cream'
+                      : 'bg-transparent text-ink-muted hover:text-ink'
+                  }`}
+                  style={{ display: 'inline-flex', alignItems: 'center' }}
                 >
                   {t.name}
                 </Link>
@@ -141,40 +163,38 @@ export const NewFeatured: React.FC = () => {
             })}
           </div>
 
-          {/* Collection Hub Callout */}
-          {activeTabKey === 'collections' && (
-            <div className="mt-6 p-4 sm:p-5 bg-cream/70 border border-stone/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <p className="font-serif text-base text-ink font-medium">Looking for complete collection stories & lookbooks?</p>
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  {(collections ?? []).map((col) => (
-                    <Link
-                      key={col.slug}
-                      to={`/collections/${col.slug}`}
-                      className="px-2.5 py-1 text-[11px] font-sans uppercase tracking-wider bg-paper border border-stone/60 hover:border-accent text-ink hover:text-accent transition-colors"
-                    >
-                      {col.name} →
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <Link
-                to="/collections"
-                className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase font-sans tracking-widest font-semibold whitespace-nowrap transition-colors shrink-0"
-              >
-                All Collections Hub →
-              </Link>
+          {activeTab.key === 'collections' && (collections ?? []).length > 0 && (
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-stone pt-4">
+              <span className="loom-label text-ink-muted">Capsules</span>
+              {(collections ?? []).map((col) => (
+                <Link
+                  key={col.slug}
+                  to={`/collections/${col.slug}`}
+                  className="font-sans text-[12.5px] text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                >
+                  {col.name}
+                </Link>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Grid */}
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 pb-24">
-        <p className="text-xs text-ink-muted mb-6 uppercase tracking-widest">
-          {filteredProducts.length} piece{filteredProducts.length === 1 ? '' : 's'} curated
-        </p>
-        <ProductGrid products={filteredProducts} />
+      <div className="mx-auto max-w-[var(--container-max)] px-4 py-8 pb-24 sm:px-6 lg:px-12">
+        {filteredProducts.length === 0 ? (
+          <p className="max-w-[54ch] py-10 font-sans text-[14px] leading-relaxed text-ink-muted">
+            Nothing is filed under this heading right now.{' '}
+            <Link
+              to="/shop"
+              className="text-ink underline decoration-stone-strong underline-offset-4 hover:decoration-ink"
+            >
+              The whole catalogue
+            </Link>{' '}
+            is the safe place to start.
+          </p>
+        ) : (
+          <ProductGrid products={filteredProducts} />
+        )}
       </div>
     </div>
   );

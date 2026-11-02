@@ -20,64 +20,94 @@ import { prefersReducedMotion } from '../lib/motion';
  *     past a section would otherwise leave it at opacity 0 forever
  *   • reduced motion opts out entirely and shows content immediately
  *   • if IntersectionObserver is missing, everything is shown (never hidden)
+ *
+ * Mounting: a component that returns `null` on its first render and renders
+ * its section once data arrives (every catalogue-backed band does this) has
+ * no element when this effect first runs. The old version returned early and
+ * never re-ran, so the section stayed at opacity 0 forever — a blank band in
+ * the middle of the page. The observer is therefore re-armed by a
+ * MutationObserver on the parent until the element appears.
  */
 export function useReveal<T extends HTMLElement = HTMLElement>() {
   const ref = useRef<T>(null);
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+
+    const arm = (el: HTMLElement) => {
+      const show = () => el.classList.add('is-visible');
+
+      // Reduced motion: no animation at all, content simply present.
+      if (prefersReducedMotion()) {
+        show();
+        return;
+      }
+
+      // Already in or above the viewport on mount (deep link, restored scroll).
+      if (el.getBoundingClientRect().top < window.innerHeight) {
+        show();
+        return;
+      }
+
+      // No IntersectionObserver: fail open, never leave content invisible.
+      if (typeof IntersectionObserver === 'undefined') {
+        show();
+        return;
+      }
+
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        show();
+        observer.disconnect();
+        window.removeEventListener('scroll', onScroll);
+      };
+
+      // Fallback for jumps that skip the element without a transition.
+      const onScroll = () => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.95) finish();
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) finish();
+          }
+        },
+        { threshold: 0.05, rootMargin: '0px 0px -5% 0px' },
+      );
+
+      observer.observe(el);
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      cleanup = () => {
+        observer.disconnect();
+        window.removeEventListener('scroll', onScroll);
+      };
+    };
+
     const el = ref.current;
-    if (!el) return;
-
-    const show = () => el.classList.add('is-visible');
-
-    // Reduced motion: no animation at all, content simply present.
-    if (prefersReducedMotion()) {
-      show();
-      return;
+    if (el) {
+      arm(el);
+      return () => cleanup?.();
     }
 
-    // Already in or above the viewport on mount (deep link, restored scroll).
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
-      show();
-      return;
-    }
+    // The element is not in the DOM yet. Wait for it to be attached, then arm.
+    const host = document.getElementById('root') ?? document.body;
+    if (!host || typeof MutationObserver === 'undefined') return;
 
-    // No IntersectionObserver: fail open, never leave content invisible.
-    if (typeof IntersectionObserver === 'undefined') {
-      show();
-      return;
-    }
-
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      show();
-      observer.disconnect();
-      window.removeEventListener('scroll', onScroll);
-    };
-
-    // Fallback for jumps that skip the element without a transition.
-    const onScroll = () => {
-      if (el.getBoundingClientRect().top < window.innerHeight * 0.95) finish();
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) finish();
-        }
-      },
-      { threshold: 0.05, rootMargin: '0px 0px -5% 0px' },
-    );
-
-    observer.observe(el);
-    window.addEventListener('scroll', onScroll, { passive: true });
+    const watcher = new MutationObserver(() => {
+      const late = ref.current;
+      if (!late) return;
+      watcher.disconnect();
+      arm(late);
+    });
+    watcher.observe(host, { childList: true, subtree: true });
 
     return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', onScroll);
+      watcher.disconnect();
+      cleanup?.();
     };
   }, []);
 

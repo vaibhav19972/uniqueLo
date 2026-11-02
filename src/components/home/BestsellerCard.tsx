@@ -1,32 +1,30 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router';
-import { formatPrice, getDefaultVariant, type Product } from '../../lib/data';
+import { formatPrice, getDefaultVariant, getIntensity, type Product } from '../../lib/data';
 import { catalogMrp } from '../../lib/pricing';
 import { useCartStore } from '../../stores/cart';
 import { useQuickViewStore } from '../../stores/quickView';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useToastStore } from '../../stores/toast';
+import { Image } from '../ui/Image';
+import { sortSizes } from '../../lib/sizes';
 
-function Stars({ rating }: { rating: number }) {
-  const full = Math.round(rating);
-  return (
-    <span className="inline-flex items-center gap-0.5 text-gold-deep" role="img" aria-label={`Rated ${rating} out of 5`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} aria-hidden="true" className={i < full ? '' : 'opacity-30'}>
-          ★
-        </span>
-      ))}
-    </span>
-  );
-}
+const INTENSITY_COPY: Record<string, string> = {
+  quiet: 'Quiet',
+  balanced: 'Balanced',
+  loud: 'Loud',
+};
 
 /**
- * Render-05 product card: ribbon, technique tag, fit+GSM, stars, price +
- * compare-at + computed %OFF, hover Quick-View overlay with
- * size chips + Add to Cart. No colour option — sizes only.
+ * The rail card. Same grammar as the grid card — photograph, name, technique,
+ * price — with one addition that only makes sense in a rail: the size chips
+ * stay on the card, because a horizontal scroll is a browsing gesture and
+ * forcing a PDP visit to pick a size breaks it.
+ *
+ * Ratings render only when the catalog actually carries them. The seed data
+ * does not, so no star row appears; a fabricated 4.8 next to a real price is
+ * exactly the dishonesty PRODUCT.md rules out.
  */
-const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'OS'];
-
 export const BestsellerCard: React.FC<{ product: Product; universeName?: string }> = ({
   product,
   universeName,
@@ -38,15 +36,7 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   const showToast = useToastStore((s) => s.showToast);
 
   const sizes = useMemo(() => {
-    const unique = [...new Set(product.variants.map((v) => v.size))];
-    return unique.sort((a, b) => {
-      const ia = SIZE_ORDER.indexOf(a);
-      const ib = SIZE_ORDER.indexOf(b);
-      if (ia !== -1 && ib !== -1) return ia - ib;
-      if (ia !== -1) return -1;
-      if (ib !== -1) return 1;
-      return a.localeCompare(b);
-    });
+    return sortSizes([...new Set(product.variants.map((v) => v.size))]);
   }, [product]);
 
   const inStockSizes = useMemo(
@@ -58,179 +48,159 @@ export const BestsellerCard: React.FC<{ product: Product; universeName?: string 
   );
   const isWish = isWishlisted(product.slug);
 
-  const currentVariant = useMemo(() => {
-    return (
+  const currentVariant = useMemo(
+    () =>
       product.variants.find((v) => v.size === size && v.status !== 'out-of-stock') ??
       product.variants.find((v) => v.size === size) ??
-      defaultVariant
-    );
-  }, [product, size, defaultVariant]);
+      defaultVariant,
+    [product, size, defaultVariant],
+  );
 
-  // One rule for the whole card: the markdown must belong to the variant being
-  // sold (not borrowed from the default variant) and must still be live. The
-  // `?? defaultVariant` fallback below was how an expired or different-size
-  // markdown ended up on this card's price.
+  // The markdown must belong to the variant being sold (not borrowed from the
+  // default variant) and must still be live.
   const mrp = catalogMrp(currentVariant);
   const compareAt = mrp?.mrpCents ?? null;
   const offPct = mrp?.offPercent ?? 0;
+  const soldOut = currentVariant.status === 'out-of-stock';
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (currentVariant.status === 'out-of-stock') {
-      showToast({ title: 'Sold out', description: `${product.name} is currently sold out in size ${size}.`, type: 'info' });
+    if (soldOut) {
+      showToast({
+        title: 'Sold out',
+        description: `${product.name} is currently sold out in size ${size}.`,
+        type: 'info',
+      });
       return;
     }
     addItem(product.slug, currentVariant.sku, 1, undefined, currentVariant.quantity ?? 99);
     showToast({
-      title: 'Added to Atelier Bag',
+      title: 'Added to bag',
       description: `${product.name} (size ${currentVariant.size})`,
       type: 'success',
     });
   };
 
   return (
-    <div
-      className="group relative flex flex-col bg-paper border border-stone/70 shadow-xs transition-all duration-500 hover:shadow-xl hover:border-ink/50 hover:-translate-y-1 w-[220px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start"
-    >
-      {/* Visual */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-stone/20">
-        <Link to={`/product/${product.slug}`} aria-label={product.name}>
-          <img
-            src={product.images[0]?.src}
+    <div className="group flex w-[228px] shrink-0 flex-col border border-stone bg-paper sm:w-[264px] lg:w-[288px]">
+      <div className="relative aspect-[3/4] overflow-hidden bg-paper">
+        <Link to={`/product/${product.slug}`} aria-label={product.name} className="block h-full w-full">
+          <Image
+            src={product.images[0]?.src ?? ''}
             alt={product.images[0]?.alt || product.name}
-            loading="lazy"
-            className="w-full h-full object-cover"
+            aspectRatio="3/4"
+            fit="contain"
+            className="h-full w-full transition-transform duration-500 ease-[var(--ease-base)] group-hover:scale-[1.02]"
           />
         </Link>
 
+        {/* A flag, not a fire emoji. Marks the piece the catalogue promotes,
+            which is a fact; "bestseller in X" would be a claim. */}
         {product.featured && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gold text-on-gold text-[11px] font-sans tracking-wide px-3 py-1.5">
-            <span aria-hidden="true">🔥</span> Bestseller{universeName ? ` in ${universeName}` : ''}
+          <span className="absolute left-0 top-0 bg-ink px-2 py-1 font-sans text-[10px] uppercase tracking-[0.14em] text-cream">
+            Featured
           </span>
         )}
 
         <button
-          onClick={() => toggleWishlist(product.slug)}
-          aria-label={isWish ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product.slug);
+          }}
+          aria-label={isWish ? `Remove ${product.name} from saved` : `Save ${product.name}`}
           aria-pressed={isWish}
-          className={`absolute top-3 right-3 w-9 h-9 rounded-full bg-paper/90 flex items-center justify-center transition-colors ${
-            isWish ? 'text-red-700' : 'text-ink'
-          } hover:text-red-700`}
+          className={`absolute right-0 top-0 grid h-11 w-11 place-items-center bg-paper/85 backdrop-blur-sm transition-colors hover:bg-paper ${
+            isWish ? 'text-accent' : 'text-ink'
+          }`}
         >
-          <svg className="w-5 h-5" fill={isWish ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill={isWish ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d="M12 20.5 4.9 13.6a4.5 4.5 0 0 1 6.4-6.3l.7.7.7-.7a4.5 4.5 0 0 1 6.4 6.3Z" strokeLinejoin="round" />
           </svg>
         </button>
 
-        {/* Hover / focus Quick-View overlay — compact integrated capsule */}
-        <div className="absolute inset-x-2.5 sm:inset-x-3 bottom-2.5 sm:bottom-3 flex flex-col opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-300 z-10 filter drop-shadow-[0_12px_28px_rgba(0,0,0,0.18)] pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
-          {/* Quick View top bar */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openQuickView(product);
-            }}
-            aria-label={`Quick view ${product.name}`}
-            className="w-full flex items-center justify-center gap-2 bg-coal-glass/85 hover:bg-coal-glass/95 backdrop-blur-md text-white py-2 min-h-[44px] font-serif text-[13px] sm:text-[14px] tracking-wide transition-colors"
-          >
-            <svg className="w-4 h-4 shrink-0 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
-              <circle cx="12" cy="12" r="3" strokeWidth="1.5" />
-            </svg>
-            <span>Quick View</span>
-          </button>
-
-          {/* Size selection & Add to Cart — crisp white floating surface */}
-          <div className="bg-paper p-2.5 sm:p-3 border-x border-b border-black/[0.04]">
-            <div className="grid grid-flow-col auto-cols-fr gap-1.5" role="group" aria-label="Choose size">
-              {sizes.map((s) => {
-                const available = inStockSizes.has(s);
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    disabled={!available}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSize(s);
-                    }}
-                    aria-pressed={size === s}
-                    aria-label={`Size ${s}${available ? '' : ', sold out'}`}
-                    className={`min-h-[44px] min-w-[44px] px-1 text-[12px] sm:text-[13px] font-serif border transition-colors flex items-center justify-center ${
-                      size === s
-                        ? 'bg-ink text-cream border-transparent font-semibold shadow-xs'
-                        : 'bg-paper border-stone text-ink hover:border-ink'
-                    } ${available ? '' : 'opacity-30 line-through cursor-not-allowed'}`}
-                  >
-                    {s}
-                  </button>
-                );
-              })}
-            </div>
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="w-full mt-2 min-h-[44px] py-2 font-sans text-[13px] sm:text-[14px] font-semibold tracking-wide transition-colors flex items-center justify-center bg-ink text-cream hover:bg-ink-muted shadow-xs active:scale-[0.99]"
-            >
-              Add to Cart — {formatPrice(currentVariant.priceCents)}
-            </button>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openQuickView(product);
+          }}
+          aria-label={`Quick view ${product.name}`}
+          className="absolute bottom-0 right-0 grid h-11 w-11 place-items-center bg-paper/85 text-ink backdrop-blur-sm transition-colors hover:bg-paper"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+            <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="2.5" />
+          </svg>
+        </button>
       </div>
 
-      {/* Info */}
-      <div className="p-4">
-        <div className="flex flex-wrap items-center gap-2">
-          {product.embroidery && (
-            <span className="inline-block rounded-full text-[11px] font-serif text-ink bg-cream border border-stone/70 px-3 py-1">
-              {product.embroidery.techniqueLabel}
-            </span>
-          )}
-          {product.handcrafted && (
-            <span className="inline-flex items-center gap-1.5 rounded-full text-[11px] font-serif text-gold-deep border border-gold-deep/50 px-3 py-1">
-              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold-deep" />
-              Handcrafted
-            </span>
-          )}
-        </div>
+      <div className="flex flex-1 flex-col border-t border-stone p-3">
         <Link to={`/product/${product.slug}`}>
-          <h3 className="font-serif text-xl text-ink mt-2 hover:text-gold-deep transition-colors">{product.name}</h3>
+          <h3 className="truncate font-sans text-[13px] font-medium text-ink transition-colors group-hover:text-accent">
+            {product.name}
+          </h3>
         </Link>
-        <p className="text-xs text-ink-muted mt-0.5">
-          {product.fit ? `${product.fit} | ` : ''}{product.fabricGsm ?? ''}
+        <p className="mt-0.5 font-sans text-[10px] uppercase tracking-[0.12em] text-ink-muted">
+          {product.embroidery?.techniqueLabel ?? 'Hand embroidery'}
+          <span aria-hidden="true"> · </span>
+          {INTENSITY_COPY[getIntensity(product)] ?? 'Balanced'}
+          {universeName ? ` · ${universeName}` : ''}
         </p>
-        {product.rating !== undefined && (
-          <p className="flex items-center gap-1.5 mt-1.5 text-[13px] text-ink">
-            <Stars rating={product.rating} />
-            <span className="font-medium">{product.rating.toFixed(1)}</span>
-            {product.reviewCount !== undefined && (
-              <span className="text-ink-muted">({product.reviewCount})</span>
-            )}
-          </p>
-        )}
-        <p className="flex items-baseline gap-2 mt-1.5">
-          {/* Tracks the selected size chip like the CTA below it. Pinned to
-              defaultVariant this read one price while "Add to Cart —" read
-              another for the same card. */}
-          <span className="font-serif text-2xl text-ink">{formatPrice(currentVariant.priceCents)}</span>
+
+        <p className="mt-1.5 flex items-baseline gap-1.5">
+          <span className="loom-price text-[15px] font-medium text-ink">
+            {formatPrice(currentVariant.priceCents)}
+          </span>
           {compareAt && compareAt > currentVariant.priceCents && (
             <>
-              <span className="text-sm text-ink-muted line-through">{formatPrice(compareAt)}</span>
-              <span className="text-[11px] font-sans font-semibold px-1.5 py-0.5 text-accent bg-accent-soft">
-                {offPct}% OFF
+              <span className="loom-price text-[11px] text-ink-muted line-through">
+                {formatPrice(compareAt)}
+              </span>
+              <span className="font-sans text-[10px] font-medium uppercase tracking-[0.06em] text-accent">
+                {offPct}%
               </span>
             </>
           )}
         </p>
-        {product.artStyleSlug && (
-          <p className="text-[11px] uppercase tracking-widest text-ink-muted mt-2">
-            {product.artStyleSlug.replace(/-/g, ' ')}
-          </p>
-        )}
+
+        <div className="mt-2.5 grid grid-flow-col auto-cols-fr gap-1" role="group" aria-label="Choose size">
+          {sizes.map((s) => {
+            const available = inStockSizes.has(s);
+            return (
+              <button
+                key={s}
+                type="button"
+                disabled={!available}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSize(s);
+                }}
+                aria-pressed={size === s}
+                aria-label={`Size ${s}${available ? '' : ', sold out'}`}
+                className={`grid min-h-[44px] place-items-center border font-sans text-[12px] transition-colors ${
+                  size === s
+                    ? 'border-ink bg-ink text-cream'
+                    : 'border-stone text-ink hover:border-ink'
+                } ${available ? '' : 'cursor-not-allowed line-through opacity-30'}`}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={soldOut}
+          className="mt-1.5 min-h-[44px] w-full bg-ink px-2 font-sans text-[11.5px] font-medium uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {soldOut ? 'Sold out' : 'Add to bag'}
+        </button>
       </div>
     </div>
   );

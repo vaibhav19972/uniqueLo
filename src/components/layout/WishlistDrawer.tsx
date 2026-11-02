@@ -5,9 +5,21 @@ import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
 import { formatPrice, getDefaultVariant } from '../../lib/data';
 import { useToastStore } from '../../stores/toast';
-import { Button } from '../ui/Button';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
 
+/**
+ * SAVED PIECES
+ *
+ * A drawer, so it keeps the bag's shape — but nothing else from the old
+ * version: a serif heading in a rounded count pill, a blurred backdrop, a
+ * circular icon badge in the empty state, rounded item cards with `bg-paper/70`
+ * and accent text, and an olive "COD" pill. All of it was a different system's
+ * vocabulary bolted onto this one.
+ *
+ * Now: the same ruled drawer grammar as the bag — display heading with the
+ * count in mono, hairline rules, square item plates on paper, price in mono,
+ * one ink action per item. Empty state is a sentence, not an illustration.
+ */
 export const WishlistDrawer: React.FC = () => {
   const isOpen = useWishlistStore((state) => state.isOpen);
   const closeWishlist = useWishlistStore((state) => state.closeWishlist);
@@ -27,15 +39,6 @@ export const WishlistDrawer: React.FC = () => {
 
   const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, closeWishlist);
 
-  // Close on Escape
-  React.useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) closeWishlist();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, closeWishlist]);
-
   if (!isOpen) return null;
 
   const handleMoveToBag = (slug: string) => {
@@ -44,7 +47,7 @@ export const WishlistDrawer: React.FC = () => {
     const variant = getDefaultVariant(product);
     if (!variant || variant.status === 'out-of-stock') {
       showToast({
-        title: 'Sold Out',
+        title: 'Sold out',
         description: 'This piece is currently unavailable.',
         type: 'info',
       });
@@ -55,170 +58,162 @@ export const WishlistDrawer: React.FC = () => {
     closeWishlist();
     openCart();
     showToast({
-      title: 'Moved to Bag',
-      description: `${product.name} is now in your Atelier Bag.`,
+      title: 'Moved to bag',
+      description: `${product.name} is now in your bag.`,
       type: 'success',
     });
   };
 
   return (
-    <div className="fixed inset-0 z-[310] flex justify-end" role="dialog" aria-modal="true" aria-label="Saved Pieces">
-      {/* Backdrop */}
+    <div
+      className="fixed inset-0 z-[310] flex justify-end"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Saved pieces"
+    >
       <div
-        className="fixed inset-0 bg-ink/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-ink/40"
         onClick={closeWishlist}
         aria-hidden="true"
       />
 
-      {/* Drawer */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-md bg-cream text-ink h-full shadow-2xl flex flex-col justify-between border-l border-stone animate-in slide-in-from-right duration-300"
+        className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-stone bg-paper text-ink"
+        style={{ borderRadius: '14px 0 0 14px' }}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-stone flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="font-serif text-xl tracking-wide">Saved Pieces</h2>
-            <span className="text-xs uppercase tracking-widest text-ink/50 bg-ink/5 px-2 py-0.5 rounded-full font-mono">
+        <div className="flex items-baseline justify-between gap-4 border-b border-stone px-5 py-5">
+          <h2 className="loom-display text-[1.375rem] text-ink">
+            Saved{' '}
+            <span className="loom-price align-baseline text-[13px] text-ink-muted">
               {savedSlugs.length}
             </span>
-          </div>
-          <div className="flex items-center gap-3">
+          </h2>
+          <div className="flex items-center gap-4">
             {savedSlugs.length > 0 && (
               <button
                 type="button"
                 onClick={clearWishlist}
-                className="text-xs text-ink/40 hover:text-rust transition-colors uppercase tracking-wider"
+                className="min-h-[44px] font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
               >
-                Clear all
+                Clear
               </button>
             )}
             <button
               type="button"
               onClick={closeWishlist}
-              className="p-2 text-ink/60 hover:text-ink transition-colors"
-              aria-label="Close wishlist drawer"
+              className="inline-flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-accent"
+              aria-label="Close saved pieces"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Content list */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5">
           {savedProducts.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center py-16 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-ink/5 flex items-center justify-center text-ink/40">
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-              </div>
-              <p className="font-serif text-lg text-ink">Your Saved Pieces is Empty</p>
-              <p className="text-sm text-ink/60 max-w-xs">
-                Save garments you love by tapping the heart icon on any piece while exploring.
+            <div className="flex h-full flex-col justify-center py-16">
+              <p className="font-sans text-[15px] leading-relaxed text-ink">
+                Nothing saved yet.
+              </p>
+              <p className="mt-1.5 max-w-[34ch] font-sans text-[13px] leading-relaxed text-ink-muted">
+                The heart on any piece keeps it here, on this device.
               </p>
               <Link
                 to="/shop"
                 onClick={closeWishlist}
-                className="mt-4 px-6 py-2.5 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
+                className="mt-6 inline-flex min-h-[48px] w-fit items-center gap-2 bg-ink px-5 font-sans text-[12px] font-medium uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent"
               >
-                Explore Catalogue
+                Browse the collection
+                <span aria-hidden="true">→</span>
               </Link>
             </div>
           ) : (
-            savedProducts.map((product) => {
-              const defaultVariant = getDefaultVariant(product);
-              const isSoldOut = !defaultVariant || defaultVariant.status === 'out-of-stock';
-              const primaryImg = product.images?.[0]?.src || '/images/placeholders/hero.jpg';
+            <ul>
+              {savedProducts.map((product) => {
+                const defaultVariant = getDefaultVariant(product);
+                const isSoldOut = !defaultVariant || defaultVariant.status === 'out-of-stock';
 
-              return (
-                <div
-                  key={product.slug}
-                  className="flex gap-4 p-3 bg-paper/70 border border-ink/5 rounded-sm hover:border-stone transition-colors"
-                >
-                  <Link
-                    to={`/product/${product.slug}`}
-                    onClick={closeWishlist}
-                    className="w-20 h-24 bg-ink/5 shrink-0 overflow-hidden rounded-xs"
+                return (
+                  <li
+                    key={product.slug}
+                    className="flex gap-3.5 border-b border-stone py-4 last:border-b-0"
                   >
-                    <img
-                      src={primaryImg}
-                      alt={product.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
-                    />
-                  </Link>
+                    <Link
+                      to={`/product/${product.slug}`}
+                      onClick={closeWishlist}
+                      className="block w-[66px] shrink-0 bg-cream"
+                    >
+                      <img
+                        src={product.images?.[0]?.src || '/images/placeholders/hero.jpg'}
+                        alt={product.images?.[0]?.alt || product.name}
+                        loading="lazy"
+                        className="block h-[88px] w-[66px] object-cover"
+                      />
+                    </Link>
 
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <Link
-                          to={`/product/${product.slug}`}
-                          onClick={closeWishlist}
-                          className="font-serif text-sm font-medium leading-snug hover:text-gold transition-colors truncate block"
-                        >
-                          {product.name}
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => toggleWishlist(product.slug)}
-                          className="text-ink/40 hover:text-rust p-1 shrink-0"
-                          title="Remove from saved"
-                          aria-label={`Remove ${product.name} from saved`}
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                              fillRule="evenodd"
-                              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className="text-xs text-ink/50 truncate mt-0.5">{product.subtitle}</p>
-                      <div className="flex items-center gap-2 mt-1.5 font-mono text-xs">
-                        <span className="font-medium">{formatPrice(defaultVariant?.priceCents || 0)}</span>
-                        {product.codAvailable && (
-                          <span className="text-[10px] uppercase tracking-wider text-olive bg-olive/10 px-1.5 py-0.5 rounded-xs">
-                            COD
-                          </span>
+                    <div className="flex min-w-0 flex-1 flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-3">
+                          <Link
+                            to={`/product/${product.slug}`}
+                            onClick={closeWishlist}
+                            className="block font-sans text-[14px] leading-snug text-ink transition-colors hover:text-accent"
+                          >
+                            {product.name}
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => toggleWishlist(product.slug)}
+                            className="shrink-0 p-1 text-ink-muted transition-colors hover:text-accent"
+                            title="Remove from saved"
+                            aria-label={`Remove ${product.name} from saved`}
+                          >
+                            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                              <path
+                                fillRule="evenodd"
+                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                        <p className="loom-price mt-1 text-[13px] text-ink">
+                          {defaultVariant ? formatPrice(defaultVariant.priceCents) : '—'}
+                        </p>
+                        {defaultVariant?.size && (
+                          <p className="loom-label mt-1 text-ink-muted">
+                            size {defaultVariant.size}
+                          </p>
                         )}
                       </div>
-                    </div>
 
-                    <div className="mt-3 flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
+                      <button
+                        type="button"
                         disabled={isSoldOut}
                         onClick={() => handleMoveToBag(product.slug)}
-                        className="w-full text-xs py-1.5"
+                        className="mt-2.5 min-h-[44px] w-fit border border-stone-strong px-3.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink disabled:cursor-not-allowed disabled:border-stone disabled:text-ink-muted"
                       >
-                        {isSoldOut ? 'Sold Out' : 'Move to Bag'}
-                      </Button>
+                        {isSoldOut ? 'Sold out' : 'Move to bag'}
+                      </button>
                     </div>
-                  </div>
-                </div>
-              );
-            })
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </div>
 
-        {/* Footer */}
         {savedProducts.length > 0 && (
-          <div className="p-6 border-t border-stone bg-paper/50">
+          <div className="border-t border-stone px-5 py-4">
             <Link
               to="/shop"
               onClick={closeWishlist}
-              className="block w-full py-2.5 text-center border border-stone-strong text-ink hover:bg-ink hover:text-cream transition-colors text-xs font-mono tracking-widest uppercase rounded-sm"
+              className="flex min-h-[48px] w-full items-center justify-center border border-stone-strong font-sans text-[12px] uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink"
             >
-              Continue Exploring
+              Continue browsing
             </Link>
           </div>
         )}

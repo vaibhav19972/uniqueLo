@@ -1,155 +1,276 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router';
 import { useCraftTechnique, useProducts } from '../hooks/useCatalog';
-import { ProductCard } from '../components/shop/ProductCard';
-import { Button } from '../components/ui/Button';
+import { formatPrice, getDefaultVariant } from '../lib/data';
+import { piecesInTechnique } from '../lib/techniques';
+import { firstRealImage } from '../lib/imagery';
 
+/**
+ * ONE TECHNIQUE — /our-craft/:techniqueSlug
+ *
+ * Was a pair of bordered cards: a serif title announcing "Generations of Needle
+ * Tension", and a four-step process panel — Grid & Pattern Pinning, Wooden
+ * Frame Tension, Needle Anchoring, Inspection & Soft Wash — presented as though
+ * every tradition in the registry worked that way. Sashiko is a running stitch
+ * worked flat; zardozi is aari-hook wirework on a frame; the monogram is a
+ * satin initial worked on a hoop. One four-step process for all nine was
+ * invented in the telling, so it is gone rather than restyled.
+ *
+ * What it carries now is what the record actually holds: the region and the
+ * cluster the technique is named for, the stitch mechanism, the registry's own
+ * pace range, its historical note, and — for every piece in stock — the thread,
+ * the placement and the motif story that piece's own entry records.
+ */
 export const AtelierTechnique: React.FC = () => {
   const { techniqueSlug } = useParams<{ techniqueSlug: string }>();
   const { data: craft, isPending } = useCraftTechnique(techniqueSlug);
   const { data: products } = useProducts();
 
-  const matchingProducts = (products || []).filter(
-    (p) => p.embroidery?.technique === techniqueSlug || p.tags.includes(techniqueSlug || '')
+  const matching = useMemo(
+    () => (techniqueSlug ? piecesInTechnique(products, techniqueSlug) : []),
+    [products, techniqueSlug],
   );
+
+  const heroSample = matching[0];
+  const heroPlate = firstRealImage(
+    heroSample?.embroidery?.macroImage?.src,
+    heroSample?.images?.[1]?.src,
+    heroSample?.images?.[0]?.src,
+  );
+  const heroPlateAlt =
+    heroSample?.embroidery?.macroImage?.alt || heroSample?.images?.[1]?.alt || heroSample?.name || '';
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <p className="font-serif text-xl text-ink">Consulting Craft Guild Archives...</p>
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <p className="loom-label text-ink-muted">Reading the technique record…</p>
       </div>
     );
   }
 
   if (!craft) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="font-serif text-3xl text-ink">Craft Technique Not Found</h2>
-        <Link to="/atelier" className="mt-4">
-          <Button variant="primary">Return to Craft Taxonomy</Button>
+      <div className="flex min-h-screen flex-col items-start justify-center bg-cream px-4 sm:px-6 lg:px-12">
+        <p className="loom-label text-ink-muted">Not in the registry</p>
+        <h1 className="loom-display mt-2 text-ink" style={{ fontSize: 'var(--text-display)' }}>
+          No technique by that name
+        </h1>
+        <p className="mt-2 max-w-[44ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+          The taxonomy holds nine traditions. One of them may be what you meant.
+        </p>
+        <Link
+          to="/our-craft"
+          className="mt-6 inline-flex min-h-[48px] items-center gap-2 bg-ink px-5 font-sans text-[12px] font-medium uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent"
+        >
+          Back to the taxonomy
+          <span aria-hidden="true">→</span>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="bg-cream min-h-screen">
-      {/* Header Banner */}
-      <section className="pt-16 pb-12 bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center text-xs tracking-wider uppercase font-sans text-ink-muted mb-4">
-            <Link to="/atelier" className="hover:text-ink">Atelier</Link>
-            <span className="mx-2">/</span>
-            <span className="text-accent font-medium">{craft.region}</span>
-          </div>
+    <div className="min-h-screen w-full bg-cream">
+      <section className="border-b border-stone bg-cream pb-8 pt-10">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
+            <Link to="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span aria-hidden="true" className="mx-2">
+              /
+            </span>
+            <Link to="/our-craft" className="transition-colors hover:text-ink">
+              The craft
+            </Link>
+            <span aria-hidden="true" className="mx-2">
+              /
+            </span>
+            <span className="text-ink">{craft.name}</span>
+          </nav>
 
-          <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-            Regional Guild // {craft.cluster}
-          </span>
-          <h1 className="font-serif text-4xl sm:text-6xl text-ink font-normal mt-2 tracking-tight">
-            {craft.name}
-          </h1>
-          <p className="text-xs sm:text-sm text-ink-muted max-w-3xl mt-4 font-light leading-relaxed">
-            {craft.description}
-          </p>
-        </div>
-      </section>
-
-      {/* Narrative & Process Grid */}
-      <section className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Left: Origin Essay */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="p-6 bg-paper border border-stone">
-              <span className="text-[10px] uppercase tracking-widest text-accent font-medium block mb-2">
-                Historical Context & Provenance
-              </span>
-              <h3 className="font-serif text-2xl text-ink font-normal">
-                Generations of Needle Tension
-              </h3>
-              <p className="text-xs sm:text-sm text-ink-muted font-light mt-3 leading-relaxed">
-                {craft.historicalContext}
+          <div
+            className={`mt-4 grid grid-cols-1 gap-6 ${
+              heroPlate ? 'lg:grid-cols-[minmax(0,1fr)_20rem]' : ''
+            }`}
+          >
+            <div>
+              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
+                {craft.name}
+              </h1>
+              <p className="mt-2 max-w-[58ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+                {craft.description}
               </p>
             </div>
 
-            <div className="p-6 bg-paper border border-stone space-y-3 text-xs">
-              <div className="flex justify-between pb-2 border-b border-stone/50">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Stitch Mechanism</span>
-                <span className="font-medium text-ink">{craft.stitchType}</span>
+            {/* The registry's own `image` is a gradient placeholder on seven of
+                nine techniques, so the plate is only shown when a piece worked
+                in this technique supplies a real photograph. Empty plate omitted
+                rather than filled with a gradient captioned as cloth. */}
+            {heroPlate && (
+              <div className="border border-stone bg-paper p-3">
+                <img
+                  src={heroPlate}
+                  alt={`${heroPlateAlt} — worked in ${craft.name}`}
+                  loading="lazy"
+                  className="block aspect-[4/3] w-full object-cover"
+                />
               </div>
-              <div className="flex justify-between pb-2 border-b border-stone/50">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Pace of Work</span>
-                <span className="font-medium text-ink">{craft.artisanPace}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-ink-muted uppercase tracking-wider text-[10px]">Regional Cluster</span>
-                <span className="font-medium text-ink">{craft.region}</span>
-              </div>
-            </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+          <div>
+            <h2 className="loom-label text-ink-muted">The record</h2>
+            <dl className="mt-3 border-t border-stone font-sans text-[13px]">
+              {[
+                ['Stitch', craft.stitchType],
+                ['Working time', craft.artisanPace],
+                ['Region', craft.region],
+                ['Cluster', craft.cluster],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex justify-between gap-4 border-b border-stone py-2.5"
+                >
+                  <dt className="shrink-0 text-ink-muted">{label}</dt>
+                  <dd className="text-right text-ink">{value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
-          {/* Right: Craft Process Steps */}
-          <div className="lg:col-span-7">
-            <span className="text-[10px] uppercase tracking-widest text-ink-muted font-medium block mb-4">
-              The Four Atelier Phases
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-5 bg-paper border border-stone">
-                <span className="font-sans text-xs text-accent font-medium">Phase 01</span>
-                <h4 className="font-serif text-lg text-ink mt-1">Grid & Pattern Pinning</h4>
-                <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">
-                  Natural mineral chalk lines are drafted onto garment panels prior to tailoring assembly to ensure stitches align across seams.
-                </p>
-              </div>
-
-              <div className="p-5 bg-paper border border-stone">
-                <span className="font-sans text-xs text-accent font-medium">Phase 02</span>
-                <h4 className="font-serif text-lg text-ink mt-1">Wooden Frame Tension</h4>
-                <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">
-                  Fabrics are mounted on hand-lathed timber frames (Khaat) to maintain drum-tight surface tension while fine needle hooks penetrate the grain.
-                </p>
-              </div>
-
-              <div className="p-5 bg-paper border border-stone">
-                <span className="font-sans text-xs text-accent font-medium">Phase 03</span>
-                <h4 className="font-serif text-lg text-ink mt-1">Needle Anchoring</h4>
-                <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">
-                  Master artisans feed pure silk floss or metallic wires loop by loop, calibrating stitch density to avoid textile distortion.
-                </p>
-              </div>
-
-              <div className="p-5 bg-paper border border-stone">
-                <span className="font-sans text-xs text-accent font-medium">Phase 04</span>
-                <h4 className="font-serif text-lg text-ink mt-1">Inspection & Soft Wash</h4>
-                <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">
-                  Finished needlecraft is washed in gentle well water and air-cured, settling the thread tension into its permanent heirloom structure.
-                </p>
-              </div>
-            </div>
+          <div>
+            <h2 className="loom-label text-ink-muted">Provenance</h2>
+            <p className="mt-3 max-w-[72ch] font-sans text-[15px] leading-relaxed text-ink">
+              {craft.historicalContext}
+            </p>
+            <p className="mt-4 max-w-[72ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+              Working time is the range this registry records for the technique
+              across the pieces it is worked on — not a guarantee for any single
+              garment. Individual pieces carry their own figure on the product page.
+            </p>
           </div>
         </div>
 
-        {/* Matching Garments from this Guild */}
-        <div className="mt-20 pt-12 border-t border-stone/60">
-          <div className="mb-8">
-            <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-              Permanent Edit
-            </span>
-            <h2 className="font-serif text-3xl text-ink mt-1">
-              Garments Embroidered in {craft.name}
-            </h2>
+        <div className="mt-10 border-t border-stone pt-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="loom-display text-ink" style={{ fontSize: '1.75rem' }}>
+                Worked in {craft.name}
+              </h2>
+              <p className="loom-label mt-1.5 text-ink-muted">
+                {matching.length === 0
+                  ? 'Nothing in stock'
+                  : `${matching.length} ${matching.length === 1 ? 'piece' : 'pieces'} in stock`}
+              </p>
+            </div>
+            {matching.length > 0 && (
+              <Link
+                to={`/shop?technique=${craft.slug}`}
+                className="font-sans text-[12px] font-medium text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                Filter the shop to this technique →
+              </Link>
+            )}
           </div>
 
-          {matchingProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {matchingProducts.map((p) => (
-                <ProductCard key={p.slug} product={p} />
-              ))}
-            </div>
+          {matching.length > 0 ? (
+            // One ruled list, not a table plus a card grid of the same eight
+            // pieces. Each row is the piece's own record — cloth, thread,
+            // placement, hours, price — with the photograph as a plate.
+            <ol className="mt-5 border-t border-stone">
+              {matching.slice(0, 8).map((p) => {
+                const variant = getDefaultVariant(p);
+                const plate = firstRealImage(
+                  p.embroidery?.macroImage?.src,
+                  p.images?.[1]?.src,
+                  p.images?.[0]?.src,
+                );
+                return (
+                  <li key={p.slug} className="border-b border-stone">
+                    <div className="grid grid-cols-1 items-start gap-x-5 gap-y-3 py-4 sm:grid-cols-[4.5rem_minmax(0,15rem)_minmax(0,1fr)_auto]">
+                      <Link
+                        to={`/product/${p.slug}`}
+                        className="block w-[4.5rem] overflow-hidden border border-stone bg-paper"
+                        tabIndex={-1}
+                        aria-hidden="true"
+                      >
+                        {plate ? (
+                          <img
+                            src={plate}
+                            alt=""
+                            loading="lazy"
+                            className="block h-[6rem] w-full object-cover"
+                          />
+                        ) : (
+                          <span className="loom-label flex h-[6rem] w-full items-center justify-center bg-cream px-1 text-center text-[8px] text-ink-muted">
+                            No photo
+                          </span>
+                        )}
+                      </Link>
+
+                      <div>
+                        <h3 className="font-sans text-[14.5px] leading-snug text-ink">
+                          <Link
+                            to={`/product/${p.slug}`}
+                            className="transition-colors hover:text-accent"
+                          >
+                            {p.name}
+                          </Link>
+                        </h3>
+                        <p className="loom-price mt-1 text-[13px] text-ink">
+                          {variant ? formatPrice(variant.priceCents) : '—'}
+                        </p>
+                        {p.embroidery?.placement?.length ? (
+                          <p className="loom-label mt-1.5 text-ink-muted">
+                            {p.embroidery.placement.join(' · ')}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="min-w-0 font-sans text-[12.5px] leading-relaxed text-ink-muted">
+                        <p>{p.embroidery?.motifStory || p.subtitle}</p>
+                        <p className="mt-1 text-ink">
+                          {p.embroidery?.threadComposition || p.material || ''}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 font-sans text-[12px] text-ink-muted sm:text-right">
+                        {p.embroidery?.artisanHours != null && p.embroidery.artisanHours > 0 && (
+                          <span className="loom-price block text-ink">
+                            {p.embroidery.artisanHours} h
+                          </span>
+                        )}
+                        {p.fabricGsm != null && (
+                          <span className="loom-price block">{p.fabricGsm} GSM</span>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           ) : (
-            <p className="text-xs text-ink-muted">
-              Current editions in this craft are undergoing seasonal atelier wash and will release shortly.
+            <p className="mt-5 max-w-[52ch] font-sans text-[13.5px] leading-relaxed text-ink-muted">
+              No piece is currently filed under this technique in the shop. The
+              method is documented above so it is on the record whether or not
+              there is stock behind it.
+            </p>
+          )}
+          {matching.length > 8 && (
+            <p className="mt-4 font-sans text-[12.5px] text-ink-muted">
+              Eight of {matching.length} shown.{' '}
+              <Link
+                to={`/shop?technique=${craft.slug}`}
+                className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                See all in the shop
+              </Link>
+              .
             </p>
           )}
         </div>

@@ -2,19 +2,21 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useProducts, useUniverses } from '../../hooks/useCatalog';
 import { useHorizontalRailGuard, RAIL_PREVENT_ATTR } from '../../hooks/useHorizontalRailGuard';
 import { MarketingHeader } from '../ui/MarketingHeader';
+import { isMerchandisable } from '../../lib/licensed-marks';
 import { BestsellerCard } from './BestsellerCard';
 import { useReveal } from '../../hooks/useReveal';
 
 /**
- * Render target 05: Community Favourites.
- * Tabs + counts from live catalog; ribbon marks `featured` pieces.
+ * COMMUNITY FAVOURITES
+ *
+ * The catalogue, surfaced as its own evidence: a rail grouped by world, with
+ * the count of what is actually in each. Nothing here is a claim the data
+ * doesn't make — the previous build printed "Free shipping on all orders
+ * above ₹29,050" in the trust row, a threshold no table backs, next to a
+ * ₹899 tee. That is the exact failure PRODUCT.md's honesty principle names,
+ * so it is removed rather than reworded: the shipping promise lives where it
+ * is true and checkable, in the bag's own milestone tracker.
  */
-const TRUST = [
-  { title: 'Free shipping', detail: 'on all orders above ₹29,050' },
-  { title: '14-day home inspection', detail: 'Try it at home. Easy returns.' },
-  { title: 'Secure payments', detail: 'UPI, Cards, Net Banking & more.' },
-];
-
 export const Bestsellers: React.FC = () => {
   const revealRef = useReveal<HTMLElement>();
   const { data: products } = useProducts();
@@ -30,8 +32,15 @@ export const Bestsellers: React.FC = () => {
   // the gesture's duration). Vertical-dominant swipes hand back untouched to Lenis.
   useHorizontalRailGuard(rowRef);
 
+  // Four pieces carry a real Nike swoosh in their photography (see
+  // lib/licensed-marks.ts). They are shoppable if someone searches for them, but
+  // they do not get promoted on a curated rail — PRODUCT.md's legal constraint
+  // is absolute, and a curated surface is the storefront endorsing the image.
   const visible = useMemo(
-    () => (products ?? []).filter((p) => tab === 'all' || p.universeSlug === tab),
+    () =>
+      (products ?? [])
+        .filter(isMerchandisable)
+        .filter((p) => tab === 'all' || p.universeSlug === tab),
     [products, tab],
   );
 
@@ -72,96 +81,91 @@ export const Bestsellers: React.FC = () => {
     // instead of mid-card (fixed 640px ignored responsive card widths and
     // fought with scroll-snap, causing the "janky" feel).
     const firstCard = el.querySelector<HTMLElement>(':scope > *');
-    const gap = 20; // gap-5
+    const gap = 16;
     const step = firstCard ? firstCard.offsetWidth + gap : Math.round(el.clientWidth * 0.8);
     el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
+  const shown = (products ?? []).filter(isMerchandisable);
+  const tabs = [{ slug: 'all', name: 'All', count: shown.length }]
+    .concat(
+      (universes ?? []).map((u) => ({
+        slug: u.slug,
+        name: u.name,
+        count: shown.filter((p) => p.universeSlug === u.slug).length,
+      })),
+    )
+    // Never offer a door that opens onto nothing.
+    .filter((t) => t.count > 0);
+
   return (
-    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16 overflow-x-clip" aria-labelledby="best-heading" >
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
+    <section
+      ref={revealRef}
+      className="reveal overflow-x-clip border-b border-stone bg-cream py-12 lg:py-16"
+      aria-labelledby="best-heading"
+    >
+      <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
         <MarketingHeader
-          eyebrow="Bestsellers"
-          title="Community Favourites"
+          title="The Catalogue"
           titleId="best-heading"
-          sub="Most-loved pieces from across our universes."
+          sub={`One rail per world: ${shown.length} of ${(products ?? []).length} pieces. The other ${(products ?? []).length - shown.length} carry a third-party mark in their photography, so they are not promoted here — the shop and the world pages carry all ${(products ?? []).length}.`}
           linkTo="/shop"
-          linkLabel="View all bestsellers"
+          linkLabel="Open the shop"
         />
 
-        {/* Universe tabs + arrows — pipe-separated, selected = gold + underline (render 05) */}
-        <div className="flex items-center justify-between gap-4 mb-2">
-          <div role="tablist" aria-label="Filter bestsellers by universe" className="flex items-center">
-            {[{ slug: 'all', name: 'All' }, ...(universes ?? []).map((u) => ({ slug: u.slug, name: u.name }))].map(
-              (t, i) => (
-                <React.Fragment key={t.slug}>
-                  {i > 0 && <span aria-hidden="true" className="text-stone mx-3 font-light select-none">|</span>}
-                  <button
-                    role="tab"
-                    aria-selected={tab === t.slug}
-                    onClick={() => setTab(t.slug)}
-                    className={`relative pb-2 text-[16px] font-serif min-h-[44px] transition-colors ${
-                      tab === t.slug ? 'text-gold-deep font-medium' : 'text-ink-muted hover:text-gold-deep'
-                    }`}
-                  >
-                    {t.name}
-                    {tab === t.slug && (
-                      <span aria-hidden="true" className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold-deep" />
-                    )}
-                  </button>
-                </React.Fragment>
-              ),
-            )}
+        {/* Universe tabs + arrows — square segment controls, one row. */}
+        <div className="mt-5 flex items-center justify-between gap-4">
+          <div role="tablist" aria-label="Filter by universe" className="flex flex-wrap items-center gap-0">
+            {tabs.map((t) => (
+              <button
+                key={t.slug}
+                role="tab"
+                aria-selected={tab === t.slug}
+                onClick={() => setTab(t.slug)}
+                className={`min-h-[44px] border border-r-0 border-stone px-3.5 font-sans text-[11px] uppercase tracking-[0.12em] transition-colors last:border-r ${
+                  tab === t.slug
+                    ? 'bg-ink text-cream'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                {t.name}
+                <span className="ml-1.5 opacity-60">{t.count}</span>
+              </button>
+            ))}
           </div>
-          <div className="hidden sm:flex items-center gap-2">
-            <button onClick={() => scrollBy(-1)} disabled={!canPrev} aria-label="Scroll bestsellers back" className="w-11 h-11 rounded-full border border-stone flex items-center justify-center text-ink hover:border-ink transition-all disabled:opacity-30 disabled:pointer-events-none">
+          <div className="hidden shrink-0 items-center gap-2 sm:flex">
+            <button
+              onClick={() => scrollBy(-1)}
+              disabled={!canPrev}
+              aria-label="Scroll back"
+              className="grid h-11 w-11 place-items-center border border-stone text-ink transition-colors hover:border-ink disabled:pointer-events-none disabled:opacity-30"
+            >
               <span aria-hidden="true">←</span>
             </button>
-            <button onClick={() => scrollBy(1)} disabled={!canNext} aria-label="Scroll bestsellers forward" className="w-11 h-11 rounded-full bg-gold text-on-gold flex items-center justify-center hover:bg-gold-hover transition-all disabled:opacity-30 disabled:pointer-events-none">
+            <button
+              onClick={() => scrollBy(1)}
+              disabled={!canNext}
+              aria-label="Scroll forward"
+              className="grid h-11 w-11 place-items-center border border-stone text-ink transition-colors hover:border-ink disabled:pointer-events-none disabled:opacity-30"
+            >
               <span aria-hidden="true">→</span>
             </button>
           </div>
         </div>
       </div>
 
-        {/* Rail is full-bleed with its own container-matching padding. Previously it
-            sat inside the padded container with no inner padding, so the first /
-            last card's hover ring + shadow were sliced at the scroller edge.
-            Extra vertical padding keeps the hover lift unclipped (overflow-x:auto
-            forces overflow-y to clip). snap-proximity + card-width stepping
-            replaces snap-mandatory + fixed 640px which landed mid-card. */}
-        <div ref={rowRef} {...RAIL_PREVENT_ATTR} className="flex gap-5 overflow-x-auto overscroll-x-contain snap-x snap-proximity scroll-px-4 sm:scroll-px-6 lg:scroll-px-12 scroll-smooth w-full max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Rail is full-bleed with its own container-matching padding so the
+          first/last card's hover state is not sliced at the scroller edge.
+          No scroll-snap: snapping fought the padded scrollport and parked the
+          first card 48px left of the container, clipped at the section edge. */}
+      <div className="mt-5 overflow-x-clip">
+        <div
+          ref={rowRef}
+          {...RAIL_PREVENT_ATTR}
+          className="mx-auto flex w-full max-w-[var(--container-max)] gap-4 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:px-6 lg:px-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {visible.map((p) => (
             <BestsellerCard key={p.slug} product={p} universeName={universeName(p.universeSlug)} />
-          ))}
-        </div>
-
-        {/* Trust strip — gold line-icon in beige circle, serif title (render 05) */}
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-2 pt-8 border-t border-stone/60">
-          {TRUST.map((t, i) => (
-            <div
-              key={t.title}
-              className={`flex items-center gap-4 ${i > 0 ? 'sm:justify-center lg:justify-start' : ''}`}
-            >
-              <span className="w-12 h-12 rounded-full bg-stone/40 flex items-center justify-center shrink-0 text-ink" aria-hidden="true">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {i === 0 && (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  )}
-                  {i === 1 && (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 3h6v3a3 3 0 11-6 0V3zM12 9v10m-4-3h8m-8-4h8" />
-                  )}
-                  {i === 2 && (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
-                  )}
-                </svg>
-              </span>
-              <div>
-                <p className="font-serif text-lg text-ink">{t.title}</p>
-                <p className="font-serif text-[13px] text-ink-muted">{t.detail}</p>
-              </div>
-            </div>
           ))}
         </div>
       </div>

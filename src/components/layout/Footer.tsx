@@ -4,113 +4,95 @@ import { useUniverses } from '../../hooks/useCatalog';
 import { EDITS } from '../../lib/data';
 
 /**
- * Render target 07 (bottom): dark coal footer.
- * Universes column is data-driven (universes + fixed vibe entries + All Products).
- * Newsletter lives in the panel above — footer links to #atelier-list.
+ * THE COLOPHON
+ *
+ * The footer was render target 07: a serif wordmark, five gold small-caps
+ * column heads, four circled gold line-icons over claims the catalogue does not
+ * back, and — the real problem — sixteen menu items rendered as
+ * `<span className="cursor-pointer">` with no destination at all. A link that
+ * does nothing is worse than an absent link: it teaches the visitor that the
+ * footer is decoration.
+ *
+ * What ships now:
+ *  · Every item is either a real route or it is gone. Nothing is a fake link.
+ *  · The four claims are the four terms from the masthead strip — dispatch,
+ *    COD, returns, carriage — each of which a catalogue field or the pricing
+ *    function backs. "14-day home inspection" is deleted: return_window_days
+ *    is 7 on every product. "Natural dyes & fabrics" is deleted: no material
+ *    record in the catalogue names a dye process.
+ *  · The mark is the wordmark set in the page's display face, no serif, no
+ *    gold, no circles. Social handles are text links because there is no
+ *    brand-glyph asset in the repo and a letter in a circle is not an icon.
  */
 const CRAFT_LINKS = [
-  { label: 'Our Story', to: '/atelier' },
-  { label: 'Our Techniques', to: '/atelier' },
-  { label: 'Embroidery Techniques', to: '/atelier' },
-  { label: 'Materials & Dyes', to: '/atelier' },
-  { label: 'Behind the Scenes', to: '/atelier' },
-  { label: 'Journal', to: '/shop' },
+  { label: 'Our Craft', to: '/our-craft' },
+  { label: 'Techniques', to: '/our-craft' },
+  { label: 'The Craft Story', to: '/our-craft' },
 ];
 
-const CARE_LINKS = [
-  'Size Guide',
-  'Care Instructions',
-  'Shipping & Delivery',
-  'Returns & Exchanges',
-  'Track Your Order',
-  'FAQs',
+const SHOP_LINKS = [
+  { label: 'All Pieces', to: '/shop' },
+  { label: 'New & Featured', to: '/new-featured' },
+  { label: 'Collections', to: '/collections' },
+  { label: 'Clothing', to: '/clothing' },
+  { label: 'Presence', to: '/styles' },
 ];
 
-const COMPANY_LINKS = [
-  'About UniqueLo',
-  'Sustainability',
-  'Contact Us',
-  'Collaborations',
-  'Wholesale',
-  'Atelier List',
-  'Careers',
+const TERMS = [
+  ['Dispatch', '4–7 days from the workshop'],
+  ['Payment', 'Cash on delivery, pan-India'],
+  ['Returns', '7 days from delivery'],
+  ['Carriage', '₹99, waived above ₹1,499'],
 ];
-
-const SOCIALS = ['Instagram', 'YouTube', 'Pinterest', 'X', 'Discord'];
-
-const PAYMENTS = ['UPI', 'VISA', 'Mastercard', 'RuPay', 'AMEX', 'COD'];
 
 export const Footer: React.FC = () => {
   const { data: universes } = useUniverses();
 
   return (
-    <footer className="border-t border-stone bg-cream text-ink">
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pt-14 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 pb-12 border-b border-stone">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Link to="/" className="font-serif text-3xl text-ink">
+    <footer className="border-t border-stone bg-paper text-ink">
+      <div className="mx-auto max-w-[var(--container-max)] px-4 pb-8 pt-12 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-2 gap-10 border-b border-stone pb-10 md:grid-cols-4 lg:grid-cols-5">
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+            <Link
+              to="/"
+              className="loom-display block text-ink"
+              style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em' }}
+            >
               UniqueLo
             </Link>
-            <p className="mt-1 font-sans text-[10px] uppercase tracking-[0.3em] text-accent">Wear the universe</p>
-            <p className="text-sm text-ink-muted leading-relaxed mt-4 max-w-xs font-light">
-              Indian stories, global universes — embroidered for your everyday.
+            <p className="mt-3 max-w-[30ch] font-sans text-[13px] leading-relaxed text-ink-muted">
+              Hand-embroidered garments made in India, priced as plainly as a
+              fabric label.
             </p>
-            <div className="flex items-center gap-2 mt-5">
-              {/* Letter-mark circles: no brand-glyph asset source in repo; stub
-                  links until real handles — revisit at P5 (logged deviation) */}
-              {SOCIALS.map((s) => (
-                <a
-                  key={s}
-                  href="#atelier-list"
-                  aria-label={`UniqueLo on ${s}`}
-                  title={s}
-                  className="w-10 h-10 rounded-full border border-stone-strong flex items-center justify-center text-ink hover:text-accent hover:border-accent transition-colors text-xs font-sans"
-                >
-                  {s[0]}
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Universes (data-driven) */}
-          <nav aria-label="Universes">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Universes</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
+          <nav aria-label="Worlds">
+            <h2 className="loom-label text-ink-muted">Worlds</h2>
+            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
               {(universes ?? []).map((u) => (
                 <li key={u.slug}>
-                  <Link to={`/universes/${u.slug}`} className="hover:text-accent transition-colors">
+                  <Link
+                    to={`/universes/${u.slug}`}
+                    className="text-ink transition-colors hover:text-accent"
+                  >
                     {u.name}
                   </Link>
                 </li>
               ))}
-              {EDITS.filter((e) => e.featured).map((e) => (
-                <li key={e.slug}>
-                  <Link to={`/shop?edit=${e.slug}`} className="hover:text-accent transition-colors">
-                    {e.title}
-                  </Link>
-                </li>
-              ))}
               <li>
-                <Link to="/collections" className="hover:text-accent transition-colors">
-                  Capsule Collections
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop" className="hover:text-accent transition-colors">
-                  All Products
+                <Link to="/universes" className="text-ink transition-colors hover:text-accent">
+                  All worlds
                 </Link>
               </li>
             </ul>
           </nav>
 
-          {/* Craft */}
-          <nav aria-label="Craft">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Craft</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
-              {CRAFT_LINKS.map((l) => (
+          <nav aria-label="Shop">
+            <h2 className="loom-label text-ink-muted">Shop</h2>
+            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
+              {SHOP_LINKS.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="hover:text-accent transition-colors">
+                  <Link to={l.to} className="text-ink transition-colors hover:text-accent">
                     {l.label}
                   </Link>
                 </li>
@@ -118,108 +100,73 @@ export const Footer: React.FC = () => {
             </ul>
           </nav>
 
-          {/* Care */}
-          <nav aria-label="Care">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Care</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
-              {CARE_LINKS.map((l) => (
-                <li key={l}>
-                  {l === 'Track Your Order' ? (
-                    <Link to="/track-order" className="hover:text-accent transition-colors">
-                      {l}
-                    </Link>
-                  ) : (
-                    <span className="hover:text-accent transition-colors cursor-pointer">{l}</span>
-                  )}
+          <nav aria-label="Edits">
+            <h2 className="loom-label text-ink-muted">Edits</h2>
+            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
+              {EDITS.filter((e) => e.featured).map((e) => (
+                <li key={e.slug}>
+                  <Link
+                    to={`/shop?edit=${e.slug}`}
+                    className="text-ink transition-colors hover:text-accent"
+                  >
+                    {e.title}
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* Company */}
           <nav aria-label="Company">
-            <h3 className="text-[11px] uppercase tracking-[0.25em] text-gold">Company</h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-ink-muted font-light">
-              {COMPANY_LINKS.map((l) => (
-                <li key={l}>
-                  {l === 'Atelier List' ? (
-                    <a href="#atelier-list" className="hover:text-accent transition-colors">
-                      {l}
-                    </a>
-                  ) : (
-                    <span className="hover:text-accent transition-colors cursor-pointer">{l}</span>
-                  )}
+            <h2 className="loom-label text-ink-muted">House</h2>
+            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
+              {CRAFT_LINKS.map((l) => (
+                <li key={l.label}>
+                  <Link to={l.to} className="text-ink transition-colors hover:text-accent">
+                    {l.label}
+                  </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  to="/#atelier-list"
+                  className="text-ink transition-colors hover:text-accent"
+                >
+                  Atelier List
+                </Link>
+              </li>
+              <li>
+                <Link to="/orders" className="text-ink transition-colors hover:text-accent">
+                  Your Orders
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
 
-        {/* India craft strip — circled gold line-icons (render 07) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 py-8 border-b border-stone">
-          {[
-            {
-              title: 'Proudly rooted in India',
-              detail: 'Designed at home in small batches — embroidery, natural dyes, honest fabric.',
-              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.5-2.5 4-5.5 4-9s-1.5-6.5-4-9m0 18c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9M3.5 9h17M3.5 15h17" />,
-            },
-            {
-              title: 'Signature embroidery',
-              detail: 'Detailed threadwork on every piece.',
-              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />,
-            },
-            {
-              title: 'Natural dyes & fabrics',
-              detail: 'Kinder to you, kinder to the planet.',
-              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21c-5 0-8-3-8-8 0-6 5-10 13-10 0 8-2 18-5 18zm0 0V9" />,
-            },
-            {
-              title: '14-day home inspection',
-              detail: 'Try it at home. Easy returns.',
-              icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />,
-            },
-          ].map((b) => (
-            <div key={b.title} className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-full border border-accent/40 flex items-center justify-center shrink-0 text-accent" aria-hidden="true">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {b.icon}
-                </svg>
-              </span>
-              <div>
-                <p className="font-sans text-sm font-medium text-ink">{b.title}</p>
-                <p className="mt-1 font-sans text-xs text-ink-muted">{b.detail}</p>
-              </div>
+        {/* The terms, as a ruled row — the same four facts the masthead strip
+            opens the page with, closed out at the bottom. */}
+        <dl className="grid grid-cols-1 border-b border-stone sm:grid-cols-2 lg:grid-cols-4">
+          {TERMS.map(([term, def], i) => (
+            <div
+              key={term}
+              className={`border-b border-stone py-4 sm:border-b-0 ${
+                i > 0 ? 'lg:border-l lg:pl-6' : 'lg:pr-6'
+              } ${i % 2 === 1 ? 'sm:border-l sm:pl-6' : ''}`}
+            >
+              <dt className="loom-label text-ink-muted">{term}</dt>
+              <dd className="mt-1 font-sans text-[13px] text-ink">{def}</dd>
             </div>
           ))}
-        </div>
+        </dl>
 
-        {/* Bottom bar */}
-        <div className="pt-6 flex flex-col lg:flex-row items-center justify-between gap-5 text-xs text-ink-muted">
-          <p>© 2026 UniqueLo. All rights reserved.</p>
-          <div className="flex items-center gap-5">
-            {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((l) => (
-              <span key={l} className="hover:text-accent transition-colors cursor-pointer">
-                {l}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Accepted payments">
-            <span className="mr-1 inline-flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 11V7a5 5 0 0110 0v4M5 11h14v10H5V11zm7 4a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" />
-              </svg>
-              Secure Payments
-            </span>
-            {PAYMENTS.map((p) => (
-              <span key={p} className="px-2 py-1 bg-paper/90 text-ink/75 text-[10px] rounded-sm">
-                {p}
-              </span>
-            ))}
-          </div>
-          <p className="text-center font-sans text-sm text-ink lg:text-right">
-            Supporting Indian Craft Heritage
-            <span className="block text-[11px] font-sans text-ink-muted">Craft. Culture. Continuity.</span>
+        <div className="flex flex-col items-start justify-between gap-4 pt-6 font-sans text-[12px] text-ink-muted lg:flex-row lg:items-center">
+          <p>© 2026 UniqueLo. Made in India.</p>
+          <p className="loom-price text-[12px] text-ink-muted">
+            UPI · VISA · Mastercard · RuPay · AMEX · COD
           </p>
+          <Link to="/orders" className="text-ink transition-colors hover:text-accent">
+            Questions about an order? Track it here →
+          </Link>
         </div>
       </div>
     </footer>

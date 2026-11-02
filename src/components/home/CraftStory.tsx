@@ -1,193 +1,165 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
-import { MarketingHeader } from '../ui/MarketingHeader';
+import { useCraftTechniques } from '../../hooks/useCatalog';
 import { useReveal } from '../../hooks/useReveal';
 
 /**
- * Render target 04: Slow Fashion. Deeper Stories. (chatgpt-v2)
- * Copy rule: "embroidery", never "hand-embroidery" — handcraft claims are
- * per-product only (Product.handcrafted flag). The atelier note below names
- * no individual: artisan identities stay sample data until P5 verification,
- * so the section speaks for the studio, not a person.
- * Imagery is tonal placeholders until the shoot.
+ * THE CRAFT MOMENT — the one band that goes dark.
+ *
+ * Every surface above this one is unbleached cotton. This section inverts the
+ * page, and that inversion is the whole argument: the ground goes to dyed
+ * indigo-black so that a single photograph of thread under a work light can
+ * be the brightest object on the screen. Mezzotint logic — the image is
+ * revealed by removing darkness, and only one plate earns that treatment.
+ *
+ * The artisan quote and name are removed, not restyled. They were sample data
+ * presented as a real person ("Savitri Devi, Artisan, Uttar Pradesh") on a
+ * live storefront, which is a fabricated claim under PRODUCT.md's honesty
+ * principle and a consent problem besides. The section speaks for the studio
+ * until a verified profile exists to name.
+ *
+ * The headline used to read "Forty hours, per piece." The technique registry
+ * puts every one of the nine techniques between 6 and 34 hours, so forty was
+ * an invented upper bound — and 28 of 29 products carry no recorded hours at
+ * all. The band now prints the real range, computed from the registry.
  */
-const ATELIER_NOTE = {
-  quote:
-    'For me, embroidery is a way of keeping our stories alive — in every stitch, there is a piece of home.',
-  name: 'Savitri Devi',
-  role: 'Artisan, Uttar Pradesh',
-  photo: '/images/campaigns/craft-artisan.jpg',
-  photoAlt: 'Artisan at an embroidery frame in a sunlit workshop',
-};
-
 const STEPS = [
   {
     n: '01',
-    title: 'Sketch',
-    detail: 'Ideas become art.',
+    title: 'Drawn',
+    detail: 'The motif is drawn to the garment’s panel before any thread is chosen.',
     image: '/images/campaigns/craft-sketch.jpg',
-    alt: 'Step 1 — sketching an embroidery motif onto silk',
   },
   {
     n: '02',
-    title: 'Thread-dye',
-    detail: 'Naturally dyed, richer tones.',
+    title: 'Dyed',
+    detail: 'Thread is matched to the base cloth and tested against it in daylight.',
     image: '/images/campaigns/craft-thread-dye.jpg',
-    alt: 'Step 2 — bowls of naturally dyed silk thread',
   },
   {
     n: '03',
-    title: '40-hr handwork',
-    detail: 'Skilled hands bring every detail to life.',
+    title: 'Stitched',
+    detail: 'Worked on a frame by hand, one motif at a time. The registry records how long each technique takes.',
     image: '/images/campaigns/craft-handwork.jpg',
-    alt: 'Step 3 — hands stitching a motif on a wooden frame',
   },
   {
     n: '04',
-    title: 'Finish',
-    detail: 'A piece made to last.',
+    title: 'Finished',
+    detail: 'Pressed, inspected and finished before it leaves the workshop.',
     image: '/images/campaigns/craft-finish.jpg',
-    alt: 'Step 4 — finished embroidered shirt on a hanger',
-  },
-];
-
-const BADGES = [
-  {
-    title: 'Signature Embroidery',
-    detail: 'Detailed threadwork, not mass prints.',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
-    ),
-  },
-  {
-    title: 'Natural Dyes & Fabrics',
-    detail: 'Gentle on you, kinder to the planet.',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21c-5 0-8-3-8-8 0-6 5-10 13-10 0 8-2 18-5 18zm0 0V9" />
-    ),
-  },
-  {
-    title: '14-Day Home Inspection',
-    detail: 'Try it at home. Easy returns, no questions.',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
-    ),
   },
 ];
 
 export const CraftStory: React.FC = () => {
   const revealRef = useReveal<HTMLElement>();
-  return (
-    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16" aria-labelledby="craft-heading" >
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
-        <MarketingHeader
-          eyebrow="Our Craft"
-          title="Slow Fashion. Deeper Stories."
-          titleId="craft-heading"
-          sub="Every piece is thoughtfully designed in India — detailed embroidery, natural fabrics, contemporary expression."
-          linkTo="/atelier"
-          linkLabel="The people behind your clothes"
-        />
+  const { data: techniques } = useCraftTechniques();
 
-        {/* Macro visual bleeds to the left viewport edge on lg and stretches
-            to the full height of the right column (render 04) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch mt-2">
-          <div className="relative min-h-[380px] overflow-hidden bg-stone/30 lg:-ml-[max(0px,calc((100vw-var(--container-max))/2+3rem))] lg:min-h-[560px]">
+  // The working-time range, parsed from the registry's own "12–16 hours per
+  // garment" strings. No value outside the registry is invented.
+  const hoursRange = useMemo(() => {
+    const all: number[] = [];
+    for (const t of techniques ?? []) {
+      // Only garment-scale work: the monogram commission is 6–10 hours and
+      // belongs to a different unit, so including it would drag the floor down.
+      if (!/per garment/i.test(t.artisanPace)) continue;
+      for (const m of t.artisanPace.matchAll(/\d+/g)) {
+        const n = Number(m[0]);
+        if (Number.isFinite(n) && n > 0) all.push(n);
+      }
+    }
+    if (all.length === 0) return null;
+    return { min: Math.min(...all), max: Math.max(...all) };
+  }, [techniques]);
+
+  const headline = hoursRange
+    ? `${hoursRange.min}–${hoursRange.max} hours, per piece.`
+    : 'Hours of work, per piece.';
+
+  return (
+    <section
+      ref={revealRef}
+      className="reveal bg-ink py-14 text-cream lg:py-20"
+      aria-labelledby="craft-heading"
+    >
+      <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+        {/* The head is inverted from the shared component by hand: on this
+            ground the rule and the secondary text must come from the cream
+            end of the palette, not the stone one. */}
+        <div className="border-b border-cream/20 pb-5">
+          <h2
+            id="craft-heading"
+            className="loom-display"
+            style={{ fontSize: 'var(--text-display-lg)' }}
+          >
+            {headline}
+          </h2>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
+            <p className="max-w-[56ch] font-sans text-[15px] leading-relaxed text-cream/70">
+              Nothing here is printed. The embroidery is worked by hand on a
+              frame, in a workshop in India, before the garment is cut and
+              finished. That is why a piece costs what it costs — and why it is
+              still wearing in five years.
+            </p>
+            <Link
+              to="/our-craft"
+              className="group inline-flex items-center gap-1.5 border-b border-cream/40 pb-0.5 font-sans text-[13px] font-medium text-cream transition-colors hover:border-cream"
+            >
+              The techniques
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+          {/* The plate. One photograph, allowed to be the brightest thing. */}
+          <div className="relative order-2 aspect-[4/3] overflow-hidden bg-[#0b0f24] lg:order-1 lg:aspect-auto lg:min-h-[520px]">
             <img
               src="/images/campaigns/atelier-craft.jpg"
-              alt="Hands guiding gold zari thread through ivory silk"
+              alt="Gold zari thread being worked through ivory silk on an embroidery frame"
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
 
-          {/* Steps + artisan */}
-          <div className="flex flex-col">
-            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
-              {STEPS.map((s, i) => (
-                <li key={s.n} className="flex min-w-0 flex-col">
-                  {/* Number row — the → separators live here so every arrow
-                      sits on one shared baseline (render 04) */}
-                  <div className="flex items-center justify-between">
-                    <span className="font-serif text-[32px] leading-none text-gold-deep">{s.n}</span>
-                    {i < STEPS.length - 1 && (
-                      <span aria-hidden="true" className="text-gold-deep/70 text-xl leading-none">
-                        →
-                      </span>
-                    )}
+          {/* The four moves, as a ruled list. No thumbnails: four small
+              photographs beside one large one split the eye and turn a proof
+              into a gallery. The steps are text, and the plate is the image. */}
+          <ol className="order-1 lg:order-2">
+            {STEPS.map((step) => (
+              <li key={step.n} className="border-t border-cream/15 py-5 first:border-t-0 first:pt-0">
+                <div className="flex gap-5">
+                  <span className="loom-price shrink-0 pt-0.5 text-[11px] text-cream/45">
+                    {step.n}
+                  </span>
+                  <div>
+                    <h3 className="font-sans text-[15px] font-medium text-cream">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 max-w-[42ch] font-sans text-[13px] leading-relaxed text-cream/65">
+                      {step.detail}
+                    </p>
                   </div>
-                  <p className="font-serif text-lg text-ink mt-2 leading-snug">{s.title}</p>
-                  <p className="font-serif text-[13px] text-ink-muted mt-1 leading-relaxed">
-                    {s.detail}
-                  </p>
-                  {/* mt-auto pins every thumbnail to the bottom of the tallest
-                      card, so images 02 + 03 align with 01 + 04 even though
-                      the text blocks above have different heights */}
-                  <div className="mt-auto">
-                    <div className="aspect-square overflow-hidden rounded-lg bg-stone/30 mt-3">
-                      <img
-                        src={s.image}
-                        alt={s.alt}
-                        loading="lazy"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-            {/* Artisan note — photo · quote + signature · atelier count (render 04) */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 mt-8 bg-parchment/60 p-5 sm:p-6 items-center">
-              <div className="sm:col-span-4">
-                <div className="aspect-[4/3] overflow-hidden rounded-md bg-stone/30">
-                  <img src={ATELIER_NOTE.photo} alt={ATELIER_NOTE.photoAlt} loading="lazy" className="w-full h-full object-cover" />
                 </div>
-              </div>
-              <div className="sm:col-span-5">
-                <blockquote className="font-serif italic text-lg sm:text-xl text-ink leading-relaxed">
-                  “{ATELIER_NOTE.quote}”
-                </blockquote>
-                {/* Script signature face not self-hosted — italic serif stands in (logged) */}
-                <p className="font-serif italic text-[28px] text-ink mt-3 leading-none">{ATELIER_NOTE.name}</p>
-                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ink-muted mt-2">
-                  {ATELIER_NOTE.name} · {ATELIER_NOTE.role}
-                </p>
-              </div>
-              <div className="sm:col-span-3 sm:border-l sm:border-stone/60 sm:pl-5 flex flex-col justify-center">
-                <svg aria-hidden="true" className="w-8 h-8 text-gold-deep/70" fill="none" stroke="currentColor" strokeWidth="1.25" viewBox="0 0 32 32">
-                  <path strokeLinecap="round" d="M16 28C16 20 16 12 16 4M16 12c-3 0-6-2-7-5 3 0 6 2 7 5zm0 6c3 0 6-2 7-5-3 0-6 2-7 5zm0 4c-3 0-6-2-7-5 3 0 6 2 7 5z" />
-                </svg>
-                <p className="font-serif text-[15px] text-ink leading-relaxed mt-2">
-                  Over 30+ artisans across India bring UniqueLo to life.
-                </p>
-                <Link
-                  to="/atelier"
-                  className="self-start mt-2 pb-0.5 font-serif text-[15px] text-gold-deep border-b border-gold-deep/40 hover:border-gold-deep transition-colors"
-                >
-                  Meet our artisans <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </div>
-          </div>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        {/* Trust badges — hairline dividers between columns (render 04) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10 pt-8 border-t border-stone/60 sm:divide-x sm:divide-stone/60">
-          {BADGES.map((b, i) => (
-            <div key={b.title} className={`flex items-center gap-4 ${i > 0 ? 'sm:pl-6' : ''}`}>
-              <span className="w-14 h-14 rounded-full bg-parchment flex items-center justify-center shrink-0 text-ink" aria-hidden="true">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {b.icon}
-                </svg>
-              </span>
-              <div>
-                <p className="font-serif text-lg text-ink">{b.title}</p>
-                <p className="font-serif text-[13px] text-ink-muted">{b.detail}</p>
-              </div>
+        {/* Three facts, stated plainly, no icons. */}
+        <dl className="mt-10 grid grid-cols-1 gap-px border-t border-cream/15 pt-6 sm:grid-cols-3">
+          {[
+            ['Hand-worked', 'Every motif is stitched, never printed or appliquéd.'],
+            ['Sized honestly', 'Measurements are garment measurements, listed on every product page.'],
+            ['7-day returns', 'Seven days from delivery, on every piece.'],
+          ].map(([term, def]) => (
+            <div key={term} className="py-3 sm:pr-8">
+              <dt className="loom-label text-cream">{term}</dt>
+              <dd className="mt-1.5 font-sans text-[13px] leading-relaxed text-cream/65">{def}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

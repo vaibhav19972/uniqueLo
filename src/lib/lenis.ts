@@ -33,15 +33,44 @@ export function destroyLenis() {
 }
 
 export function useLenisScrollReset() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    // A hash target wins over the top-of-page reset. Without this, a footer
+    // link like `/#atelier-list` lands at the top of the home page and the
+    // anchor is silently ignored — the reader is told to go somewhere and
+    // arrives at the wrong place.
+    //
+    // The target's offset is only final once the catalogue query resolves and
+    // the bands above it have their real height, so the scroll is re-applied
+    // for a short window while the document is still growing.
+    const scrollToHash = () => {
+      const target = hash ? document.getElementById(hash.slice(1)) : null;
+      if (!target) return false;
+      const y = target.getBoundingClientRect().top + window.scrollY;
+      if (lenis) lenis.scrollTo(y, { immediate: true });
+      else window.scrollTo(0, y);
+      return true;
+    };
+
+    if (hash && scrollToHash()) {
+      let frames = 0;
+      let raf = 0;
+      const settle = () => {
+        frames += 1;
+        scrollToHash();
+        if (frames < 40) raf = requestAnimationFrame(settle);
+      };
+      raf = requestAnimationFrame(settle);
+      return () => cancelAnimationFrame(raf);
+    }
+
     if (lenis) {
       lenis.scrollTo(0, { immediate: true });
     } else {
       window.scrollTo(0, 0);
     }
-  }, [pathname]);
+  }, [pathname, hash]);
 }
 
 export function getLenis() {

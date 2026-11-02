@@ -41,10 +41,13 @@ export const EditsGateway: React.FC = () => {
   const featured = EDITS.filter((e) => e.featured);
 
   return (
-    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16" aria-labelledby="edits-heading" >
+    <section
+      ref={revealRef}
+      className="reveal border-b border-stone bg-cream py-12 lg:py-16"
+      aria-labelledby="edits-heading"
+    >
       <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
         <MarketingHeader
-          eyebrow="Shop by intent"
           title="Explore by Edit"
           titleId="edits-heading"
           sub="Curated collections across every universe — the craft stays constant."
@@ -52,35 +55,37 @@ export const EditsGateway: React.FC = () => {
           linkLabel="View all edits"
         />
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-4 py-4">
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-6 xl:grid-cols-4">
           {featured.map((e) => (
             <article
               key={e.slug}
-              className="group relative rounded-sm overflow-hidden text-left transition-all duration-300 hover:z-10 hover:scale-[1.03] hover:ring-2 hover:ring-gold"
+              className="group relative overflow-hidden text-left"
             >
-              <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-stone/30">
+              <div className="relative aspect-[4/5] overflow-hidden bg-paper">
                 <img
                   src={EDIT_IMAGE[e.slug]}
-                  alt={`${e.title} — ${e.tagline}`}
+                  alt=""
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[500ms] ease-[var(--ease-base)] group-hover:scale-[1.03]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-5 text-cream">
-                  <div className="flex items-end justify-between gap-1.5 sm:gap-3">
-                    <div>
-                      <h3 className="font-serif text-sm sm:text-[22px] leading-tight line-clamp-1">{e.title}</h3>
-                      <p className="font-serif italic text-[11px] sm:text-[15px] text-cream/85 mt-0.5 sm:mt-1 line-clamp-1">{e.tagline}</p>
-                    </div>
-                    <span className="text-right leading-none shrink-0">
-                      <span className="block font-serif text-sm sm:text-xl">{counts[e.slug] ?? 0}</span>
-                      <span className="block font-sans text-[8px] sm:text-[9px] uppercase tracking-widest text-cream/80 mt-0.5 sm:mt-1">
-                        Styles
-                      </span>
-                    </span>
-                  </div>
-                </div>
               </div>
+
+              {/* Name and count beneath the photograph, like every other card
+                  in this world. The old version printed the title inside a
+                  dark scrim on the image, which is the pattern this redesign
+                  exists to remove. */}
+              <div className="mt-2.5 flex items-baseline justify-between gap-2">
+                <h3 className="font-sans text-[13px] font-medium text-ink transition-colors group-hover:text-accent">
+                  {e.title}
+                </h3>
+                <span className="loom-price shrink-0 text-[11px] text-ink-muted">
+                  {counts[e.slug] ?? 0}
+                </span>
+              </div>
+              <p className="mt-0.5 line-clamp-1 font-sans text-[12px] text-ink-muted">
+                {e.tagline}
+              </p>
+
               {/* Stretched link: whole card clickable, heading stays in flow */}
               <Link
                 to="/shop"
@@ -88,8 +93,8 @@ export const EditsGateway: React.FC = () => {
                   ev.preventDefault();
                   explore(e.slug);
                 }}
-                aria-label={`Explore ${e.title}`}
-                className="absolute inset-0 rounded-sm focus-visible:outline focus-visible:outline-accent"
+                aria-label={`Explore ${e.title} — ${counts[e.slug] ?? 0} pieces`}
+                className="absolute inset-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               />
             </article>
           ))}

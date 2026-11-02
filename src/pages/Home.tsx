@@ -1,5 +1,5 @@
 import React from 'react';
-import { HeroCarousel } from '../components/home/HeroCarousel';
+import { HeroStage } from '../components/home/HeroStage';
 import { TrustStrip } from '../components/home/TrustStrip';
 import { NewAndFeaturedSection } from '../components/home/NewAndFeaturedSection';
 import { ShopByGarment } from '../components/home/ShopByGarment';
@@ -11,40 +11,57 @@ import { CraftStory } from '../components/home/CraftStory';
 import { UGCWall } from '../components/home/UGCWall';
 import { Newsletter } from '../components/home/Newsletter';
 
+/**
+ * The catalog is the page.
+ *
+ * Order is the argument the page makes, and it is deliberately not the
+ * category's order. The old build opened on a four-slide campaign carousel,
+ * then ran three near-identical product grids before the buyer had seen a
+ * price. This one answers the three questions an Indian D2C buyer asks, in
+ * the order they ask them:
+ *
+ *   1. What is this, and what does it cost?   → HeroStage (with real price)
+ *   2. Is any of this actually for me?        → New & Featured, by garment
+ *   3. Which of these worlds is mine?         → Universes as horizon bands
+ *
+ * Trust (COD, returns, delivery) is answered in the strip directly under the
+ * hero rather than buried in the footer, because in tier 2/3 it is the
+ * question that stops the order, not a closing argument.
+ */
 export const Home: React.FC = () => {
   return (
     <div className="w-full">
-      {/* Section 1: Edge-to-Edge Hero Carousel with circular timer pills */}
-      <HeroCarousel />
+      {/* 1 — The first viewport: one garment, one price, one action. */}
+      <HeroStage />
 
-      {/* Trust & Craft Value Strip */}
+      {/* 2 — Trust. COD and delivery certainty, said plainly, before any grid. */}
       <TrustStrip />
 
-      {/* Section 2: New & Featured (Tabbed: New Arrivals | Limited Editions | Collections) */}
+      {/* 3 — The index: what is actually available, with prices. */}
       <NewAndFeaturedSection />
 
-      {/* Section 3: Shop by Garment (Visual Silhouettes Grid) */}
+      {/* 4 — The cut: browse by what kind of thing it is. */}
       <ShopByGarment />
 
-      {/* Section 4: Choose Your World (Universes & Worlds) */}
+      {/* 5 — The worlds: places you enter, each with its own horizon. */}
       <UniversePortals />
 
-      {/* Section 5: Find Your Expression (5-Tier Intensity Spectrum) */}
+      {/* 6 — The volume axis: how loudly you want to wear it. */}
       <FindYourExpression />
 
-      {/* Section 6: Curated Edits (Shop by Buyer Intent) */}
+      {/* 7 — Buyer intent: curated edits rather than facets. */}
       <EditsGateway />
 
-      {/* Section 7: Bestsellers (Community Favourites Archive) */}
+      {/* 8 — Social proof, only from real catalog data. */}
       <Bestsellers />
 
-      {/* Section 8: The Craft (Haute Needlecraft & Thread Architecture) */}
+      {/* 9 — The craft moment: the one place the page goes dark. */}
       <CraftStory />
 
-      {/* Section 9: UGC Community Wall (Worn Worldwide) */}
+      {/* 10 — Worn, shown. */}
       <UGCWall />
 
-      {/* Section 10: Newsletter & Collector Registration */}
+      {/* 11 — The ask. */}
       <Newsletter />
     </div>
   );

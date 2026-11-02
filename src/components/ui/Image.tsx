@@ -6,6 +6,13 @@ export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   aspectRatio?: string;
   placeholderColor?: string;
   lazy?: boolean;
+  /**
+   * How the photograph fills its frame. `cover` crops to fill — right for
+   * garment-on-model shots. `contain` preserves the whole product, which is
+   * what a cut-out studio shot needs: cropping a shirt to a 4:5 hero box
+   * silently deletes its collar and hem.
+   */
+  fit?: 'cover' | 'contain';
 }
 
 export const Image: React.FC<ImageProps> = ({
@@ -14,6 +21,7 @@ export const Image: React.FC<ImageProps> = ({
   aspectRatio = '3/4',
   placeholderColor = 'var(--color-stone)',
   lazy = true,
+  fit = 'cover',
   className = '',
   ...props
 }) => {
@@ -67,9 +75,9 @@ export const Image: React.FC<ImageProps> = ({
         decoding="async"
         onLoad={() => setIsLoaded(true)}
         onError={handleError}
-        className={`w-full h-full object-cover transition-all duration-700 ease-out ${
-          isLoaded ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'
-        }`}
+        className={`w-full h-full transition-all duration-700 ease-out ${
+          fit === 'contain' ? 'object-contain' : 'object-cover'
+        } ${isLoaded ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'}`}
         {...props}
       />
     </div>

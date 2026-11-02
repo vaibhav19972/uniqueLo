@@ -1,124 +1,129 @@
 /* src/styles/tokens.css — single source of truth for all design values.
 
    ─────────────────────────────────────────────────────────────────────────────
-   THE MODEL
+   THE MODEL — THE LOOM CARD
    ─────────────────────────────────────────────────────────────────────────────
+   The storefront is a woven index, not a stage. Surfaces read as unbleached
+   cotton; type is a condensed grotesque that behaves like woven garment
+   labelling; the only saturated colour in the system is madder red, and it
+   marks action and price, never decoration.
+
    Two axes, and they multiply:
 
    1. MODE — the surface system. Set once on <html data-mode="light|dark">.
-        light → warm paper. Ivory canvas, cream cards, warm near-black ink.
-        dark  → black atelier. #000 canvas, #181818 cards, white ink.
+        light → unbleached cotton. The canonical surface: this is a daylight,
+                mid-range-Android, tier-2/3 storefront. It is the default.
+        dark  → the dyeworks. Indigo-black ground for night browsing; same
+                structure, inverted values. Not a "flagship" — an equal.
 
-   2. UNIVERSE — the accent system. Set on any element via [data-accent].
-        Each universe redefines only --color-accent and its companions, so a
-        single page can carry a rose Animeverse block next to a bronze Itihaas
-        block without either leaking into the other.
+   2. ACCENT — the universe system. Set on any element via [data-accent].
+        Each universe owns a hue family, so a page can carry an Animeverse
+        block beside an Itihaas block without either leaking.
 
    Semantic naming note: --color-ink is the FOREGROUND and --color-cream is the
-   CANVAS. That pairing is what lets `text-ink` / `bg-cream` keep one meaning
-   across ~1400 call sites while the whole palette flips underneath them.
+   CANVAS. That pairing lets `text-ink` / `bg-cream` keep one meaning across
+   ~1400 call sites while the palette flips underneath them.
 
    Every accent below is contrast-checked at ≥4.5:1 (WCAG AA) as text on all
-   three surfaces — cream, paper, panel — AND on its own 10–12% soft tint laid
-   over each of them, plus ≥4.5:1 for the on-accent label. The soft tint is the
-   tightest case and the one that quietly fails: a chip reading accent-on-
-   accent-soft loses ~0.4 of its ratio to the flat surface.
+   three surfaces — cream, paper, panel — and on its own soft tint. The soft
+   tint is the tightest case and the one that quietly fails.
 
    Run `npx tsx scripts/check-contrast.ts` after changing any of them.
    ───────────────────────────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════════════
-   MODE · LIGHT — warm paper (the daylight atelier)
+   MODE · LIGHT — unbleached cotton (the canonical surface)
    ═══════════════════════════════════════════════════════════════ */
 :root,
 :root[data-mode='light'] {
   color-scheme: light;
 
-  /* Surfaces */
-  --color-cream:         #f7f3ec; /* page canvas — warm ivory */
-  --color-paper:         #fffdf9; /* cards, drawers, menus */
-  --color-panel:         #f2ece1; /* nested surface */
-  --color-panel-raised:  #eae2d4; /* hover surface */
-  --color-ink:           #17140f; /* primary foreground — warm near-black */
-  --color-ink-muted:     #6b6459; /* secondary text (5.29:1 on canvas) */
-  --color-stone:         #e2dacc; /* hairlines, dividers */
-  --color-stone-strong:  #cfc4b1; /* emphasized borders */
-  --color-warm-gray:     #a39a8b; /* placeholders, disabled */
+  /* Surfaces — cotton, then paper laid on it, then the deeper panel. */
+  --color-cream:         #f4efe4; /* page canvas — unbleached cotton */
+  --color-paper:         #fbf8f1; /* cards, drawers, menus — sized cotton */
+  --color-panel:         #ebe4d5; /* nested surface */
+  --color-panel-raised:  #e2d9c7; /* hover surface */
+  --color-ink:           #141a2e; /* primary foreground — dyed indigo, not black */
+  --color-ink-muted:     #5f5747; /* secondary text (6.23:1 on canvas) */
+  --color-stone:         #ddd4c3; /* hairlines, dividers, loom rules */
+  --color-stone-strong:  #c6bba6; /* emphasized borders */
+  --color-warm-gray:     #9b9283; /* placeholders, disabled */
 
   /* Signals */
-  --color-error:         #b02a1f;
-  --color-success:       #2f6b3a;
+  --color-error:         #a4322a;
+  --color-success:       #2f6247;
 
-  /* Light-mode shadows stay warm: a cool grey shadow on ivory reads dirty. */
-  --shadow-sm:    0 1px 2px rgba(64, 48, 28, 0.05);
-  --shadow-md:    0 6px 16px rgba(64, 48, 28, 0.08);
-  --shadow-lg:    0 16px 48px rgba(64, 48, 28, 0.12);
-  --shadow-float: 0 28px 70px rgba(64, 48, 28, 0.18);
+  /* Shadows — only in response to state. Cotton shadows stay warm. */
+  --shadow-sm:    0 1px 2px rgba(58, 44, 24, 0.06);
+  --shadow-md:    0 8px 20px rgba(58, 44, 24, 0.09);
+  --shadow-lg:    0 18px 48px rgba(58, 44, 24, 0.13);
+  --shadow-float: 0 28px 70px rgba(58, 44, 24, 0.18);
 
-  /* Paper grain: light surfaces get a warm fleck, not a black speck. */
-  --grain-opacity: 0.5;
+  /* Ground texture is off: see the note in globals.css. */
+  /* Set to 1 to re-enable a ground texture if one is ever produced. */
+  --grain-opacity: 0;
   --grain-blend: multiply;
 
-  /* Playful background washes — the colour temperature of the section fields. */
-  --wash-a: #f3e7d8;
-  --wash-b: #eee6f2;
-  --wash-c: #e7ece4;
+  /* Universe fields — the horizon bands. */
+  --wash-a: #f0e6d2;
+  --wash-b: #ece3ea;
+  --wash-c: #e6e8dd;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MODE · DARK — black atelier (the flagship look)
+   MODE · DARK — the dyeworks (indigo night)
    ═══════════════════════════════════════════════════════════════ */
 :root[data-mode='dark'] {
   color-scheme: dark;
 
-  --color-cream:         #000000;
-  --color-paper:         #181818;
-  --color-panel:         #1f1f1f;
-  --color-panel-raised:  #272727;
-  --color-ink:           #ffffff;
-  --color-ink-muted:     #9b9b9b; /* 7.56:1 on canvas */
-  --color-stone:         #272727;
-  --color-stone-strong:  #313131;
-  --color-warm-gray:     #666666;
+  --color-cream:         #0f1216;
+  --color-paper:         #171c23;
+  --color-panel:         #1e242d;
+  --color-panel-raised:  #262d38;
+  --color-ink:           #f2ece0;
+  --color-ink-muted:     #c9c2b4; /* 10.60:1 on canvas */
+  --color-stone:         #2a313b;
+  --color-stone-strong:  #3a4350;
+  --color-warm-gray:     #7c838f;
 
-  --color-error:         #e5675b;
-  --color-success:       #6fbf87;
+  --color-error:         #e8705f;
+  --color-success:       #77bd97;
 
   --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md:    0 6px 16px rgba(0, 0, 0, 0.6);
-  --shadow-lg:    0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-md:    0 8px 20px rgba(0, 0, 0, 0.6);
+  --shadow-lg:    0 18px 48px rgba(0, 0, 0, 0.7);
   --shadow-float: 0 28px 70px rgba(0, 0, 0, 0.8);
 
-  --grain-opacity: 1;
+  --grain-opacity: 0;
   --grain-blend: screen;
 
-  --wash-a: #17120c;
-  --wash-b: #14101a;
-  --wash-c: #0f1512;
+  --wash-a: #17130d;
+  --wash-b: #16121a;
+  --wash-c: #101613;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ACCENT · the house default (Atelier — burnt terracotta)
+   ACCENT · the house default (Atelier — madder red)
    These are the values every non-universe surface inherits.
    ═══════════════════════════════════════════════════════════════ */
 :root,
 [data-accent='atelier'],
 [data-accent='none'] {
-  --color-accent:        #a93a1a; /* 5.63:1 ivory, 4.67:1 worst case on a soft tint over panel */
-  --color-accent-hover:  #92300f;
-  --color-accent-soft:   rgba(169, 58, 26, 0.10);
-  --color-accent-border: rgba(169, 58, 26, 0.30);
+  --color-accent:        #a4322a; /* 5.97:1 on cotton, 5.30:1 worst case on a soft tint */
+  --color-accent-hover:  #8f2a22;
+  --color-accent-soft:   rgba(164, 50, 42, 0.09);
+  --color-accent-border: rgba(164, 50, 42, 0.30);
   --color-on-accent:     #ffffff;
 }
 
 :root[data-mode='dark'],
 [data-mode='dark'] [data-accent='atelier'],
 [data-mode='dark'] [data-accent='none'] {
-  --color-accent:        #f0865f; /* 8.28:1 on #000 */
-  --color-accent-hover:  #f59a78;
-  --color-accent-soft:   rgba(240, 134, 95, 0.12);
-  --color-accent-border: rgba(240, 134, 95, 0.32);
-  --color-on-accent:     #17140f; /* dark label on the light accent */
+  --color-accent:        #e8705f; /* 6.18:1 on indigo night */
+  --color-accent-hover:  #f2887a;
+  --color-accent-soft:   rgba(232, 112, 95, 0.13);
+  --color-accent-border: rgba(232, 112, 95, 0.34);
+  --color-on-accent:     #141a2e;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -132,28 +137,28 @@
 
 /* ANIMEVERSE — sakura rose */
 [data-accent='animeverse'] {
-  --color-accent:        #ac3159; /* 5.69:1 ivory, 4.90:1 on its own soft tint */
-  --color-accent-hover:  #9c2c53;
-  --color-accent-soft:   rgba(172, 49, 89, 0.10);
-  --color-accent-border: rgba(172, 49, 89, 0.30);
+  --color-accent:        #9c2f5a; /* 6.02:1 cotton */
+  --color-accent-hover:  #87264c;
+  --color-accent-soft:   rgba(156, 47, 90, 0.09);
+  --color-accent-border: rgba(156, 47, 90, 0.30);
   --color-on-accent:     #ffffff;
 }
 
 [data-mode='dark'] [data-accent='animeverse'],
 [data-mode='dark'][data-accent='animeverse'] {
-  --color-accent:        #f28cb4; /* 9.19:1 */
+  --color-accent:        #f08cb2; /* 9.19:1 */
   --color-accent-hover:  #f7a8c7;
-  --color-accent-soft:   rgba(242, 140, 180, 0.12);
-  --color-accent-border: rgba(242, 140, 180, 0.32);
-  --color-on-accent:     #17140f;
+  --color-accent-soft:   rgba(240, 140, 178, 0.12);
+  --color-accent-border: rgba(240, 140, 178, 0.32);
+  --color-on-accent:     #141a2e;
 }
 
 /* HEROVERSE — courage crimson */
 [data-accent='heroverse'] {
-  --color-accent:        #b32d22; /* 5.73:1 */
-  --color-accent-hover:  #971f16;
-  --color-accent-soft:   rgba(179, 45, 34, 0.10);
-  --color-accent-border: rgba(179, 45, 34, 0.30);
+  --color-accent:        #a52a20; /* 6.35:1 cotton */
+  --color-accent-hover:  #8c1f16;
+  --color-accent-soft:   rgba(165, 42, 32, 0.09);
+  --color-accent-border: rgba(165, 42, 32, 0.30);
   --color-on-accent:     #ffffff;
 }
 
@@ -163,15 +168,15 @@
   --color-accent-hover:  #f9938a;
   --color-accent-soft:   rgba(244, 119, 106, 0.12);
   --color-accent-border: rgba(244, 119, 106, 0.32);
-  --color-on-accent:     #17140f;
+  --color-on-accent:     #141a2e;
 }
 
 /* ITIHAAS — darbar wine */
 [data-accent='itihaas'] {
-  --color-accent:        #7d2333; /* 8.79:1 */
-  --color-accent-hover:  #651a28;
-  --color-accent-soft:   rgba(125, 35, 51, 0.10);
-  --color-accent-border: rgba(125, 35, 51, 0.30);
+  --color-accent:        #7a2331; /* 8.79:1 */
+  --color-accent-hover:  #631a27;
+  --color-accent-soft:   rgba(122, 35, 49, 0.09);
+  --color-accent-border: rgba(122, 35, 49, 0.30);
   --color-on-accent:     #ffffff;
 }
 
@@ -181,7 +186,7 @@
   --color-accent-hover:  #f0a7b2;
   --color-accent-soft:   rgba(231, 144, 158, 0.12);
   --color-accent-border: rgba(231, 144, 158, 0.32);
-  --color-on-accent:     #17140f;
+  --color-on-accent:     #141a2e;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -197,13 +202,12 @@
   --color-riviera:         var(--color-panel);
   --color-blush:           var(--color-panel);
   --color-parchment:       var(--color-paper);
-
   --color-anime-deep:      var(--color-panel);
   --color-hero-crimson:    var(--color-accent);
   --color-itihaas-bronze:  var(--color-panel);
   --color-champagne:       var(--color-accent);
   --color-ivory:           var(--color-ink);
-  --color-coal-glass:      #17140f;
+  --color-coal-glass:      #141a2e;
   --color-stone-deep:      var(--color-stone-strong);
 
   /* Brand aliases consumed by ui/Cta and the marketing shell. */
@@ -211,21 +215,25 @@
   --brand-gold-hover:  var(--color-accent-hover);
   --brand-gold-deep:   var(--color-accent);
   --on-gold:           var(--color-on-accent);
-  --brand-coal:        var(--color-cream);
-  --brand-coal-soft:   var(--color-paper);
+  --brand-coal:        var(--color-ink);
+  --brand-coal-soft:   var(--color-panel);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    TYPOGRAPHY
-   Display = Playfair Display. UI = Geist. Mono = Geist Mono.
-   `--font-serif` is kept as the utility name (272 call sites) but is now
-   applied only where it belongs — see the .font-serif rule in globals.css,
-   which drops small-size serif text back to the UI face automatically.
+   Display = Archivo (condensed grotesque, wdth axis pushed narrow).
+   UI = Geist. Mono = Geist Mono — reserved for prices and measured values.
+
+   The serif is RETIRED as the brand voice. `--font-serif` survives as a
+   utility name so the 272 existing `font-serif` call sites keep resolving,
+   but it now returns to the display grotesque: no page in this world sets
+   a Playfair glyph.
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  --font-sans:  'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Playfair Display', 'Melodrama', Georgia, 'Times New Roman', serif;
-  --font-mono:  'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans:    'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif:   'Archivo', 'Geist', system-ui, sans-serif;
+  --font-display: 'Archivo', 'Geist', system-ui, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, SFMono-Regular, monospace;
 
   --text-xs:    0.75rem;  /* 12px */
   --text-sm:    0.875rem; /* 14px */
@@ -242,24 +250,22 @@
   --leading-snug:    1.15;
   --leading-normal:  1.5;
   --leading-relaxed: 1.7;
-  --leading-display: 1.04;
+  --leading-display: 1.02;
 
-  --tracking-tight:   -0.035em;
+  --tracking-tight:   -0.03em;
   --tracking-normal:  0;
   --tracking-wide:    0.05em;
   --tracking-eyebrow: 0.18em;
   --tracking-label:   0.12em;
 
-  /* Display sizes resolve onto the Tailwind scale, not bespoke clamps. */
-  --text-display:    clamp(2.5rem, 6vw, 5.5rem);   /* 40 → 88px */
-  --text-display-lg: clamp(2rem, 4vw, 3.5rem);     /* 32 → 56px */
-  --text-hero:       clamp(3rem, 7.5vw, 7rem);     /* 48 → 112px */
+  /* Display sizes: wide-but-narrow — the width axis does the shouting. */
+  --text-display:    clamp(2.25rem, 5.2vw, 4.75rem);
+  --text-display-lg: clamp(1.875rem, 3.4vw, 3rem);
+  --text-hero:       clamp(2.75rem, 8.4vw, 8rem);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SPACING — the closed scale, one notch tighter than the old atelier.
-   Section rhythm drops from 96px to 64/80px so the page reads as one
-   continuous surface instead of a stack of islands.
+   SPACING — the loom scale.
    ═══════════════════════════════════════════════════════════════ */
 :root {
   --spacing-0:  0;
@@ -273,28 +279,29 @@
   --spacing-10: 4rem;    /* 64px */
   --spacing-12: 6rem;    /* 96px */
 
-  --section-gap:      var(--spacing-10); /* 64px — was 96px */
+  --section-gap:      var(--spacing-10); /* 64px */
   --section-gap-lg:   var(--spacing-12); /* 96px — hero-adjacent only */
-  --section-gutter:   1.25rem;           /* tight in-section rhythm */
+  --section-gutter:   1.25rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    LAYOUT
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  --container-max: 90rem;         /* 1440px */
-  --container-narrow: 68rem;      /* 1088px — editorial columns */
-  --container-padding: 1rem;      /* mobile */
-  --container-padding-md: 1.5rem; /* >=768px */
-  --container-padding-lg: 2rem;   /* >=1024px */
-  --container-padding-xl: 3rem;   /* >=1280px */
+  --container-max: 90rem;
+  --container-narrow: 68rem;
+  --container-padding: 1rem;
+  --container-padding-md: 1.5rem;
+  --container-padding-lg: 2rem;
+  --container-padding-xl: 3rem;
 
-  --header-height: 4.5rem;
+  --header-height: 4.25rem;
   --drawer-width:  28rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RADIUS — Tailwind scale only, with inner = outer − gap documented.
+   RADIUS — square by default. This world has no rounded cards.
+   Radius exists only for controls (4px) and the cart (see DESIGN.md).
    ═══════════════════════════════════════════════════════════════ */
 :root {
   --radius-none: 0;
@@ -312,9 +319,9 @@
 :root {
   --ease-base:       cubic-bezier(0.22, 1, 0.36, 1);
   --ease-playful:    cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-move:   500ms;
-  --duration-color:  300ms;
-  --duration-reveal: 700ms;
+  --duration-move:   420ms;
+  --duration-color:  260ms;
+  --duration-reveal: 640ms;
 }
 
 /* ═══════════════════════════════════════════════════════════════

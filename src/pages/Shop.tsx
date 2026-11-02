@@ -7,18 +7,25 @@ import { CategoryTabs } from '../components/shop/CategoryTabs';
 import { FilterBar } from '../components/shop/FilterBar';
 import { ProductGrid } from '../components/shop/ProductGrid';
 
+/**
+ * The shop's two non-catalogue states — loading and error. They used to be
+ * centred around a 48px rounded-full glyph badge over a serif sentence, which
+ * is a different system's empty state. Here it is a ruled block at the left
+ * margin, the same register as the rest of the page: a label, a sentence, and
+ * nothing that looks like an illustration.
+ */
 function CatalogState({ message, detail }: { message: string; detail?: string }) {
   return (
-    <div className="py-16 text-center max-w-md mx-auto px-4">
-      <div className="w-12 h-12 rounded-full border border-stone mx-auto flex items-center justify-center mb-4 text-ink-muted" aria-hidden="true">
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" />
-        </svg>
+    <div className="mx-auto max-w-[46rem] px-4 py-16 sm:px-6 lg:px-12">
+      <div className="border-t border-stone pt-4">
+        <p className="loom-label text-ink-muted">The collection</p>
+        <h3 className="loom-display mt-2 text-[1.5rem] text-ink">{message}</h3>
+        {detail && (
+          <p className="mt-2 max-w-[52ch] font-sans text-[13px] leading-relaxed text-ink-muted">
+            {detail}
+          </p>
+        )}
       </div>
-      <h3 className="font-serif text-2xl text-ink">{message}</h3>
-      {detail && (
-        <p className="text-xs text-ink-muted mt-2 font-light leading-relaxed">{detail}</p>
-      )}
     </div>
   );
 }
@@ -43,12 +50,18 @@ export const Shop: React.FC = () => {
     const garment = searchParams.get('garment');
     const edit = searchParams.get('edit');
     const expression = searchParams.get('expression');
+    const technique = searchParams.get('technique');
     if (universe) s.setUniverse(universe);
     if (character) s.setCharacter(character);
     if (style) s.setArtStyle(style as ArtStyleSlug);
     if (garment) s.setGarmentTypes([garment]);
     if (edit) s.setEdit(edit as EditSlug);
     if (expression) s.setExpressionSlug(expression as any);
+    // A technique deep-link from /our-craft/:slug. `toggleTechnique` is the only
+    // setter on the store; it flips, so call it only when it would turn on.
+    if (technique && !(s.filters.techniques ?? []).includes(technique as any)) {
+      s.toggleTechnique(technique as any);
+    }
   }, [searchParams]);
 
   const currentCategory = useMemo(() => {
@@ -61,37 +74,30 @@ export const Shop: React.FC = () => {
   }, [allProducts, filters]);
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      {/* Editorial Header */}
-      <section className="pt-12 pb-8 bg-paper border-b border-stone/50 relative overflow-hidden">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="min-h-screen w-full bg-cream">
+      {/* The head: what this page is, how many pieces are in it, and the
+          filter state — in that order, at one type register. */}
+      <section className="border-b border-stone bg-cream pb-6 pt-8">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                {currentCategory ? `Curated Category • ${currentCategory.label}` : 'Permanent & Capsule Editions'}
-              </span>
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
-                {currentCategory ? currentCategory.name : 'The Atelier Collections'}
+              <h1
+                className="loom-display text-ink"
+                style={{ fontSize: 'var(--text-display)' }}
+              >
+                {currentCategory ? currentCategory.name : 'The Collection'}
               </h1>
-              <p className="text-xs sm:text-sm text-ink-muted max-w-2xl mt-3 font-light leading-relaxed">
+              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
                 {currentCategory
                   ? currentCategory.description
-                  :                 'Every piece is constructed from heirloom natural textiles and enriched with three-dimensional embroidery. Inspect individual stitch reliefs or customize with bespoke monograms.'}
+                  : 'Every piece currently in stock, priced. Filter by world, garment, or how loudly the embroidery reads.'}
               </p>
             </div>
 
-            {/* Needlework Metrics Badge */}
-            <div className="flex items-center gap-4 py-2 px-4 bg-cream border border-stone/80 text-xs text-ink font-sans">
-              <div>
-                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Available Edits</span>
-                <span className="font-serif text-lg font-medium text-ink">{filteredProducts.length} Garments</span>
-              </div>
-              <div className="h-8 w-px bg-stone/80" />
-              <div>
-                <span className="block text-[9px] uppercase tracking-widest text-ink-muted">Craft</span>
-                <span className="font-serif text-lg font-medium text-accent">Detailed Embroidery</span>
-              </div>
-            </div>
+            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
+              <span className="loom-price text-[15px] text-ink">{filteredProducts.length}</span>
+              {' '}of {(allProducts ?? []).length} shown
+            </p>
           </div>
         </div>
       </section>
@@ -103,7 +109,7 @@ export const Shop: React.FC = () => {
       <FilterBar />
 
       {/* Main Grid Container */}
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pb-24 pt-8">
+      <div className="mx-auto max-w-[var(--container-max)] px-4 pb-24 pt-6 sm:px-6 lg:px-12">
         {isError ? (
           <CatalogState
             message="The Collection Could Not Be Reached"

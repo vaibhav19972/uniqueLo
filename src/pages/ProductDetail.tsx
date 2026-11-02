@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { useProduct, useProducts, useReviews, useUniverse } from '../hooks/useCatalog';
 import { useCartStore } from '../stores/cart';
-import { useCustomizerStore } from '../stores/customizer';
 import { useWishlistStore } from '../stores/wishlist';
 import { useToastStore } from '../stores/toast';
 import {
@@ -16,11 +15,44 @@ import {
   type ProductVariant,
   submitReview,
 } from '../lib/data';
+import { catalogMrp } from '../lib/pricing';
+import { orderedVariants } from '../lib/sizes';
+import { hasLicensedMark } from '../lib/licensed-marks';
 import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
 import { ExpressionGuideModal } from '../components/shop/ExpressionGuideModal';
-import { CtaButton } from '../components/ui/Cta';
+import { ProductCard } from '../components/shop/ProductCard';
 
+/**
+ * THE PRODUCT PAGE
+ *
+ * A garment page, not a campaign page. The composition is a two-column ruled
+ * sheet: the photograph on the left at the width the garment deserves, the
+ * buy box on the right in the order a buyer actually asks questions — what is
+ * it, what does it cost, will it fit, will it arrive, why is it this price.
+ *
+ * What was removed, and why:
+ *  · the five-star row. It rendered "5.0 (0 reviews)" because the catalog
+ *    ships a mock `rating: 5` on 28 of 29 products. A star row that exists
+ *    only because a seed row defaults to five is a fabricated rating under
+ *    PRODUCT.md's honesty constraint. Reviews now come from real rows or not
+ *    at all.
+ *  · "0 hours of threadwork" and "Over — hours" — `artisanHours` is null for
+ *    28 of 29 products, and the old markup interpolated the null.
+ *  · the pincode checker. It answered with a hardcoded city table promising
+ *    "Dispatch: 24h, Delivery: 2 Days" while the catalog says 4–7 days. An
+ *    invented serviceability estimate that contradicts the real field is
+ *    worse than no estimate. The real window is stated instead.
+ *  · "Free shipping on orders above ₹500". The shipping rule in
+ *    `20261101_checkout_pricing.sql` is ₹99 flat, waived above ₹1,499.
+ *  · "14-day home inspection" next to "7-Day Doorstep Exchange".
+ *    `returnWindowDays` is 7 on every product.
+ *  · the HUSTLE10 pill. The coupon is real, but its floor is a ₹999 subtotal,
+ *    so it silently does not apply to the ₹899 entry pieces this page is most
+ *    often reached for. Offers belong in the bag, where the server prices them.
+ *  · the "Real People. Real Fits." strip, which relabelled catalog product
+ *    shots as customer photographs and invited a hashtag that does not exist.
+ */
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isPending, isError } = useProduct(slug);
@@ -28,69 +60,45 @@ export const ProductDetail: React.FC = () => {
   const { data: reviews, refetch: refetchReviews } = useReviews(slug);
 
   const addItem = useCartStore((state) => state.addItem);
-  const openCustomizer = useCustomizerStore((state) => state.openCustomizer);
   const { toggleWishlist, isWishlisted } = useWishlistStore();
   const showToast = useToastStore((state) => state.showToast);
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeAccordion, setActiveAccordion] = useState<string | null>('technique');
+  const [activeSection, setActiveSection] = useState<string | null>('technique');
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  // Stable identity: useDialogFocus re-runs its effect when onClose changes,
+  // which would yank focus back to the first control on every render.
+  const closeSizeGuide = React.useCallback(() => setIsSizeGuideOpen(false), []);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isExpressionModalOpen, setIsExpressionModalOpen] = useState(false);
 
-  // Review Form State
+  // Review form state
   const [reviewAuthor, setReviewAuthor] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  // Interactive Macro Loupe Zoom State
+  // Macro inspection
   const [isZooming, setIsZooming] = useState(false);
-  const [zoomCoords, setZoomCoords] = useState({ x: 0, y: 0, percentX: 0, percentY: 0 });
+  const [zoomCoords, setZoomCoords] = useState({ percentX: 50, percentY: 50 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
-  // Sticky Purchase Bar State
+  // Sticky purchase bar
   const [showStickyBar, setShowStickyBar] = useState(false);
   const buyBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       if (buyBoxRef.current) {
-        const rect = buyBoxRef.current.getBoundingClientRect();
-        setShowStickyBar(rect.bottom < 80);
+        setShowStickyBar(buyBoxRef.current.getBoundingClientRect().bottom < 80);
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // India Pincode Delivery ETA State
-  const [pincode, setPincode] = useState('');
-  const [pincodeEta, setPincodeEta] = useState<string | null>(null);
-
-  const checkPincode = () => {
-    if (!/^\d{6}$/.test(pincode)) {
-      setPincodeEta('Please enter a valid 6-digit Indian PIN code.');
-      return;
-    }
-    const cityMap: Record<string, string> = {
-      '11': 'Delhi NCR (Dispatch: 24h, Delivery: 2 Days)',
-      '40': 'Mumbai (Dispatch: 24h, Delivery: 2 Days)',
-      '56': 'Bengaluru (Dispatch: 24h, Delivery: 3 Days)',
-      '70': 'Kolkata (Dispatch: 24h, Delivery: 3 Days)',
-      '60': 'Chennai (Dispatch: 24h, Delivery: 3 Days)',
-      '30': 'Jaipur (Local Atelier Dispatch: 1 Day)',
-      '22': 'Lucknow (Local Atelier Dispatch: 1 Day)',
-    };
-    const prefix = pincode.substring(0, 2);
-    const cityInfo = cityMap[prefix] || 'Pan-India Express (Dispatch: 24h, Delivery: 3–4 Days)';
-    setPincodeEta(
-      `Estimated serviceability: ${cityInfo}. COD / UPI availability is confirmed at checkout — this is an estimate, not a guarantee.`
-    );
-  };
 
   const currentVariant = useMemo(() => {
     if (!product) return null;
@@ -98,63 +106,77 @@ export const ProductDetail: React.FC = () => {
   }, [product, selectedVariant]);
 
   const { data: universe } = useUniverse(product?.universeSlug);
-
   const motif = product?.motifId ? getMotifSync(product.motifId) ?? null : null;
 
-  // Display rating prefers mock-phase product fields, falls back to review aggregate.
-  const productRating = product?.rating;
-  const productReviewCount = product?.reviewCount;
-  const displayRating = useMemo(() => {
-    if (productRating !== undefined) {
-      return { value: productRating, count: productReviewCount ?? (reviews?.length ?? 0) };
-    }
-    if (reviews && reviews.length > 0) {
-      return {
-        value: reviews.reduce((a, r) => a + r.rating, 0) / reviews.length,
-        count: reviews.length,
-      };
-    }
-    return null;
-  }, [productRating, productReviewCount, reviews]);
+  /** Only real review rows can produce a rating. Never the seed field. */
+  const reviewAggregate = useMemo(() => {
+    if (!reviews || reviews.length === 0) return null;
+    return {
+      value: reviews.reduce((a, r) => a + r.rating, 0) / reviews.length,
+      count: reviews.length,
+    };
+  }, [reviews]);
 
-  const discountPct = useMemo(() => {
-    const compare = currentVariant?.compareAtPriceCents;
-    if (!currentVariant || !compare || compare <= currentVariant.priceCents) return 0;
-    return Math.round((1 - currentVariant.priceCents / compare) * 100);
+  const discount = useMemo(() => {
+    if (!currentVariant) return null;
+    return catalogMrp(currentVariant);
   }, [currentVariant]);
 
   const expScore = useMemo(() => getExpressionScore(product), [product]);
   const expInfo = useMemo(() => getExpressionByScore(expScore), [expScore]);
 
-  // Universe Recommendations (same world / story)
+  // Cross-sell rails present pieces as the brand's own work, so a product whose
+  // photograph carries a third-party mark is kept out of them (see
+  // lib/licensed-marks.ts). The piece is still reachable in the collection.
   const universeProducts = useMemo(() => {
     if (!product || !allProducts || !product.universeSlug) return [];
     return allProducts
-      .filter((p) => p.slug !== product.slug && p.universeSlug === product.universeSlug)
-      .slice(0, 3);
+      .filter(
+        (p) =>
+          p.slug !== product.slug &&
+          p.universeSlug === product.universeSlug &&
+          !hasLicensedMark(p),
+      )
+      .slice(0, 4);
   }, [product, allProducts]);
 
-  // Expression Recommendations (same visual presence across worlds)
   const expressionProducts = useMemo(() => {
     if (!product || !allProducts) return [];
     return allProducts
-      .filter((p) => p.slug !== product.slug && getExpressionScore(p) === expScore)
-      .slice(0, 3);
+      .filter(
+        (p) =>
+          p.slug !== product.slug &&
+          getExpressionScore(p) === expScore &&
+          !hasLicensedMark(p),
+      )
+      .slice(0, 4);
   }, [product, allProducts, expScore]);
 
   const relatedProducts = useMemo(() => {
     if (!product || !allProducts) return [];
     return allProducts
-      .filter((p) => p.slug !== product.slug && (p.categorySlug === product.categorySlug || p.featured))
-      .slice(0, 3);
+      .filter(
+        (p) =>
+          p.slug !== product.slug &&
+          (p.categorySlug === product.categorySlug || p.featured) &&
+          !hasLicensedMark(p),
+      )
+      .slice(0, 4);
   }, [product, allProducts]);
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl text-accent animate-pulse">✦</div>
-          <p className="font-serif text-xl text-ink mt-2">Unfolding Atelier Piece...</p>
+      <div className="min-h-screen bg-cream">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12 lg:py-16">
+          <p className="loom-label text-ink-muted">Product</p>
+          <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+            <div className="aspect-[4/5] w-full animate-pulse bg-panel" />
+            <div className="space-y-3">
+              <div className="h-8 w-3/4 animate-pulse bg-panel" />
+              <div className="h-4 w-1/2 animate-pulse bg-panel" />
+              <div className="h-10 w-28 animate-pulse bg-panel" />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -162,82 +184,36 @@ export const ProductDetail: React.FC = () => {
 
   if (isError || !product || !currentVariant) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="font-serif text-3xl text-ink">Garment Not Found in Atelier</h2>
-        <p className="text-xs text-ink-muted mt-2">This edition may have been retired or moved to the archives.</p>
-        <Link to="/shop" className="mt-6">
-          <Button variant="primary">Return to Collections</Button>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-6 text-center">
+        <p className="loom-label text-ink-muted">Not in the catalogue</p>
+        <h1 className="loom-display mt-3 text-3xl text-ink">This piece is no longer listed</h1>
+        <p className="mt-2 max-w-[44ch] font-sans text-sm leading-relaxed text-ink-muted">
+          It may have sold through, or the link may be from an older catalogue.
+          Everything currently available is in the collection.
+        </p>
+        <Link
+          to="/shop"
+          className="mt-6 inline-flex min-h-[48px] items-center justify-center bg-ink px-6 font-sans text-[13px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent"
+        >
+          Shop the collection
+          <span aria-hidden="true">→</span>
         </Link>
       </div>
     );
   }
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current) return;
-    const rect = imageContainerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const percentX = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    const percentY = Math.max(0, Math.min(100, (y / rect.height) * 100));
-    setZoomCoords({ x, y, percentX, percentY });
-  };
-
-  const handleAddToCart = () => {
-    if (currentVariant.status === 'out-of-stock') {
-      showToast({
-        title: 'Sold out in this size',
-        description: 'Please choose another size or join the dispatch for restock.',
-        type: 'info',
-      });
-      return;
-    }
-    const max = currentVariant.quantity ?? 99;
-    const safeQty = Math.min(Math.max(1, quantity), max);
-    addItem(product.slug, currentVariant.sku, safeQty, undefined, max);
-    showToast({
-      title: 'Added to Atelier Bag',
-      description: `${safeQty}× ${product.name} (size ${currentVariant.size})`,
-      type: 'success',
-    });
-  };
-
-  const handleWishlistToggle = () => {
-    toggleWishlist(product.slug);
-    const saved = !isWishlisted(product.slug);
-    showToast({
-      title: saved ? 'Saved to Wishlist' : 'Removed from Wishlist',
-      description: product.name,
-      type: saved ? 'accent' : 'info',
-    });
-  };
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewAuthor || !reviewTitle || !reviewComment) return;
-
-    setIsSubmittingReview(true);
-    await submitReview({
-      productSlug: product.slug,
-      author: reviewAuthor,
-      rating: reviewRating,
-      title: reviewTitle,
-      comment: reviewComment,
-    });
-    setIsSubmittingReview(false);
-    setIsReviewModalOpen(false);
-    setReviewAuthor('');
-    setReviewTitle('');
-    setReviewComment('');
-    showToast({
-      title: 'Review Submitted',
-      description: 'Thank you for your connoisseur feedback.',
-      type: 'success',
-    });
-    refetchReviews();
-  };
-
   const activeImage = product.images[selectedImageIndex] || product.images[0];
   const isWish = isWishlisted(product.slug);
+  const soldOut = currentVariant.status === 'out-of-stock';
+  const maxQty = currentVariant.quantity ?? 99;
+
+  const swapExtension = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.dataset.tried) return;
+    target.dataset.tried = 'true';
+    if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
+    else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
+  };
 
   const toAbsoluteUrl = (src: string): string => {
     if (/^https?:\/\//.test(src)) return src;
@@ -258,19 +234,20 @@ export const ProductDetail: React.FC = () => {
       '@type': 'Offer',
       priceCurrency: 'INR',
       price: (currentVariant.priceCents / 100).toFixed(0),
-      availability:
-        currentVariant.status === 'out-of-stock'
-          ? 'https://schema.org/OutOfStock'
-          : 'https://schema.org/InStock',
+      availability: soldOut
+        ? 'https://schema.org/OutOfStock'
+        : 'https://schema.org/InStock',
     },
-    ...(reviews && reviews.length > 0
+    // Structured aggregate data is only emitted when review rows exist, for the
+    // same reason the star row is gone: a seed default is not a rating.
+    ...(reviewAggregate
       ? {
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1),
-            reviewCount: reviews.length,
+            ratingValue: reviewAggregate.value.toFixed(1),
+            reviewCount: reviewAggregate.count,
           },
-          review: reviews.slice(0, 5).map((r) => ({
+          review: (reviews ?? []).slice(0, 5).map((r) => ({
             '@type': 'Review',
             author: { '@type': 'Person', name: r.author },
             reviewRating: { '@type': 'Rating', ratingValue: r.rating },
@@ -281,1127 +258,938 @@ export const ProductDetail: React.FC = () => {
       : {}),
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const percentX = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const percentY = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setZoomCoords({ percentX, percentY });
+  };
+
+  const handleAddToCart = () => {
+    if (soldOut) {
+      showToast({
+        title: 'Sold out in this size',
+        description: 'Choose another size, or save the piece to be told when it returns.',
+        type: 'info',
+      });
+      return;
+    }
+    const safeQty = Math.min(Math.max(1, quantity), maxQty);
+    addItem(product.slug, currentVariant.sku, safeQty, undefined, maxQty);
+    showToast({
+      title: 'Added to bag',
+      description: `${safeQty} × ${product.name} (size ${currentVariant.size})`,
+      type: 'success',
+    });
+  };
+
+  const handleWishlistToggle = () => {
+    toggleWishlist(product.slug);
+    showToast({
+      title: !isWish ? 'Saved' : 'Removed',
+      description: product.name,
+      type: !isWish ? 'accent' : 'info',
+    });
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewAuthor || !reviewTitle || !reviewComment) return;
+    setIsSubmittingReview(true);
+    await submitReview({
+      productSlug: product.slug,
+      author: reviewAuthor,
+      rating: reviewRating,
+      title: reviewTitle,
+      comment: reviewComment,
+    });
+    setIsSubmittingReview(false);
+    setIsReviewModalOpen(false);
+    setReviewAuthor('');
+    setReviewTitle('');
+    setReviewComment('');
+    showToast({ title: 'Review posted', description: 'Thank you — it now appears below.', type: 'success' });
+    refetchReviews();
+  };
+
+  // ── Facts this page may state ─────────────────────────────────────────
+  // Every value here is read from the product row. Nothing is inferred,
+  // rounded up, or filled in with a plausible-sounding default.
+  const specFacts: Array<[string, string]> = [
+    ['Textile', product.fabricGsm ? `${product.fabricGsm} GSM` : (product.material?.[0] ?? '')],
+    ['Technique', product.embroidery?.techniqueLabel ?? ''],
+    ['Fit', product.fit ?? ''],
+    ['Made in', formatCountryOfOrigin(product.countryOfOrigin)],
+  ].filter(([, v]) => Boolean(v)) as Array<[string, string]>;
+
+  const deliveryLine =
+    product.deliveryDaysMin != null && product.deliveryDaysMax != null
+      ? `Dispatches in ${product.deliveryDaysMin}–${product.deliveryDaysMax} days`
+      : 'Dispatches from the workshop';
+
+  const returnLine =
+    product.returnWindowDays && product.returnWindowDays > 0
+      ? `${product.returnWindowDays}-day return window`
+      : 'Made to order — not returnable';
+
+  const sections = [
+    {
+      id: 'technique',
+      title: 'Needlework & technique',
+      body: product.embroidery ? (
+        <div className="space-y-3">
+          <p className="font-sans text-[14px] font-medium text-ink">
+            {product.embroidery.techniqueLabel}
+          </p>
+          <p className="font-sans text-[14px] leading-relaxed text-ink-muted">
+            {product.embroidery.motifStory}
+          </p>
+          <dl className="grid grid-cols-1 gap-x-8 gap-y-2 pt-2 sm:grid-cols-2">
+            {[
+              ['Thread', product.embroidery.threadComposition],
+              ['Placement', product.embroidery.placement?.join(', ')],
+              [
+                'Working time',
+                // `artisan_hours` defaults to 0 in the schema, so a piece whose
+                // hours were never recorded arrives as 0 — which is how this
+                // page used to print "0 hours of threadwork" on 28 of 29
+                // products. Zero means "not recorded", never "no work".
+                product.embroidery.artisanHours != null && product.embroidery.artisanHours > 0
+                  ? `${product.embroidery.artisanHours} hours`
+                  : 'Recorded on the certificate',
+              ],
+            ]
+              .filter(([, v]) => Boolean(v))
+              .map(([k, v]) => (
+                <div key={k as string} className="flex gap-3">
+                  <dt className="w-28 shrink-0 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                    {k}
+                  </dt>
+                  <dd className="font-sans text-[13px] text-ink">{v}</dd>
+                </div>
+              ))}
+          </dl>
+        </div>
+      ) : null,
+    },
+    {
+      id: 'materials',
+      title: 'Cloth & composition',
+      body: (
+        <div className="space-y-3">
+          <p className="max-w-[62ch] font-sans text-[14px] leading-relaxed text-ink-muted">
+            {product.description}
+          </p>
+          {product.material && product.material.length > 0 && (
+            <ul className="space-y-1">
+              {product.material.map((m) => (
+                <li key={m} className="font-sans text-[13px] text-ink">
+                  {m}
+                </li>
+              ))}
+            </ul>
+          )}
+          {product.attributes && Object.keys(product.attributes).length > 0 && (
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-stone pt-3 sm:grid-cols-2">
+              {Object.entries(product.attributes).map(([k, v]) => (
+                <div key={k} className="flex gap-3">
+                  <dt className="w-36 shrink-0 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                    {k.replace(/_/g, ' ')}
+                  </dt>
+                  <dd className="font-sans text-[13px] text-ink">{String(v).replace(/-/g, ' ')}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'fit',
+      title: 'Fit & measurements',
+      body: (
+        <div className="space-y-3">
+          {product.fitNotes && (
+            <p className="font-sans text-[14px] leading-relaxed text-ink">{product.fitNotes}</p>
+          )}
+          {(product.modelHeightCm || product.modelWornSize) && (
+            <p className="font-sans text-[13px] text-ink-muted">
+              {product.modelHeightCm ? `Model is ${product.modelHeightCm} cm` : 'Model'}
+              {product.modelWornSize ? ` and wears size ${product.modelWornSize}.` : '.'}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => setIsSizeGuideOpen(true)}
+            className="inline-flex min-h-[44px] items-center font-sans text-[13px] text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+          >
+            Garment measurements for every size
+          </button>
+        </div>
+      ),
+    },
+    {
+      id: 'care',
+      title: 'Care & storage',
+      body: (
+        <ul className="space-y-1.5">
+          {(product.care ?? ['Cold wash, inside out. Dry flat away from direct sun.']).map((c) => (
+            <li key={c} className="font-sans text-[13px] leading-relaxed text-ink-muted">
+              {c}
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      id: 'delivery',
+      title: 'Dispatch & returns',
+      body: (
+        <div className="space-y-2 font-sans text-[13px] leading-relaxed text-ink-muted">
+          <p>{deliveryLine}. Every order leaves with its own numbered certificate.</p>
+          <p>
+            {product.codAvailable
+              ? 'Cash on delivery is available. A ₹59 handling fee applies to COD orders.'
+              : 'Prepaid only — UPI, cards and net banking.'}
+          </p>
+          <p>
+            {product.returnWindowDays && product.returnWindowDays > 0
+              ? `${returnLine} from delivery, unworn and with the tags attached.`
+              : 'Cut to order for this size, so it cannot be returned.'}
+          </p>
+          <p>Carriage is ₹99, waived on orders above ₹1,499.</p>
+        </div>
+      ),
+    },
+  ].filter((s) => s.body);
+
   return (
-    <div className="bg-cream min-h-screen">
+    <div className="min-h-screen bg-cream">
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      {/* Breadcrumb Bar */}
-      <div className="border-b border-stone/50 bg-paper py-3">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 flex items-center text-xs tracking-wider uppercase font-sans text-ink-muted">
-          <Link to="/" className="hover:text-ink transition-colors">Home</Link>
-          <span className="mx-2 text-stone">/</span>
-          {universe ? (
+
+      {/* ── Breadcrumb ──────────────────────────────────────────────── */}
+      <nav aria-label="Breadcrumb" className="border-b border-stone">
+        <div className="mx-auto flex max-w-[var(--container-max)] items-center gap-2 overflow-hidden px-4 py-3 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted sm:px-6 lg:px-12">
+          <Link to="/" className="transition-colors hover:text-ink">Home</Link>
+          <span aria-hidden="true">/</span>
+          {universe && (
             <>
-              <Link to={`/universes/${universe.slug}`} className="hover:text-ink transition-colors">{universe.name}</Link>
-              <span className="mx-2 text-stone">/</span>
+              <Link to={`/universes/${universe.slug}`} className="whitespace-nowrap transition-colors hover:text-ink">
+                {universe.name}
+              </Link>
+              <span aria-hidden="true">/</span>
             </>
-          ) : null}
+          )}
           {product.garmentType ? (
-            <Link to={`/clothing/${product.garmentType}`} className="text-accent hover:text-ink transition-colors font-medium capitalize">
-              {product.garmentType}s
+            <Link
+              to={`/clothing/${product.garmentType}`}
+              className="whitespace-nowrap capitalize transition-colors hover:text-ink"
+            >
+              {product.garmentType === 'scarf' ? 'scarves' : `${product.garmentType}s`}
             </Link>
           ) : (
-            <Link to={`/category/${product.categorySlug}`} className="text-accent hover:text-ink transition-colors font-medium capitalize">
+            <Link
+              to={`/category/${product.categorySlug}`}
+              className="whitespace-nowrap capitalize transition-colors hover:text-ink"
+            >
               {product.categorySlug}
             </Link>
           )}
-          <span className="mx-2 text-stone">/</span>
-          <span className="text-ink truncate max-w-[200px]">{product.name}</span>
+          <span aria-hidden="true">/</span>
+          <span className="truncate text-ink" aria-current="page">{product.name}</span>
         </div>
-      </div>
+      </nav>
 
-      {/* Main PDP Container */}
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 lg:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-          
-          {/* LEFT: Multi-Image Gallery & Interactive Macro Loupe Zoom */}
-          <div className="lg:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
-            {/* Thumbnail Strip */}
-            <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImageIndex(idx)}
-                  aria-label={`View image ${idx + 1} of ${product.images.length}`}
-                  aria-pressed={selectedImageIndex === idx}
-                  className={`w-16 sm:w-20 aspect-[3/4] border overflow-hidden flex-shrink-0 transition-all min-h-[44px] ${
-                    selectedImageIndex === idx
-                      ? 'border-gold ring-2 ring-gold/30 shadow-sm'
-                      : 'border-transparent opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (!target.dataset.tried) {
-                        target.dataset.tried = 'true';
-                        if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
-                        else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
-                      }
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
-
-            {/* Main Interactive Stage */}
-            <div className="flex-1 relative">
+      <div className="mx-auto max-w-[var(--container-max)] px-4 pb-16 pt-8 sm:px-6 lg:px-12 lg:pb-24 lg:pt-10">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-14">
+          {/* ── THE PLATE ──────────────────────────────────────────── */}
+          <div>
+            <div className="relative bg-paper">
+              {/* The frame follows the photograph instead of forcing it into a
+                  4:5 box. Catalogue shots range from 0.77 to 1.11 in aspect,
+                  so a fixed portrait frame left a third of the plate empty on
+                  every landscape shot. Height-capped, width-following, centred
+                  on paper: no crop, no dead band. */}
               <div
                 ref={imageContainerRef}
                 onMouseEnter={() => setIsZooming(true)}
                 onMouseLeave={() => setIsZooming(false)}
                 onMouseMove={handleMouseMove}
-                className="relative aspect-[3/4] bg-stone/20 overflow-hidden border border-stone cursor-crosshair group shadow-md"
+                className="flex w-full items-center justify-center"
               >
-                <img
-                  src={activeImage.src}
-                  alt={activeImage.alt}
-                  className="w-full h-full object-cover select-none"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    if (!target.dataset.tried) {
-                      target.dataset.tried = 'true';
-                      if (target.src.endsWith('.jpg')) target.src = target.src.replace(/\.jpg$/, '.png');
-                      else if (target.src.endsWith('.png')) target.src = target.src.replace(/\.png$/, '.jpg');
-                    }
-                  }}
-                />
+                <div className="relative w-fit max-w-full">
+                  <img
+                    src={activeImage.src}
+                    alt={activeImage.alt || product.name}
+                    className="block h-auto max-h-[76svh] w-auto max-w-full select-none object-contain"
+                    onError={swapExtension}
+                  />
 
-                {/* Macro Loupe Lens Hover Window (Pillar 1) */}
-                {isZooming && (
-                  <div
-                    className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
-                    style={{
-                      backgroundImage: `url(${activeImage.src})`,
-                      backgroundPosition: `${zoomCoords.percentX}% ${zoomCoords.percentY}%`,
-                      backgroundSize: '280%',
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  >
-                    <div className="absolute top-4 left-4 bg-ink/90 text-cream px-3 py-1 text-[10px] tracking-widest uppercase font-sans backdrop-blur-md border border-stone/30">
-                      3x Macro Thread Inspection
-                    </div>
-                  </div>
-                )}
-
-                {/* Badges on Image */}
-                {product.embroidery && (
-                  <div className="absolute bottom-4 left-4 bg-cream/95 text-ink backdrop-blur-md px-3 py-1.5 text-[11px] tracking-widest uppercase border border-stone shadow-sm">
-                    {product.embroidery.techniqueLabel}
-                  </div>
-                )}
-
-                <div className="absolute top-4 right-4 bg-ink/75 text-cream text-[10px] px-2.5 py-1 tracking-widest uppercase backdrop-blur-xs">
-                  Hover to Inspect Stitches
-                </div>
-              </div>
-
-              {/* Embroidery Hours Pill (+ Handcrafted badge only when flagged) */}
-              {product.embroidery?.artisanHours && (
-                <div className="mt-4 p-3 bg-paper border border-stone flex items-center justify-between text-xs text-ink-muted">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 20l3-3m2-2l9.5-9.5a1.5 1.5 0 00-2-2L7 13l-3 3m9-9l2 2M9 7l8 8" />
-                    </svg>
-                    <span className="font-serif text-ink text-sm">
-                      {product.embroidery.artisanHours} hours of embroidery threadwork
-                    </span>
-                  </div>
-                  <span className={`text-[10px] uppercase tracking-widest font-medium ${product.handcrafted ? 'text-gold-deep' : 'text-ink'}`}>
-                    {product.handcrafted ? 'Handcrafted piece' : 'Atelier finish'}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: Product Buy Box & Tailoring Specs */}
-          <div ref={buyBoxRef} className="lg:col-span-5 flex flex-col justify-between">
-            <div>
-              {/* Universe tag + transliteration + Bestseller (render 09) */}
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2 text-xs">
-                  {universe && (
-                    <Link
-                      to={`/universes/${universe.slug}`}
-                      className="inline-flex items-center gap-1.5 bg-gold-deep/10 text-gold-deep font-sans tracking-[0.18em] uppercase px-2.5 py-1"
-                    >
-                      <span aria-hidden="true">◉</span> {universe.name}
-                    </Link>
-                  )}
-                  {product.foreignTagline && (
-                    <span className="text-ink-muted font-serif" lang="ja">
-                      {product.foreignTagline}
-                    </span>
-                  )}
-                </div>
-                {product.featured && (
-                  <span className="text-xs text-ink font-medium inline-flex items-center gap-1">
-                    Bestseller <span aria-hidden="true" className="text-gold-deep">🔥</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Category, Craft Region & Batch Scarcity Marker */}
-              <div className="flex flex-col gap-1.5 mb-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-sans text-[11px] tracking-[0.25em] text-accent uppercase font-medium">
-                    {formatCountryOfOrigin(product.countryOfOrigin)} // {product.garmentType ?? product.categorySlug}
-                  </span>
-                  <div className="flex items-center gap-1.5 text-xs text-ink">
-                    {displayRating ? (
-                      <>
-                        <span className="text-gold-deep" aria-hidden="true">
-                          {'★'.repeat(Math.round(displayRating.value))}
-                        </span>
-                        <span className="font-medium">{displayRating.value.toFixed(1)}</span>
-                        <span className="text-ink-muted text-[11px]">({displayRating.count} reviews)</span>
-                      </>
-                    ) : (
-                      <span className="text-ink-muted text-[11px]">No reviews yet</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Collection + Craft provenance strip */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] uppercase font-sans tracking-widest">
-                  {(product.collectionSlug || product.artStyleSlug) && (
-                    <span className="inline-flex items-center gap-2 text-ink">
-                      <span className="text-ink-muted font-medium">Collection</span>
-                      <Link
-                        to={`/collections/${product.collectionSlug || product.artStyleSlug}`}
-                        className="font-medium text-ink hover:text-accent transition-colors underline decoration-stone/50 underline-offset-4"
-                      >
-                        {COLLECTIONS.find((s) => s.slug === (product.collectionSlug || product.artStyleSlug))?.name.replace(' Collection', '') ??
-                          (product.collectionSlug || product.artStyleSlug)?.replace(/-/g, ' ')}
-                      </Link>
-                    </span>
-                  )}
-                  {(product.craftTechniques ?? []).map((t) => (
-                    <Link
-                      key={t}
-                      to={`/atelier/${t}`}
-                      className="border border-stone/70 px-2 py-0.5 hover:border-ink hover:text-accent transition-colors"
-                    >
-                      {t.replace(/-/g, ' ')}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Trust row — replaces the old batch/cluster scarcity strip.
-                    These are the surfaces a first-time tier-2/3 buyer checks
-                    before adding to bag (docs/11-data-model §5). */}
-                <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] uppercase font-sans tracking-widest text-ink-muted">
-                  {product.codAvailable && (
-                    <span className="text-ink font-medium">Cash on delivery</span>
-                  )}
-                  {product.returnWindowDays != null && product.returnWindowDays > 0 && (
-                    <span>{product.returnWindowDays}-day returns</span>
-                  )}
-                  {product.returnWindowDays === 0 && (
-                    <span>Made to order · non-returnable</span>
-                  )}
-                  {product.deliveryDaysMin != null && product.deliveryDaysMax != null && (
-                    <span>
-                      Delivers in {product.deliveryDaysMin}–{product.deliveryDaysMax} days
-                    </span>
+                  {/* Magnified inspection, following the cursor. */}
+                  {isZooming && (
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 overflow-hidden"
+                      style={{
+                        backgroundImage: `url(${activeImage.src})`,
+                        backgroundPosition: `${zoomCoords.percentX}% ${zoomCoords.percentY}%`,
+                        backgroundSize: '260%',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    />
                   )}
                 </div>
               </div>
 
-              {/* Title & Subtitle */}
-              <h1 className="font-serif text-4xl sm:text-5xl text-ink font-normal leading-[1.05] tracking-tight">
-                {product.name}
-              </h1>
-              <p className="font-serif italic text-lg text-ink-muted mt-2 leading-relaxed">
-                {product.subtitle}
+              {/* Frame counter reads from the real gallery length. */}
+              <p className="loom-label absolute bottom-0 left-0 bg-paper px-2.5 py-1.5 text-ink-muted">
+                {selectedImageIndex + 1} / {product.images.length}
               </p>
 
-              {/* Expression Scale & Placement Badge (Spec PDP requirement) */}
-              <div className="mt-4 p-3.5 bg-paper border border-stone/70 space-y-2.5">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 bg-ink text-cream text-[11px] font-mono font-bold flex items-center justify-center shrink-0">
-                      {expScore}
-                    </span>
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] uppercase font-sans tracking-widest text-ink-muted">
-                          Expression
-                        </span>
-                        <span className="text-xs font-serif font-semibold text-accent">
-                          Level {expScore} / 5 · {expInfo?.name ?? 'Artistic'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-ink-muted leading-tight font-light mt-0.5">
-                        {expInfo?.tagline ?? 'Medium compositions, illustrative designs.'}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsExpressionModalOpen(true)}
-                    className="text-[10px] uppercase font-sans tracking-widest text-accent hover:underline font-semibold cursor-pointer shrink-0 ml-2"
-                  >
-                    Explain Scale ↗
-                  </button>
-                </div>
-
-                {product.embroidery?.placement && product.embroidery.placement.length > 0 && (
-                  <div className="pt-2 border-t border-stone/30 flex items-center gap-2 text-[10px] text-ink-muted">
-                    <span className="uppercase tracking-wider font-medium text-ink/70">
-                      Placement Zones:
-                    </span>
-                    <span className="font-serif italic text-ink">
-                      {product.embroidery.placement.join(' • ')}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Price: serif + compare-at + computed %OFF (render 09) */}
-              <div className="mt-5 pb-5 border-b border-stone/50">
-                <div className="flex items-baseline gap-3 flex-wrap">
-                  <span className="font-serif text-3xl sm:text-4xl text-ink font-bold">
-                    {formatPrice(currentVariant.priceCents)}
-                  </span>
-                  {currentVariant.compareAtPriceCents &&
-                    currentVariant.compareAtPriceCents > currentVariant.priceCents && (
-                      <>
-                        <span className="text-base text-ink-muted line-through">
-                          {formatPrice(currentVariant.compareAtPriceCents)}
-                        </span>
-                        <span className="text-[12px] font-sans font-semibold px-2 py-0.5 text-accent bg-accent-soft">
-                          {discountPct}% OFF
-                        </span>
-                      </>
-                    )}
-                </div>
-
-                {/* First-order incentive, in the house accent rather than a
-                    second colour family. */}
-                <div className="mt-3 p-3 border border-accent-border bg-accent-soft flex items-center justify-between gap-3 text-xs text-ink font-sans">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base text-accent" aria-hidden="true">✦</span>
-                    <span>
-                      Get an extra 10% off with code{' '}
-                      <strong className="font-mono font-bold text-accent">HUSTLE10</strong> at checkout
-                    </span>
-                  </div>
-                  <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide bg-accent text-on-accent px-2 py-0.5">
-                    Apply in bag
-                  </span>
-                </div>
-
-                <p className="text-[11px] text-ink-muted mt-2 font-light">
-                  Inclusive of all taxes. Hand-numbered certificate of authenticity included with each piece.
+              {soldOut && (
+                <p className="absolute right-0 top-0 bg-ink px-3 py-2 font-sans text-[11px] uppercase tracking-[0.16em] text-cream">
+                  Sold out
                 </p>
-                {/* EMI line (render 09) — figure computed from variant price; the
-                    render's "with simpl" brand claim deferred: no EPI integration
-                    exists yet, so it stays a neutral promise (logged deviation) */}
-                <p className="font-serif text-xs text-ink-muted mt-1.5">
-                  or {formatPrice(Math.round(currentVariant.priceCents / 6)).replace('-', '')}/month for 6 months ·
-                  EMI options confirmed at checkout
-                </p>
-              </div>
-
-              {/* Non-Accordion Initial Garment Specifications (Mobile-Optimized) */}
-              <div className="my-5 p-4 bg-paper border border-stone/70">
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  {product.fabricGsm && (
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Textile Spec</span>
-                      <span className="text-ink font-medium">{product.fabricGsm}</span>
-                    </div>
-                  )}
-                  {product.embroidery?.artisanHours != null && (
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Embroidery Time</span>
-                      <span className="text-ink font-medium">{product.embroidery.artisanHours} hours of threadwork</span>
-                    </div>
-                  )}
-                  {product.embroidery?.techniqueLabel && (
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Craft Technique</span>
-                      <span className="text-ink font-medium">{product.embroidery.techniqueLabel}</span>
-                    </div>
-                  )}
-                  {product.fit && (
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider text-ink-muted block font-medium">Fit Profile</span>
-                      <span className="text-ink font-medium">{product.fit}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Variant Picker: Sizes (no colour option — one colour per piece) */}
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-sans tracking-widest uppercase text-ink font-medium">
-                    Size: <span className="text-ink-muted font-normal">{currentVariant.size}</span>
-                  </span>
-                  <button
-                    onClick={() => setIsSizeGuideOpen(true)}
-                    className="text-[11px] uppercase tracking-widest text-accent hover:underline font-medium"
-                  >
-                    India & International Sizing →
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2.5">
-                  {product.variants
-                    .map((v) => {
-                      const isSelected = currentVariant.sku === v.sku;
-                      const isOut = v.status === 'out-of-stock';
-                      const sizeLabel =
-                        v.size === 'S' ? '38 (S)' :
-                        v.size === 'M' ? '40 (M)' :
-                        v.size === 'L' ? '42 (L)' :
-                        v.size === 'XL' ? '44 (XL)' : v.size;
-                      return (
-                        <button
-                          key={v.sku}
-                          onClick={() => !isOut && setSelectedVariant(v)}
-                          disabled={isOut}
-                          aria-label={`Size ${sizeLabel}${isOut ? ' — sold out' : ''}`}
-                          aria-pressed={isSelected}
-                          className={`min-w-[64px] min-h-[44px] h-11 px-3 text-xs font-sans border transition-all flex flex-col items-center justify-center ${
-                            isOut
-                              ? 'bg-cream text-ink-muted/50 border-stone/40 line-through cursor-not-allowed'
-                              : isSelected
-                                ? 'border-gold bg-gold/10 text-ink font-medium shadow-sm'
-                                : 'bg-paper text-ink border-stone hover:border-ink/60'
-                          }`}
-                        >
-                          <span>{sizeLabel}</span>
-                          {isOut && <span className="text-[9px] no-underline">Sold out</span>}
-                        </button>
-                      );
-                    })}
-                </div>
-                {/* Stock Indicator */}
-                <div className="mt-2.5 flex items-center gap-2 text-xs">
-                  <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-ink-muted text-[11px]">
-                    {currentVariant.quantity && currentVariant.quantity <= 2
-                      ? `Small batch alert: Only ${currentVariant.quantity} pieces left in atelier`
-                      : 'In stock — ready for dispatch from regional workshop'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Quantity Stepper & Add to Bag */}
-              <div className="mt-8 flex gap-3">
-                <div className="flex items-center border border-stone bg-paper">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    aria-label="Decrease quantity"
-                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
-                  >
-                    –
-                  </button>
-                  <span className="w-10 text-center font-sans text-xs font-medium text-ink">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity((q) => Math.min(currentVariant.quantity ?? 99, q + 1))}
-                    aria-label="Increase quantity"
-                    className="w-11 h-12 flex items-center justify-center text-ink hover:text-accent transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <CtaButton className="flex-1" onClick={handleAddToCart}>
-                  Add to Bag <span aria-hidden="true">→</span>
-                </CtaButton>
-
-                {/* Wishlist Button */}
-                <button
-                  onClick={handleWishlistToggle}
-                  aria-label={isWish ? 'Remove from wishlist' : 'Save to wishlist'}
-                  aria-pressed={isWish}
-                  className={`min-w-[44px] min-h-[44px] w-12 h-12 border flex items-center justify-center transition-colors ${
-                    isWish
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-stone bg-paper text-ink-muted hover:text-ink hover:border-ink'
-                  }`}
-                >
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Trust row (render 09) — line-icon SVGs, no emoji */}
-              <div className="mt-4 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                  'Free shipping on orders above ₹500'
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7H4v13h16V7zM4 7l2-3h12l2 3M9 11h6" />
-                  </svg>
-                  14-day home inspection
-                </span>
-                <span className="hidden sm:flex items-center gap-1.5">
-                  <svg className="w-4 h-4 shrink-0 text-gold-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 3l8 3v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-3zm-2.5 8.5l2 2 4-4" />
-                  </svg>
-                  Secure payments · UPI, Cards, COD
-                </span>
-              </div>
-
-              {/* India Pincode Delivery ETA & Trust Block (Task S1.9) */}
-              <div className="mt-5 p-4 bg-paper border border-stone/80 rounded-sm space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-sans uppercase tracking-widest text-ink font-medium">
-                    Estimated Delivery & Pincode Checker
-                  </span>
-                  <span className="text-[10px] text-accent font-medium">Pan-India Express</span>
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Enter 6-digit PIN code (e.g. 110001, 400001)"
-                    className="flex-1 bg-cream border border-stone px-3 py-2 text-xs text-ink placeholder:text-warm-gray focus:outline-accent"
-                  />
-                  <button
-                    type="button"
-                    onClick={checkPincode}
-                    className="px-4 py-2 bg-ink text-cream hover:bg-accent text-xs uppercase tracking-wider transition-colors font-medium"
-                  >
-                    Check
-                  </button>
-                </div>
-                {pincodeEta && (
-                  <p className="text-xs text-ink font-medium bg-cream p-2.5 border border-stone/50">
-                    ✦ {pincodeEta}
-                  </p>
-                )}
-                <div className="pt-2 border-t border-stone/40 grid grid-cols-2 gap-2 text-[10px] text-ink-muted uppercase tracking-wider font-light">
-                  <span>✓ Cash on Delivery (COD)</span>
-                  <span>✓ UPI / NetBanking / Cards</span>
-                  <span>✓ Free Express Shipping</span>
-                  <span>✓ 7-Day Doorstep Exchange</span>
-                </div>
-              </div>
-
-              {/* Bespoke Personalization CTA */}
-              {product.customizable && (
-                <div className="mt-4 p-4 bg-paper border border-stone/80 rounded-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] uppercase font-sans tracking-widest text-accent font-medium block">
-                        ✦ Bespoke Studio Available
-                      </span>
-                      <p className="text-xs text-ink font-serif mt-0.5">
-                        Personalize with embroidered monogram or botanical motif
-                      </p>
-                    </div>
-                    <Button
-                      variant="accent"
-                      size="sm"
-                      onClick={() => openCustomizer(product)}
-                      className="text-[10px] tracking-widest px-3"
-                    >
-                      Customize
-                    </Button>
-                  </div>
-                </div>
               )}
             </div>
 
-            {/* Accordion Pillars: Craftsmanship, Fabrics, Fit & Care */}
-            <div className="mt-10 border-t border-stone/60 divide-y divide-stone/60">
-              
-              {/* Accordion 1: Technique & Needlework */}
-              {product.embroidery && (
-                <div>
+            {/* Thumbnails: one horizontal rail, no vertical strip running
+                past the buy box. */}
+            {product.images.length > 1 && (
+              <div
+                role="group"
+                aria-label="Product photographs"
+                className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {product.images.map((img, idx) => (
                   <button
-                    onClick={() => setActiveAccordion(activeAccordion === 'technique' ? null : 'technique')}
-                    aria-expanded={activeAccordion === 'technique'}
-                    className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                    key={`${img.src}-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    aria-label={`Photograph ${idx + 1} of ${product.images.length}`}
+                    aria-pressed={selectedImageIndex === idx}
+                    className={`relative h-16 w-[52px] shrink-0 overflow-hidden bg-paper transition-opacity sm:h-20 sm:w-16 ${
+                      selectedImageIndex === idx
+                        ? 'opacity-100 outline outline-1 outline-ink'
+                        : 'opacity-55 hover:opacity-100'
+                    }`}
                   >
-                    <span>Needlecraft & Technique</span>
-                    <span className="text-sm">{activeAccordion === 'technique' ? '–' : '+'}</span>
+                    <img
+                      src={img.src}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                      onError={swapExtension}
+                    />
                   </button>
-                  {activeAccordion === 'technique' && (
-                    <div className="pb-5 text-xs text-ink-muted space-y-2.5 font-light leading-relaxed">
-                      <p className="text-ink font-serif text-sm">
-                        {product.embroidery.techniqueLabel}
-                      </p>
-                      <p>{product.embroidery.motifStory}</p>
-                      <div className="pt-2 grid grid-cols-2 gap-2 text-[11px] text-ink">
-                        <div>
-                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-[9px]">
-                            Thread Composition
-                          </strong>
-                          {product.embroidery.threadComposition}
-                        </div>
-                        <div>
-                          <strong className="font-medium text-ink-muted uppercase tracking-wider block text-[9px]">
-                            Placement Zones
-                          </strong>
-                          {product.embroidery.placement.join(', ')}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                ))}
+              </div>
+            )}
+
+            {/* Four frames that carry the proof live in their own strip after
+                the buy box, not under the plate: on a phone, four macro shots
+                between the photograph and the price pushed the title 1,400px
+                down the page. The buyer met the garment four times before
+                being told what it costs. */}
+          </div>
+
+          {/* ── THE BUY BOX ────────────────────────────────────────── */}
+          <div ref={buyBoxRef}>
+            {/* Provenance line: where you are, how it was made. */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[11px] uppercase tracking-[0.14em] text-ink-muted">
+              {universe ? (
+                <Link
+                  to={`/universes/${universe.slug}`}
+                  className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                >
+                  {universe.name}
+                </Link>
+              ) : (
+                <span className="text-ink">The Atelier</span>
               )}
+              <span aria-hidden="true">·</span>
+              <span>{product.embroidery?.techniqueLabel ?? 'Hand embroidery'}</span>
+              {product.handcrafted && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>Hand-worked</span>
+                </>
+              )}
+            </div>
 
-              {/* Accordion 2: Materials & Provenance */}
-              <div>
+            <h1
+              className="loom-display mt-3 text-ink"
+              style={{ fontSize: 'clamp(1.9rem, 3.4vw, 2.9rem)' }}
+            >
+              {product.name}
+            </h1>
+            <p className="mt-2 max-w-[46ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+              {product.subtitle}
+            </p>
+
+            {/* Price. Mono, tabular, first-class — the number the buyer came for. */}
+            <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-stone pt-5">
+              <span className="loom-price text-[30px] font-medium leading-none text-ink">
+                {formatPrice(currentVariant.priceCents)}
+              </span>
+              {discount && (
+                <>
+                  <span className="loom-price text-[15px] text-ink-muted line-through">
+                    {formatPrice(discount.mrpCents)}
+                  </span>
+                  <span className="font-sans text-[12px] font-medium uppercase tracking-[0.08em] text-accent">
+                    {discount.offPercent}% off
+                  </span>
+                </>
+              )}
+              <span className="w-full font-sans text-[12px] text-ink-muted">
+                Inclusive of all taxes. Carriage is ₹99, waived above ₹1,499.
+              </span>
+            </div>
+
+            {/* Rating: real rows only. An empty catalogue says so plainly. */}
+            <div className="mt-3 flex items-center gap-3">
+              {reviewAggregate ? (
+                <>
+                  <span className="loom-price text-[13px] text-ink">
+                    {reviewAggregate.value.toFixed(1)} / 5
+                  </span>
+                  <a
+                    href="#reviews"
+                    className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                  >
+                    {reviewAggregate.count} {reviewAggregate.count === 1 ? 'review' : 'reviews'}
+                  </a>
+                </>
+              ) : (
                 <button
-                  onClick={() => setActiveAccordion(activeAccordion === 'materials' ? null : 'materials')}
-                  aria-expanded={activeAccordion === 'materials'}
-                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
                 >
-                  <span>Textile Composition & Provenance</span>
-                  <span className="text-sm">{activeAccordion === 'materials' ? '–' : '+'}</span>
+                  No reviews yet — be the first
                 </button>
-                {activeAccordion === 'materials' && (
-                  <div className="pb-5 text-xs text-ink-muted space-y-2 font-light leading-relaxed">
-                    <p>{product.description}</p>
-                    {product.material && (
-                      <ul className="list-disc pl-4 space-y-1 text-ink mt-2">
-                        {product.material.map((m, i) => (
-                          <li key={i}>{m}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
+              )}
+            </div>
+
+            {/* Sizes. Square chips; the chest figure only where it is true. */}
+            <fieldset className="mt-7">
+              <div className="flex items-baseline justify-between gap-3">
+                <legend className="loom-label text-ink-muted">
+                  Size <span className="ml-2 normal-case tracking-normal text-ink">{currentVariant.size}</span>
+                </legend>
+                <button
+                  type="button"
+                  onClick={() => setIsSizeGuideOpen(true)}
+                  className="font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                >
+                  Measurements
+                </button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {orderedVariants(product).map((v) => {
+                  const isSelected = currentVariant.sku === v.sku;
+                  const isOut = v.status === 'out-of-stock';
+                  return (
+                    <button
+                      key={v.sku}
+                      type="button"
+                      onClick={() => !isOut && setSelectedVariant(v)}
+                      disabled={isOut}
+                      aria-label={`Size ${v.size}${isOut ? ' — sold out' : ''}`}
+                      aria-pressed={isSelected}
+                      className={`flex h-11 min-w-[56px] items-center justify-center border px-3 font-sans text-[13px] transition-colors ${
+                        isOut
+                          ? 'cursor-not-allowed border-stone text-ink-muted/60 line-through'
+                          : isSelected
+                            ? 'border-ink bg-ink text-cream'
+                            : 'border-stone-strong text-ink hover:border-ink'
+                      }`}
+                    >
+                      {v.size}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 font-sans text-[12px] text-ink-muted">
+                {soldOut
+                  ? 'This size is sold out.'
+                  : maxQty <= 2
+                    ? `Only ${maxQty} left in this size.`
+                    : 'In stock — dispatching from the workshop.'}
+              </p>
+            </fieldset>
+
+            {/* Add to bag */}
+            <div className="mt-6 flex gap-2">
+              <div className="flex items-center border border-stone-strong">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  aria-label="Decrease quantity"
+                  className="flex h-12 w-11 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-40"
+                  disabled={quantity <= 1}
+                >
+                  –
+                </button>
+                <span className="loom-price w-8 text-center text-[13px] text-ink">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+                  aria-label="Increase quantity"
+                  className="flex h-12 w-11 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-40"
+                  disabled={quantity >= maxQty}
+                >
+                  +
+                </button>
               </div>
 
-              {/* Accordion 3: Fit & Measurements */}
-              <div>
-                <button
-                  onClick={() => setActiveAccordion(activeAccordion === 'fit' ? null : 'fit')}
-                  aria-expanded={activeAccordion === 'fit'}
-                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={soldOut}
+                className="flex h-12 flex-1 items-center justify-center gap-2 bg-ink font-sans text-[13px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
+              >
+                {soldOut ? 'Sold out' : 'Add to bag'}
+                {!soldOut && <span aria-hidden="true">→</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleWishlistToggle}
+                aria-label={isWish ? 'Remove from saved' : 'Save this piece'}
+                aria-pressed={isWish}
+                className={`flex h-12 w-12 shrink-0 items-center justify-center border transition-colors ${
+                  isWish
+                    ? 'border-accent text-accent'
+                    : 'border-stone-strong text-ink hover:border-ink'
+                }`}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-[18px] w-[18px]"
+                  fill={isWish ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  aria-hidden="true"
                 >
-                  <span>Fit & Tailoring Dimensions</span>
-                  <span className="text-sm">{activeAccordion === 'fit' ? '–' : '+'}</span>
-                </button>
-                {activeAccordion === 'fit' && (
-                  <div className="pb-5 text-xs text-ink-muted space-y-3 font-light leading-relaxed">
-                    {product.fitNotes && (
-                      <p className="text-ink font-medium">{product.fitNotes}</p>
-                    )}
-                    {product.fit && !product.fitNotes && (
-                      <p className="text-ink font-medium">{product.fit}</p>
-                    )}
-                    {(product.modelHeightCm || product.modelWornSize) && (
-                      <p>
-                        {product.modelHeightCm ? `Model is ${product.modelHeightCm} cm` : 'Model'}
-                        {product.modelWornSize ? ` and wears size ${product.modelWornSize}.` : '.'}
-                      </p>
-                    )}
+                  <path d="M12 20.5 4.9 13.6a4.5 4.5 0 0 1 6.4-6.3l.7.7.7-.7a4.5 4.5 0 0 1 6.4 6.3Z" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
 
-                    {/* Category-scoped attributes, as a marketplace-style spec table.
-                        Which rows appear depends on garment type: a scarf has no
-                        neck or sleeve, a trouser has rise. Sourced from
-                        products.attributes validated against attribute_definitions. */}
-                    {product.attributes && Object.keys(product.attributes).length > 0 && (
-                      <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-2 border-t border-stone/40">
-                        {Object.entries(product.attributes).map(([k, v]) => (
-                          <div key={k} className="contents">
-                            <dt className="text-ink-muted">{k.replace(/_/g, ' ')}</dt>
-                            <dd className="text-ink m-0">{String(v).replace(/-/g, ' ')}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    )}
+            {/* Logistics: the fields the buyer checks before paying. */}
+            <dl className="mt-6 grid grid-cols-1 gap-px border-y border-stone sm:grid-cols-3">
+              {[
+                ['Delivery', deliveryLine],
+                ['Payment', product.codAvailable ? 'COD or prepaid' : 'Prepaid only'],
+                ['Returns', returnLine],
+              ].map(([term, def]) => (
+                <div key={term} className="py-3 sm:border-r sm:border-stone sm:pr-4 sm:last:border-r-0">
+                  <dt className="loom-label text-ink-muted">{term}</dt>
+                  <dd className="mt-1 font-sans text-[13px] leading-snug text-ink">{def}</dd>
+                </div>
+              ))}
+            </dl>
 
-                    {product.countryOfOrigin && (
-                      <p className="pt-1 text-[11px] uppercase tracking-widest text-ink-muted">
-                        {formatCountryOfOrigin(product.countryOfOrigin)}
-                      </p>
-                    )}
+            {/* Specification, stated as a fabric label would. */}
+            {specFacts.length > 0 && (
+              <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
+                {specFacts.map(([term, value]) => (
+                  <div key={term}>
+                    <dt className="loom-label text-ink-muted">{term}</dt>
+                    <dd className="mt-1 font-sans text-[13px] leading-snug text-ink">{value}</dd>
                   </div>
-                )}
-              </div>
+                ))}
+              </dl>
+            )}
 
-              {/* Accordion 4: Garment Care */}
+            {/* Expression level — the brand's own intensity axis, kept because
+                it is a real catalogue field, presented as a ruled aside. */}
+            <div className="mt-6 flex items-start justify-between gap-4 border-t border-stone pt-4">
               <div>
-                <button
-                  onClick={() => setActiveAccordion(activeAccordion === 'care' ? null : 'care')}
-                  aria-expanded={activeAccordion === 'care'}
-                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
-                >
-                  <span>Heirloom Care & Storage</span>
-                  <span className="text-sm">{activeAccordion === 'care' ? '–' : '+'}</span>
-                </button>
-                {activeAccordion === 'care' && (
-                  <div className="pb-5 text-xs text-ink-muted space-y-1 font-light leading-relaxed">
-                    {product.care?.map((c, i) => (
-                      <p key={i}>✦ {c}</p>
-                    ))}
-                  </div>
-                )}
+                <p className="loom-label text-ink-muted">Presence</p>
+                <p className="mt-1 font-sans text-[13px] text-ink">
+                  {expScore} of 5 — {expInfo?.name ?? 'Balanced'}
+                  <span className="text-ink-muted">
+                    {expInfo?.tagline ? ` · ${expInfo.tagline}` : ''}
+                  </span>
+                </p>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsExpressionModalOpen(true)}
+                className="shrink-0 font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                What this measures
+              </button>
+            </div>
 
-              {/* Accordion 5: White-Glove Delivery */}
-              <div>
-                <button
-                  onClick={() => setActiveAccordion(activeAccordion === 'delivery' ? null : 'delivery')}
-                  aria-expanded={activeAccordion === 'delivery'}
-                  className="w-full py-4 min-h-[44px] flex items-center justify-between text-left text-xs uppercase tracking-widest text-ink font-medium hover:text-accent transition-colors"
+            {product.collectionSlug && (
+              <p className="mt-4 font-sans text-[13px] text-ink-muted">
+                Part of{' '}
+                <Link
+                  to={`/collections/${product.collectionSlug}`}
+                  className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
                 >
-                  <span>Atelier Dispatch & In-Home Guarantee</span>
-                  <span className="text-sm">{activeAccordion === 'delivery' ? '–' : '+'}</span>
-                </button>
-                {activeAccordion === 'delivery' && (
-                  <div className="pb-5 text-xs text-ink-muted space-y-2 font-light leading-relaxed">
-                    <p>Orders ship in bespoke archival gift boxes lined with Japanese mulberry tissue and unbleached cotton dust bags.</p>
-                    <p>Complimentary 14-day in-home inspection and exchange service included.</p>
-                  </div>
-                )}
-              </div>
+                  {COLLECTIONS.find((c) => c.slug === product.collectionSlug)?.name ??
+                    product.collectionSlug.replace(/-/g, ' ')}
+                </Link>
+              </p>
+            )}
 
+            {/* Disclosures — ruled rows, one open at a time. */}
+            <div className="mt-10 border-t border-stone">
+              {sections.map((section) => {
+                const open = activeSection === section.id;
+                return (
+                  <div key={section.id} className="border-b border-stone">
+                    <button
+                      type="button"
+                      onClick={() => setActiveSection(open ? null : section.id)}
+                      aria-expanded={open}
+                      className="flex min-h-[52px] w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-accent"
+                    >
+                      <span className="loom-label text-ink">{section.title}</span>
+                      <span aria-hidden="true" className="relative h-3 w-3 shrink-0">
+                        <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-current" />
+                        <span
+                          className={`absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-current transition-opacity ${
+                            open ? 'opacity-0' : 'opacity-100'
+                          }`}
+                        />
+                      </span>
+                    </button>
+                    {open && <div className="pb-5">{section.body}</div>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* DETAIL STRIP: captioned macro / fabric / placement / fit (render 09) */}
-        <section aria-label="Product details close-up" className="mt-14 grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { img: product.images[3], title: 'Embroidered details', detail: product.embroidery ? `Over ${product.embroidery.artisanHours ?? '—'} hours of threadwork.` : 'Finished in the atelier.', badge: product.handcrafted ? 'Handcrafted' : undefined },
-            { img: product.images[2], title: 'Premium fabric', detail: product.fabricGsm ? `${product.fabricGsm} · ${product.material?.[0] ?? 'natural textile'}.` : 'Natural textile.', badge: undefined },
-            { img: product.images[4] ?? product.images[1], title: 'Motif placement', detail: product.embroidery ? product.embroidery.placement.join(', ') || 'All-over artwork.' : 'Full artwork view.', badge: undefined },
-            { img: product.images[5] ?? product.images[0], title: 'Scale & fit', detail: product.fit ? `${product.fit}. Comfort meets statement.` : 'Comfort meets statement.', badge: undefined },
-          ].map((d, i) => (
-            <figure key={i} className="bg-paper border border-stone/60 overflow-hidden">
-              <div className="aspect-square overflow-hidden bg-stone/20">
-                {d.img && (
-                  <img src={d.img.src} alt={d.img.alt} loading="lazy" className="w-full h-full object-cover" />
-                )}
-              </div>
-              <figcaption className="p-3">
-                <p className="font-serif text-[15px] text-ink flex items-center gap-2 flex-wrap">
-                  {d.title}
-                  {d.badge && (
-                    <span className="text-[10px] font-sans uppercase tracking-[0.14em] text-gold-deep border border-gold-deep/50 rounded-full px-2 py-0.5">
-                      {d.badge}
-                    </span>
-                  )}
-                </p>
-                <p className="text-[11px] text-ink-muted mt-0.5">{d.detail}</p>
-              </figcaption>
-            </figure>
-          ))}
-        </section>
+        {/* ── THE PROOF STRIP ──────────────────────────────────────── */}
+        {(() => {
+          const frames = [
+            {
+              img: product.embroidery?.macroImage ?? product.images[1],
+              title: 'The stitch',
+              detail: product.embroidery?.techniqueLabel ?? 'Hand embroidery',
+            },
+            {
+              img: product.images[2],
+              title: 'The cloth',
+              detail: product.fabricGsm
+                ? `${product.fabricGsm} GSM`
+                : (product.material?.[0] ?? 'Natural textile'),
+            },
+            {
+              img: product.images[3] ?? product.images[1],
+              title: 'The placement',
+              detail: product.embroidery?.placement?.join(', ') || 'All-over',
+            },
+            {
+              img: product.images[4] ?? product.images[0],
+              title: 'The fit',
+              detail: product.fit ?? 'See measurements',
+            },
+          ].filter((d) => Boolean(d.img));
 
-        {/* MOTIF STORY BAND (render 09) */}
+          if (frames.length === 0) return null;
+
+          return (
+            <section
+              aria-labelledby="proof-heading"
+              className="mt-16 border-t border-stone pt-10 lg:mt-24"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-stone pb-4">
+                <h2 id="proof-heading" className="loom-display text-2xl text-ink">
+                  Seen up close
+                </h2>
+                <p className="font-sans text-[13px] text-ink-muted">
+                  Every caption on this strip reads from the garment's own record.
+                </p>
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+                {frames.map((d) => (
+                  <figure key={d.title}>
+                    <div className="aspect-square overflow-hidden bg-paper">
+                      <img
+                        src={d.img!.src}
+                        alt={d.img!.alt || d.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                        onError={swapExtension}
+                      />
+                    </div>
+                    <figcaption className="mt-2">
+                      <p className="loom-label text-ink-muted">{d.title}</p>
+                      <p className="mt-1 font-sans text-[13px] leading-snug text-ink">{d.detail}</p>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+
+        {/* ── THE STORY ────────────────────────────────────────────── */}
         {(motif || product.embroidery?.motifStory) && (
-          <section aria-label="The story behind this motif" className="mt-14 bg-paper border border-stone/60 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          <section
+            aria-labelledby="story-heading"
+            className="mt-16 grid grid-cols-1 gap-8 border-t border-stone pt-10 lg:mt-24 lg:grid-cols-[1fr_1.1fr] lg:gap-14"
+          >
             <div>
-              <p className="text-[11px] font-sans uppercase tracking-[0.28em] text-gold-deep">
-                {universe?.name ?? 'UniqueLo'} lore
-              </p>
-              <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 tracking-tight">
-                The Story Behind {motif?.name ?? product.name}
+              <h2 id="story-heading" className="loom-display text-ink" style={{ fontSize: 'var(--text-display-lg)' }}>
+                {motif?.name ?? product.name}
               </h2>
-              <p className="text-sm text-ink-muted mt-4 font-light leading-relaxed">
+              <p className="mt-4 max-w-[52ch] font-sans text-[15px] leading-relaxed text-ink-muted">
                 {motif?.meaning ?? product.embroidery?.motifStory}
               </p>
               {product.embroidery?.motifStory && motif?.meaning && (
-                <p className="text-sm text-ink-muted mt-3 font-light leading-relaxed">
+                <p className="mt-3 max-w-[52ch] font-sans text-[15px] leading-relaxed text-ink-muted">
                   {product.embroidery.motifStory}
                 </p>
               )}
               {universe && (
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="inline-flex items-center gap-2 mt-5 px-6 py-3 font-serif text-[16px] text-ink border border-stone-strong hover:border-ink transition-colors min-h-[48px]"
+                  className="mt-6 inline-flex min-h-[44px] items-center gap-2 border-b border-stone-strong pb-1 font-sans text-[13px] font-medium text-ink transition-colors hover:border-ink"
                 >
-                  Explore {universe.name} <span aria-hidden="true">→</span>
+                  Enter {universe.name}
+                  <span aria-hidden="true">→</span>
                 </Link>
               )}
             </div>
-            <div className="aspect-[16/10] overflow-hidden bg-stone/20">
-              {product.images[3] && (
+            {product.images[3] && (
+              <div className="aspect-[4/3] overflow-hidden bg-paper lg:aspect-auto lg:min-h-[440px]">
                 <img
                   src={product.images[3].src}
-                  alt={product.images[3].alt}
+                  alt={product.images[3].alt || product.name}
                   loading="lazy"
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
+                  onError={swapExtension}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </section>
         )}
 
-        {/* COMMUNITY STRIP (render 09) */}
-        <section aria-label="Worn by the community" className="mt-14">
-          <h2 className="font-serif text-3xl sm:text-4xl text-ink tracking-tight">Real People. Real Fits.</h2>
-          <p className="text-sm text-ink-muted mt-2 font-light">Worn across cities, campuses and conventions.</p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-            {[product.images[1], product.images[4], product.images[5], product.images[0]]
-              .filter(Boolean)
-              .map((img, i) => (
-                <div key={i} className="aspect-[3/4] overflow-hidden bg-stone/20 border border-stone/60">
-                  <img src={img!.src} alt={img!.alt} loading="lazy" className="w-full h-full object-cover" />
-                </div>
-              ))}
-          </div>
-          <p className="text-xs text-ink-muted mt-3">Community fits — share yours with #UniqueLo.</p>
-        </section>
-
-        {/* CUSTOMER REVIEWS & CONNOISSEUR TESTIMONIALS */}
-        <section className="mt-20 pt-16 border-t border-stone/60">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-stone/40">
+        {/* ── REVIEWS ──────────────────────────────────────────────── */}
+        <section id="reviews" aria-labelledby="reviews-heading" className="mt-16 border-t border-stone pt-10 lg:mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-stone pb-4">
             <div>
-              <span className="text-[10px] font-sans tracking-[0.25em] text-gold-deep uppercase font-medium">
-                Worn & reviewed
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-1 tracking-tight">
-                Customer Reviews
+              <h2 id="reviews-heading" className="loom-display text-2xl text-ink sm:text-3xl">
+                {reviewAggregate
+                  ? `${reviewAggregate.value.toFixed(1)} out of 5`
+                  : 'No reviews yet'}
               </h2>
-              {displayRating && (
-                <p className="text-sm text-ink-muted mt-2">
-                  <span className="text-gold-deep" aria-hidden="true">
-                    {'★'.repeat(Math.round(displayRating.value))}
-                  </span>{' '}
-                  {displayRating.value.toFixed(1)} out of 5 · Based on {displayRating.count} reviews
-                </p>
-              )}
+              <p className="mt-1 font-sans text-[13px] text-ink-muted">
+                {reviewAggregate
+                  ? `From ${reviewAggregate.count} ${reviewAggregate.count === 1 ? 'buyer' : 'buyers'} who received this piece.`
+                  : 'This piece has not been reviewed. Written reviews appear here once they are submitted.'}
+              </p>
             </div>
             <button
+              type="button"
               onClick={() => setIsReviewModalOpen(true)}
-              className="mt-4 sm:mt-0 px-5 py-2.5 bg-transparent text-ink border border-stone-strong text-xs uppercase tracking-widest font-sans hover:border-ink transition-colors min-h-[44px]"
+              className="inline-flex min-h-[44px] items-center border border-stone-strong px-5 font-sans text-[12px] uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-cream"
             >
               Write a review
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(reviews || []).map((rev) => (
-              <div key={rev.id} className="p-6 bg-paper border border-stone/70 rounded-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-accent text-sm">{'★'.repeat(rev.rating)}</span>
-                  <span className="text-[10px] text-ink-muted uppercase tracking-wider">{rev.createdAt}</span>
-                </div>
-                <h4 className="font-serif text-base text-ink font-medium">{rev.title}</h4>
-                <p className="text-xs text-ink-muted font-light mt-2 leading-relaxed">{rev.comment}</p>
-                <div className="mt-4 pt-3 border-t border-stone/40 flex items-center justify-between text-[11px]">
-                  <span className="text-ink font-medium">{rev.author}</span>
-                  {rev.verified && (
-                    <span className="text-accent text-[10px] uppercase tracking-wider">
-                      Verified Collector ✓
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          {(reviews ?? []).length > 0 && (
+            <ul className="mt-2">
+              {(reviews ?? []).map((rev) => (
+                <li key={rev.id} className="border-b border-stone py-6">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <p className="font-sans text-[14px] font-medium text-ink">{rev.title}</p>
+                    <p className="loom-price shrink-0 text-[12px] text-ink-muted">
+                      {rev.rating} / 5
+                    </p>
+                  </div>
+                  <p className="mt-1.5 max-w-[68ch] font-sans text-[14px] leading-relaxed text-ink-muted">
+                    {rev.comment}
+                  </p>
+                  <p className="mt-2 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                    {rev.author}
+                    {' · '}
+                    {rev.createdAt}
+                    {rev.verified && ' · verified buyer'}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
-        {/* DUAL DISCOVERY AXIS RECOMMENDATIONS */}
-        <div className="mt-20 pt-16 border-t border-stone/60 space-y-16">
-          {/* Stream 1: More from the same Universe */}
+        {/* ── CONTINUE ─────────────────────────────────────────────── */}
+        <div className="mt-16 space-y-14 lg:mt-24">
           {universe && universeProducts.length > 0 && (
-            <section aria-labelledby="universe-recs-heading">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-                <div>
-                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                    Curated Universe
-                  </span>
-                  <h2 id="universe-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
-                    More from {universe.name}
-                  </h2>
-                  <p className="text-xs text-ink-muted mt-1 font-light">
-                    Heirloom pieces woven from the same lore, characters, and needlework aesthetic.
-                  </p>
-                </div>
+            <section aria-labelledby="universe-recs">
+              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-stone pb-4">
+                <h2 id="universe-recs" className="loom-display text-2xl text-ink">
+                  More from {universe.name}
+                </h2>
                 <Link
-                  to={`/worlds/${universe.slug}`}
-                  className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold shrink-0"
+                  to={`/universes/${universe.slug}`}
+                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
                 >
-                  Explore All {universe.name} Pieces →
+                  All {universe.name} pieces
                 </Link>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
-                {universeProducts.map((rel) => {
-                  const relVariant = getDefaultVariant(rel);
-                  return (
-                    <Link
-                      key={rel.slug}
-                      to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
-                    >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
-                        <img
-                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
-                          alt={rel.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
-                            {rel.embroidery.techniqueLabel}
-                          </span>
-                        )}
-                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
-                          ✦ L{getExpressionScore(rel)}
-                        </span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <div className="min-w-0">
-                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
-                            {rel.name}
-                          </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
-                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
-                          </span>
-                        </div>
-                        <span className="font-sans text-xs font-semibold text-ink shrink-0">
-                          {formatPrice(relVariant.priceCents)}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+                {universeProducts.map((p) => (
+                  <ProductCard key={p.slug} product={p} />
+                ))}
               </div>
             </section>
           )}
 
-          {/* Stream 2: More at the same Expression Level */}
           {expressionProducts.length > 0 && (
-            <section aria-labelledby="expression-recs-heading">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-                <div>
-                  <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                    The Expression Spectrum
-                  </span>
-                  <h2 id="expression-recs-heading" className="font-serif text-2xl sm:text-3xl text-ink mt-1">
-                    Pieces at Level {expScore} ({expInfo?.name})
-                  </h2>
-                  <p className="text-xs text-ink-muted mt-1 font-light">
-                    Cross-world pieces sharing the same visual presence and needlecraft density.
-                  </p>
-                </div>
+            <section aria-labelledby="expression-recs">
+              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-stone pb-4">
+                <h2 id="expression-recs" className="loom-display text-2xl text-ink">
+                  Also at presence {expScore}
+                </h2>
                 <Link
                   to={`/styles/${product.expressionSlug || 'cult'}`}
-                  className="text-xs uppercase font-sans tracking-widest text-accent hover:underline font-semibold shrink-0"
+                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
                 >
-                  Explore All {expInfo?.name || `Level ${expScore}`} Pieces →
+                  All level {expScore} pieces
                 </Link>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
-                {expressionProducts.map((rel) => {
-                  const relVariant = getDefaultVariant(rel);
-                  return (
-                    <Link
-                      key={rel.slug}
-                      to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
-                    >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
-                        <img
-                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
-                          alt={rel.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
-                            {rel.embroidery.techniqueLabel}
-                          </span>
-                        )}
-                        <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-paper/90 text-accent text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5 font-sans font-semibold">
-                          ✦ L{getExpressionScore(rel)}
-                        </span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <div className="min-w-0">
-                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
-                            {rel.name}
-                          </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
-                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
-                          </span>
-                        </div>
-                        <span className="font-sans text-xs font-semibold text-ink shrink-0">
-                          {formatPrice(relVariant.priceCents)}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+                {expressionProducts.map((p) => (
+                  <ProductCard key={p.slug} product={p} />
+                ))}
               </div>
             </section>
           )}
 
-          {/* Fallback Curated Wardrobe when neither stream populated */}
           {!universeProducts.length && !expressionProducts.length && relatedProducts.length > 0 && (
-            <section>
-              <div className="mb-8">
-                <span className="text-[10px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                  Curated Wardrobe
-                </span>
-                <h2 className="font-serif text-3xl text-ink mt-1">
-                  Frequently Stitched Together
+            <section aria-labelledby="related-recs">
+              <div className="border-b border-stone pb-4">
+                <h2 id="related-recs" className="loom-display text-2xl text-ink">
+                  Also in the catalogue
                 </h2>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3">
-                {relatedProducts.map((rel) => {
-                  const relVariant = getDefaultVariant(rel);
-                  return (
-                    <Link
-                      key={rel.slug}
-                      to={`/product/${rel.slug}`}
-                      className="group block bg-paper border border-stone/70 p-2.5 sm:p-3 hover:border-ink/50 transition-colors"
-                    >
-                      <div className="aspect-[3/4] bg-stone/20 overflow-hidden relative mb-2 sm:mb-3">
-                        <img
-                          src={rel.images[0]?.src || '/images/placeholders/hero.jpg'}
-                          alt={rel.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {rel.embroidery && (
-                          <span className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 bg-cream/90 text-ink text-[8px] sm:text-[9px] uppercase tracking-widest px-1.5 sm:px-2 py-0.5">
-                            {rel.embroidery.techniqueLabel}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <div className="min-w-0">
-                          <h4 className="font-serif text-xs sm:text-sm text-ink group-hover:text-accent transition-colors line-clamp-1">
-                            {rel.name}
-                          </h4>
-                          <span className="font-sans text-[10px] sm:text-[11px] text-ink-muted block mt-0.5 truncate">
-                            {rel.garmentType ? `${rel.garmentType}s` : rel.categorySlug}
-                          </span>
-                        </div>
-                        <span className="font-sans text-xs font-medium text-ink shrink-0">
-                          {formatPrice(relVariant.priceCents)}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+                {relatedProducts.map((p) => (
+                  <ProductCard key={p.slug} product={p} />
+                ))}
               </div>
             </section>
           )}
         </div>
       </div>
 
-      {/* Sizing Guide Modal */}
       <SizeGuideModal
         isOpen={isSizeGuideOpen}
-        onClose={() => setIsSizeGuideOpen(false)}
-        category={product.categorySlug}
+        onClose={closeSizeGuide}
+        product={product}
       />
 
-      {/* Expression Guide Modal */}
       <ExpressionGuideModal
         isOpen={isExpressionModalOpen}
         onClose={() => setIsExpressionModalOpen(false)}
         currentScore={expScore}
       />
 
-      {/* Review Submission Modal */}
+      {/* ── REVIEW FORM ────────────────────────────────────────────── */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-[480] flex items-center justify-center p-4">
-          <div
+        <div className="fixed inset-0 z-[480] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="review-form-title">
+          <button
+            type="button"
+            aria-label="Close"
             onClick={() => setIsReviewModalOpen(false)}
-            className="fixed inset-0 bg-ink/70 backdrop-blur-md"
+            className="fixed inset-0 cursor-default bg-ink/70"
           />
-          <div className="relative w-full max-w-lg bg-paper border border-stone shadow-2xl rounded-sm p-6 sm:p-8 z-10 animate-in zoom-in-95 duration-200">
-            <h3 className="font-serif text-2xl text-ink">Submit Connoisseur Review</h3>
-            <p className="text-xs text-ink-muted mt-1">Share your thoughts on the needlecraft and fit of {product.name}.</p>
-            
-            <form onSubmit={handleReviewSubmit} className="mt-5 space-y-3.5">
+          <div className="relative z-10 w-full max-w-lg border border-stone bg-paper p-6 sm:p-8">
+            <h2 id="review-form-title" className="loom-display text-2xl text-ink">
+              Review {product.name}
+            </h2>
+            <p className="mt-1 font-sans text-[13px] text-ink-muted">
+              Reviews are published as written. A review is marked “verified buyer” only when it comes from a delivered order.
+            </p>
+
+            <form onSubmit={handleReviewSubmit} className="mt-6 space-y-4">
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
-                  Your Name
+                <label htmlFor="review-author" className="loom-label block text-ink-muted">
+                  Your name
                 </label>
                 <input
+                  id="review-author"
                   type="text"
                   required
                   value={reviewAuthor}
                   onChange={(e) => setReviewAuthor(e.target.value)}
-                  placeholder="e.g. Evelyn Reed"
-                  className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
+                  className="mt-1.5 w-full border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink placeholder:text-ink-muted/60 focus:border-ink focus:outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
-                  Rating (1 to 5 Stars)
-                </label>
-                <div className="flex gap-2">
-                  {[5, 4, 3, 2, 1].map((star) => (
+              <fieldset>
+                <legend className="loom-label text-ink-muted">Rating</legend>
+                <div className="mt-2 flex gap-1.5">
+                  {[1, 2, 3, 4, 5].map((n) => (
                     <button
+                      key={n}
                       type="button"
-                      key={star}
-                      onClick={() => setReviewRating(star)}
-                      className={`px-3 py-1 text-xs border ${
-                        reviewRating === star ? 'bg-ink text-cream border-ink' : 'border-stone text-ink'
+                      onClick={() => setReviewRating(n)}
+                      aria-pressed={reviewRating === n}
+                      aria-label={`${n} out of 5`}
+                      className={`h-11 min-w-[44px] border font-sans text-[13px] transition-colors ${
+                        reviewRating === n
+                          ? 'border-ink bg-ink text-cream'
+                          : 'border-stone-strong text-ink hover:border-ink'
                       }`}
                     >
-                      {star} ★
+                      {n}
                     </button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
-                  Review Headline
+                <label htmlFor="review-title" className="loom-label block text-ink-muted">
+                  Headline
                 </label>
                 <input
+                  id="review-title"
                   type="text"
                   required
                   value={reviewTitle}
                   onChange={(e) => setReviewTitle(e.target.value)}
-                  placeholder="e.g. Exquisite silk tension and heirloom structure"
-                  className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
+                  className="mt-1.5 w-full border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink focus:border-ink focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-ink font-medium mb-1">
-                  Detailed Experience
+                <label htmlFor="review-body" className="loom-label block text-ink-muted">
+                  Your experience
                 </label>
                 <textarea
+                  id="review-body"
                   required
                   rows={4}
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Describe the fabric feel, stitch relief, and how the garment wears..."
-                  className="w-full bg-cream border border-stone px-3 py-2 text-xs text-ink focus:outline-accent"
+                  className="mt-1.5 w-full resize-none border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink focus:border-ink focus:outline-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
-                <Button
+              <div className="flex justify-end gap-2 pt-1">
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setIsReviewModalOpen(false)}
+                  className="inline-flex min-h-[44px] items-center border border-stone-strong px-5 font-sans text-[12px] uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
                 >
                   Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                  disabled={isSubmittingReview}
-                >
-                  {isSubmittingReview ? 'Submitting...' : 'Post Review'}
+                </button>
+                <Button type="submit" variant="primary" size="sm" disabled={isSubmittingReview}>
+                  {isSubmittingReview ? 'Posting…' : 'Post review'}
                 </Button>
               </div>
             </form>
@@ -1409,45 +1197,31 @@ export const ProductDetail: React.FC = () => {
         </div>
       )}
 
-      {/* Sticky Quick-Buy Bar for High-Conversion Scroll (Competitor Parity) */}
+      {/* ── STICKY BUY BAR ─────────────────────────────────────────── */}
       {showStickyBar && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-paper/95 backdrop-blur-md border-t border-stone shadow-xl py-3 px-4 sm:px-8 transition-transform duration-300">
-          <div className="max-w-[var(--container-max)] mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-stone bg-paper/95 backdrop-blur-md">
+          <div className="mx-auto flex max-w-[var(--container-max)] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-12">
+            <div className="flex min-w-0 items-center gap-3">
               <img
                 src={activeImage.src}
-                alt={product.name}
-                className="w-10 h-12 object-cover border border-stone shadow-xs"
+                alt=""
+                className="h-12 w-10 shrink-0 object-cover"
               />
-              <div className="hidden sm:block">
-                <span className="font-serif text-sm text-ink block leading-tight font-medium">
-                  {product.name}
-                </span>
-                <span className="text-[10px] text-ink-muted uppercase tracking-widest font-sans">
-                  {currentVariant.size}
-                </span>
+              <div className="min-w-0">
+                <p className="truncate font-sans text-[13px] font-medium text-ink">{product.name}</p>
+                <p className="loom-price text-[12px] text-ink-muted">
+                  {formatPrice(currentVariant.priceCents)} · {currentVariant.size}
+                </p>
               </div>
             </div>
-
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <span className="font-sans text-base sm:text-lg font-medium text-ink block leading-none">
-                  {formatPrice(currentVariant.priceCents)}
-                </span>
-                <span className="text-[10px] text-accent font-medium font-sans">
-                  Express Dispatch Included
-                </span>
-              </div>
-
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleAddToCart}
-                className="text-xs uppercase tracking-widest px-6 h-10 shadow-sm"
-              >
-                Add to Bag
-              </Button>
-            </div>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={soldOut}
+              className="inline-flex min-h-[44px] shrink-0 items-center bg-ink px-5 font-sans text-[12px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
+            >
+              {soldOut ? 'Sold out' : 'Add to bag'}
+            </button>
           </div>
         </div>
       )}

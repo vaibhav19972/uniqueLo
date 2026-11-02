@@ -4,9 +4,21 @@ import { useUniverses, useProducts } from '../hooks/useCatalog';
 import { useFiltersStore } from '../stores/filters';
 
 /**
- * Universes index — /universes.
- * Unified Atelier design system matching "Worlds to Wear".
- * Shows each universe and The Atelier portal in quiet-luxury aesthetic.
+ * ALL WORLDS — /worlds
+ *
+ * Was a four-card grid: 16–20px rounded cards with a resting shadow, a hover
+ * translate, a serif name that italicised on hover, a bottom scrim over the
+ * artwork, an accent bar along the image edge, a "15+" badge in serif, and a
+ * rounded accent button. That is the anti-reference this system replaced —
+ * and worse, the badge said "15+" when the count was exactly 15.
+ *
+ * Now it is the same ruled strata as the home band: one row per world, numbered
+ * in mono, with its name at display size, its own line, the live count, and an
+ * arrow. Each row is scoped to the world's accent so the horizon tint and the
+ * hover colour come from that world and nowhere else.
+ *
+ * A world with nothing in stock is not rendered as a door. An "Enter
+ * The Atelier — 0 pieces" row was a promise of a shop that does not exist.
  */
 export const Universes: React.FC = () => {
   const { data: universes } = useUniverses();
@@ -19,11 +31,6 @@ export const Universes: React.FC = () => {
     [products],
   );
 
-  const enterAtelier = () => {
-    setUniverse('atelier');
-    navigate('/shop');
-  };
-
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const p of products ?? []) {
@@ -33,130 +40,145 @@ export const Universes: React.FC = () => {
     return c;
   }, [products]);
 
+  const worlds = useMemo(() => {
+    const list = (universes ?? [])
+      .map((u) => ({
+        id: u.slug,
+        name: u.name,
+        tagline: u.tagline,
+        lore: u.lore,
+        count: counts[u.slug] ?? 0,
+        to: `/universes/${u.slug}`,
+      }))
+      .filter((w) => w.count > 0);
+
+    if (atelierCount > 0) {
+      list.push({
+        id: 'atelier',
+        name: 'The Atelier',
+        tagline: 'The base line — craft with no theme',
+        lore: 'Artisanal embroidery for its own sake: technique, textile and construction above every story.',
+        count: atelierCount,
+        to: '',
+      });
+    }
+    return list;
+  }, [universes, counts, atelierCount]);
+
+  const enterAtelier = React.useCallback(() => {
+    setUniverse('atelier');
+    navigate('/shop');
+  }, [setUniverse, navigate]);
+
+  const totalPieces = worlds.reduce((n, w) => n + w.count, 0);
+
   return (
-    <div className="w-full bg-cream min-h-screen">
-      <section className="bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-14">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <span>Universes</span>
+    <div className="min-h-screen w-full bg-cream">
+      <section className="border-b border-stone bg-cream pb-8 pt-10">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
+          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
+            <Link to="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
+            <span aria-hidden="true" className="mx-2">
+              /
+            </span>
+            <span className="text-ink">Worlds</span>
           </nav>
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-3 tracking-tight font-medium">
-            Worlds to Wear
-          </h1>
-          <p className="text-sm sm:text-base text-ink-muted mt-3 max-w-2xl font-light">
-            Stories, characters and legacies — embroidered for your everyday. Pick a world, then a character.
-          </p>
+
+          <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
+                Worlds to Wear
+              </h1>
+              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+                Each world is an original set of stories with its own accent,
+                characters and capsule. Enter one and the collection narrows to it.
+              </p>
+            </div>
+            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
+              <span className="loom-price text-[15px] text-ink">{totalPieces}</span> pieces across{' '}
+              <span className="loom-price text-[15px] text-ink">{worlds.length}</span>{' '}
+              {worlds.length === 1 ? 'world' : 'worlds'}
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6 lg:grid-cols-4">
-          {(universes ?? []).map((u) => {
-            const count = counts[u.slug] ?? 0;
-            return (
-              <article
-                key={u.slug}
-                data-accent={u.slug}
-                className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:border-accent hover:shadow-md"
-              >
-                {/* Artwork media preview */}
-                {u.emblem_src && (
-                  <div className="relative h-28 sm:h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
-                    <img
-                      src={u.emblem_src}
-                      alt={`${u.name} universe artwork`}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="scrim-bottom-soft absolute inset-x-0 bottom-0 h-1/2" aria-hidden="true" />
-                    <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
-                  </div>
-                )}
-
-                {/* Editorial text stack */}
-                <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
-                  <div className="max-w-[92%]">
-                    <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
-                      {u.name}
-                    </h2>
-                    <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
-                      {u.tagline}
-                    </p>
-                    <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                    <p className="font-sans text-xs sm:text-[14px] text-ink-muted mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {u.lore}
-                    </p>
-                  </div>
-
-                  <div className="mt-auto pt-3 sm:pt-6">
-                    <p className="leading-none">
-                      <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{count}+ </span>
-                      <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
-                        Styles
-                      </span>
-                    </p>
-                    <Link
-                      to={`/universes/${u.slug}`}
-                      className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-sans text-xs font-semibold sm:text-[15px] bg-accent text-on-accent hover:bg-accent-hover min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
-                      aria-label={`Enter ${u.name}`}
-                    >
-                      Enter {u.name} <span aria-hidden="true">→</span>
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-
-          {/* 4th Card — The Atelier portal */}
-          <article
-            className="group relative flex flex-col overflow-hidden rounded-[16px] sm:rounded-[20px] border border-stone/60 bg-paper transition-all motion-reduce:transform-none hover:-translate-y-1 duration-500 shadow-sm hover:shadow-md"
-          >
-            <div className="relative h-28 sm:h-48 w-full overflow-hidden border-b border-stone/40 bg-stone/20">
-              <img
-                src="/images/products/ivory-mandarin-knit-sweater-1.jpg"
-                alt="The Atelier artwork"
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      <section className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12">
+        <div className="border-t border-stone">
+          {worlds.map((world) => (
+            <div
+              key={world.id}
+              data-accent={world.id}
+              className="group relative overflow-hidden border-b border-stone"
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: 'color-mix(in srgb, var(--color-accent) 7%, transparent)',
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-paper/30 to-transparent" />
-            </div>
-            <div className="relative z-10 flex flex-1 flex-col p-3 sm:p-6 min-h-[190px] sm:min-h-[280px]">
-              <div className="max-w-[92%]">
-                <h2 className="font-serif text-base sm:text-2xl lg:text-3xl leading-[1.1] text-ink transition-transform duration-500 group-hover:italic font-medium truncate">
-                  The Atelier
-                </h2>
-                <p className="font-sans text-[9px] sm:text-[11px] uppercase tracking-label text-ink-muted mt-1 sm:mt-2 truncate">
-                  Pure craftsmanship, no theme
-                </p>
-                <span aria-hidden="true" className="mt-2 sm:mt-3.5 block h-px w-6 sm:w-8 bg-ink/25" />
-                <p className="font-sans text-xs sm:text-[14px] text-ink-muted mt-2 sm:mt-3 leading-relaxed line-clamp-2 sm:line-clamp-3">
-                  The base line of the house: artisanal embroidery for its own sake — technique, textile, and construction above every story.
-                </p>
-              </div>
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]"
+                style={{ background: 'var(--color-accent)' }}
+              />
 
-              <div className="mt-auto pt-3 sm:pt-6">
-                <p className="leading-none">
-                  <span className="font-serif font-semibold text-lg sm:text-2xl text-ink">{atelierCount}+ </span>
-                  <span className="font-sans text-[9px] sm:text-[10px] uppercase tracking-widest text-ink-muted ml-0.5 sm:ml-1">
-                    Styles
-                  </span>
-                </p>
-                <button
-                  type="button"
-                  onClick={enterAtelier}
-                  className="mt-2 sm:mt-3.5 inline-flex w-full sm:w-fit items-center justify-center gap-1.5 sm:gap-2 rounded-md px-3 sm:px-7 py-2 sm:py-3 font-sans text-xs font-semibold sm:text-[15px] bg-accent text-on-accent hover:bg-accent-hover min-h-[36px] sm:min-h-[44px] transition-all group-hover:gap-3 cursor-pointer"
-                  aria-label="Enter The Atelier"
+              <Link
+                to={world.to || '/shop'}
+                onClick={(e) => {
+                  if (!world.to) {
+                    e.preventDefault();
+                    enterAtelier();
+                  }
+                }}
+                className="relative grid grid-cols-1 items-baseline gap-x-6 gap-y-3 px-1 py-6 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto_auto]"
+                aria-label={`Enter ${world.name} — ${world.count} pieces`}
+              >
+                <h2
+                  className="loom-display text-ink transition-colors group-hover:text-accent"
+                  style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.25rem)' }}
                 >
-                  Enter The Atelier <span aria-hidden="true">→</span>
-                </button>
-              </div>
+                  {world.name}
+                </h2>
+
+                <div className="min-w-0">
+                  <p className="font-sans text-[13px] leading-snug text-ink sm:text-sm">
+                    {world.tagline}
+                  </p>
+                  <p className="mt-1 line-clamp-2 max-w-[64ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
+                    {world.lore}
+                  </p>
+                </div>
+
+                <span className="loom-label text-ink-muted">
+                  {world.count} {world.count === 1 ? 'piece' : 'pieces'}
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="font-sans text-lg text-ink transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent"
+                >
+                  →
+                </span>
+              </Link>
             </div>
-          </article>
+          ))}
         </div>
-      </div>
+
+        <p className="mt-6 font-sans text-[12.5px] text-ink-muted">
+          Not sure which world?{' '}
+          <Link
+            to="/styles"
+            className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+          >
+            Browse by presence
+          </Link>{' '}
+          — how loudly the embroidery reads, across all of them.
+        </p>
+      </section>
     </div>
   );
 };

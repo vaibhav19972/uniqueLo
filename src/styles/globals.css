@@ -96,21 +96,56 @@
   }
 
   /* ── Display face scoping ───────────────────────────────────────────
-     Playfair is the brand voice, but only where it can breathe. Any
-     `.font-serif` element at reading size drops back to the UI face, so
-     the 272 existing call sites keep working while small serif text stops
-     looking spindly on screens. */
+     Archivo is the brand voice and it is a grotesque, so it survives at
+     reading size — the old rule demoting small serif text back to the UI
+     face existed only because Playfair turns spindly below 20px. What the
+     world needs instead is the width axis: headlines and labels are woven
+     narrow, body stays at normal width. These classes are the vocabulary
+     every section speaks. */
   .font-serif {
-    font-family: var(--font-serif);
+    font-family: var(--font-display);
+    font-stretch: 88%;
+    letter-spacing: -0.02em;
   }
 
-  .text-xs.font-serif,
-  .text-sm.font-serif,
-  .text-base.font-serif,
-  .text-lg.font-serif,
-  .text-xl.font-serif {
-    font-family: var(--font-sans);
-    letter-spacing: -0.005em;
+  /* Woven tape: the label voice. Condensed, tracked, uppercase. */
+  .loom-label {
+    font-family: var(--font-display);
+    font-stretch: 62%;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  /* The display setting. Narrow width carries the emphasis, not weight. */
+  .loom-display {
+    font-family: var(--font-display);
+    font-stretch: 78%;
+    font-weight: 650;
+    line-height: var(--leading-display);
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+
+  /* Prices. Mono, tabular, and never letter-spaced — the digits are data. */
+  .loom-price {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* The loom rule: the system's only separator. 1px, hairline stone. */
+  .loom-rule {
+    border: 0;
+    border-top: 1px solid var(--color-stone);
+  }
+
+  .loom-rule-strong {
+    border: 0;
+    border-top: 1px solid var(--color-stone-strong);
   }
 
   /* Buttons, inputs and tabular figures are UI, never display. */
@@ -122,9 +157,11 @@
     font-family: var(--font-sans);
   }
 
-  /* No faux italics — the serif has a real italic cut, the sans does not. */
+  /* No faux italics — Archivo and Geist have no italic cut at this weight. */
   .font-sans em,
   .font-sans i,
+  .font-serif em,
+  .font-serif i,
   button em,
   button i,
   figcaption em {
@@ -148,8 +185,29 @@
   }
 
   ::selection {
-    background-color: var(--color-accent-soft);
-    color: var(--color-ink);
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  /* Browser surfaces carry the design. The caret, the underline offset and
+     the scrollbar are the parts nobody draws, and the cheapest signal that a
+     page was built rather than assembled. */
+  :root {
+    caret-color: var(--color-accent);
+    accent-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--color-stone-strong);
+  }
+
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  img,
+  video {
+    /* Garments are photographed on paper; never let a rounded mask appear. */
+    border-radius: 0;
   }
 
   /* Respect the OS setting at the source: no smooth scroll, no long easing. */
@@ -204,20 +262,15 @@
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SURFACE TEXTURE
-   The approved alternative to decorative gradients: one fixed grain layer
-   over the whole app, blended into whatever canvas the mode provides.
-   ═══════════════════════════════════════════════════════════════ */
-.grain-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: calc(0.035 * var(--grain-opacity));
-  mix-blend-mode: var(--grain-blend);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+/* The cloth ground is a colour, not a texture. A CSS weave was tried here —
+   two repeating-linear-gradients at 8px pitch — and it was wrong twice over:
+   it screens a fake 8px lattice across every photograph on the page, and it
+   imitates a woven material the page never actually renders. Faked physicality
+   is the most reliable mark of machine-made design, so it is gone rather than
+   softened. If a ground texture is ever wanted, it must be a photographed
+   cotton plate that sits under the content, never over a garment.
+   The universe texture families below remain opt-in and are never applied to
+   photography. */
 
 /* Universe texture families — repeating rules, never gradients.
    Set --u-texture on a universe scope, then opt in with .u-texture. */

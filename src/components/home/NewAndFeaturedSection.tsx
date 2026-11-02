@@ -4,6 +4,7 @@ import { useProducts, useCollections } from '../../hooks/useCatalog';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { ProductCard } from '../shop/ProductCard';
 import { useReveal } from '../../hooks/useReveal';
+import { hasLicensedMark } from '../../lib/licensed-marks';
 
 type FeaturedTab = 'new-arrivals' | 'limited-editions' | 'collections';
 
@@ -22,7 +23,11 @@ const TABS: TabConfig[] = [
   {
     slug: 'limited-editions',
     title: 'Limited Editions',
-    tagline: 'Strictly numbered runs with zero mass reproduction.',
+    // The catalogue carries no edition number and no batch count, so this tab
+    // is a curation (collector-edited and handcrafted pieces), not a numbered
+    // run. The old tagline — "strictly numbered runs with zero mass
+    // reproduction" — promised a fact no table holds.
+    tagline: 'Collector-edited and handcrafted pieces, grouped by what they are.',
   },
   {
     slug: 'collections',
@@ -39,7 +44,10 @@ export const NewAndFeaturedSection: React.FC = () => {
   const [selectedCollectionSlug, setSelectedCollectionSlug] = useState<string>('all');
 
   const productsForTab = useMemo(() => {
-    const list = allProducts ?? [];
+    // A curated rail presents pieces as the brand's own work, so a product whose
+    // photograph carries a third-party mark is excluded here (see
+    // lib/licensed-marks.ts). The piece stays in the collection and in search.
+    const list = (allProducts ?? []).filter((p) => !hasLicensedMark(p));
     if (activeTab === 'new-arrivals') {
       // Sort by newest createdAt timestamp descending, fallback to original order
       return [...list]
@@ -90,25 +98,26 @@ export const NewAndFeaturedSection: React.FC = () => {
       : `Explore Complete ${currentTabConfig.title} Collection`;
 
   return (
-    <section ref={revealRef} className="reveal bg-cream py-16 lg:py-16 border-b border-stone/50 overflow-hidden"       aria-labelledby="new-featured-heading"
-      
+    <section
+      ref={revealRef}
+      className="reveal border-b border-stone bg-cream py-12 lg:py-16"
+      aria-labelledby="new-featured-heading"
     >
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
         <MarketingHeader
-          eyebrow="Curated Drops & Editions"
           title="New & Featured"
           titleId="new-featured-heading"
-          sub="Explore latest atelier drops, scarce numbered runs, and thematic capsule collections."
+          sub="The latest releases, with their prices. No enquiry forms, no made-to-order waits."
           linkTo={headerLinkTo}
           linkLabel={headerLinkLabel}
         />
 
-        {/* Tab Controls */}
-        <div className="mt-6 flex flex-col gap-3 border-b border-stone pb-4">
+        {/* Tab Controls — segmented, square, one row. */}
+        <div className="mt-6 flex flex-col gap-3">
           <div
             role="tablist"
             aria-label="Filter products by feature tier"
-            className="flex flex-wrap items-center gap-1.5 sm:gap-2"
+            className="-mx-4 flex items-center gap-0 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
           >
             {TABS.map((tab) => {
               const isSelected = activeTab === tab.slug;
@@ -123,10 +132,11 @@ export const NewAndFeaturedSection: React.FC = () => {
                       setSelectedCollectionSlug('all');
                     }
                   }}
-                  className={`whitespace-nowrap border px-3 py-2 font-sans text-[10px] font-semibold uppercase tracking-[0.12em] transition-all cursor-pointer sm:px-4 sm:text-xs sm:tracking-widest ${isSelected
-                      ? 'bg-ink text-cream border-ink shadow-sm'
-                      : 'bg-paper text-ink border-stone/60 hover:border-accent hover:text-accent'
-                    }`}
+                  className={`min-h-[44px] whitespace-nowrap border border-r-0 border-stone px-4 font-sans text-[11px] font-medium uppercase tracking-[0.14em] transition-colors last:border-r ${
+                    isSelected
+                      ? 'bg-ink text-cream'
+                      : 'bg-transparent text-ink-muted hover:text-ink'
+                  }`}
                 >
                   {tab.title}
                 </button>
@@ -134,64 +144,55 @@ export const NewAndFeaturedSection: React.FC = () => {
             })}
           </div>
 
-          <p className="font-sans text-sm text-ink-muted">{currentTabConfig.tagline}</p>
+          <p className="font-sans text-[13px] text-ink-muted">{currentTabConfig.tagline}</p>
         </div>
 
-        {/* Collections Dropdown Pills (when Collections tab is active) */}
+        {/* Collections (when the Collections tab is active) */}
         {activeTab === 'collections' && (
-          <div className="mt-5 p-3.5 sm:p-4 bg-paper border border-stone/60 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-300">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-sans tracking-[0.2em] text-accent font-medium mr-1">
-                Capsule Drops:
-              </span>
-              <button
-                type="button"
-                onClick={() => setSelectedCollectionSlug('all')}
-                className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${selectedCollectionSlug === 'all'
-                    ? 'bg-ink text-cream border-ink font-semibold'
-                    : 'bg-cream text-ink border-stone/60 hover:border-ink'
-                  }`}
-              >
-                All Drops
-              </button>
-              {(collections ?? []).map((col) => {
-                const isColActive = selectedCollectionSlug === col.slug;
-                return (
-                  <button
-                    key={col.slug}
-                    type="button"
-                    onClick={() => setSelectedCollectionSlug(col.slug)}
-                    className={`px-3 py-1.5 text-xs font-sans tracking-wider uppercase transition-colors border cursor-pointer ${isColActive
-                        ? 'bg-accent text-paper border-accent font-semibold shadow-xs'
-                        : 'bg-cream text-ink border-stone/60 hover:border-accent hover:text-accent'
-                      }`}
-                  >
-                    {col.name}
-                  </button>
-                );
-              })}
-            </div>
-            <Link
-              to="/collections"
-              className="text-xs font-serif text-accent hover:text-ink transition-colors inline-flex items-center gap-1 font-medium"
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedCollectionSlug('all')}
+              className={`min-h-[44px] border px-3 font-sans text-[11px] uppercase tracking-[0.12em] transition-colors ${
+                selectedCollectionSlug === 'all'
+                  ? 'border-ink bg-ink text-cream'
+                  : 'border-stone text-ink-muted hover:border-ink hover:text-ink'
+              }`}
             >
-              All Drops Showroom →
-            </Link>
+              All drops
+            </button>
+            {(collections ?? []).map((col) => {
+              const isColActive = selectedCollectionSlug === col.slug;
+              return (
+                <button
+                  key={col.slug}
+                  type="button"
+                  onClick={() => setSelectedCollectionSlug(col.slug)}
+                  className={`min-h-[44px] border px-3 font-sans text-[11px] uppercase tracking-[0.12em] transition-colors ${
+                    isColActive
+                      ? 'border-ink bg-ink text-cream'
+                      : 'border-stone text-ink-muted hover:border-ink hover:text-ink'
+                  }`}
+                >
+                  {col.name}
+                </button>
+              );
+            })}
           </div>
         )}
 
         {/* Product Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 mt-6 sm:mt-8">
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
           {productsForTab.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
         </div>
 
         {/* Bottom Navigation CTA */}
-        <div className="mt-10 text-center">
+        <div className="mt-12">
           <Link
             to={bottomCtaTo}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-paper border border-stone/80 hover:border-ink text-ink text-xs uppercase font-sans tracking-widest font-semibold hover:bg-ink hover:text-cream transition-all shadow-sm"
+            className="inline-flex min-h-[48px] items-center gap-2 border border-stone-strong px-6 font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-cream"
           >
             {bottomCtaLabel}
             <span aria-hidden="true">→</span>
