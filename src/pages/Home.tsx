@@ -2,28 +2,29 @@ import React from 'react';
 import { CastHero } from '../components/home/CastHero';
 import { TrustStrip } from '../components/home/TrustStrip';
 import { NewAndFeaturedSection } from '../components/home/NewAndFeaturedSection';
+import { ShopByGarment } from '../components/home/ShopByGarment';
 import { UniversePortals } from '../components/home/UniversePortals';
-import { PresenceTriptych } from '../components/home/PresenceTriptych';
+import { EditsGateway } from '../components/home/EditsGateway';
 import { Bestsellers } from '../components/home/Bestsellers';
 import { UGCWall } from '../components/home/UGCWall';
-import { BrowseIndex } from '../components/home/BrowseIndex';
+import { PresenceTriptych } from '../components/home/PresenceTriptych';
 import { Newsletter } from '../components/home/Newsletter';
 
 /**
  * HOME PAGE
  *
- * Combines the hero, presence triptych, and tiled menu directory
- * with the catalog showcase sections:
+ * Storytelling & Catalog Sequence:
  *
- *   1. CastHero              → Who wears this
+ *   1. CastHero              → Who wears this (Opening brand identity)
  *   2. TrustStrip            → COD, delivery certainty, craft guarantee
- *   3. NewAndFeaturedSection → The live catalog, tabs with priced pieces
- *   4. UniversePortals       → The three worlds (Itihaas, Animeverse, Heroverse)
- *   5. PresenceTriptych      → How loudly do you wear it (Quiet / Balanced / Loud)
- *   6. Bestsellers           → Verified community favorites rail
- *   7. UGCWall               → "Where the stitches come from" — Techniques table
- *   8. BrowseIndex           → "Here's the menu." — Tiled directory by cut & intent
- *   9. Newsletter            → Low-friction email signup
+ *   3. NewAndFeaturedSection → The live catalog, tabs with newest pieces (New arrivals)
+ *   4. ShopByGarment         → "Shop by Garment" — Silhouette discovery rail
+ *   5. UniversePortals       → "Worlds to Wear" — The four worlds (Itihaas, Animeverse, Heroverse, Atelier)
+ *   6. EditsGateway          → "Explore by Edit" — Curated capsules swipe rail
+ *   7. Bestsellers           → Verified community favorites rail
+ *   8. UGCWall               → "Where the stitches come from" — Techniques table
+ *   9. PresenceTriptych      → "How loudly do you wear it" — Expression & intensity scale
+ *  10. Newsletter            → Low-friction email signup
  */
 export const Home: React.FC = () => {
   return (
@@ -31,11 +32,12 @@ export const Home: React.FC = () => {
       <CastHero />
       <TrustStrip />
       <NewAndFeaturedSection />
+      <ShopByGarment />
       <UniversePortals />
-      <PresenceTriptych />
+      <EditsGateway />
       <Bestsellers />
       <UGCWall />
-      <BrowseIndex />
+      <PresenceTriptych />
       <Newsletter />
     </div>
   );

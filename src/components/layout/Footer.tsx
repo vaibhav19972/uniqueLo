@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { useUniverses } from '../../hooks/useCatalog';
 import { EDITS } from '../../lib/data';
+import { Logo } from '../ui/Logo';
 
 /**
  * THE COLOPHON
@@ -35,7 +36,7 @@ const SHOP_LINKS = [
   { label: 'New & Featured', to: '/new-featured' },
   { label: 'Collections', to: '/collections' },
   { label: 'Clothing', to: '/clothing' },
-  { label: 'Presence', to: '/styles' },
+  { label: 'Edits & Styles', to: '/styles' },
 ];
 
 const TERMS = [
@@ -55,10 +56,10 @@ export const Footer: React.FC = () => {
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <Link
               to="/"
-              className="loom-display block text-ink"
-              style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.03em' }}
+              className="inline-block text-ink transition-opacity hover:opacity-85"
+              aria-label="UniqueLo — home"
             >
-              UniqueLo
+              <Logo variant="stacked" className="h-14 sm:h-16 w-auto text-ink" />
             </Link>
             <p className="mt-3 max-w-[30ch] font-sans text-[13px] leading-relaxed text-ink-muted">
               Hand-embroidered garments made in India, priced as plainly as a

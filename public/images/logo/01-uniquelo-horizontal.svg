@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="480" viewBox="0 0 540 190" role="img" aria-label="UniqueLo horizontal logo">
+
+<g transform="translate(0 0) scale(.78)">
+<g id="UL-monogram" fill="none" stroke="#211B18" stroke-linecap="round" stroke-linejoin="round">
+  <!-- U: broad, elegant bowl -->
+  <path d="M55 26 V105 C55 145 77 165 111 165 C145 165 167 145 167 105 V45"
+        stroke-width="12"/>
+  <!-- L: shares the central stem and extends into a clean foot -->
+  <path d="M124 66 V181 H218" stroke-width="12"/>
+  <!-- subtle serif terminals -->
+  <path d="M43 26 H67 M155 45 H179 M112 181 H136 M206 169 V193"
+        stroke-width="7"/>
+</g>
+<!-- The branch is a single restrained accent, identical in every lockup -->
+<g id="flowering-branch" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M42 177 C82 157 111 132 139 107 C164 85 189 63 224 37"
+        stroke="#8A463B" stroke-width="3.5"/>
+  <g stroke="#66715A" stroke-width="2.6">
+    <path d="M83 153 C67 137 54 138 49 140 C59 152 70 156 83 153Z"/>
+    <path d="M115 129 C104 111 91 108 82 110 C91 123 101 130 115 129Z"/>
+    <path d="M151 98 C145 81 133 75 123 77 C130 91 139 98 151 98Z"/>
+    <path d="M181 72 C179 57 170 49 160 48 C164 61 171 69 181 72Z"/>
+  </g>
+  <g fill="#A65349" stroke="#8A463B" stroke-width="1.2">
+    <g transform="translate(91 111)">
+      <ellipse cy="-6" rx="4.2" ry="6.5"/><ellipse cx="6" cy="-2" rx="4.2" ry="6.5" transform="rotate(72 6 -2)"/>
+      <ellipse cx="4" cy="5" rx="4.2" ry="6.5" transform="rotate(144 4 5)"/><ellipse cx="-4" cy="5" rx="4.2" ry="6.5" transform="rotate(216 -4 5)"/>
+      <ellipse cx="-6" cy="-2" rx="4.2" ry="6.5" transform="rotate(288 -6 -2)"/><circle r="2.2" fill="#D2A45A" stroke="none"/>
+    </g>
+    <g transform="translate(151 78) scale(.82)">
+      <ellipse cy="-6" rx="4.2" ry="6.5"/><ellipse cx="6" cy="-2" rx="4.2" ry="6.5" transform="rotate(72 6 -2)"/>
+      <ellipse cx="4" cy="5" rx="4.2" ry="6.5" transform="rotate(144 4 5)"/><ellipse cx="-4" cy="5" rx="4.2" ry="6.5" transform="rotate(216 -4 5)"/>
+      <ellipse cx="-6" cy="-2" rx="4.2" ry="6.5" transform="rotate(288 -6 -2)"/><circle r="2.2" fill="#D2A45A" stroke="none"/>
+    </g>
+    <g transform="translate(198 54) scale(.68)">
+      <ellipse cy="-6" rx="4.2" ry="6.5"/><ellipse cx="6" cy="-2" rx="4.2" ry="6.5" transform="rotate(72 6 -2)"/>
+      <ellipse cx="4" cy="5" rx="4.2" ry="6.5" transform="rotate(144 4 5)"/><ellipse cx="-4" cy="5" rx="4.2" ry="6.5" transform="rotate(216 -4 5)"/>
+      <ellipse cx="-6" cy="-2" rx="4.2" ry="6.5" transform="rotate(288 -6 -2)"/><circle r="2.2" fill="#D2A45A" stroke="none"/>
+    </g>
+  </g>
+</g>
+</g>
+<text x="224" y="117" fill="#211B18" font-family="Georgia, 'Times New Roman', serif"
+      font-size="62" letter-spacing="1.1">UniqueLo</text>
+<path d="M227 137 H512" stroke="#8A463B" stroke-width="2"/>
+
+</svg>

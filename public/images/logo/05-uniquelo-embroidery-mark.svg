@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="650" height="525" viewBox="0 0 260 210" role="img" aria-label="UniqueLo simplified embroidery mark">
+
+<g fill="none" stroke="#211B18" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M55 26 V105 C55 145 77 165 111 165 C145 165 167 145 167 105 V45"/>
+ <path d="M124 66 V181 H218"/>
+</g>
+<g fill="none" stroke="#8A463B" stroke-width="7" stroke-linecap="round">
+ <path d="M45 177 C84 157 112 132 140 107 C164 85 189 63 220 39"/>
+</g>
+<g fill="#A65349">
+ <circle cx="91" cy="111" r="7"/><circle cx="151" cy="78" r="7"/><circle cx="198" cy="54" r="6"/>
+</g>
+
+</svg>

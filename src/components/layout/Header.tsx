@@ -4,17 +4,19 @@ import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
 import { useFiltersStore } from '../../stores/filters';
 import { useAuthStore } from '../../stores/auth';
-import { useUniverses, useExpressions, useGarments } from '../../hooks/useCatalog';
+import { useUniverses, useGarments, useExpressions } from '../../hooks/useCatalog';
+import { EDITS, type EditSlug } from '../../lib/data';
 import { prefersReducedMotion } from '../../lib/motion';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AnnouncementBar } from './AnnouncementBar';
+import { Logo } from '../ui/Logo';
 
 type NavMenuKey = 'worlds' | 'styles' | 'clothing' | 'new-featured' | 'our-craft' | null;
 
 /** Nav items in reading order. A storefront's first five destinations, no more. */
 const NAV = [
   { key: 'worlds' as const, label: 'Worlds', to: '/worlds' },
-  { key: 'styles' as const, label: 'Presence', to: '/styles' },
+  { key: 'styles' as const, label: 'Edits / Styles', to: '/styles' },
   { key: 'clothing' as const, label: 'Clothing', to: '/clothing' },
   { key: 'new-featured' as const, label: 'New', to: '/new-featured' },
   { key: 'our-craft' as const, label: 'The craft', to: '/our-craft' },
@@ -49,6 +51,7 @@ export const Header: React.FC = () => {
   const wishlistCount = useWishlistStore((state) => state.count());
   const openWishlist = useWishlistStore((state) => state.openWishlist);
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
+  const setEdit = useFiltersStore((state) => state.setEdit);
   const user = useAuthStore((state) => state.user);
   const openAuthModal = useAuthStore((state) => state.openModal);
   const openAccountDrawer = useAuthStore((state) => state.openAccountDrawer);
@@ -108,9 +111,9 @@ export const Header: React.FC = () => {
       case 'worlds':
         return p.startsWith('/worlds') || p.startsWith('/universes');
       case 'styles':
-        return p.startsWith('/styles') || p.startsWith('/expression');
+        return p.startsWith('/styles') || p.startsWith('/expression') || (p === '/shop' && location.search.includes('edit='));
       case 'clothing':
-        return p.startsWith('/clothing') || p.startsWith('/garments') || p === '/shop';
+        return p.startsWith('/clothing') || p.startsWith('/garments') || (p === '/shop' && !location.search.includes('edit='));
       case 'new-featured':
         return p.startsWith('/new-featured') || p.startsWith('/collections');
       case 'our-craft':
@@ -122,7 +125,6 @@ export const Header: React.FC = () => {
 
   const coreGarments = (garments ?? []).slice(0, 6);
 
-  const panelShell = 'absolute left-0 top-full w-[min(22rem,calc(100vw-2rem))] pt-2';
   const panelBody = 'border border-stone bg-paper';
   const panelHead = 'border-b border-stone px-4 py-2';
   const rowLink = 'block px-4 py-2.5 transition-colors hover:bg-panel';
@@ -162,7 +164,13 @@ export const Header: React.FC = () => {
         </Link>
 
         {hasPanel && activeMenu === key && (
-          <div className={panelShell}>
+          <div
+            className={`absolute left-0 top-full pt-2 z-50 ${
+              key === 'styles'
+                ? 'w-[min(38rem,calc(100vw-2rem))]'
+                : 'w-[min(22rem,calc(100vw-2rem))]'
+            }`}
+          >
             {key === 'worlds' && (
               <div className={panelBody}>
                 <div className={panelHead}>
@@ -186,25 +194,66 @@ export const Header: React.FC = () => {
 
             {key === 'styles' && (
               <div className={panelBody}>
-                <div className={panelHead}>
-                  <span className="loom-label text-ink-muted">How loudly it wears</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-stone">
+                  {/* Left Column: Curated Edits */}
+                  <div>
+                    <div className={panelHead}>
+                      <span className="loom-label text-ink-muted">Curated Edits (Mood & Intent)</span>
+                    </div>
+                    {EDITS.map((e) => (
+                      <Link
+                        key={e.slug}
+                        to={`/shop?edit=${e.slug}`}
+                        onClick={() => {
+                          setEdit(e.slug as EditSlug);
+                          closeMenu();
+                        }}
+                        className={`group ${rowLink}`}
+                      >
+                        <span className={rowName}>{e.title}</span>
+                        <span className={rowMeta}>{e.tagline}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Right Column: Styles / Presence */}
+                  <div>
+                    <div className={panelHead}>
+                      <span className="loom-label text-ink-muted">Presence (How Loudly It Wears)</span>
+                    </div>
+                    {(expressions ?? []).map((exp) => (
+                      <Link
+                        key={exp.slug}
+                        to={`/styles/${exp.slug}`}
+                        onClick={closeMenu}
+                        className={`group ${rowLink}`}
+                      >
+                        <span className="flex items-baseline justify-between gap-3">
+                          <span className={rowName}>{exp.name}</span>
+                          <span className="loom-price shrink-0 text-[11px] text-ink-muted">{exp.score}/5</span>
+                        </span>
+                        <span className={rowMeta}>{exp.tagline}</span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-                {(expressions ?? []).map((exp) => (
-                  <Link key={exp.slug} to={`/styles/${exp.slug}`} onClick={closeMenu} className={`group ${rowLink}`}>
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span className={rowName}>{exp.name}</span>
-                      <span className="loom-price shrink-0 text-[11px] text-ink-muted">{exp.score}/5</span>
-                    </span>
-                    <span className={rowMeta}>{exp.tagline}</span>
+
+                <div className="flex items-center justify-between border-t border-stone px-4 py-2.5">
+                  <Link
+                    to="/styles"
+                    onClick={closeMenu}
+                    className="font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:text-accent font-medium"
+                  >
+                    All Edits & Styles Studio →
                   </Link>
-                ))}
-                <Link
-                  to="/styles"
-                  onClick={closeMenu}
-                  className="block border-t border-stone px-4 py-2.5 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
-                >
-                  All levels →
-                </Link>
+                  <Link
+                    to="/shop"
+                    onClick={closeMenu}
+                    className="font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                  >
+                    Open Catalogue →
+                  </Link>
+                </div>
               </div>
             )}
 
@@ -292,18 +341,13 @@ export const Header: React.FC = () => {
           </svg>
         </button>
 
-        {/* Wordmark — same face as every display line on the site. */}
+        {/* Brand Logo — Master horizontal emblem lockup */}
         <Link
           to="/"
-          className="ml-1 mr-6 shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent md:ml-0 lg:mr-12"
+          className="ml-1 mr-6 shrink-0 flex items-center text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent md:ml-0 lg:mr-10"
           aria-label="UniqueLo — home"
         >
-          <span
-            className="loom-display block text-ink transition-colors hover:text-accent"
-            style={{ fontSize: '1.375rem', fontWeight: 700, letterSpacing: '-0.03em' }}
-          >
-            UniqueLo
-          </span>
+          <Logo variant="horizontal" className="h-8 sm:h-9 w-auto text-ink transition-opacity hover:opacity-85" />
         </Link>
 
         {/* Desktop navigation */}
@@ -436,10 +480,20 @@ export const Header: React.FC = () => {
             },
             {
               key: 'styles' as const,
-              label: 'Presence',
-              rows: (expressions ?? []).map((e) => ({ to: `/styles/${e.slug}`, name: `${e.score}/5 — ${e.name}` })),
+              label: 'Edits / Styles',
+              rows: [
+                ...EDITS.map((e) => ({
+                  to: `/shop?edit=${e.slug}`,
+                  name: `Edit: ${e.title}`,
+                  slug: e.slug,
+                })),
+                ...(expressions ?? []).map((e) => ({
+                  to: `/styles/${e.slug}`,
+                  name: `Presence: ${e.score}/5 — ${e.name}`,
+                })),
+              ],
               moreTo: '/styles',
-              moreLabel: 'All levels',
+              moreLabel: 'All edits & styles',
             },
             {
               key: 'clothing' as const,
@@ -474,7 +528,12 @@ export const Header: React.FC = () => {
                     <li key={row.to}>
                       <Link
                         to={row.to}
-                        onClick={() => setMobileOpen(false)}
+                        onClick={() => {
+                          if ('slug' in row && row.slug) {
+                            setEdit(row.slug as EditSlug);
+                          }
+                          setMobileOpen(false);
+                        }}
                         className="block py-2.5 font-sans text-[14px] text-ink-muted transition-colors hover:text-ink"
                       >
                         {row.name}
