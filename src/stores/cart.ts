@@ -4,6 +4,7 @@ import type { CartItem, CartCustomization } from '../lib/data';
 
 interface CartState {
   items: CartItem[];
+  expressItem: CartItem | null;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -13,8 +14,16 @@ interface CartState {
     variantSku: string,
     quantity?: number,
     customization?: CartCustomization,
-    maxQuantity?: number
+    maxQuantity?: number,
+    openDrawer?: boolean
   ) => void;
+  setExpressItem: (
+    productSlug: string,
+    variantSku: string,
+    quantity?: number,
+    customization?: CartCustomization
+  ) => void;
+  clearExpressItem: () => void;
   removeItem: (id: string) => void;
   /** Bulk removal by id. Used to drop lines the catalogue can no longer price. */
   removeItems: (ids: string[]) => void;
@@ -40,13 +49,30 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      expressItem: null,
       isOpen: false,
 
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
-      addItem: (productSlug, variantSku, quantity = 1, customization, maxQuantity) => {
+      setExpressItem: (productSlug, variantSku, quantity = 1, customization) => {
+        const id = generateCartItemId(productSlug, variantSku, customization);
+        set({
+          expressItem: {
+            id,
+            productSlug,
+            variantSku,
+            quantity: Math.max(1, quantity),
+            customization,
+          },
+          isOpen: false,
+        });
+      },
+
+      clearExpressItem: () => set({ expressItem: null }),
+
+      addItem: (productSlug, variantSku, quantity = 1, customization, maxQuantity, openDrawer = true) => {
         const id = generateCartItemId(productSlug, variantSku, customization);
         const safeQty = maxQuantity != null ? Math.min(Math.max(1, quantity), maxQuantity) : Math.max(1, quantity);
         set((state) => {
@@ -59,7 +85,7 @@ export const useCartStore = create<CartState>()(
               ...newItems[existingIndex],
               quantity: next,
             };
-            return { items: newItems, isOpen: true };
+            return { items: newItems, isOpen: openDrawer ? true : state.isOpen };
           }
           return {
             items: [
@@ -72,7 +98,7 @@ export const useCartStore = create<CartState>()(
                 customization,
               },
             ],
-            isOpen: true,
+            isOpen: openDrawer ? true : state.isOpen,
           };
         });
       },
@@ -126,7 +152,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'uniquelo-cart-storage',
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, expressItem: state.expressItem }),
     }
   )
 );

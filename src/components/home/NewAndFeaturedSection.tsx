@@ -184,7 +184,7 @@ export const NewAndFeaturedSection: React.FC = () => {
         {/* Product Grid */}
         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
           {productsForTab.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+            <ProductCard key={product.slug} product={product} type="quick" />
           ))}
         </div>
 

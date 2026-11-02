@@ -13,8 +13,13 @@ import type { PaymentMethod } from '../lib/data';
  * that is exactly how the previous bag ended up showing `subtotal * 1.266`, a
  * hardcoded Rs 400 savings floor and a 21% badge with no table behind it.
  */
-export function useQuote(opts?: { couponCode?: string | null; paymentMethod?: PaymentMethod }) {
-  const items = useCartStore((s) => s.items);
+export function useQuote(opts?: {
+  couponCode?: string | null;
+  paymentMethod?: PaymentMethod;
+  items?: { variantSku: string; quantity: number }[];
+}) {
+  const storeItems = useCartStore((s) => s.items);
+  const items = opts?.items ?? storeItems;
   const email = useAuthStore((s) => s.user?.email ?? null);
 
   const cartKey = useMemo(

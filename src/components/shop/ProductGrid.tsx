@@ -7,6 +7,7 @@ import { useFiltersStore } from '../../stores/filters';
 
 interface ProductGridProps {
   products: Product[];
+  cardType?: 'quick' | 'normal';
 }
 
 /**
@@ -23,7 +24,7 @@ interface ProductGridProps {
  * cannot currently see: how many pieces match, and how to widen the search
  * when nothing does.
  */
-export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
+export const ProductGrid: React.FC<ProductGridProps> = ({ products, cardType = 'quick' }) => {
   const resetFilters = useFiltersStore((state) => state.resetFilters);
 
   if (products.length === 0) {
@@ -62,7 +63,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
 
       <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-6 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard key={product.slug} product={product} type={cardType} />
         ))}
       </div>
     </div>

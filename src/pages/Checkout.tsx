@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useCartStore } from '../stores/cart';
 import { useAuthStore, type CustomerAddress } from '../stores/auth';
 import { useToastStore } from '../stores/toast';
@@ -46,9 +46,18 @@ interface FatalPayment {
  */
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const items = useCartStore((s) => s.items);
+  const expressItem = useCartStore((s) => s.expressItem);
+  const clearExpressItem = useCartStore((s) => s.clearExpressItem);
   const clearCart = useCartStore((s) => s.clearCart);
   const removeItems = useCartStore((s) => s.removeItems);
+
+  const isExpress = searchParams.get('express') === '1' && Boolean(expressItem);
+  const checkoutItems = useMemo(
+    () => (isExpress && expressItem ? [expressItem] : items),
+    [isExpress, expressItem, items]
+  );
   const { data: products = [] } = useProducts();
   const showToast = useToastStore((s) => s.showToast);
 
@@ -105,15 +114,16 @@ export const Checkout: React.FC = () => {
 
   const cartLines = useMemo(
     () =>
-      items
+      checkoutItems
         .map((i) => getCartLine(i, products))
         .filter((l): l is CartLine => Boolean(l)),
-    [items, products]
+    [checkoutItems, products]
   );
 
   const { quote, isLoading, error: quoteError, refetch: refetchQuote } = useQuote({
     couponCode: appliedCode,
     paymentMethod,
+    items: checkoutItems,
   });
 
   useEffect(() => {
@@ -163,6 +173,15 @@ export const Checkout: React.FC = () => {
   // the customer with no line to delete.
   useEffect(() => {
     if (!(quoteError instanceof UnknownVariantError)) return;
+    if (isExpress && expressItem?.variantSku === quoteError.sku) {
+      clearExpressItem();
+      showToast({
+        title: 'An item is no longer available',
+        description: 'This item is no longer available to checkout.',
+        type: 'info',
+      });
+      return;
+    }
     const culprits = items.filter((i) => i.variantSku === quoteError.sku);
     if (culprits.length === 0) return;
 
@@ -173,7 +192,7 @@ export const Checkout: React.FC = () => {
       type: 'info',
     });
     // Removing re-keys the quote query; no explicit refetch needed.
-  }, [quoteError, items, removeItems, showToast]);
+  }, [quoteError, isExpress, expressItem, clearExpressItem, items, removeItems, showToast]);
 
   const bestCoupon: BestCoupon | null = quote?.best_coupon ?? null;
   const offers: BestCoupon[] = quote?.available_offers ?? [];
@@ -295,7 +314,11 @@ export const Checkout: React.FC = () => {
         });
 
         if (res.success && res.orderId) {
-          clearCart();
+          if (isExpress) {
+            clearExpressItem();
+          } else {
+            clearCart();
+          }
           // The email is what lets the confirmation page fetch the receipt
           // itself. Without it the customer lands on a lookup form asking for an
           // id they never memorised.
@@ -347,7 +370,11 @@ export const Checkout: React.FC = () => {
       });
 
       // Paid AND verified AND the order exists. Only now is the bag safe to drop.
-      clearCart();
+      if (isExpress) {
+        clearExpressItem();
+      } else {
+        clearCart();
+      }
       navigate(`/order-confirmation/${result.orderId}?email=${encodeURIComponent(email)}`, {
         replace: true,
       });

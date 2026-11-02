@@ -34,6 +34,7 @@ export const FilterBar: React.FC = () => {
     setUniverse,
     setCharacter,
     setExpressionSlug,
+    setIntensity,
     toggleGarmentType,
     toggleSize,
     toggleTechnique,
@@ -48,6 +49,7 @@ export const FilterBar: React.FC = () => {
     (filters.techniques?.length || 0) +
     (filters.garmentTypes?.length || 0) +
     (filters.expressionSlug && filters.expressionSlug !== 'all' ? 1 : 0) +
+    (filters.intensity && filters.intensity !== 'all' ? 1 : 0) +
     (filters.artStyleSlug && filters.artStyleSlug !== 'all' ? 1 : 0) +
     (filters.universeSlug && filters.universeSlug !== 'all' ? 1 : 0) +
     (filters.characterId && filters.characterId !== 'all' ? 1 : 0) +
@@ -192,6 +194,17 @@ export const FilterBar: React.FC = () => {
               <span className="inline-flex items-center gap-1.5 border border-stone bg-paper px-2 py-1 font-sans text-[11px] text-ink">
                 Style: {filters.expressionSlug.replace(/-/g, ' ')}
                 <button onClick={() => setExpressionSlug('all')} aria-label="Clear style filter" className="text-ink-muted hover:text-ink">✕</button>
+              </span>
+            )}
+
+            {/* Presence. Reachable only by deep link today (Home's
+                Quiet / Balanced / Loud panes), so without this chip a buyer who
+                arrived that way sees a filtered grid with no visible reason and
+                no way to undo it. */}
+            {filters.intensity && filters.intensity !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 border border-stone bg-paper px-2 py-1 font-sans text-[11px] text-ink">
+                Presence: {filters.intensity}
+                <button onClick={() => setIntensity('all')} aria-label="Clear presence filter" className="text-ink-muted hover:text-ink">✕</button>
               </span>
             )}
 

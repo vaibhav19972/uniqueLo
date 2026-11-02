@@ -51,12 +51,17 @@ export const Shop: React.FC = () => {
     const edit = searchParams.get('edit');
     const expression = searchParams.get('expression');
     const technique = searchParams.get('technique');
+    const intensity = searchParams.get('intensity');
     if (universe) s.setUniverse(universe);
     if (character) s.setCharacter(character);
     if (style) s.setArtStyle(style as ArtStyleSlug);
     if (garment) s.setGarmentTypes([garment]);
     if (edit) s.setEdit(edit as EditSlug);
     if (expression) s.setExpressionSlug(expression as any);
+    // Presence deep-link from Home's Quiet / Balanced / Loud panes. Intensity
+    // is the field every product carries, so it is the axis that can always
+    // answer the question the pane asked.
+    if (intensity) s.setIntensity(intensity as 'quiet' | 'balanced' | 'loud');
     // A technique deep-link from /our-craft/:slug. `toggleTechnique` is the only
     // setter on the store; it flips, so call it only when it would turn on.
     if (technique && !(s.filters.techniques ?? []).includes(technique as any)) {

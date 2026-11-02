@@ -1,64 +1,217 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- * ANNOUNCEMENT STRIP — the facts a first-time buyer needs before they shop
+ * UNIQUE LO — ANNOUNCEMENT BAR CONFIGURATION & PRIORITY LIST
  * ─────────────────────────────────────────────────────────────────────────────
- * This file used to hold eight promotional messages, every one of which made a
- * claim the business cannot back:
+ * Flexible announcement system supporting continuous running marquee tickers,
+ * live flashing beacon badges, spotlight rotator mode, and dynamic priority.
  *
- *   "1ST ANNIVERSARY LAUNCH OFFER! 50% OFF ON ALL ARTICLES"  — no catalogue-wide
- *       discount exists. `compare_at_price_cents` is null on all 197 variants.
- *   "FREE SHIPPING!! ON ORDERS ABOVE ₹999"                   — the live shipping
- *       rule (`20261101_checkout_pricing.sql`) is ₹99 flat, waived above ₹1,499.
- *   "YOUR FIRST ORDER, WITH A EXTRA GIFT"                    — there is no gift.
- *   "LIMITED DROP. WHEN IT'S GONE, IT'S GONE."               — fabricated scarcity,
- *       which PRODUCT.md rules out by name.
- *
- * Repeating them every 32 seconds above a sticky header is the most-seen copy on
- * the site, so those were the most-seen false claims on it.
- *
- * What replaces them is the dispatch, payment and return terms — the three
- * things an India-first D2C buyer actually scans a header for, and all three
- * readable from `shipping_rules` and the product rows.
- *
- * There is no marquee. A permanent CSS animation across the top of every page
- * costs a compositor layer and continuous frames on the mid-range Android the
- * brief names as the target, and it makes the strip the loudest moving thing on
- * a page whose whole thesis is that the catalogue is the composition.
+ * Ordered by flexible priority from top (Priority 1 = highest precedence).
  */
 
-export type AnnouncementItem = {
+export type AnnouncementBadgeStyle =
+  | 'emerald'
+  | 'cyan'
+  | 'amber'
+  | 'crimson'
+  | 'purple'
+  | 'gold'
+  | 'default';
+
+export type AnnouncementIconType =
+  | 'lightning'
+  | 'truck'
+  | 'shield'
+  | 'tracking'
+  | 'craft'
+  | 'gift'
+  | 'flame'
+  | 'hourglass';
+
+export interface AnnouncementItem {
   id: string;
   text: string;
-  /** Optional second line or qualifier. Rendered at the same reading size. */
-  detail?: string;
+  /**
+   * Numerical priority: 1 is the highest top-level priority, followed by 2, 3, etc.
+   * Items are sorted ascending by priority so the top-priority items appear first.
+   */
+  priority: number;
+  badge: string;
+  badgeStyle: AnnouncementBadgeStyle;
+  /**
+   * If true, enables live flashing / pulsing beacon or glowing border effect.
+   */
+  isFlashing?: boolean;
+  flashingStyle?: 'beacon' | 'badge' | 'urgent' | 'shimmer';
+  beaconColor?: string;
+  icon?: AnnouncementIconType;
   link?: string;
+  highlightWords?: string;
   ariaLabel?: string;
+}
+
+export interface AnnouncementConfig {
+  /**
+   * Marquee run cycle duration in seconds (smaller = faster scroll).
+   */
+  speedSeconds: number;
+  /**
+   * Whether hovering pauses the running ticker marquee.
+   */
+  pauseOnHover: boolean;
+  /**
+   * Transition interval for single-item spotlight mode in ms.
+   */
+  spotlightIntervalMs: number;
+  /**
+   * Default active mode: 'marquee' (running ticker) or 'spotlight' (rotating flashcard).
+   */
+  defaultMode: 'marquee' | 'spotlight';
+  /**
+   * Initial priority filter threshold: 'all' to show all items, or number for max priority.
+   */
+  priorityFilter: 'all' | 'top-priority';
+}
+
+export const ANNOUNCEMENT_CONFIG: AnnouncementConfig = {
+  speedSeconds: 32,
+  pauseOnHover: true,
+  spotlightIntervalMs: 4500,
+  defaultMode: 'marquee',
+  priorityFilter: 'all',
 };
 
-/** Terms shown in the header strip. Change them here; nothing else hardcodes them. */
-export const ANNOUNCEMENTS: AnnouncementItem[] = [
+/**
+ * 8 Core Announcements requested by user, ordered with flexible priority from top:
+ * 1. 1ST ANNIVERSARY LAUNCH OFFER! 50% OFF ON ALL ARTICLES
+ * 2. FREE SHIPPING!! ON ORDERS ABOVE ₹999
+ * 3. COD AVAILABLE! PAN INDIA!!
+ * 4. SECURE CHECKOUT. A SEAMLESS EXPERIENCE.
+ * 5. MADE TO BE WORN. DESIGNED TO BE KEPT.
+ * 6. YOUR FIRST ORDER, WITH A EXTRA GIFT
+ * 7. NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.
+ * 8. LIMITED DROP. WHEN IT'S GONE, IT'S GONE.
+ */
+export const DEFAULT_ANNOUNCEMENTS: AnnouncementItem[] = [
   {
-    id: 'dispatch',
-    text: 'Dispatch 4–7 days',
+    id: 'anniversary-launch-offer',
+    text: 'ANNIVERSARY LAUNCH OFFER! 50% OFF',
+    priority: 1, // Highest top priority
+    badge: 'ALL ARTICLES',
+    badgeStyle: 'crimson',
+    isFlashing: true,
+    flashingStyle: 'badge',
+    beaconColor: '#f43f5e',
+    icon: 'flame',
+    link: '/shop',
+    highlightWords: '50% OFF',
+    ariaLabel: '1st Anniversary Launch Offer: 50% off on all articles',
+  },
+  {
+    id: 'free-shipping-999',
+    text: 'FREE SHIPPING!! ON ORDERS ABOVE ₹999',
+    priority: 2,
+    badge: '',
+    badgeStyle: 'emerald',
+    isFlashing: true,
+    flashingStyle: 'badge',
+    beaconColor: '#10b981',
+    icon: 'lightning',
+    link: '/shop',
+    highlightWords: 'ABOVE ₹999',
+    ariaLabel: 'Free Shipping on orders above 999 Rupees',
+  },
+  {
+    id: 'cod-pan-india',
+    text: 'COD AVAILABLE! PAN INDIA!!',
+    priority: 3,
+    badge: ' ',
+    badgeStyle: 'cyan',
+    isFlashing: true,
+    flashingStyle: 'beacon',
+    beaconColor: '#06b6d4',
+    icon: 'truck',
+    link: '/shop',
+    highlightWords: 'PAN INDIA!!',
+    ariaLabel: 'Cash on Delivery available across Pan India',
+  },
+  {
+    id: 'secure-checkout',
+    text: 'SECURE CHECKOUT. A SEAMLESS EXPERIENCE.',
+    priority: 4,
+    badge: '🔒 100% SECURE',
+    badgeStyle: 'default',
+    isFlashing: false,
+    icon: 'shield',
+    link: '/shop',
+    ariaLabel: 'Secure encrypted checkout and seamless shopping experience',
+  },
+  {
+    id: 'made-to-be-worn',
+    text: 'MADE TO BE WORN. DESIGNED TO BE KEPT.',
+    priority: 5,
+    badge: 'Evergreen',
+    badgeStyle: 'emerald',
+    isFlashing: false,
+    icon: 'craft',
     link: '/our-craft',
-    ariaLabel: 'Orders dispatch from the workshop in 4 to 7 days',
+    ariaLabel: 'Made to be worn, designed to be kept. Luxury atelier craftsmanship.',
   },
   {
-    id: 'cod',
-    text: 'Cash on delivery, pan-India',
-    ariaLabel: 'Cash on delivery is available across India',
+    id: 'first-order-gift',
+    text: 'YOUR FIRST ORDER, WITH A EXTRA GIFT',
+    priority: 6,
+    badge: '',
+    badgeStyle: 'purple',
+    isFlashing: true,
+    flashingStyle: 'badge',
+    beaconColor: '#c084fc',
+    icon: 'gift',
+    link: '/#atelier-list',
+    highlightWords: 'EXTRA GIFT',
+    ariaLabel: 'Your first order comes with an exclusive extra gift',
   },
   {
-    id: 'returns',
-    text: '7-day returns',
-    ariaLabel: 'Seven day return window on every piece',
+    id: 'new-arrivals',
+    text: 'NEW ARRIVALS. FRESH DESIGNS. EXPLORE!!.',
+    priority: 7,
+    badge: ' HOT DROP',
+    badgeStyle: 'amber',
+    isFlashing: true,
+    flashingStyle: 'badge',
+    beaconColor: '#f59e0b',
+    icon: 'flame',
+    link: '/new-featured',
+    highlightWords: 'EXPLORE!!.',
+    ariaLabel: 'Explore new arrivals and fresh designs',
   },
   {
-    id: 'carriage',
-    text: '₹99 carriage, free above ₹1,499',
-    ariaLabel: 'Carriage is 99 rupees, waived on orders above 1,499 rupees',
+    id: 'limited-drop',
+    text: "LIMITED DROP. WHEN IT'S GONE, IT'S GONE.",
+    priority: 8,
+    badge: '',
+    badgeStyle: 'crimson',
+    isFlashing: true,
+    flashingStyle: 'urgent',
+    beaconColor: '#f43f5e',
+    icon: 'hourglass',
+    link: '/collections',
+    highlightWords: "GONE, IT'S GONE.",
+    ariaLabel: "Limited drop edition: when it is gone, it is gone",
   },
 ];
 
-/** Kept for callers that want the first item only. */
-export const DEFAULT_ANNOUNCEMENTS = ANNOUNCEMENTS;
+/**
+ * Returns announcements sorted by flexible priority from top (1, 2, 3...)
+ * and optionally filtered by priority threshold.
+ */
+export function getPrioritizedAnnouncements(
+  items: AnnouncementItem[] = DEFAULT_ANNOUNCEMENTS,
+  filter: 'all' | 'top-priority' = 'all'
+): AnnouncementItem[] {
+  const sorted = [...items].sort((a, b) => a.priority - b.priority);
+  if (filter === 'top-priority') {
+    // Top 4 priority tier
+    return sorted.filter((item) => item.priority <= 4);
+  }
+  return sorted;
+}

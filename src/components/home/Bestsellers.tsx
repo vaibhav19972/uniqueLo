@@ -3,7 +3,7 @@ import { useProducts, useUniverses } from '../../hooks/useCatalog';
 import { useHorizontalRailGuard, RAIL_PREVENT_ATTR } from '../../hooks/useHorizontalRailGuard';
 import { MarketingHeader } from '../ui/MarketingHeader';
 import { isMerchandisable } from '../../lib/licensed-marks';
-import { BestsellerCard } from './BestsellerCard';
+import { ProductCard } from '../shop/ProductCard';
 import { useReveal } from '../../hooks/useReveal';
 
 /**
@@ -44,7 +44,6 @@ export const Bestsellers: React.FC = () => {
     [products, tab],
   );
 
-  const universeName = (slug?: string) => universes?.find((u) => u.slug === slug)?.name;
 
   const updateEdges = useCallback(() => {
     const el = rowRef.current;
@@ -165,7 +164,9 @@ export const Bestsellers: React.FC = () => {
           className="mx-auto flex w-full max-w-[var(--container-max)] gap-4 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:px-6 lg:px-12 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {visible.map((p) => (
-            <BestsellerCard key={p.slug} product={p} universeName={universeName(p.universeSlug)} />
+            <div key={p.slug} className="w-[280px] sm:w-[320px] shrink-0">
+              <ProductCard product={p} type="normal" />
+            </div>
           ))}
         </div>
       </div>

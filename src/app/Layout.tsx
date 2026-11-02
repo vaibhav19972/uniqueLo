@@ -7,6 +7,7 @@ import { WishlistDrawer } from '../components/layout/WishlistDrawer';
 import { AccountDrawer } from '../components/auth/AccountDrawer';
 import { CustomizerModal } from '../components/customizer/CustomizerModal';
 import { QuickViewModal } from '../components/shop/QuickViewModal';
+import { QuickAddModal } from '../components/shop/QuickAddModal';
 import { AuthModal } from '../components/auth/AuthModal';
 import { ToastContainer } from '../components/ui/Toast';
 import { universeAccent, useThemeBoot } from '../config/theme';
@@ -65,6 +66,7 @@ export const Layout: React.FC = () => {
       <AuthModal />
       <CustomizerModal />
       <QuickViewModal />
+      <QuickAddModal />
       <ToastContainer />
     </div>
   );
