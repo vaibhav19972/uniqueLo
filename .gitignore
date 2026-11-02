@@ -35,7 +35,8 @@ dist-ssr
 # Ignored per-directory rather than as a blanket `/public`, which also swallowed
 # the fonts and category/campaign images the storefront genuinely serves from the
 # bundle.
-/public/images/products
+/public/images/products/*
+!/public/images/products/*-hero.png
 
 # Local-only ChatGPT design reference renders (large binaries, never push)
 sketches/design-renders/chatgpt-v2/
@@ -45,4 +46,5 @@ sketches/design-renders/chatgpt-v2/
 # them stays tracked; the images themselves do not belong in git.
 design-references/**/*.png
 sketches/**/*.png
+.impeccable/review/
 .hermes/
