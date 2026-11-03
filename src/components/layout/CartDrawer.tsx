@@ -162,14 +162,14 @@ export const CartDrawer: React.FC = () => {
   const upsellProducts = useMemo(() => {
     if (!products) return [];
     const inCart = new Set(items.map((i) => i.productSlug));
-    return products
-      .filter(
-        (p) =>
-          !inCart.has(p.slug) &&
-          !hasLicensedMark(p) &&
-          getDefaultVariant(p).status !== 'out-of-stock',
-      )
-      .slice(0, 2);
+    const available = products.filter(
+      (p) =>
+        !inCart.has(p.slug) &&
+        !hasLicensedMark(p) &&
+        getDefaultVariant(p).status !== 'out-of-stock',
+    );
+    const accessories = available.filter((p) => p.categorySlug === 'accessories');
+    return (accessories.length >= 2 ? accessories : available).slice(0, 2);
   }, [products, items]);
 
   if (!isOpen) return null;
@@ -213,20 +213,26 @@ export const CartDrawer: React.FC = () => {
           </button>
         </div>
 
-        {/* ── Carriage meter — the one threshold that exists ────────── */}
+        {/* ── Gamified Free Shipping & Coupon Meter ────────── */}
         {cartLines.length > 0 && (
-          <div className="border-b border-stone bg-cream px-5 py-3">
-            <p className="font-sans text-[12px] text-ink">
-              {!quote
-                ? 'Pricing your bag…'
-                : freeShippingQualified
-                  ? 'Carriage is waived on this order.'
-                  : `Add ${formatPrice(remainingFree)} for free carriage.`}
-            </p>
-            <div className="mt-2 h-px w-full bg-stone">
+          <div className="border-b border-[#EDEDED] bg-emerald-50/70 px-5 py-3.5">
+            <div className="flex items-center justify-between text-xs font-bold text-emerald-950">
+              <span className="flex items-center gap-1.5">
+                <span>🚚</span>
+                <span>
+                  {freeShippingQualified
+                    ? '🎉 You unlocked FREE SHIPPING & 10% OFF!'
+                    : `Add ${formatPrice(remainingFree)} more to unlock FREE SHIPPING!`}
+                </span>
+              </span>
+              <span className="font-mono text-[11px] text-emerald-700">
+                {Math.min(100, Math.round(shippingProgressPercent))}%
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-emerald-200/80">
               <div
-                className="h-px bg-ink transition-[width] duration-500"
-                style={{ width: `${shippingProgressPercent}%` }}
+                className="h-full rounded-full bg-emerald-600 transition-[width] duration-500"
+                style={{ width: `${Math.min(100, Math.max(8, shippingProgressPercent))}%` }}
               />
             </div>
           </div>
@@ -264,25 +270,32 @@ export const CartDrawer: React.FC = () => {
                 ))}
               </ul>
 
-              {/* A bag is not a catalogue page: two garments, one line each,
-                  no badge and no carousel. */}
+              {/* Impulse Add-Ons / Grab an Accessory */}
               {upsellProducts.length > 0 && (
-                <div className="border-b border-stone py-4">
-                  <p className="loom-label text-ink-muted">Also in the catalogue</p>
-                  <ul className="mt-3 space-y-2">
+                <div className="border-b border-[#EDEDED] py-4">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="font-mono text-[11px] font-black uppercase tracking-wider text-neutral-900">
+                      ★ COMPLETE THE LOOK
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-medium">Quick add</span>
+                  </div>
+                  <div className="no-scrollbar flex gap-2.5 overflow-x-auto pb-1">
                     {upsellProducts.map((up) => {
                       const uv = getDefaultVariant(up);
                       return (
-                        <li key={up.slug} className="flex items-center gap-3 border border-stone px-2 py-2">
+                        <div
+                          key={up.slug}
+                          className="flex w-[210px] shrink-0 items-center gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 p-2 shadow-2xs"
+                        >
                           <img
-                            src={up.images[0]?.src || '/images/placeholders/hero.jpg'}
+                            src={up.images[0]?.src || '/images/placeholders/hoodie.jpg'}
                             alt=""
                             loading="lazy"
-                            className="h-12 w-10 shrink-0 object-cover"
+                            className="h-12 w-10 shrink-0 rounded object-cover"
                           />
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-sans text-[12px] text-ink">{up.name}</p>
-                            <p className="loom-price text-[12px] text-ink-muted">
+                            <p className="truncate text-xs font-bold text-neutral-900">{up.name}</p>
+                            <p className="text-xs font-bold text-[#D32F2F]">
                               {formatPrice(uv.priceCents)}
                             </p>
                           </div>
@@ -290,14 +303,14 @@ export const CartDrawer: React.FC = () => {
                             type="button"
                             onClick={() => handleAddUpsell(up.slug)}
                             aria-label={`Add ${up.name}`}
-                            className="min-h-[44px] shrink-0 border border-stone-strong px-3 font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-cream"
+                            className="flex h-8 items-center justify-center rounded bg-black px-2.5 text-[10px] font-black uppercase tracking-wider text-white shadow-xs transition hover:bg-neutral-800 active:scale-95"
                           >
-                            Add
+                            + ADD
                           </button>
-                        </li>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
               )}
 
@@ -329,6 +342,22 @@ export const CartDrawer: React.FC = () => {
         {/* ── Totals ───────────────────────────────────────────────── */}
         {cartLines.length > 0 && (
           <div className="border-t border-stone px-5 pb-5 pt-4">
+            {/* Quick 1-Tap Coupon Pill */}
+            {!appliedCode && (
+              <div className="mb-2 flex items-center justify-between rounded-md bg-amber-50 px-2.5 py-1.5 border border-amber-200">
+                <span className="text-[11px] font-bold text-amber-900">
+                  ✨ Extra 10% OFF: <span className="font-mono font-black">HUSTLE10</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => applyCode('HUSTLE10')}
+                  className="rounded bg-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white hover:bg-neutral-800"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+
             {/* Coupon */}
             {!appliedCode && !isCouponInputOpen ? (
               <button

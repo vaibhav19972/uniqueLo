@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
 import {
   type AnnouncementItem,
@@ -8,6 +8,7 @@ import {
   getPrioritizedAnnouncements,
 } from '../../config/announcements';
 import { SITE_TWEAKS } from '../../config/tweaks';
+import { useUIStore } from '../../stores/ui';
 
 export interface AnnouncementBarProps {
   customItems?: AnnouncementItem[];
@@ -88,31 +89,22 @@ const AnnouncementIcon: React.FC<{
 };
 
 /**
- * Badge styling resolver.
- *
- * The bar carries one accent — the universe's — so badge variants differ by
- * EMPHASIS, not by hue. Three treatments only:
- *
- *   default   → quiet panel chip, reads as metadata
- *   urgent    → solid accent chip, reads as a deadline (crimson / amber)
- *   highlight → soft accent chip, reads as an offer (emerald / cyan / etc.)
- *
- * `isFlashing` adds a slow opacity pulse to the urgent treatment and nothing
- * to the rest. The old beacon pulse was dropped: it competed with the sticky
- * header for attention on every scroll.
+ * Badge styling resolver matching the site's crimson & dark accent palette.
  */
 function getBadgeClasses(style: AnnouncementBadgeStyle, isFlashing?: boolean): string {
-  const base = 'inline-flex items-center px-2 py-0.5 text-[10px] font-sans font-semibold uppercase tracking-widest';
+  const base = 'inline-flex items-center px-2 py-0.5 text-[9.5px] sm:text-[10px] font-mono font-bold uppercase tracking-wider rounded-full';
 
-  if (style === 'crimson' || style === 'amber') {
-    return `${base} bg-accent text-on-accent ${isFlashing ? 'animate-flash-text' : ''}`;
+  switch (style) {
+    case 'crimson':
+      return `${base} bg-[#D32F2F] text-white shadow-2xs ${isFlashing ? 'animate-pulse' : ''}`;
+    case 'amber':
+      return `${base} bg-amber-400 text-black shadow-2xs ${isFlashing ? 'animate-pulse' : ''}`;
+    case 'emerald':
+      return `${base} bg-emerald-600 text-white shadow-2xs`;
+    case 'default':
+    default:
+      return `${base} border border-white/20 bg-white/10 text-white`;
   }
-
-  if (style === 'default') {
-    return `${base} border border-stone bg-panel text-ink`;
-  }
-
-  return `${base} border border-accent-border bg-accent-soft text-accent`;
 }
 
 /**
@@ -131,7 +123,7 @@ const AnnouncementCard: React.FC<{
     renderedText = (
       <>
         <span>{before}</span>
-        <span className="font-semibold text-accent underline decoration-accent/40 underline-offset-2">
+        <span className="font-extrabold text-[#ff4d4d] underline decoration-[#ff4d4d]/40 underline-offset-2">
           {item.highlightWords}
         </span>
         <span>{after}</span>
@@ -140,27 +132,27 @@ const AnnouncementCard: React.FC<{
   }
 
   const content = (
-    <div className="inline-flex items-center gap-2.5 whitespace-nowrap group/item py-0.5">
-      {/* Live dot — a single accent dot, no ping ring. */}
+    <div className="inline-flex items-center gap-2 whitespace-nowrap group/item py-0.5">
+      {/* Live dot — pulsing accent dot */}
       {item.isFlashing && (
         <span
-          className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#D32F2F] animate-pulse"
           aria-hidden="true"
         />
       )}
 
-      {/* Badge Pill */}
-      {item.badge && (
+      {/* Badge / Icon Pill */}
+      {(item.badge || item.icon) && (
         <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider uppercase transition-transform group-hover/item:scale-105 ${badgeClasses}`}
+          className={`inline-flex items-center gap-1 transition-transform group-hover/item:scale-105 ${badgeClasses}`}
         >
           {item.icon && <AnnouncementIcon type={item.icon} className="w-3 h-3 shrink-0" />}
-          <span>{item.badge}</span>
+          {item.badge && item.badge.trim() ? <span>{item.badge.trim()}</span> : null}
         </span>
       )}
 
       {/* Main Text */}
-      <span className="font-sans text-[11.5px] sm:text-[12.5px] font-medium tracking-tight text-ink transition-colors">
+      <span className="font-sans text-[11px] sm:text-[12px] font-semibold tracking-wide text-neutral-100 transition-colors group-hover/item:text-white">
         {renderedText}
       </span>
 
@@ -168,7 +160,7 @@ const AnnouncementCard: React.FC<{
       {item.link && (
         <span
           aria-hidden="true"
-          className="text-ink-muted text-[10px] group-hover/item:text-accent group-hover/item:translate-x-0.5 transition-all"
+          className="text-neutral-400 text-[10px] group-hover/item:text-white group-hover/item:translate-x-0.5 transition-all"
         >
           →
         </span>
@@ -181,7 +173,7 @@ const AnnouncementCard: React.FC<{
       <Link
         to={item.link}
         aria-label={item.ariaLabel || item.text}
-        className="inline-flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+        className="inline-flex items-center rounded-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#D32F2F]"
       >
         {content}
       </Link>
@@ -192,22 +184,20 @@ const AnnouncementCard: React.FC<{
 };
 
 /**
- * Revamped AnnouncementBar Component
+ * Store Announcement Bar (from previous version on main, tuned to active palette)
  *
- * Clean, seamless e-commerce rolling announcement bar:
- * • Smooth continuous rolling animation in priority order from top to bottom.
- * • Flashing beacon dots and glowing badges on high-priority items.
- * • Natural pause-on-hover: hovering pauses scrolling so shoppers can comfortably read/click.
- * • Clean dismiss button (✕) on the right.
- * • Priority order is managed under the hood in `src/config/announcements.ts`.
+ * • Continuous smooth rolling marquee in priority order.
+ * • Accents matching current site: crimson/madder red (#D32F2F), warm amber, emerald, and white-glass badges.
+ * • Hover to pause scrolling.
+ * • Dismiss button (✕) synced with global UI state.
  */
 export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
   customItems,
   speedSeconds = SITE_TWEAKS.announcements.speedSeconds,
 }) => {
-  const [isDismissed, setIsDismissed] = useState(false);
+  const isDismissed = useUIStore((state) => state.isAnnouncementDismissed);
+  const dismissAnnouncement = useUIStore((state) => state.dismissAnnouncement);
 
-  // Announcements ordered with flexible priority from top
   const announcements = useMemo(() => {
     return getPrioritizedAnnouncements(customItems || DEFAULT_ANNOUNCEMENTS, 'all');
   }, [customItems]);
@@ -220,7 +210,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
     <aside
       role="region"
       aria-label="Store Announcements and Offers"
-      className="relative z-10 h-9 w-full select-none overflow-hidden border-b border-stone bg-panel text-xs text-ink"
+      className="relative z-50 h-9 w-full select-none overflow-hidden border-b border-white/10 bg-[#0c0d12] text-xs text-white"
     >
       <div className="h-full max-w-[var(--container-max)] mx-auto px-2 sm:px-4 flex items-center justify-between gap-2">
         {/* RUNNING / ROLLING MARQUEE */}
@@ -238,7 +228,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
               {announcements.map((item) => (
                 <React.Fragment key={`set1-${item.id}`}>
                   <AnnouncementCard item={item} />
-                  <span aria-hidden="true" className="select-none text-[10px] text-ink-muted/50">
+                  <span aria-hidden="true" className="select-none text-[10px] text-white/30">
                     ✦
                   </span>
                 </React.Fragment>
@@ -253,7 +243,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
               {announcements.map((item) => (
                 <React.Fragment key={`set2-${item.id}`}>
                   <AnnouncementCard item={item} />
-                  <span aria-hidden="true" className="select-none text-[10px] text-ink-muted/50">
+                  <span aria-hidden="true" className="select-none text-[10px] text-white/30">
                     ✦
                   </span>
                 </React.Fragment>
@@ -264,10 +254,10 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
 
         {/* RIGHT: CLEAN DISMISS BUTTON ONLY */}
         <button
-          onClick={() => setIsDismissed(true)}
+          onClick={dismissAnnouncement}
           aria-label="Dismiss announcement"
           title="Dismiss announcement"
-          className="p-1 rounded text-ink-muted hover:text-ink hover:bg-panel-raised transition-colors shrink-0 z-10 min-w-[28px] min-h-[28px] flex items-center justify-center"
+          className="p-1 rounded text-neutral-400 hover:text-white hover:bg-white/10 transition-colors shrink-0 z-10 min-w-[28px] min-h-[28px] flex items-center justify-center"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

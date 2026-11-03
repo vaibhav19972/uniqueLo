@@ -44,6 +44,10 @@ export const Shop: React.FC = () => {
     lastSearchRef.current = currentSearch;
 
     const s = useFiltersStore.getState();
+    const category = searchParams.get('category');
+    const gender = searchParams.get('gender');
+    const query = searchParams.get('q');
+    const sort = searchParams.get('sort');
     const universe = searchParams.get('universe');
     const character = searchParams.get('character');
     const style = searchParams.get('style');
@@ -52,6 +56,17 @@ export const Shop: React.FC = () => {
     const expression = searchParams.get('expression');
     const technique = searchParams.get('technique');
     const intensity = searchParams.get('intensity');
+
+    if (category) s.setCategory(category);
+    if (gender && (gender === 'men' || gender === 'women' || gender === 'unisex' || gender === 'all')) {
+      s.setGender(gender);
+    }
+    if (query !== null) s.setSearchQuery(query);
+    if (sort) {
+      if (sort === 'new' || sort === 'newest') s.setSort('newest');
+      else if (sort === 'price-asc') s.setSort('price-asc');
+      else if (sort === 'price-desc') s.setSort('price-desc');
+    }
     if (universe) s.setUniverse(universe);
     if (character) s.setCharacter(character);
     if (style) s.setArtStyle(style as ArtStyleSlug);
@@ -130,6 +145,37 @@ export const Shop: React.FC = () => {
         ) : (
           <ProductGrid products={filteredProducts} />
         )}
+      </div>
+
+      {/* ── Sticky Mobile Filter & Sort Bar (Bonkers 1:1 Architecture) ── */}
+      <div className="fixed bottom-0 inset-x-0 z-30 flex h-12 items-stretch border-t border-neutral-300 bg-white/95 backdrop-blur-md shadow-lg md:hidden">
+        <button
+          type="button"
+          onClick={() => {
+            window.scrollTo({ top: 180, behavior: 'smooth' });
+          }}
+          className="flex-1 flex items-center justify-center gap-1.5 font-display text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          <span>FILTER</span>
+        </button>
+
+        <div className="w-[1px] bg-neutral-200" />
+
+        <button
+          type="button"
+          onClick={() => {
+            window.scrollTo({ top: 180, behavior: 'smooth' });
+          }}
+          className="flex-1 flex items-center justify-center gap-1.5 font-display text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+          </svg>
+          <span>SORT BY</span>
+        </button>
       </div>
     </div>
   );

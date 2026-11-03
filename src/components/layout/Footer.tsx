@@ -1,173 +1,187 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router';
-import { useUniverses } from '../../hooks/useCatalog';
-import { EDITS } from '../../lib/data';
-import { Logo } from '../ui/Logo';
 
-/**
- * THE COLOPHON
- *
- * The footer was render target 07: a serif wordmark, five gold small-caps
- * column heads, four circled gold line-icons over claims the catalogue does not
- * back, and — the real problem — sixteen menu items rendered as
- * `<span className="cursor-pointer">` with no destination at all. A link that
- * does nothing is worse than an absent link: it teaches the visitor that the
- * footer is decoration.
- *
- * What ships now:
- *  · Every item is either a real route or it is gone. Nothing is a fake link.
- *  · The four claims are the four terms from the masthead strip — dispatch,
- *    COD, returns, carriage — each of which a catalogue field or the pricing
- *    function backs. "14-day home inspection" is deleted: return_window_days
- *    is 7 on every product. "Natural dyes & fabrics" is deleted: no material
- *    record in the catalogue names a dye process.
- *  · The mark is the wordmark set in the page's display face, no serif, no
- *    gold, no circles. Social handles are text links because there is no
- *    brand-glyph asset in the repo and a letter in a circle is not an icon.
- */
-const CRAFT_LINKS = [
-  { label: 'Our Craft', to: '/our-craft' },
-  { label: 'Techniques', to: '/our-craft' },
-  { label: 'The Craft Story', to: '/our-craft' },
-];
+interface FooterSection {
+  title: string;
+  links: { label: string; to: string }[];
+}
 
-const SHOP_LINKS = [
-  { label: 'All Pieces', to: '/shop' },
-  { label: 'New & Featured', to: '/new-featured' },
-  { label: 'Collections', to: '/collections' },
-  { label: 'Clothing', to: '/clothing' },
-  { label: 'Edits & Styles', to: '/styles' },
-];
-
-const TERMS = [
-  ['Dispatch', '4–7 days from the workshop'],
-  ['Payment', 'Cash on delivery, pan-India'],
-  ['Returns', '7 days from delivery'],
-  ['Carriage', '₹99, waived above ₹1,499'],
+const FOOTER_SECTIONS: FooterSection[] = [
+  {
+    title: 'SHOP',
+    links: [
+      { label: 'BEST SELLERS', to: '/shop?sort=bestseller' },
+      { label: 'NEW ARRIVALS', to: '/shop?sort=new' },
+      { label: 'Oversized T-Shirts', to: '/shop?category=tops&fit=oversized' },
+      { label: 'Hoodies & Sweatshirts', to: '/shop?category=outerwear&type=hoodie' },
+      { label: 'Cargos & Parachutes', to: '/shop?category=bottoms&type=cargo' },
+      { label: 'Statement Caps (₹799)', to: '/shop?category=accessories&type=cap' },
+      { label: 'Special Prices', to: '/shop?sale=true' },
+    ],
+  },
+  {
+    title: 'TRENDING DROPS',
+    links: [
+      { label: 'Culture Corner Collab', to: '/shop?universe=itihaas' },
+      { label: 'Animeverse Drop 02', to: '/shop?universe=animeverse' },
+      { label: 'Heroverse Legacy', to: '/shop?universe=heroverse' },
+      { label: 'The Knit Edit', to: '/shop?type=knit' },
+      { label: 'Acid Wash Heavyweights', to: '/shop?wash=acid' },
+      { label: 'Co-Ord Sets', to: '/shop?type=coord' },
+    ],
+  },
+  {
+    title: 'CUSTOMER CARE',
+    links: [
+      { label: 'Track Order', to: '/orders' },
+      { label: 'Returns & Exchange Policy', to: '/orders' },
+      { label: 'FAQs & Help', to: '/our-craft' },
+      { label: 'WhatsApp Concierge', to: 'https://wa.me/' },
+      { label: 'Stores Near Me', to: '/shop' },
+      { label: 'Offers & Promo Codes', to: '/shop' },
+    ],
+  },
+  {
+    title: 'ABOUT UNIQUELO',
+    links: [
+      { label: 'Our Story & Culture', to: '/our-craft' },
+      { label: 'Embroidery Techniques', to: '/our-craft' },
+      { label: 'Heavyweight Indian Cotton', to: '/our-craft' },
+      { label: 'Sustainability & Values', to: '/our-craft' },
+      { label: 'Privacy Policy', to: '/' },
+      { label: 'Terms & Conditions', to: '/' },
+    ],
+  },
 ];
 
 export const Footer: React.FC = () => {
-  const { data: universes } = useUniverses();
+  const [openSection, setOpenSection] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const toggleSection = (title: string) => {
+    setOpenSection((prev) => (prev === title ? null : title));
+  };
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail('');
+  };
 
   return (
-    <footer className="border-t border-stone bg-paper text-ink">
-      <div className="mx-auto max-w-[var(--container-max)] px-4 pb-8 pt-12 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-2 gap-10 border-b border-stone pb-10 md:grid-cols-4 lg:grid-cols-5">
-          <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <Link
-              to="/"
-              className="inline-block text-ink transition-opacity hover:opacity-85"
-              aria-label="UniqueLo — home"
-            >
-              <Logo variant="stacked" className="h-14 sm:h-16 w-auto text-ink" />
-            </Link>
-            <p className="mt-3 max-w-[30ch] font-sans text-[13px] leading-relaxed text-ink-muted">
-              Hand-embroidered garments made in India, priced as plainly as a
-              fabric label.
-            </p>
+    <footer className="w-full bg-black text-white pt-10 pb-8 border-t border-neutral-800">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* ── Newsletter Block ── */}
+        <div className="border-b border-neutral-800 pb-8 text-center sm:text-left">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <p className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-neutral-400">
+                ★ WE&apos;VE GOT YOU COVERED ★
+              </p>
+              <h3 className="mt-1 font-display text-lg font-black uppercase tracking-tight text-white sm:text-xl">
+                Beyond the Outfit: Get First Access
+              </h3>
+              <p className="mt-0.5 text-xs text-neutral-400 font-normal">
+                Be the first to know about secret drops, Shark Tank codes &amp; VIP sales.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubscribe} className="flex max-w-md w-full gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address..."
+                className="h-11 flex-1 rounded bg-neutral-900 border border-neutral-700 px-3.5 text-xs text-white placeholder-neutral-500 outline-none focus:border-white"
+              />
+              <button
+                type="submit"
+                className="h-11 shrink-0 rounded bg-white px-5 text-xs font-black uppercase tracking-wider text-black transition hover:bg-neutral-200 active:scale-95"
+              >
+                {subscribed ? 'Joined ✓' : 'Subscribe'}
+              </button>
+            </form>
           </div>
-
-          <nav aria-label="Worlds">
-            <h2 className="loom-label text-ink-muted">Worlds</h2>
-            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
-              {(universes ?? []).map((u) => (
-                <li key={u.slug}>
-                  <Link
-                    to={`/universes/${u.slug}`}
-                    className="text-ink transition-colors hover:text-accent"
-                  >
-                    {u.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link to="/universes" className="text-ink transition-colors hover:text-accent">
-                  All worlds
-                </Link>
-              </li>
-            </ul>
-          </nav>
-
-          <nav aria-label="Shop">
-            <h2 className="loom-label text-ink-muted">Shop</h2>
-            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
-              {SHOP_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link to={l.to} className="text-ink transition-colors hover:text-accent">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="Edits">
-            <h2 className="loom-label text-ink-muted">Edits</h2>
-            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
-              {EDITS.filter((e) => e.featured).map((e) => (
-                <li key={e.slug}>
-                  <Link
-                    to={`/shop?edit=${e.slug}`}
-                    className="text-ink transition-colors hover:text-accent"
-                  >
-                    {e.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="Company">
-            <h2 className="loom-label text-ink-muted">House</h2>
-            <ul className="mt-3 space-y-2 font-sans text-[13.5px]">
-              {CRAFT_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link to={l.to} className="text-ink transition-colors hover:text-accent">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link
-                  to="/#atelier-list"
-                  className="text-ink transition-colors hover:text-accent"
-                >
-                  Atelier List
-                </Link>
-              </li>
-              <li>
-                <Link to="/orders" className="text-ink transition-colors hover:text-accent">
-                  Your Orders
-                </Link>
-              </li>
-            </ul>
-          </nav>
         </div>
 
-        {/* The terms, as a ruled row — the same four facts the masthead strip
-            opens the page with, closed out at the bottom. */}
-        <dl className="grid grid-cols-1 border-b border-stone sm:grid-cols-2 lg:grid-cols-4">
-          {TERMS.map(([term, def], i) => (
-            <div
-              key={term}
-              className={`border-b border-stone py-4 sm:border-b-0 ${
-                i > 0 ? 'lg:border-l lg:pl-6' : 'lg:pr-6'
-              } ${i % 2 === 1 ? 'sm:border-l sm:pl-6' : ''}`}
-            >
-              <dt className="loom-label text-ink-muted">{term}</dt>
-              <dd className="mt-1 font-sans text-[13px] text-ink">{def}</dd>
-            </div>
-          ))}
-        </dl>
+        {/* ── 4 Collapsible Accordions (Mobile) / 4-Col Grid (Desktop) ── */}
+        <div className="py-8 divide-y divide-neutral-800 md:divide-y-0 md:grid md:grid-cols-4 md:gap-8">
+          {FOOTER_SECTIONS.map((section) => {
+            const isOpen = openSection === section.title;
+            return (
+              <div key={section.title} className="py-3 md:py-0">
+                {/* Mobile Accordion Trigger */}
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.title)}
+                  className="flex min-h-[44px] w-full items-center justify-between text-left text-xs font-black uppercase tracking-wider text-white md:cursor-default"
+                >
+                  <span>{section.title}</span>
+                  <span className="text-sm font-light text-neutral-400 md:hidden">
+                    {isOpen ? '−' : '+'}
+                  </span>
+                </button>
 
-        <div className="flex flex-col items-start justify-between gap-4 pt-6 font-sans text-[12px] text-ink-muted lg:flex-row lg:items-center">
-          <p>© 2026 UniqueLo. Made in India.</p>
-          <p className="loom-price text-[12px] text-ink-muted">
-            UPI · VISA · Mastercard · RuPay · AMEX · COD
+                {/* Links List */}
+                <ul
+                  className={`mt-2 space-y-2 text-xs text-neutral-400 ${
+                    isOpen ? 'block' : 'hidden md:block'
+                  }`}
+                >
+                  {section.links.map((link) => (
+                    <li key={link.label}>
+                      {link.to.startsWith('http') ? (
+                        <a
+                          href={link.to}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:text-white transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link
+                          to={link.to}
+                          className="hover:text-white transition-colors block py-0.5"
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── App Store & Play Store Experience Banner ── */}
+        <div className="border-t border-neutral-800 pt-8 pb-4 text-center">
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">
+            EXPERIENCE THE UNIQUELO APP
           </p>
-          <Link to="/orders" className="text-ink transition-colors hover:text-accent">
-            Questions about an order? Track it here →
-          </Link>
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <span className="flex h-10 items-center justify-center rounded border border-neutral-700 bg-neutral-900 px-4 text-xs font-bold text-white shadow-xs">
+               App Store
+            </span>
+            <span className="flex h-10 items-center justify-center rounded border border-neutral-700 bg-neutral-900 px-4 text-xs font-bold text-white shadow-xs">
+              ▶ Google Play
+            </span>
+          </div>
+
+          <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-neutral-500 sm:flex-row">
+            <div className="flex items-center gap-2">
+              <span className="font-display font-black text-white tracking-tight">UNIQUELO</span>
+              <span>© 2026 UniqueLo Streetwear India. All Rights Reserved.</span>
+            </div>
+            <div className="flex gap-4">
+              <a href="#instagram" className="hover:text-white">Instagram</a>
+              <a href="#discord" className="hover:text-white">Community</a>
+              <a href="#spotify" className="hover:text-white">Soundtrack</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

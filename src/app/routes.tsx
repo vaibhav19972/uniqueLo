@@ -150,13 +150,17 @@ export const routes: RouteObject[] = [
         path: 'women',
         element: withSuspense(<GenderPage />),
       },
-      // Product PDP (both singular and plural)
+      // Product PDP (singular, plural, and shop alias)
       {
         path: 'product/:slug',
         element: withSuspense(<ProductDetail />),
       },
       {
         path: 'products/:slug',
+        element: withSuspense(<ProductDetail />),
+      },
+      {
+        path: 'shop/:slug',
         element: withSuspense(<ProductDetail />),
       },
       {

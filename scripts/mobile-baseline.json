@@ -1,0 +1,52 @@
+{
+  "recordedAt": "2026-11-03T08:49:42.475Z",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "base": "http://127.0.0.1:5177",
+  "routes": {
+    "/": {
+      "heightPx": 6797,
+      "screens": 8.05,
+      "words": 1213,
+      "smallTargets": 117,
+      "overflow": false
+    },
+    "/shop": {
+      "heightPx": 7963,
+      "screens": 9.43,
+      "words": 1183,
+      "smallTargets": 97,
+      "overflow": false
+    },
+    "/product/ascendant-cream-tee": {
+      "heightPx": 6368,
+      "screens": 7.55,
+      "words": 580,
+      "smallTargets": 34,
+      "overflow": false
+    },
+    "/worlds": {
+      "heightPx": 2042,
+      "screens": 2.42,
+      "words": 137,
+      "smallTargets": 8,
+      "overflow": false
+    },
+    "/styles": {
+      "heightPx": 10744,
+      "screens": 12.73,
+      "words": 768,
+      "smallTargets": 19,
+      "overflow": false
+    },
+    "/clothing": {
+      "heightPx": 3209,
+      "screens": 3.8,
+      "words": 195,
+      "smallTargets": 19,
+      "overflow": false
+    }
+  }
+}

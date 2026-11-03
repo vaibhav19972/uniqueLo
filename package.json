@@ -16,7 +16,10 @@
     "publish:payload": "node ../backend/scripts/render-publish-payload.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "schema:check": "node ../backend/scripts/check-schema-completeness.mjs"
+    "schema:check": "node ../backend/scripts/check-schema-completeness.mjs",
+    "mobile:check": "node scripts/check-mobile.mjs",
+    "mobile:report": "node scripts/mobile-breakdown.mjs",
+    "mobile:baseline": "node scripts/check-mobile.mjs --baseline"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

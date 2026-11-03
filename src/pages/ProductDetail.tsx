@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router';
 import { useProduct, useProducts, useReviews, useUniverse } from '../hooks/useCatalog';
 import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
@@ -55,6 +55,7 @@ import { ProductCard } from '../components/shop/ProductCard';
  */
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { data: product, isPending, isError } = useProduct(slug);
   const { data: allProducts } = useProducts();
   const { data: reviews, refetch: refetchReviews } = useReviews(slug);
@@ -282,6 +283,13 @@ export const ProductDetail: React.FC = () => {
       description: `${safeQty} × ${product.name} (size ${currentVariant.size})`,
       type: 'success',
     });
+  };
+
+  const handleBuyItNow = () => {
+    if (!product || !currentVariant || currentVariant.status === 'out-of-stock') return;
+    const safeQty = Math.min(quantity, maxQty);
+    addItem(product.slug, currentVariant.sku, safeQty, undefined, maxQty, false);
+    navigate('/checkout');
   };
 
   const handleWishlistToggle = () => {
@@ -779,6 +787,53 @@ export const ProductDetail: React.FC = () => {
               </button>
             </div>
 
+            {/* ── Fintech Conversion Widgets (Bonkers 1:1 Architecture) ── */}
+            <div className="mt-5 space-y-2 rounded-xl bg-neutral-50 p-3 border border-neutral-200">
+              <span className="block text-[10px] font-black uppercase tracking-widest text-neutral-400">
+                ★ SPECIAL PAYMENT OFFERS ★
+              </span>
+
+              {/* Zero-Cost UPI EMI */}
+              <div className="flex items-center justify-between rounded-lg bg-white p-2.5 border border-neutral-200 shadow-2xs">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-emerald-100 text-emerald-800 font-black text-xs">
+                    ₹
+                  </span>
+                  <div className="text-left">
+                    <p className="text-[11px] font-black text-neutral-900 leading-tight">
+                      Zero-Cost EMI on UPI | Pay ₹{Math.round(currentVariant.priceCents / 100 / 3)} × 3 Months
+                    </p>
+                    <p className="text-[9.5px] text-neutral-500">
+                      No credit card required • Instant verification
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 text-[10px] font-bold text-emerald-700 underline">
+                  Available
+                </span>
+              </div>
+
+              {/* Prepaid UPI ₹60 Off */}
+              <div className="flex items-center justify-between rounded-lg bg-white p-2.5 border border-neutral-200 shadow-2xs">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-amber-100 text-amber-800 font-black text-xs">
+                    ⚡
+                  </span>
+                  <div className="text-left">
+                    <p className="text-[11px] font-black text-neutral-900 leading-tight">
+                      Prepaid Discounts | Get ₹60 Off on UPI
+                    </p>
+                    <p className="text-[9.5px] text-neutral-500">
+                      Auto-applied at checkout for instant savings
+                    </p>
+                  </div>
+                </div>
+                <span className="shrink-0 text-[10px] font-bold text-amber-700">
+                  AUTO-APPLIED
+                </span>
+              </div>
+            </div>
+
             {/* Logistics: the fields the buyer checks before paying. */}
             <dl className="mt-6 grid grid-cols-1 gap-px border-y border-stone sm:grid-cols-3">
               {[
@@ -1197,31 +1252,44 @@ export const ProductDetail: React.FC = () => {
         </div>
       )}
 
-      {/* ── STICKY BUY BAR ─────────────────────────────────────────── */}
+      {/* ── STICKY BUY BAR (Bonkers 1:1 Dual-Action Mobile Architecture) ── */}
       {showStickyBar && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-stone bg-paper/95 backdrop-blur-md">
-          <div className="mx-auto flex max-w-[var(--container-max)] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-12">
-            <div className="flex min-w-0 items-center gap-3">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-300 bg-white/95 backdrop-blur-md shadow-2xl pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <div className="mx-auto flex max-w-[var(--container-max)] items-center justify-between gap-3 px-3 py-2.5 sm:px-6 lg:px-12">
+            <div className="hidden sm:flex min-w-0 items-center gap-3">
               <img
                 src={activeImage.src}
                 alt=""
-                className="h-12 w-10 shrink-0 object-cover"
+                className="h-11 w-9 shrink-0 object-cover rounded-xs"
               />
               <div className="min-w-0">
-                <p className="truncate font-sans text-[13px] font-medium text-ink">{product.name}</p>
-                <p className="loom-price text-[12px] text-ink-muted">
-                  {formatPrice(currentVariant.priceCents)} · {currentVariant.size}
+                <p className="truncate font-sans text-[13px] font-bold text-neutral-900">{product.name}</p>
+                <p className="text-[12px] font-bold text-[#D32F2F]">
+                  {formatPrice(currentVariant.priceCents)} · Size {currentVariant.size}
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={soldOut}
-              className="inline-flex min-h-[44px] shrink-0 items-center bg-ink px-5 font-sans text-[12px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
-            >
-              {soldOut ? 'Sold out' : 'Add to bag'}
-            </button>
+
+            {/* Mobile Dual Buttons: 48% Add to Cart / 52% Buy It Now */}
+            <div className="flex w-full sm:w-auto items-center gap-2">
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={soldOut}
+                className="flex-1 sm:flex-none flex min-h-[46px] sm:min-h-[44px] items-center justify-center rounded border-2 border-black bg-white px-4 font-display text-xs font-black uppercase tracking-wider text-black transition hover:bg-neutral-50 active:scale-98 disabled:opacity-50"
+              >
+                {soldOut ? 'Sold out' : 'Add to bag'}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleBuyItNow}
+                disabled={soldOut}
+                className="flex-1 sm:flex-none flex min-h-[46px] sm:min-h-[44px] items-center justify-center rounded bg-black px-5 font-display text-xs font-black uppercase tracking-wider text-white shadow-md transition hover:bg-neutral-800 active:scale-98 disabled:opacity-50"
+              >
+                Buy it now ⚡
+              </button>
+            </div>
           </div>
         </div>
       )}
