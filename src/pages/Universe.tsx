@@ -12,22 +12,8 @@ import {
 } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
 import { BundleBand } from '../components/shop/BundleBand';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-
-const HERO_ORNAMENTS: Record<string, React.ReactNode> = {
-  lotus: (
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21c-5 0-8-3-8-8 0-6 5-10 13-10 0 8-2 18-5 18zm0 0V9" />
-  ),
-  compass: (
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2L12 2zm0 8a2 2 0 100 .01" />
-  ),
-};
-
-/**
- * Render target 08: themed universe landing (chatgpt-v2 8.1–8.3).
- * Same skeleton for every universe — only tokens + lore + copy accents differ
- * (all copy accents come from universes.json, never hardcoded per slug).
- */
 export const Universe: React.FC = () => {
   const { universeSlug } = useParams<{ universeSlug: string }>();
   const { data: universe } = useUniverse(universeSlug);
@@ -81,262 +67,260 @@ export const Universe: React.FC = () => {
 
   if (universe === undefined) {
     return (
-      <div className="py-16 text-center">
-        <p className="font-serif text-2xl text-ink">Unfolding universe…</p>
+      <div className="flex min-h-[50vh] items-center justify-center bg-white py-16 text-center">
+        <p className="font-display text-lg font-bold uppercase tracking-wider text-neutral-800 animate-pulse">
+          Unfolding universe capsule…
+        </p>
       </div>
     );
   }
 
   if (!universe) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4">
-        <h1 className="font-serif text-3xl text-ink">Universe not found</h1>
-        <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
-        <Link to="/" className="inline-block mt-6 text-sm underline underline-offset-4">Back to the Atelier</Link>
+      <div className="mx-auto max-w-md px-4 py-20 text-center bg-white">
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">Universe Not Found</h1>
+        <p className="mt-2 text-xs text-neutral-500">This dimensional thread leads nowhere yet.</p>
+        <Link to="/universes" className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+          Back to Worlds
+        </Link>
       </div>
     );
   }
 
-  const headline = universe.hero_headline ?? universe.name;
-  const isCaps = universe.hero_headline_case === 'caps';
-  const accentWord = universe.hero_headline_accent;
-  // Two-tone split: 8.2 reads accent-first ("Extraordinary" gold), 8.3 accent-last —
-  // split handles both orders; always-render with token fallbacks so no word vanishes.
-  const [accentBefore, accentAfter] = accentWord
-    ? headline.split(accentWord)
-    : [undefined, undefined];
+  const heroImage = universe.hero_image || '/images/placeholders/hero.jpg';
+  const universeProducts = (allProducts ?? []).filter((p) => p.universeSlug === universeSlug);
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      {/* Editorial Hero — unified Atelier quiet-luxury layout */}
-      <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-14 lg:py-14 relative z-10">
-          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/universes" className="hover:underline">Universes</Link>
-            <span className="mx-2">›</span>
-            <span>{universe.name}</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Cinematic Universe Hero Banner ── */}
+      <section className="relative overflow-hidden bg-neutral-950 text-white">
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt={universe.name}
+            className="h-full w-full object-cover object-center opacity-40"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/images/placeholders/hero.jpg';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-transparent" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 pt-10 pb-14 sm:px-6 lg:px-8">
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/universes" className="hover:text-white transition-colors">Worlds</Link>
+            <span>/</span>
+            <span className="text-white">{universe.name}</span>
           </nav>
 
-          {/* Ornament / kicker */}
-          {universe.hero_ornament && (
-            <svg className="w-8 h-8 mt-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              {HERO_ORNAMENTS[universe.hero_ornament]}
-            </svg>
-          )}
-          {universe.hero_kicker && (
-            <p className="font-serif text-xl mt-5 tracking-[0.2em] text-accent" aria-hidden="true">
-              {universe.hero_kicker}
+          <div className="mt-6 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="rounded-xs bg-red-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                {universe.hero_kicker || 'DROP CAPSULE'}
+              </span>
+              <span className="rounded-xs bg-white/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-200 backdrop-blur-xs">
+                {universeProducts.length} Exclusive Pieces
+              </span>
+            </div>
+
+            <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white leading-none">
+              {universe.name}
+            </h1>
+
+            <p className="mt-3 text-base sm:text-lg font-bold text-neutral-200">
+              {universe.tagline}
             </p>
-          )}
 
-          {/* Headline */}
-          <h1
-            className={`font-serif font-semibold tracking-tight leading-[1.02] mt-2 ${isCaps ? 'uppercase text-5xl sm:text-7xl lg:text-8xl' : 'text-5xl sm:text-6xl lg:text-7xl max-w-3xl'}`}
-          >
-            {accentWord ? (
-              <>
-                <span>
-                  {accentBefore}
-                </span>
-                <span className="text-accent">
-                  {accentWord}
-                </span>
-                {accentAfter !== undefined && accentAfter !== '' && (
-                  <span>
-                    {accentAfter}
-                  </span>
-                )}
-              </>
-            ) : (
-              headline
-            )}
-          </h1>
+            <p className="mt-2 text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-2xl">
+              {universe.lore}
+            </p>
 
-          <p className="mt-3 font-sans text-lg text-ink-muted sm:text-xl">{universe.tagline}</p>
-          <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-ink/85 sm:text-lg">
-            {universe.lore}
-          </p>
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href="#collection"
-              className="inline-flex min-h-[48px] items-center gap-2 rounded-md bg-accent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-on-accent transition-colors hover:bg-accent-hover active:translate-y-px"
-            >
-              Explore Collection <span aria-hidden="true">→</span>
-            </a>
-            <a
-              href="#lore"
-              className="inline-flex min-h-[48px] items-center gap-2 rounded-md border border-stone-strong px-7 py-3.5 font-sans text-sm text-ink transition-colors hover:border-ink"
-            >
-              Read the Lore <span aria-hidden="true">↓</span>
-            </a>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a
+                href="#collection"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-xs bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-black shadow-md hover:bg-neutral-200 transition active:scale-98"
+              >
+                Explore Collection ↓
+              </a>
+              {motifs && motifs.length > 0 && (
+                <a
+                  href="#characters"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-xs border border-white/40 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-xs hover:border-white transition"
+                >
+                  Meet the Characters ({motifs.length})
+                </a>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Handwritten-style annotation */}
-        {universe.hero_note && (
-          <p className="hidden lg:block absolute top-8 right-10 font-sans text-[12px] uppercase tracking-[0.25em] text-ink-muted rotate-2 opacity-80" aria-hidden="true">
-            {universe.hero_note}
-          </p>
-        )}
-
-        {/* Vertical accent text along the right edge */}
-        {universe.hero_vertical_text && (
-          <p
-            className="hidden lg:flex absolute top-28 right-6 font-serif text-lg text-ink-muted opacity-60 cursor-default"
-            style={{ writingMode: 'vertical-rl' }}
-            aria-hidden="true"
-          >
-            {universe.hero_vertical_text}
-          </p>
-        )}
       </section>
 
-      {/* Lore strip — unified Atelier parchment panels */}
-      <section id="lore" aria-label={`${universe.name} lore`} className="bg-cream border-b border-stone/60">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-accent">
-            The {universe.name} lore
-          </p>
-          <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2 font-medium leading-display tracking-tight">
-            {universe.lore_heading ?? 'More Than Characters.'}
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-3 mt-7">
-            {(motifs ?? []).map((m) => {
-              const count = (allProducts ?? []).filter((p) =>
-                getCharacterIds(p).includes(m.id),
-              ).length;
-              return (
-                <Link
-                  key={m.id}
-                  to={`/universes/${universe.slug}/characters/${m.id}`}
-                  className="group flex flex-col justify-between border border-stone bg-paper p-3 transition-colors hover:border-accent sm:p-5"
+      {/* ── Character / Motif Story Rails (CategoryQuickNav Style) ── */}
+      {motifs && motifs.length > 0 && (
+        <section id="characters" className="border-b border-neutral-200 bg-white py-6">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-display text-xs font-black uppercase tracking-wider text-neutral-400">
+                  Filter by Icon &amp; Character
+                </h3>
+              </div>
+              {character !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setCharacter('all')}
+                  className="text-xs font-bold uppercase tracking-wider text-red-600 hover:underline"
                 >
-                  <div>
-                    <div className="mb-2 aspect-[16/9] overflow-hidden bg-stone/30 sm:mb-4">
-                      {m.image && (
-                        <img
-                          src={m.image}
-                          alt={`${m.name} — embroidered motif`}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
+                  Clear Character ({character})
+                </button>
+              )}
+            </div>
+
+            <div className="no-scrollbar flex items-center gap-4 overflow-x-auto pb-2">
+              {/* All Characters Bubble */}
+              <button
+                type="button"
+                onClick={() => setCharacter('all')}
+                className="group flex flex-col items-center gap-1.5 shrink-0"
+              >
+                <div className={`h-16 w-16 rounded-full flex items-center justify-center border-2 transition-all ${
+                  character === 'all'
+                    ? 'border-black bg-black text-white ring-2 ring-black/20'
+                    : 'border-neutral-200 bg-neutral-100 text-neutral-800 hover:border-black'
+                }`}>
+                  <span className="text-xs font-black uppercase">ALL</span>
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-tight text-neutral-700">
+                  All
+                </span>
+              </button>
+
+              {motifs.map((m) => {
+                const count = (allProducts ?? []).filter((p) =>
+                  getCharacterIds(p).includes(m.id),
+                ).length;
+                const isSelected = character === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setCharacter(isSelected ? 'all' : m.id)}
+                    className="group flex flex-col items-center gap-1.5 shrink-0"
+                  >
+                    <div className={`relative h-16 w-16 overflow-hidden rounded-full border-2 transition-all ${
+                      isSelected
+                        ? 'border-black ring-2 ring-black/30 scale-105'
+                        : 'border-neutral-200 hover:border-black'
+                    }`}>
+                      {m.image ? (
+                        <img src={m.image} alt={m.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-neutral-200 flex items-center justify-center font-bold text-xs">
+                          {m.name.slice(0, 2)}
+                        </div>
                       )}
                     </div>
-                    <h3 className="font-serif text-base sm:text-xl text-ink group-hover:text-accent transition-colors truncate">
+                    <span className={`text-[11px] font-bold uppercase tracking-tight max-w-[70px] truncate text-center ${
+                      isSelected ? 'text-black' : 'text-neutral-600'
+                    }`}>
                       {m.name}
-                    </h3>
-                    <p className="font-serif text-xs sm:text-sm text-ink-muted mt-1 sm:mt-1.5 leading-relaxed line-clamp-2">{m.meaning}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 mt-2 sm:mt-3 text-[10px] sm:text-[11px] uppercase tracking-widest text-ink font-medium">
-                    Shop · {count} <span aria-hidden="true">→</span>
-                  </span>
-                </Link>
-              );
-            })}
-            {(motifs ?? []).length > 0 && (motifs ?? []).length < 3 && (
-              <article className="border border-dashed border-stone/70 p-3 sm:p-5 flex items-center">
-                <p className="font-serif text-xs sm:text-sm text-ink-muted leading-relaxed">
-                  More symbols join this row as the collection unfolds.
-                </p>
-              </article>
-            )}
+                    </span>
+                    <span className="text-[9px] text-neutral-400">
+                      {count} {count === 1 ? 'fit' : 'fits'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Collection */}
-      <section id="collection" aria-label={`${universe.name} collection`} className="bg-cream">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-          {/* Filter chips — garments + characters + art styles */}
-          <div className="flex flex-wrap items-center gap-2">
+      {/* ── Collection Product Showcase ── */}
+      <section id="collection" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Filter Pills */}
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-neutral-200 pb-4">
+          <button
+            type="button"
+            onClick={() => { setGarment('all'); setCharacter('all'); setArtStyle('all'); setExpression('all'); }}
+            className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+              garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'
+                ? 'bg-black text-white'
+                : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
+            }`}
+          >
+            All Silhouettes
+          </button>
+
+          {garmentTypes.map((g) => (
             <button
-              onClick={() => { setGarment('all'); setCharacter('all'); setArtStyle('all'); setExpression('all'); }}
-              aria-pressed={garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'}
-              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                garment === 'all' && character === 'all' && artStyle === 'all' && expression === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
-                  : 'text-ink border border-stone bg-paper hover:border-ink'
+              key={g}
+              type="button"
+              onClick={() => setGarment(g === garment ? 'all' : g)}
+              className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                garment === g
+                  ? 'bg-black text-white'
+                  : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
               }`}
             >
-              All
+              {garmentLabel(g)}
             </button>
-            {garmentTypes.map((g) => (
-              <button
-                key={g}
-                onClick={() => setGarment(g === garment ? 'all' : g)}
-                aria-pressed={garment === g}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                  garment === g
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink border border-stone bg-paper hover:border-ink'
-                }`}
-              >
-                {garmentLabel(g)}
-              </button>
-            ))}
-            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
-            {EXPRESSION_LEVELS.map((e) => (
-              <button
-                key={e.score}
-                onClick={() => setExpression(e.score === expression ? 'all' : e.score)}
-                aria-pressed={expression === e.score}
-                title={e.tagline}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-sans min-h-[44px] transition-colors cursor-pointer ${
-                  expression === e.score
-                    ? 'bg-accent text-cream border border-transparent font-medium shadow-sm'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
-                }`}
-              >
-                ✦ L{e.score} {e.name}
-              </button>
-            ))}
-            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
-            {(motifs ?? []).map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setCharacter(m.id === character ? 'all' : m.id)}
-                aria-pressed={character === m.id}
-                title={m.meaning}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                  character === m.id
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
-                }`}
-              >
-                {m.name}
-              </button>
-            ))}
-            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
-            {universeArtStyles.map((s) => (
-              <button
-                key={s.slug}
-                onClick={() => setArtStyle(s.slug === artStyle ? 'all' : s.slug)}
-                aria-pressed={artStyle === s.slug}
-                title={s.tagline}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                  artStyle === s.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
-                }`}
-              >
-                {s.name}
-              </button>
-            ))}
-          </div>
+          ))}
 
-          <p className="font-sans text-xs text-ink-muted mt-5">
-            {filtered.length} product{filtered.length === 1 ? '' : 's'}
-          </p>
+          <span className="hidden h-5 w-px bg-neutral-200 sm:block mx-1" />
 
-          <ProductGrid products={filtered} />
+          {EXPRESSION_LEVELS.map((e) => (
+            <button
+              key={e.score}
+              type="button"
+              onClick={() => setExpression(e.score === expression ? 'all' : e.score)}
+              title={e.tagline}
+              className={`min-h-[38px] rounded-xs px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                expression === e.score
+                  ? 'bg-red-600 text-white'
+                  : 'border border-neutral-200 bg-white text-neutral-600 hover:border-black'
+              }`}
+            >
+              L{e.score} {e.name}
+            </button>
+          ))}
+
+          {universeArtStyles.length > 0 && (
+            <>
+              <span className="hidden h-5 w-px bg-neutral-200 sm:block mx-1" />
+              {universeArtStyles.map((s) => (
+                <button
+                  key={s.slug}
+                  type="button"
+                  onClick={() => setArtStyle(s.slug === artStyle ? 'all' : s.slug)}
+                  title={s.tagline}
+                  className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                    artStyle === s.slug
+                      ? 'bg-black text-white'
+                      : 'border border-neutral-200 bg-white text-neutral-600 hover:border-black'
+                  }`}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* Product Grid */}
+        <div className="mt-6">
+          <ProductGrid products={filtered} cardType="quick" />
         </div>
       </section>
 
-      {/* Complete the Look (render 08) */}
+      {/* Complete the Look Bundle */}
       <BundleBand universeSlug={universe.slug} universeName={universe.name} />
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

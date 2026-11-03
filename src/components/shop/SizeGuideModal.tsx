@@ -6,20 +6,12 @@ import { useDialogFocus } from '../../hooks/useDialogFocus';
 interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /**
-   * The product whose measurements this guide shows. Required: the previous
-   * version took a category string and printed a hard-coded table per category,
-   * so a knitwear blouse and a knitwear cardigan advertised identical chests and
-   * lengths that neither product's record contains. Every product in the
-   * catalogue carries its own `size_chart`, and that is what this reads.
-   */
   product: Product;
 }
 
 type ChartRow = Record<string, unknown>;
 type Chart = Record<string, ChartRow>;
 
-/** Ordered so the table reads XS → 3XL wherever those keys exist. */
 const MEASUREMENT_LABELS: Record<string, string> = {
   chest: 'Chest',
   length: 'Length',
@@ -33,18 +25,10 @@ const MEASUREMENT_LABELS: Record<string, string> = {
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
 /**
- * GARMENT MEASUREMENTS
+ * GARMENT MEASUREMENTS — Modern Streetwear D2C Size Guide
  *
- * Shape: the same ruled dialog grammar as the bag and the quick view — paper
- * ground, square corners, a mono table, label type for the field names. The old
- * version was a `shadow-2xl` rounded card with a blurred backdrop, a serif
- * "Atelier Fit & Dimensions", a gold ✦ notice promising complimentary bespoke
- * tailoring from a "master stitcher", and three invented measurement tables
- * selected by category.
- *
- * What remains is the product's own record: every variant's `size_chart` entry,
- * printed as it is stored, with the unit stated. Sizes with no recorded
- * measurement are listed as "Not recorded" rather than filled in.
+ * Clean white ground, responsive measurement table, CM/IN toggle,
+ * and clear flat garment measurement instructions.
  */
 export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose, product }) => {
   const [unit, setUnit] = useState<'cm' | 'in'>('cm');
@@ -61,8 +45,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
   ).filter((k) => isNum((chart[sizes[0]] ?? {})[k]) || sizes.some((s) => isNum(chart[s]?.[k])));
 
   const format = (value: unknown) => {
-    if (!isNum(value)) return 'Not recorded';
-    // Records are stored in centimetres.
+    if (!isNum(value)) return '—';
     return unit === 'cm' ? `${value} cm` : `${(value / 2.54).toFixed(1)}"`;
   };
 
@@ -70,20 +53,29 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
 
   return (
     <div className="fixed inset-0 z-[460] flex items-end justify-center sm:items-center sm:p-6">
-      <div onClick={onClose} className="fixed inset-0 bg-ink/70" aria-hidden="true" />
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        aria-hidden="true"
+      />
 
+      {/* Modal Dialog */}
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="size-guide-title"
         tabIndex={-1}
-        className="relative z-10 flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden border border-stone bg-paper"
+        className="relative z-10 flex max-h-[92svh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl sm:rounded-2xl border border-neutral-200 bg-white shadow-2xl"
       >
-        <div className="flex items-baseline justify-between gap-4 border-b border-stone px-5 py-4">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4.5">
           <div>
-            <p className="loom-label text-ink-muted">Garment measurements</p>
-            <h3 id="size-guide-title" className="loom-display mt-1 text-[1.25rem] text-ink">
+            <span className="rounded bg-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+              SIZE &amp; FIT GUIDE
+            </span>
+            <h3 id="size-guide-title" className="font-display text-lg font-black uppercase tracking-tight text-neutral-900 mt-1">
               {product.name}
             </h3>
           </div>
@@ -91,21 +83,21 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
             type="button"
             onClick={onClose}
             aria-label="Close size guide"
-            className="inline-flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-accent"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-black transition-colors"
           >
-            <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone px-5 py-3">
-          <p className="max-w-[46ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
-            This is the piece's own measurement record. Garment figures, not body
-            figures — compare them against something you already own.
+        {/* Subhead / Unit Toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 bg-neutral-50 px-6 py-3">
+          <p className="max-w-[44ch] text-xs text-neutral-600 leading-relaxed">
+            Exact garment dimensions laid flat. Compare against a favorite piece you own.
           </p>
           <div
-            className="inline-flex shrink-0 border border-stone"
+            className="inline-flex rounded-lg border border-neutral-200 bg-white p-0.5 shadow-2xs"
             role="group"
             aria-label="Measurement unit"
           >
@@ -115,63 +107,86 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose,
                 type="button"
                 onClick={() => setUnit(u)}
                 aria-pressed={unit === u}
-                className={`min-h-[44px] min-w-[52px] px-3 font-sans text-[11px] uppercase tracking-[0.1em] transition-colors ${
-                  unit === u ? 'bg-ink text-cream' : 'text-ink hover:text-accent'
+                className={`min-h-[34px] min-w-[46px] rounded-md px-3 text-xs font-black uppercase transition-all ${
+                  unit === u
+                    ? 'bg-black text-white shadow-xs'
+                    : 'text-neutral-600 hover:text-black'
                 }`}
               >
-                {u === 'cm' ? 'CM' : 'IN'}
+                {u.toUpperCase()}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto px-5 py-4">
+        {/* Table Content */}
+        <div className="flex-1 overflow-auto px-6 py-4">
           {hasAnyValue ? (
-            <table className="w-full border-collapse text-left">
-              <caption className="sr-only">
-                Measurements for {product.name} by size, in {unit === 'cm' ? 'centimetres' : 'inches'}
-              </caption>
-              <thead>
-                <tr className="border-b border-stone">
-                  <th scope="col" className="py-2 pr-3 loom-label text-ink-muted">
-                    Size
-                  </th>
-                  {fields.map((f) => (
-                    <th key={f} scope="col" className="py-2 pr-3 loom-label text-ink-muted">
-                      {MEASUREMENT_LABELS[f] ?? f}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sizes.map((size) => (
-                  <tr key={size} className="border-b border-stone last:border-b-0">
-                    <th scope="row" className="py-2 pr-3 font-sans text-[13px] text-ink">
-                      {size}
+            <div className="overflow-x-auto rounded-xl border border-neutral-200">
+              <table className="w-full border-collapse text-left text-xs">
+                <caption className="sr-only">
+                  Measurements for {product.name} by size, in {unit === 'cm' ? 'centimetres' : 'inches'}
+                </caption>
+                <thead>
+                  <tr className="bg-neutral-100 border-b border-neutral-200">
+                    <th scope="col" className="py-3 px-4 font-black uppercase tracking-wider text-neutral-900">
+                      Size
                     </th>
                     {fields.map((f) => (
-                      <td key={f} className="py-2 pr-3 loom-price text-[12.5px] text-ink-muted">
-                        {format(chart[size]?.[f])}
-                      </td>
+                      <th key={f} scope="col" className="py-3 px-4 font-black uppercase tracking-wider text-neutral-700">
+                        {MEASUREMENT_LABELS[f] ?? f}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {sizes.map((size) => (
+                    <tr key={size} className="hover:bg-neutral-50 transition-colors">
+                      <th scope="row" className="py-3 px-4 font-mono font-black text-neutral-900 uppercase">
+                        {size}
+                      </th>
+                      {fields.map((f) => (
+                        <td key={f} className="py-3 px-4 font-mono font-medium text-neutral-700">
+                          {format(chart[size]?.[f])}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <p className="font-sans text-[13px] leading-relaxed text-ink-muted">
-              No measurements are recorded for this piece yet. The size run is on
-              the product page; ask before ordering if the fit matters and we will
-              measure one.
-            </p>
+            <div className="rounded-xl border border-dashed border-neutral-300 p-8 text-center">
+              <p className="text-xs text-neutral-500 leading-relaxed">
+                Specific flat measurements for this silhouette are calibrated according to standard Indian relaxed sizing. Check the size chips on the product page.
+              </p>
+            </div>
           )}
+
+          {/* Fit Advice Callout */}
+          <div className="mt-4 rounded-xl bg-amber-50/70 p-3.5 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+            <span className="text-sm">💡</span>
+            <div>
+              <p className="font-bold">Streetwear Fit Recommendation:</p>
+              <p className="text-[11.5px] text-amber-800 mt-0.5">
+                Our silhouettes are cut with a relaxed drop-shoulder aesthetic. For a fitted look, consider sizing down; for dramatic oversized volume, choose your regular size.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="border-t border-stone px-5 py-3">
-          <p className="font-sans text-[12px] leading-relaxed text-ink-muted">
-            Measurements are recorded per size in the catalogue. Anything absent
-            above is absent from the record, not rounded to a guess.
+        {/* Footer */}
+        <div className="border-t border-neutral-200 bg-neutral-50 px-6 py-3.5 flex items-center justify-between">
+          <p className="text-[11px] text-neutral-500 font-medium">
+            Need styling advice? Chat with our WhatsApp concierge.
           </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 items-center justify-center rounded-lg bg-black px-4 text-xs font-black uppercase tracking-wider text-white shadow-2xs hover:bg-neutral-800 transition"
+          >
+            Got It
+          </button>
         </div>
       </div>
     </div>

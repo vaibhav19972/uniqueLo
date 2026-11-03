@@ -18,12 +18,6 @@ function pickBundle(products: Product[]): Product[] {
   return picked.length >= 2 ? picked : [];
 }
 
-/**
- * Render-08 "Complete the Look": curated same-universe set with one Add-All.
- * Shows honest set total at unit prices; a bundle-discount engine is P-future.
- * Renders nothing when fewer than 2 items qualify.
- * Must live inside a [data-universe] wrapper for themed tokens.
- */
 export const BundleBand: React.FC<{ universeSlug: string; universeName: string }> = ({
   universeSlug,
   universeName,
@@ -52,8 +46,8 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
       added += 1;
     }
     showToast({
-      title: `Bundle added (${added} pieces)`,
-      description: `Complete the ${universeName} look — ${added} pieces at unit prices.`,
+      title: `Bundle Added (${added} pieces)`,
+      description: `Complete ${universeName} capsule look added to bag.`,
       type: 'success',
     });
   };
@@ -61,60 +55,81 @@ export const BundleBand: React.FC<{ universeSlug: string; universeName: string }
   return (
     <section
       aria-label="Complete the look"
-      className="mt-8 bg-paper border-t border-stone/60 text-ink"
+      className="mt-12 bg-neutral-50 border-t border-neutral-200 text-neutral-900 py-10"
     >
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-        <div className="flex items-end justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight text-ink">Complete the Look</h2>
-            <p className="text-sm mt-1 text-ink-muted font-light">Curated pieces from {universeName} that go together.</p>
+            <div className="inline-flex items-center gap-1.5 rounded-xs bg-neutral-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-900 mb-1.5">
+              <span>✦</span>
+              <span>CURATED OUTFIT BUNDLE</span>
+            </div>
+            <h2 className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight text-neutral-900">
+              Complete the {universeName} Look
+            </h2>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Coordinated streetwear silhouettes styled to be worn together.
+            </p>
           </div>
-          <Link to="/shop" className="hidden sm:inline-flex items-center gap-2 text-sm border-b border-ink/40 pb-1 text-ink-muted hover:text-ink hover:border-ink transition-colors">
-            Shop the set <span aria-hidden="true">→</span>
+          <Link
+            to="/shop"
+            className="text-xs font-bold uppercase tracking-wider text-black underline underline-offset-4 hover:text-red-600 transition-colors"
+          >
+            Shop All Pieces →
           </Link>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-stretch gap-6 mt-7">
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="flex flex-col lg:flex-row items-stretch gap-6 mt-6">
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {bundle.map((p, i) => (
               <div key={p.slug} className="relative">
                 {i > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-1/2 -translate-y-1/2 -left-3.5 z-10 font-serif text-xl text-ink-muted"
+                    className="absolute top-1/2 -translate-y-1/2 -left-3 z-10 hidden sm:flex h-6 w-6 items-center justify-center rounded-full bg-white border border-neutral-200 text-xs font-black shadow-xs"
                   >
                     +
                   </span>
                 )}
-                <Link to={`/product/${p.slug}`} className="group block bg-cream/50 border border-stone/70 p-2.5 rounded-sm hover:border-ink transition-colors">
-                  <div className="aspect-square overflow-hidden bg-stone/20">
+                <Link
+                  to={`/product/${p.slug}`}
+                  className="group block bg-white border border-neutral-200/80 p-2.5 rounded-md hover:border-black hover:shadow-md transition-all h-full"
+                >
+                  <div className="aspect-[3/4] overflow-hidden rounded-xs bg-neutral-100">
                     <img
-                      src={p.images[0]?.src}
+                      src={p.images[0]?.src || '/images/placeholders/hoodie.jpg'}
                       alt={p.images[0]?.alt || p.name}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <p className="font-serif text-[15px] mt-2.5 leading-tight text-ink group-hover:text-accent transition-colors">{p.name}</p>
-                  <p className="text-[13px] text-ink-muted mt-1">{formatPrice(getDefaultVariant(p).priceCents)}</p>
+                  <p className="text-xs font-bold uppercase tracking-tight text-neutral-900 mt-2 truncate group-hover:text-red-600 transition-colors">
+                    {p.name}
+                  </p>
+                  <p className="text-xs font-black text-[#D32F2F] mt-0.5">
+                    {formatPrice(getDefaultVariant(p).priceCents)}
+                  </p>
                 </Link>
               </div>
             ))}
           </div>
 
-          <div className="lg:w-64 shrink-0 border-t lg:border-t-0 lg:border-l border-stone/60 pt-5 lg:pt-0 lg:pl-6 flex lg:flex-col justify-between gap-4">
+          <div className="lg:w-64 shrink-0 rounded-md border border-neutral-200 bg-white p-5 flex flex-col justify-between shadow-xs">
             <div>
-              <p className="text-xs uppercase tracking-widest text-ink-muted">Set Total</p>
-              <p className="font-serif text-3xl mt-1 text-ink font-medium">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Bundle Price</p>
+              <p className="font-display text-2xl font-black text-neutral-900 mt-1">
                 {formatPrice(setTotal)}
               </p>
-              <p className="text-[11px] mt-1 text-ink-muted">Unit prices · bundle discount engine lands next</p>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                Includes all {bundle.length} coordinating pieces
+              </p>
             </div>
             <button
+              type="button"
               onClick={handleAddAll}
-              className="px-6 py-3.5 font-serif text-[16px] min-h-[48px] bg-ink text-cream hover:bg-ink/90 transition-colors rounded-sm cursor-pointer"
+              className="mt-4 w-full min-h-[44px] rounded-xs bg-black py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition active:scale-98"
             >
-              Add All to Cart <span aria-hidden="true">→</span>
+              Add Full Look to Bag →
             </button>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useTransition } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
 import { getOrderDetails, formatPrice } from '../lib/data';
 import { useToastStore } from '../stores/toast';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
 interface OrderRecord {
   id: string;
@@ -58,13 +59,10 @@ export const OrderConfirmation: React.FC = () => {
         setOrder(res.data.order);
         setItems(res.data.items || []);
       } else {
-        setErrorMessage(
-          res.message ||
-            'Order not found or the email provided does not match this commission record.'
-        );
+        setErrorMessage(res.message || 'No matching order could be found.');
       }
-    } catch {
-      setErrorMessage('Could not load order details. Please check connection and retry.');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Error communicating with order service.');
     } finally {
       setIsLoading(false);
     }
@@ -72,19 +70,21 @@ export const OrderConfirmation: React.FC = () => {
 
   useEffect(() => {
     if (routeOrderId && emailParam) {
-      startTransition(() => {
-        fetchOrder(routeOrderId, emailParam);
-      });
+      void fetchOrder(routeOrderId, emailParam);
     }
   }, [routeOrderId, emailParam]);
 
   const handleLookupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const targetId = routeOrderId || inputOrderId.trim();
-    const targetEmail = inputEmail.trim();
-    if (!targetId || !targetEmail) return;
-    setSearchParams({ email: targetEmail });
-    fetchOrder(targetId, targetEmail);
+    const idToUse = routeOrderId || inputOrderId.trim();
+    if (!idToUse || !inputEmail.trim()) {
+      setErrorMessage('Order reference and email are both required.');
+      return;
+    }
+    startTransition(() => {
+      setSearchParams({ email: inputEmail.trim() });
+    });
+    void fetchOrder(idToUse, inputEmail.trim());
   };
 
   const handleCopyId = () => {
@@ -93,8 +93,8 @@ export const OrderConfirmation: React.FC = () => {
     setCopied(true);
     showToast({
       title: 'Order ID Copied',
-      description: 'Reference copied to clipboard for concierge tracking.',
-      type: 'success',
+      description: activeOrderId,
+      type: 'info',
     });
     setTimeout(() => setCopied(false), 2500);
   };
@@ -124,287 +124,262 @@ export const OrderConfirmation: React.FC = () => {
       : 'upi';
 
   return (
-    <div className="bg-cream min-h-screen py-12 lg:py-14 text-ink">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb / Back Navigation */}
-        <nav aria-label="Breadcrumb" className="loom-label mb-6 text-ink-muted">
-          <Link to="/" className="transition-colors hover:text-ink">
-            Home
-          </Link>
-          <span aria-hidden="true" className="mx-2">
-            /
-          </span>
-          <span className="text-ink">Your order</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900 py-10">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-6">
+          <Link to="/" className="hover:text-black transition-colors">Home</Link>
+          <span>/</span>
+          <Link to="/orders" className="hover:text-black transition-colors">Orders</Link>
+          <span>/</span>
+          <span className="text-black">Receipt</span>
         </nav>
 
-        {/* Order lookup — a receipt is retrieved by the buyer's own email, so
-            a guessed order id alone opens nothing. */}
         {!order && !isLoading && (
-          <div className="border-t border-stone pt-6">
-            <p className="loom-label text-ink-muted">Order record</p>
-            <h1 className="loom-display mt-2 text-ink" style={{ fontSize: 'var(--text-display)' }}>
-              Find your order
+          <div className="rounded-lg border border-neutral-200 bg-white p-8 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Order Verification</span>
+            <h1 className="font-display text-2xl sm:text-3xl font-black uppercase text-neutral-900 mt-1">
+              Find Your Order
             </h1>
-            <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-1 text-xs text-neutral-500 max-w-md">
               {routeOrderId ? (
-                <>
-                  Enter the email you ordered with to open order{' '}
-                  <span className="loom-price text-ink">{routeOrderId.slice(0, 8)}</span>.
-                </>
+                <>Enter the email address you purchased with to inspect #{routeOrderId.slice(0, 8).toUpperCase()}.</>
               ) : (
-                'Enter the order reference and the email you ordered with.'
+                'Enter your order reference ID and email address to view tracking and invoice.'
               )}
             </p>
 
             {errorMessage && (
-              <p
-                role="alert"
-                className="mt-4 max-w-[54ch] border-l-2 border-accent pl-3 font-sans text-[13px] leading-relaxed text-accent"
-              >
+              <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
                 {errorMessage}
-              </p>
+              </div>
             )}
 
-            <form onSubmit={handleLookupSubmit} className="mt-6 grid max-w-xl gap-3">
+            <form onSubmit={handleLookupSubmit} className="mt-6 space-y-4 max-w-md">
               {!routeOrderId && (
-                <label className="block">
-                  <span className="loom-label text-ink-muted">Order reference</span>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
+                    Order Reference ID
+                  </label>
                   <input
                     type="text"
                     required
                     value={inputOrderId}
                     onChange={(e) => setInputOrderId(e.target.value)}
-                    placeholder="The reference from your confirmation"
-                    className="loom-price mt-1.5 min-h-[44px] w-full border border-stone bg-paper px-3 text-[13px] text-ink placeholder:font-sans placeholder:text-ink-muted focus:border-ink focus:outline-none"
+                    placeholder="e.g. 848d7986..."
+                    className="min-h-[42px] w-full rounded-xs border border-neutral-300 bg-neutral-50 px-3 text-xs text-neutral-900 focus:border-black focus:bg-white focus:outline-none"
                   />
-                </label>
+                </div>
               )}
-              <label className="block">
-                <span className="loom-label text-ink-muted">Email</span>
+              <div>
+                <label className="block text-xs font-bold uppercase text-neutral-700 mb-1">
+                  Email Address
+                </label>
                 <input
                   type="email"
                   required
                   value={inputEmail}
                   onChange={(e) => setInputEmail(e.target.value)}
                   placeholder="name@domain.com"
-                  className="mt-1.5 min-h-[44px] w-full border border-stone bg-paper px-3 font-sans text-[13px] text-ink placeholder:text-ink-muted focus:border-ink focus:outline-none"
+                  className="min-h-[42px] w-full rounded-xs border border-neutral-300 bg-neutral-50 px-3 text-xs text-neutral-900 focus:border-black focus:bg-white focus:outline-none"
                 />
-              </label>
+              </div>
               <button
                 type="submit"
-                className="mt-1 min-h-[48px] w-fit bg-ink px-5 font-sans text-[12px] uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
               >
-                Open the record
+                Inspect Order Record →
               </button>
             </form>
           </div>
         )}
 
         {isLoading && (
-          <div className="border-t border-stone pt-6">
-            <p className="loom-label text-ink-muted">Reading the record</p>
-            <p className="mt-2 font-sans text-[15px] text-ink">One moment.</p>
+          <div className="py-20 text-center">
+            <div className="inline-block h-7 w-7 animate-spin rounded-full border-2 border-black border-t-transparent mb-2" />
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Retrieving Order Details…</p>
           </div>
         )}
 
         {order && !isLoading && (
           <div>
-            {/* Head: the receipt's own facts, no certificate theatre. */}
-            <div className="border-t border-stone pt-6">
-              <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
-                <Link to="/orders" className="transition-colors hover:text-ink">
-                  Orders
-                </Link>
-                <span aria-hidden="true" className="mx-2">
-                  /
-                </span>
-                <span className="text-ink">This order</span>
-              </nav>
-
-              <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-                <div>
-                  <h1
-                    className="loom-display text-ink"
-                    style={{ fontSize: 'var(--text-display)' }}
-                  >
-                    Order placed
-                  </h1>
-                  <p className="mt-2 max-w-[52ch] font-sans text-[15px] leading-relaxed text-ink-muted">
-                    {order.customer_name}, this is the record of what you bought
-                    and what it cost. Placed {formattedDate}.
-                  </p>
+            {/* Confirmation Banner */}
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white font-black text-xl">
+                    ✓
+                  </div>
+                  <div>
+                    <span className="rounded-xs bg-emerald-100 px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wider text-emerald-800">
+                      ORDER CONFIRMED
+                    </span>
+                    <h1 className="font-display text-2xl sm:text-3xl font-black uppercase text-neutral-900 mt-1">
+                      Thank You, {order.customer_name}
+                    </h1>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Confirmation dispatch recorded on {formattedDate}.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="shrink-0 sm:text-right">
-                  <p className="loom-label text-ink-muted">Reference</p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="loom-price text-[13px] text-ink">
-                      {order.id.slice(0, 8).toUpperCase()}
+                <div className="rounded-md border border-neutral-200 bg-white p-3 text-left sm:text-right shrink-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Reference ID</p>
+                  <div className="flex items-center gap-2 mt-0.5 sm:justify-end">
+                    <span className="font-mono text-sm font-black text-neutral-900">
+                      #{order.id.slice(0, 8).toUpperCase()}
                     </span>
                     <button
                       type="button"
                       onClick={handleCopyId}
-                      className="min-h-[44px] border border-stone-strong px-2.5 font-sans text-[10.5px] uppercase tracking-[0.1em] text-ink transition-colors hover:border-ink"
+                      className="rounded-xs border border-neutral-300 px-2 py-0.5 text-[10px] font-bold uppercase text-neutral-700 hover:border-black"
                     >
                       {copied ? 'Copied' : 'Copy'}
                     </button>
                   </div>
-                  <p className="mt-1.5 font-sans text-[11.5px] text-ink-muted">
-                    Status:{' '}
-                    <span className="text-ink">{order.status.replace(/-/g, ' ')}</span>
-                  </p>
+                  <span className="inline-block mt-1 text-[10px] font-bold uppercase text-neutral-500">
+                    Status: <strong className="text-black">{order.status.replace(/-/g, ' ')}</strong>
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Timeline */}
+              <div className="mt-8 border-t border-neutral-200 pt-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Step 1</span>
+                    <p className="font-bold text-neutral-900 mt-0.5">Order Verified</p>
+                    <p className="text-[11px] text-neutral-500">Received &amp; queued</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Step 2</span>
+                    <p className="font-bold text-neutral-900 mt-0.5">Workshop Stitching</p>
+                    <p className="text-[11px] text-neutral-500">Needlework allocation</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Step 3</span>
+                    <p className="font-bold text-neutral-900 mt-0.5">Dispatch Window</p>
+                    <p className="text-[11px] text-neutral-500">Leaves in 4–7 days</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Step 4</span>
+                    <p className="font-bold text-neutral-900 mt-0.5">Doorstep Delivery</p>
+                    <p className="text-[11px] text-neutral-500">7-Day easy exchange</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* What happens next, from the same four terms the footer states —
-                dispatch window, COD, returns, carriage — not a four-step
-                "lifecycle" invented for the page. */}
-            <dl className="mt-8 grid grid-cols-1 border-t border-stone sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ['Next', 'Packed and dispatched from the workshop'],
-                ['Dispatch window', '4–7 days from the order'],
-                ['Returns', `7 days from delivery`],
-                ['Payment', paymentMethod === 'cod' ? 'Cash on delivery' : 'Paid online'],
-              ].map(([term, def], i) => (
-                <div
-                  key={term}
-                  className={`border-b border-stone py-4 sm:border-b-0 ${
-                    i > 0 ? 'lg:border-l lg:pl-5' : 'lg:pr-5'
-                  } ${i % 2 === 1 ? 'sm:border-l sm:pl-5' : ''}`}
-                >
-                  <dt className="loom-label text-ink-muted">{term}</dt>
-                  <dd className="mt-1 font-sans text-[13px] leading-snug text-ink">{def}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
-              {/* Items */}
+            {/* Receipt Details Breakdown */}
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Items List */}
               <div className="lg:col-span-7">
-                <h2 className="loom-label text-ink-muted">
-                  {items.length} {items.length === 1 ? 'piece' : 'pieces'}
+                <h2 className="font-display text-sm font-bold uppercase tracking-wider text-neutral-900 mb-3">
+                  Ordered Silhouettes ({items.length})
                 </h2>
-                <ol className="mt-3 border-t border-stone">
+                <div className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white">
                   {items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-start justify-between gap-4 border-b border-stone py-4"
-                    >
+                    <div key={item.id} className="flex items-start justify-between gap-4 p-4">
                       <div className="min-w-0">
                         <Link
                           to={`/product/${item.product_slug}`}
-                          className="font-sans text-[14px] leading-snug text-ink transition-colors hover:text-accent"
+                          className="font-bold uppercase text-xs text-neutral-900 hover:text-red-600 transition-colors"
                         >
                           {item.product_name}
                         </Link>
-                        <p className="loom-label mt-1.5 text-ink-muted">
-                          {[item.color, item.size ? `size ${item.size}` : null, `qty ${item.quantity}`]
+                        <p className="text-[11px] text-neutral-500 mt-0.5">
+                          {[item.color, item.size ? `Size ${item.size}` : null, `Qty ${item.quantity}`]
                             .filter(Boolean)
                             .join(' · ')}
                         </p>
-                        <p className="loom-price mt-0.5 text-[11px] text-ink-muted">
+                        <p className="font-mono text-[10px] text-neutral-400 mt-0.5">
                           {item.variant_sku}
                         </p>
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="loom-price text-[13.5px] text-ink">
+                      <div className="text-right shrink-0">
+                        <p className="font-black text-xs text-neutral-900">
                           {formatPrice(item.price_cents * item.quantity)}
                         </p>
                         {item.quantity > 1 && (
-                          <p className="loom-price mt-0.5 text-[11px] text-ink-muted">
+                          <p className="text-[10px] text-neutral-400 mt-0.5">
                             {formatPrice(item.price_cents)} each
                           </p>
                         )}
                       </div>
-                    </li>
+                    </div>
                   ))}
-                </ol>
+                </div>
 
                 {order.gift_note && (
-                  <div className="mt-4 border-l-2 border-accent pl-3">
-                    <p className="loom-label text-ink-muted">Gift note</p>
-                    <p className="mt-1 font-sans text-[13px] leading-relaxed text-ink">
-                      {order.gift_note}
-                    </p>
+                  <div className="mt-4 rounded-md border border-neutral-200 bg-neutral-50 p-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Gift Note</span>
+                    <p className="text-xs text-neutral-800 mt-1 italic">"{order.gift_note}"</p>
                   </div>
                 )}
               </div>
 
-              {/* Totals + delivery */}
-              <div className="lg:col-span-5">
-                <h2 className="loom-label text-ink-muted">What it cost</h2>
-                <dl className="mt-3 border-t border-stone font-sans text-[13px]">
-                  <div className="flex justify-between gap-4 border-b border-stone py-2.5">
-                    <dt className="text-ink-muted">Subtotal</dt>
-                    <dd className="loom-price text-ink">{formatPrice(order.subtotal_cents)}</dd>
-                  </div>
-                  {order.discount_cents > 0 && (
-                    <div className="flex justify-between gap-4 border-b border-stone py-2.5">
-                      <dt className="text-ink-muted">
-                        Discount{order.coupon_code ? ` (${order.coupon_code})` : ''}
-                      </dt>
-                      <dd className="loom-price text-ink">
-                        –{formatPrice(order.discount_cents)}
+              {/* Price Breakdown & Delivery Address */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-xs">
+                  <h3 className="font-display text-xs font-bold uppercase tracking-wider text-neutral-900 mb-3">
+                    Payment Summary
+                  </h3>
+                  <dl className="space-y-2 text-xs">
+                    <div className="flex justify-between text-neutral-600">
+                      <dt>Subtotal</dt>
+                      <dd className="font-bold text-neutral-900">{formatPrice(order.subtotal_cents)}</dd>
+                    </div>
+                    {order.discount_cents > 0 && (
+                      <div className="flex justify-between text-red-600">
+                        <dt>Discount {order.coupon_code ? `(${order.coupon_code})` : ''}</dt>
+                        <dd className="font-bold">–{formatPrice(order.discount_cents)}</dd>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-neutral-600">
+                      <dt>Shipping</dt>
+                      <dd className="font-bold text-neutral-900">
+                        {order.shipping_cents === 0 ? 'FREE' : formatPrice(order.shipping_cents)}
                       </dd>
                     </div>
-                  )}
-                  <div className="flex justify-between gap-4 border-b border-stone py-2.5">
-                    <dt className="text-ink-muted">Carriage</dt>
-                    <dd className="loom-price text-ink">
-                      {order.shipping_cents === 0 ? 'Waived' : formatPrice(order.shipping_cents)}
-                    </dd>
+                    <div className="flex justify-between border-t border-neutral-200 pt-2.5 text-sm font-black text-neutral-900">
+                      <dt>Total</dt>
+                      <dd className="text-red-600">{formatPrice(order.total_cents)}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-3 text-[11px] text-neutral-500 border-t border-neutral-100 pt-2.5">
+                    {paymentMethod === 'cod'
+                      ? `Cash on delivery. Please keep ${formatPrice(order.total_cents)} ready at handover.`
+                      : 'Paid online securely. Your transaction is verified.'}
+                  </p>
+                </div>
+
+                {/* Delivery Address */}
+                <div className="rounded-lg border border-neutral-200 bg-white p-5 shadow-xs">
+                  <h3 className="font-display text-xs font-bold uppercase tracking-wider text-neutral-900 mb-2">
+                    Shipping Address
+                  </h3>
+                  <div className="text-xs text-neutral-600 leading-relaxed">
+                    <p className="font-bold text-neutral-900">{order.customer_name}</p>
+                    <p className="mt-0.5">{deliveryAddress}</p>
+                    {deliveryPincode && <p>PIN: {deliveryPincode}</p>}
+                    {deliveryPhone && <p>Phone: {deliveryPhone}</p>}
+                    <p className="mt-2 text-[11px] text-neutral-400">Tracking updates dispatched to {order.customer_email}</p>
                   </div>
-                  <div className="flex items-baseline justify-between gap-4 border-b border-stone py-3">
-                    <dt className="font-sans text-[13px] text-ink">Total</dt>
-                    <dd className="loom-price text-[17px] text-ink">
-                      {formatPrice(order.total_cents)}
-                    </dd>
-                  </div>
-                </dl>
+                </div>
 
-                <p className="mt-3 font-sans text-[12px] leading-relaxed text-ink-muted">
-                  {paymentMethod === 'cod'
-                    ? `Cash on delivery. Have ${formatPrice(order.total_cents)} ready at handover.`
-                    : 'Paid online through Razorpay. Card and UPI details were entered on their page, never stored here.'}
-                </p>
-
-                <h2 className="mt-8 loom-label text-ink-muted">Delivering to</h2>
-                <address className="mt-2 border-t border-stone pt-3 font-sans text-[13px] not-italic leading-relaxed text-ink">
-                  {order.customer_name}
-                  <br />
-                  <span className="text-ink-muted">{deliveryAddress}</span>
-                  {deliveryPincode && (
-                    <>
-                      <br />
-                      <span className="loom-price text-ink-muted">PIN {deliveryPincode}</span>
-                    </>
-                  )}
-                  {deliveryPhone && (
-                    <>
-                      <br />
-                      <span className="loom-price text-ink-muted">{deliveryPhone}</span>
-                    </>
-                  )}
-                </address>
-                <p className="mt-1 font-sans text-[12px] text-ink-muted">
-                  Confirmation sent to {order.customer_email}
-                </p>
-
-                <div className="mt-6 flex flex-col gap-2">
+                {/* Actions */}
+                <div className="flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="min-h-[44px] border border-stone-strong px-4 font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink"
+                    className="w-full min-h-[42px] rounded-xs border border-neutral-300 bg-white px-4 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:border-black transition"
                   >
-                    Print this order
+                    Print Receipt 🖨
                   </button>
                   <Link
                     to="/shop"
-                    className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-ink px-5 font-sans text-[12px] font-medium uppercase tracking-[0.12em] text-cream transition-colors hover:bg-accent"
+                    className="w-full min-h-[44px] inline-flex items-center justify-center rounded-xs bg-black px-4 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
                   >
-                    Back to the collection
-                    <span aria-hidden="true">→</span>
+                    Continue Shopping →
                   </Link>
                 </div>
               </div>
@@ -412,6 +387,8 @@ export const OrderConfirmation: React.FC = () => {
           </div>
         )}
       </div>
+
+      <TrustBadgesPreFooter />
     </div>
   );
 };

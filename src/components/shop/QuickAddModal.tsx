@@ -41,7 +41,6 @@ export const QuickAddModal: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
 
-  // Reset selections when product changes
   useEffect(() => {
     if (product) {
       const defaultVariant = getDefaultVariant(product);
@@ -51,7 +50,6 @@ export const QuickAddModal: React.FC = () => {
     }
   }, [product, colors, sizes, inStockSizes]);
 
-  // Handle ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -62,7 +60,6 @@ export const QuickAddModal: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, closeQuickAdd]);
 
-  // Prevent background scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -119,20 +116,20 @@ export const QuickAddModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-add-title"
-      className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center p-0 sm:p-4"
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-ink/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={closeQuickAdd}
         aria-hidden="true"
       />
 
       {/* Sheet / Dialog Container */}
-      <div className="relative z-10 w-full sm:max-w-md bg-paper border-t sm:border border-stone p-5 sm:p-6 sm:rounded-none shadow-2xl transition-all max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white border border-neutral-200 p-5 sm:p-6 shadow-2xl transition-all max-h-[90vh] overflow-y-auto">
         {/* Header with thumbnail, title, price, and close button */}
-        <div className="flex items-start gap-3.5 pb-4 border-b border-stone">
-          <div className="relative h-20 w-16 shrink-0 overflow-hidden bg-cream border border-stone">
+        <div className="flex items-start gap-3.5 pb-4 border-b border-neutral-200">
+          <div className="relative h-22 w-16.5 shrink-0 overflow-hidden rounded-lg bg-neutral-100 border border-neutral-200">
             <img
               src={thumbnail}
               alt=""
@@ -141,27 +138,26 @@ export const QuickAddModal: React.FC = () => {
           </div>
 
           <div className="flex-1 min-w-0 pr-6">
-            <p className="loom-label text-ink-muted uppercase">
-              {product.countryOfOrigin ? `${product.countryOfOrigin} · ` : ''}
-              {product.garmentType ?? 'Garment'}
-            </p>
+            <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-neutral-700">
+              {product.garmentType ?? 'STREETWEAR'}
+            </span>
             <h3
               id="quick-add-title"
-              className="mt-0.5 font-sans text-base font-semibold text-ink truncate"
+              className="mt-1 font-display text-sm font-black uppercase tracking-tight text-neutral-900 line-clamp-2"
             >
               {product.name}
             </h3>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="loom-price text-sm font-semibold text-ink">
+              <span className="font-mono text-sm font-black text-[#D32F2F]">
                 {formatPrice(selectedVariant.priceCents)}
               </span>
               {compareAt && compareAt > selectedVariant.priceCents && (
-                <span className="loom-price text-xs text-ink-muted line-through">
+                <span className="font-mono text-xs text-neutral-400 line-through">
                   {formatPrice(compareAt)}
                 </span>
               )}
               {offPct > 0 && (
-                <span className="font-sans text-[10px] font-semibold text-accent bg-accent-soft px-1.5 py-0.5">
+                <span className="rounded bg-red-100 px-1 py-0.2 text-[9px] font-black text-red-600">
                   {offPct}% OFF
                 </span>
               )}
@@ -173,20 +169,20 @@ export const QuickAddModal: React.FC = () => {
             type="button"
             onClick={closeQuickAdd}
             aria-label="Close"
-            className="absolute top-4 right-4 grid h-8 w-8 place-items-center text-ink-muted hover:text-ink hover:bg-cream rounded-sm transition-colors"
+            className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Color Options (if multiple colors) */}
+        {/* Color Options */}
         {colors.length > 1 && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs mb-2">
-              <span className="font-sans font-medium text-ink">Color</span>
-              <span className="font-sans text-ink-muted capitalize">{selectedColor}</span>
+              <span className="font-bold text-neutral-900 uppercase text-[11px] tracking-wider">Color</span>
+              <span className="text-neutral-500 capitalize">{selectedColor}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {colors.map((c) => (
@@ -194,10 +190,10 @@ export const QuickAddModal: React.FC = () => {
                   key={c}
                   type="button"
                   onClick={() => setSelectedColor(c)}
-                  className={`min-h-[36px] px-3 font-sans text-xs capitalize border transition-colors ${
+                  className={`min-h-[36px] rounded-lg px-3.5 text-xs font-bold capitalize border transition-colors ${
                     selectedColor.toLowerCase() === c.toLowerCase()
-                      ? 'border-ink bg-ink text-cream'
-                      : 'border-stone bg-cream text-ink hover:border-ink'
+                      ? 'border-black bg-black text-white shadow-2xs'
+                      : 'border-neutral-300 bg-white text-neutral-800 hover:border-black'
                   }`}
                 >
                   {c}
@@ -210,8 +206,8 @@ export const QuickAddModal: React.FC = () => {
         {/* Size Selection */}
         <div className="mt-4">
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="font-sans font-medium text-ink">Select Size</span>
-            <span className="loom-price text-ink-muted">
+            <span className="font-bold text-neutral-900 uppercase text-[11px] tracking-wider">Select Size</span>
+            <span className={`text-[11px] font-bold ${isSoldOut ? 'text-red-600' : 'text-emerald-700'}`}>
               {isSoldOut ? 'Sold out in this size' : 'In stock'}
             </span>
           </div>
@@ -226,23 +222,15 @@ export const QuickAddModal: React.FC = () => {
                   key={s}
                   type="button"
                   onClick={() => setSelectedSize(s)}
-                  className={`relative min-h-[44px] flex items-center justify-center font-sans text-xs font-medium uppercase border transition-all ${
+                  className={`relative min-h-[44px] rounded-lg flex items-center justify-center text-xs font-black uppercase border transition-all ${
                     isSelected
-                      ? 'border-ink bg-ink text-cream shadow-sm'
+                      ? 'border-black bg-black text-white shadow-xs'
                       : inStock
-                      ? 'border-stone bg-paper text-ink hover:border-ink hover:bg-cream'
-                      : 'border-stone/40 bg-stone/20 text-ink-muted/50 cursor-not-allowed'
+                      ? 'border-neutral-300 bg-white text-neutral-800 hover:border-black'
+                      : 'border-neutral-200 bg-neutral-100 text-neutral-400 line-through cursor-not-allowed'
                   }`}
                 >
                   {s}
-                  {!inStock && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    >
-                      <span className="w-full h-[1px] bg-ink-muted/40 rotate-45" />
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -255,7 +243,7 @@ export const QuickAddModal: React.FC = () => {
             type="button"
             disabled={isSoldOut}
             onClick={handleAddToCart}
-            className="w-full min-h-[48px] flex items-center justify-center gap-2 bg-ink text-cream hover:bg-accent font-sans text-xs font-semibold uppercase tracking-[0.14em] transition-colors disabled:opacity-50 disabled:pointer-events-none shadow-sm"
+            className="w-full min-h-[48px] rounded-lg flex items-center justify-center gap-2 bg-black text-white hover:bg-neutral-800 text-xs font-black uppercase tracking-wider shadow-md transition active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none"
           >
             {isSoldOut
               ? 'Sold Out in this Size'
@@ -265,13 +253,12 @@ export const QuickAddModal: React.FC = () => {
           <Link
             to={`/product/${product.slug}`}
             onClick={closeQuickAdd}
-            className="text-center font-sans text-xs text-ink-muted hover:text-ink underline underline-offset-4 py-1"
+            className="text-center text-xs font-bold text-neutral-500 hover:text-black underline underline-offset-4 py-1 transition-colors"
           >
-            View full garment & craft details →
+            View full garment &amp; craft details →
           </Link>
         </div>
       </div>
     </div>
   );
 };
-

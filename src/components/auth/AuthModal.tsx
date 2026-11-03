@@ -1,21 +1,22 @@
 import React, { useCallback, useState } from 'react';
 import { useAuthStore } from '../../stores/auth';
-import { Button } from '../ui/Button';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 /**
- * Email-only account modal. Two modes: sign in, create account.
+ * Email-only account modal — Streetwear D2C Revamp
  *
- * Deliberately no OTP/SMS path — phone auth is deferred. See stores/auth.ts
- * for why password (not magic link) is the transport.
+ * Clean white ground, bold display typography, modern inputs,
+ * streamlined sign in & create account flows.
  */
 export const AuthModal: React.FC = () => {
   const isOpen = useAuthStore((s) => s.isOpen);
+  const user = useAuthStore((s) => s.user);
   const mode = useAuthStore((s) => s.mode);
   const status = useAuthStore((s) => s.status);
   const error = useAuthStore((s) => s.error);
   const openModal = useAuthStore((s) => s.openModal);
   const closeModal = useAuthStore((s) => s.closeModal);
+  const openAccountDrawer = useAuthStore((s) => s.openAccountDrawer);
   const signIn = useAuthStore((s) => s.signIn);
   const signUp = useAuthStore((s) => s.signUp);
   const resetPassword = useAuthStore((s) => s.resetPassword);
@@ -27,6 +28,14 @@ export const AuthModal: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
+  // If user is already logged in, never show the auth modal; route directly to account drawer
+  React.useEffect(() => {
+    if (isOpen && user) {
+      closeModal();
+      openAccountDrawer();
+    }
+  }, [isOpen, user, closeModal, openAccountDrawer]);
+
   const handleClose = useCallback(() => {
     setPassword('');
     setShowPassword(false);
@@ -35,10 +44,6 @@ export const AuthModal: React.FC = () => {
     closeModal();
   }, [clearError, closeModal]);
 
-  // A successful sign-in closes the modal from inside the store
-  // (`set({ isOpen: false })`), which bypasses handleClose and leaves the
-  // typed password sitting in component state. Clear it whenever the modal
-  // is not open, regardless of which path closed it.
   React.useEffect(() => {
     if (!isOpen) {
       setPassword('');
@@ -50,7 +55,7 @@ export const AuthModal: React.FC = () => {
 
   const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, handleClose);
 
-  if (!isOpen) return null;
+  if (!isOpen || user) return null;
 
   const isSignup = mode === 'signup';
   const busy = status === 'loading';
@@ -82,69 +87,75 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[350] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[350] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {/* Backdrop */}
       <button
         aria-label="Close account dialog"
         onClick={handleClose}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] cursor-default"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs cursor-default transition-opacity"
       />
 
+      {/* Modal Dialog */}
       <div
         ref={dialogRef}
         tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-modal-title"
-        className="relative w-full sm:max-w-[420px] bg-paper border border-stone shadow-xl max-h-[92vh] overflow-y-auto focus:outline-none"
+        className="relative z-10 w-full sm:max-w-[420px] rounded-t-2xl sm:rounded-2xl bg-white border border-neutral-200 shadow-2xl max-h-[92vh] overflow-y-auto focus:outline-none"
       >
-        <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-stone">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-200">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-ink-muted">Atelier Account</p>
-            <h2 id="auth-modal-title" className="font-serif text-2xl text-ink mt-1">
-              {isSignup ? 'Create your account' : 'Welcome back'}
+            <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+              UNIQUELO MEMBER
+            </span>
+            <h2 id="auth-modal-title" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1.5">
+              {isSignup ? 'Join The Inner Circle' : 'Welcome Back'}
             </h2>
           </div>
           <button
             onClick={handleClose}
             aria-label="Close"
-            className="p-2 -mr-2 -mt-1 text-ink-muted hover:text-ink transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-black transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
+        {/* Content */}
         <div className="px-6 py-5">
-          <p className="text-sm text-ink-muted leading-relaxed mb-5">
+          <p className="text-xs text-neutral-500 leading-relaxed mb-5">
             {isSignup
-              ? 'Save addresses, keep your pieces across devices, and track every order.'
-              : 'Sign in to track orders and keep your saved pieces in sync.'}
+              ? 'Get early drop alerts, save shipping addresses, track deliveries, and sync your pieces across devices.'
+              : 'Sign in to track orders, access member pricing, and sync your saved pieces.'}
           </p>
 
           {status === 'awaiting_confirmation' ? (
-            <div className="border border-stone bg-cream/60 p-4 mb-4">
-              <p className="text-sm text-ink font-medium mb-1">Check your inbox</p>
-              <p className="text-sm text-ink-muted leading-relaxed">
-                We sent a confirmation link to <span className="text-ink">{email}</span>. Open it to activate the
-                account, then sign in.
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 mb-4">
+              <p className="text-xs font-bold text-emerald-950 mb-1">Check your inbox ✉️</p>
+              <p className="text-xs text-emerald-800 leading-relaxed">
+                We sent a confirmation link to <strong className="text-emerald-950">{email}</strong>. Open it to activate your account, then sign in.
               </p>
               <button
+                type="button"
                 onClick={() => {
                   useAuthStore.setState({ status: 'idle' });
                   openModal('signin');
                 }}
-                className="mt-3 text-xs uppercase tracking-widest text-accent hover:text-accent-hover transition-colors cursor-pointer"
+                className="mt-3 text-xs font-black uppercase tracking-wider text-emerald-900 hover:underline"
               >
-                Go to sign in
+                Go to Sign In →
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignup && (
                 <div>
-                  <label htmlFor="auth-name" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5">
-                    Name <span className="normal-case tracking-normal">(optional)</span>
+                  <label htmlFor="auth-name" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                    Your Full Name <span className="text-neutral-400 font-normal lowercase">(optional)</span>
                   </label>
                   <input
                     id="auth-name"
@@ -152,15 +163,15 @@ export const AuthModal: React.FC = () => {
                     autoComplete="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-paper border border-stone text-sm text-ink placeholder:text-warm-gray focus:outline-none focus:border-ink transition-colors"
-                    placeholder="Your name"
+                    className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
+                    placeholder="e.g. Kabir Roy"
                   />
                 </div>
               )}
 
               <div>
-                <label htmlFor="auth-email" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5">
-                  Email
+                <label htmlFor="auth-email" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  Email Address
                 </label>
                 <input
                   id="auth-email"
@@ -171,21 +182,21 @@ export const AuthModal: React.FC = () => {
                   data-autofocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-paper border border-stone text-sm text-ink placeholder:text-warm-gray focus:outline-none focus:border-ink transition-colors"
+                  className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
 
               <div>
-                <div className="flex items-baseline justify-between mb-1.5">
-                  <label htmlFor="auth-password" className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="auth-password" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700">
                     Password
                   </label>
                   {!isSignup && (
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-accent transition-colors cursor-pointer"
+                      className="text-[11px] font-bold text-neutral-500 hover:text-black underline transition-colors"
                     >
                       Forgot?
                     </button>
@@ -200,60 +211,73 @@ export const AuthModal: React.FC = () => {
                     minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2.5 pr-16 bg-paper border border-stone text-sm text-ink placeholder:text-warm-gray focus:outline-none focus:border-ink transition-colors"
-                    placeholder={isSignup ? 'At least 8 characters' : 'Your password'}
+                    className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 pr-14 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
+                    placeholder={isSignup ? 'At least 8 characters' : 'Enter your password'}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-0 top-0 h-full px-3 text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                    className="absolute right-0 top-0 h-full px-3 text-[11px] font-bold uppercase tracking-wider text-neutral-500 hover:text-black"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
                 {isSignup && password.length > 0 && password.length < 8 && (
-                  <p className="text-[11px] text-error mt-1.5">Use at least 8 characters.</p>
+                  <p className="text-[11px] font-medium text-red-600 mt-1.5">
+                    Password must be at least 8 characters long.
+                  </p>
                 )}
               </div>
 
               {resetSent && (
-                <p className="text-[11px] text-success">If that email exists, a reset link is on its way.</p>
+                <div className="rounded-lg bg-emerald-50 p-2.5 text-xs font-medium text-emerald-800 border border-emerald-200">
+                  Password reset link sent! Check your inbox.
+                </div>
               )}
 
               {error && (
                 <div
                   role="alert"
-                  className={`border p-3 text-[12px] leading-relaxed ${
-                    error.isMailerLimit ? 'border-saffron/60 bg-saffron/10 text-ink' : 'border-error/40 bg-error/5 text-error'
+                  className={`rounded-lg p-3 text-xs leading-relaxed border ${
+                    error.isMailerLimit
+                      ? 'border-amber-200 bg-amber-50 text-amber-900'
+                      : 'border-red-200 bg-red-50 text-red-800'
                   }`}
                 >
                   {error.isMailerLimit && (
-                    <span className="block font-medium mb-1 uppercase tracking-wider text-[10px]">Setup incomplete</span>
+                    <span className="block font-black mb-0.5 uppercase tracking-wider text-[10px]">Notice</span>
                   )}
                   {error.message}
                 </div>
               )}
 
-              <Button type="submit" variant="primary" size="md" disabled={!canSubmit} className="w-full">
-                {busy ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}
-              </Button>
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md transition hover:bg-neutral-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
+              >
+                {busy ? 'Please wait…' : isSignup ? 'Create Account →' : 'Sign In →'}
+              </button>
             </form>
           )}
 
-          <p className="text-xs text-ink-muted text-center mt-5">
-            {isSignup ? 'Already have an account?' : 'New to UniqueLo?'}{' '}
-            <button
-              onClick={switchMode}
-              className="text-ink underline underline-offset-4 hover:text-accent transition-colors cursor-pointer"
-            >
-              {isSignup ? 'Sign in' : 'Create one'}
-            </button>
-          </p>
+          <div className="mt-5 pt-4 border-t border-neutral-100 text-center">
+            <p className="text-xs text-neutral-600">
+              {isSignup ? 'Already have an account?' : 'New to UniqueLo?'}{' '}
+              <button
+                type="button"
+                onClick={switchMode}
+                className="font-bold text-black underline underline-offset-2 hover:text-red-600 transition-colors"
+              >
+                {isSignup ? 'Sign in' : 'Create an account'}
+              </button>
+            </p>
 
-          <p className="text-[10px] text-warm-gray text-center mt-4 leading-relaxed">
-            No account is required to checkout. Guests can order and track by order ID and email.
-          </p>
+            <p className="mt-3 text-[11px] text-neutral-400">
+              No account required. Guests can track orders with their Order ID and Email.
+            </p>
+          </div>
         </div>
       </div>
     </div>

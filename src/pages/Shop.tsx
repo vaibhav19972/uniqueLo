@@ -1,31 +1,27 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { filterProducts, type ArtStyleSlug, type EditSlug } from '../lib/data';
 import { useProducts, useCategories } from '../hooks/useCatalog';
 import { useFiltersStore } from '../stores/filters';
 import { CategoryTabs } from '../components/shop/CategoryTabs';
 import { FilterBar } from '../components/shop/FilterBar';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * The shop's two non-catalogue states — loading and error. They used to be
- * centred around a 48px rounded-full glyph badge over a serif sentence, which
- * is a different system's empty state. Here it is a ruled block at the left
- * margin, the same register as the rest of the page: a label, a sentence, and
- * nothing that looks like an illustration.
- */
 function CatalogState({ message, detail }: { message: string; detail?: string }) {
   return (
-    <div className="mx-auto max-w-[46rem] px-4 py-16 sm:px-6 lg:px-12">
-      <div className="border-t border-stone pt-4">
-        <p className="loom-label text-ink-muted">The collection</p>
-        <h3 className="loom-display mt-2 text-[1.5rem] text-ink">{message}</h3>
-        {detail && (
-          <p className="mt-2 max-w-[52ch] font-sans text-[13px] leading-relaxed text-ink-muted">
-            {detail}
-          </p>
-        )}
+    <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+        <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
       </div>
+      <h3 className="font-display text-xl font-bold uppercase tracking-tight text-neutral-900">{message}</h3>
+      {detail && (
+        <p className="mt-2 text-xs text-neutral-500 leading-relaxed max-w-md mx-auto">
+          {detail}
+        </p>
+      )}
     </div>
   );
 }
@@ -73,12 +69,7 @@ export const Shop: React.FC = () => {
     if (garment) s.setGarmentTypes([garment]);
     if (edit) s.setEdit(edit as EditSlug);
     if (expression) s.setExpressionSlug(expression as any);
-    // Presence deep-link from Home's Quiet / Balanced / Loud panes. Intensity
-    // is the field every product carries, so it is the axis that can always
-    // answer the question the pane asked.
     if (intensity) s.setIntensity(intensity as 'quiet' | 'balanced' | 'loud');
-    // A technique deep-link from /our-craft/:slug. `toggleTechnique` is the only
-    // setter on the store; it flips, so call it only when it would turn on.
     if (technique && !(s.filters.techniques ?? []).includes(technique as any)) {
       s.toggleTechnique(technique as any);
     }
@@ -94,30 +85,37 @@ export const Shop: React.FC = () => {
   }, [allProducts, filters]);
 
   return (
-    <div className="min-h-screen w-full bg-cream">
-      {/* The head: what this page is, how many pieces are in it, and the
-          filter state — in that order, at one type register. */}
-      <section className="border-b border-stone bg-cream pb-6 pt-8">
-        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Streetwear PLP Masthead ── */}
+      <section className="border-b border-neutral-200 bg-white pt-8 pb-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-black">{currentCategory ? currentCategory.name : 'The Collection'}</span>
+          </nav>
+
+          <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1
-                className="loom-display text-ink"
-                style={{ fontSize: 'var(--text-display)' }}
-              >
-                {currentCategory ? currentCategory.name : 'The Collection'}
+              <div className="inline-flex items-center gap-2 rounded-xs bg-neutral-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-neutral-900 mb-2">
+                <span>✦</span>
+                <span>ORIGINAL STREETWEAR ARCHIVE</span>
+              </div>
+              <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl">
+                {currentCategory ? currentCategory.name : 'The Full Collection'}
               </h1>
-              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+              <p className="mt-1.5 max-w-2xl text-xs text-neutral-500 sm:text-sm">
                 {currentCategory
                   ? currentCategory.description
-                  : 'Every piece currently in stock, priced. Filter by world, garment, or how loudly the embroidery reads.'}
+                  : 'Every piece in the current drop. Filter by universe narrative, silhouette cut, or needlework density.'}
               </p>
             </div>
 
-            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
-              <span className="loom-price text-[15px] text-ink">{filteredProducts.length}</span>
-              {' '}of {(allProducts ?? []).length} shown
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-neutral-900 px-3 py-1 text-xs font-bold text-white">
+                {filteredProducts.length} Pieces
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -129,32 +127,35 @@ export const Shop: React.FC = () => {
       <FilterBar />
 
       {/* Main Grid Container */}
-      <div className="mx-auto max-w-[var(--container-max)] px-4 pb-24 pt-6 sm:px-6 lg:px-12">
+      <div className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8">
         {isError ? (
           <CatalogState
             message="The Collection Could Not Be Reached"
             detail={error instanceof Error ? error.message : 'Please try again shortly.'}
           />
         ) : isPending ? (
-          <CatalogState message="Curating the Collection..." />
+          <CatalogState message="Loading Fresh Drops..." />
         ) : filteredProducts.length === 0 ? (
           <CatalogState
-            message="No Matching Atelier Pieces Found"
+            message="No Matching Pieces Found"
             detail="Try loosening your filters or clearing search criteria to reveal additional archival editions."
           />
         ) : (
-          <ProductGrid products={filteredProducts} />
+          <ProductGrid products={filteredProducts} cardType="quick" />
         )}
       </div>
 
-      {/* ── Sticky Mobile Filter & Sort Bar (Bonkers 1:1 Architecture) ── */}
+      {/* Trust Badges Pre-Footer matching Home */}
+      <TrustBadgesPreFooter />
+
+      {/* ── Sticky Mobile Filter & Sort Bar ── */}
       <div className="fixed bottom-0 inset-x-0 z-30 flex h-12 items-stretch border-t border-neutral-300 bg-white/95 backdrop-blur-md shadow-lg md:hidden">
         <button
           type="button"
           onClick={() => {
-            window.scrollTo({ top: 180, behavior: 'smooth' });
+            window.scrollTo({ top: 120, behavior: 'smooth' });
           }}
-          className="flex-1 flex items-center justify-center gap-1.5 font-display text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
+          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -167,9 +168,9 @@ export const Shop: React.FC = () => {
         <button
           type="button"
           onClick={() => {
-            window.scrollTo({ top: 180, behavior: 'smooth' });
+            window.scrollTo({ top: 120, behavior: 'smooth' });
           }}
-          className="flex-1 flex items-center justify-center gap-1.5 font-display text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
+          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-wider text-black active:bg-neutral-100"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />

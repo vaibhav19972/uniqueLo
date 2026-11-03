@@ -27,8 +27,9 @@ const Checkout = lazy(() => import('../pages/Checkout').then((m) => ({ default: 
 const ResetPassword = lazy(() => import('../pages/ResetPassword').then((m) => ({ default: m.ResetPassword })));
 
 const PageFallback: React.FC = () => (
-  <div className="min-h-[50vh] flex items-center justify-center bg-cream">
-    <p className="font-serif text-xl text-ink animate-pulse">Unfolding Atelier Piece...</p>
+  <div className="min-h-[50vh] flex flex-col items-center justify-center bg-white">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent mb-3" />
+    <p className="text-xs font-bold uppercase tracking-wider text-neutral-600">Loading Drop…</p>
   </div>
 );
 

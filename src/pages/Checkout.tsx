@@ -463,18 +463,23 @@ export const Checkout: React.FC = () => {
   // ── Empty bag ────────────────────────────────────────────────────────
   if (cartLines.length === 0) {
     return (
-      <div className="bg-cream min-h-screen">
-        <div className="max-w-2xl mx-auto px-5 py-16 text-center">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Checkout</p>
-          <h1 className="font-serif text-3xl text-ink mt-2">Your bag is empty</h1>
-          <p className="text-sm text-ink-muted mt-3 leading-relaxed">
-            Nothing to check out yet.
+      <div className="bg-white min-h-screen text-neutral-900">
+        <div className="max-w-2xl mx-auto px-5 py-20 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Checkout</p>
+          <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 mt-1">Your bag is empty</h1>
+          <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+            Nothing to check out yet. Discover our fresh drops and curated capsules.
           </p>
           <Link
             to="/shop"
-            className="inline-block mt-8 px-8 py-3 bg-ink text-cream text-[11px] uppercase tracking-[0.18em]"
+            className="inline-flex min-h-[44px] items-center rounded-xs bg-black px-8 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition mt-6"
           >
-            Browse the collection
+            Browse the Collection
           </Link>
         </div>
       </div>
@@ -482,7 +487,7 @@ export const Checkout: React.FC = () => {
   }
 
   const field =
-    'w-full border border-stone bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40';
+    'w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 py-2.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors';
 
   const busy = submitting || stage !== 'idle';
   const onlinePayable = isPaymentsConfigured();
@@ -497,37 +502,40 @@ export const Checkout: React.FC = () => {
     if (hardStop) return 'Payment already received';
     if (!quote) return 'Place order';
     return paymentMethod === 'cod'
-      ? `Place order · ${formatPrice(quote.total_cents)}`
-      : `Pay ${formatPrice(quote.total_cents)} securely`;
+      ? `Place Order · ${formatPrice(quote.total_cents)}`
+      : `Pay ${formatPrice(quote.total_cents)} Securely →`;
   };
 
   return (
-    <div className="bg-cream min-h-screen">
+    <div className="bg-white min-h-screen text-neutral-900">
       <div className="max-w-6xl mx-auto px-5 lg:px-8 py-10">
-        <div className="flex items-baseline justify-between">
+        <div className="flex items-center justify-between border-b border-neutral-200 pb-5">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Checkout</p>
-            <h1 className="font-serif text-3xl text-ink mt-1">Complete your order</h1>
+            <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+              EXPRESS CHECKOUT
+            </span>
+            <h1 className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight text-neutral-900 mt-1.5">
+              Complete Your Order
+            </h1>
           </div>
-          <Link to="/shop" className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink">
-            Keep shopping
+          <Link to="/shop" className="text-xs font-bold uppercase tracking-wider text-neutral-500 hover:text-black transition-colors">
+            Keep Shopping →
           </Link>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_380px] gap-10 mt-9 items-start">
+        <div className="grid lg:grid-cols-[1fr_380px] gap-10 mt-8 items-start">
           {/* ── Left: delivery, payment ─────────────────────────────── */}
           <div className="space-y-8">
             {/* Delivery */}
-            <section>
-              <h2 className="font-serif text-lg text-ink mb-4 flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-ink text-cream text-[11px] flex items-center justify-center">1</span>
-                Delivery
+            <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xs">
+              <h2 className="font-display text-base font-black uppercase tracking-tight text-neutral-900 mb-4 flex items-center gap-2.5">
+                <span className="w-6 h-6 rounded-full bg-black text-white text-xs font-mono font-bold flex items-center justify-center">1</span>
+                <span>Delivery Address</span>
               </h2>
 
               {!user && (
-                <p className="text-xs text-ink-muted mb-4">
-                  Checking out as a guest. <span className="text-ink">Sign in</span> to use saved
-                  addresses and track this order.
+                <p className="text-xs text-neutral-500 mb-4">
+                  Checking out as a guest. You can track this order with your order ID &amp; email.
                 </p>
               )}
 
@@ -539,48 +547,50 @@ export const Checkout: React.FC = () => {
                       key={a.id}
                       type="button"
                       onClick={() => setSelectedAddressId(a.id)}
-                      className={`w-full text-left border p-4 transition-colors ${
+                      className={`w-full text-left rounded-xl border p-4 transition-all ${
                         selectedAddressId === a.id
-                          ? 'border-ink bg-paper'
-                          : 'border-stone bg-paper/50 hover:border-stone-strong'
+                          ? 'border-black bg-neutral-50 ring-1 ring-black shadow-xs'
+                          : 'border-neutral-200 bg-white hover:border-neutral-300'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-ink">
+                          <p className="text-xs font-black uppercase tracking-tight text-neutral-900">
                             {a.recipient_name}
                             {a.label && (
-                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted border border-stone px-1.5 py-0.5">
+                              <span className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-[9px] font-bold uppercase text-neutral-700">
                                 {a.label}
                               </span>
                             )}
                             {a.is_default && (
-                              <span className="ml-2 text-[9px] uppercase tracking-[0.14em] text-ink-muted">
+                              <span className="ml-2 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-black uppercase text-emerald-800">
                                 Default
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-ink-muted mt-1 leading-relaxed">
+                          <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
                             {a.address_line}
                             {a.landmark ? `, ${a.landmark}` : ''}
                             <br />
-                            {a.city}, {a.state} {a.pincode}
+                            {a.city}, {a.state} – <span className="font-mono font-bold">{a.pincode}</span>
                             <br />
-                            {a.phone}
+                            <span className="text-neutral-500 font-mono">📱 {a.phone}</span>
                           </p>
                         </div>
                         <span
-                          className={`mt-1 w-3.5 h-3.5 rounded-full border shrink-0 ${
-                            selectedAddressId === a.id ? 'border-ink bg-ink' : 'border-stone-strong'
+                          className={`mt-1 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                            selectedAddressId === a.id ? 'border-black bg-black' : 'border-neutral-300'
                           }`}
-                        />
+                        >
+                          {selectedAddressId === a.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
                       </div>
                     </button>
                   ))}
                   <button
                     type="button"
                     onClick={() => setShowAddressForm(true)}
-                    className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink underline underline-offset-4"
+                    className="text-xs font-bold text-neutral-700 hover:text-black underline underline-offset-2 pt-1 block"
                   >
                     + Deliver to a different address
                   </button>
@@ -589,12 +599,12 @@ export const Checkout: React.FC = () => {
 
               {/* Address form */}
               {(!user || addresses.length === 0 || showAddressForm) && (
-                <div className="bg-paper border border-stone p-5 space-y-3">
+                <div className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-5 space-y-3.5">
                   {user && addresses.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setShowAddressForm(false)}
-                      className="text-[11px] uppercase tracking-[0.16em] text-ink-muted hover:text-ink mb-1"
+                      className="text-xs font-bold text-neutral-600 hover:text-black mb-1 block"
                     >
                       ← Use a saved address
                     </button>
@@ -608,7 +618,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         autoComplete="name"
                       />
-                      {errors.name && <p className="text-[10px] text-red-600 mt-1">{errors.name}</p>}
+                      {errors.name && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.name}</p>}
                     </div>
                     <div>
                       <input
@@ -619,35 +629,35 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
                         autoComplete="tel"
                       />
-                      {errors.phone && <p className="text-[10px] text-red-600 mt-1">{errors.phone}</p>}
+                      {errors.phone && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.phone}</p>}
                     </div>
                   </div>
                   {!user && (
                     <div>
                       <input
                         className={field}
-                        placeholder="Email for the receipt"
+                        placeholder="Email for the order receipt"
                         type="email"
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                         autoComplete="email"
                       />
-                      {errors.email && <p className="text-[10px] text-red-600 mt-1">{errors.email}</p>}
+                      {errors.email && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.email}</p>}
                     </div>
                   )}
                   <div>
                     <input
                       className={field}
-                      placeholder="Flat / house, street, area"
+                      placeholder="Flat / house no., street, locality"
                       value={form.address}
                       onChange={(e) => setForm({ ...form, address: e.target.value })}
                       autoComplete="street-address"
                     />
-                    {errors.address && <p className="text-[10px] text-red-600 mt-1">{errors.address}</p>}
+                    {errors.address && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.address}</p>}
                   </div>
                   <input
                     className={field}
-                    placeholder="Landmark (optional)"
+                    placeholder="Nearby landmark (optional)"
                     value={form.landmark}
                     onChange={(e) => setForm({ ...form, landmark: e.target.value })}
                   />
@@ -660,7 +670,7 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, city: e.target.value })}
                         autoComplete="address-level2"
                       />
-                      {errors.city && <p className="text-[10px] text-red-600 mt-1">{errors.city}</p>}
+                      {errors.city && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.city}</p>}
                     </div>
                     <div>
                       <input
@@ -670,28 +680,28 @@ export const Checkout: React.FC = () => {
                         onChange={(e) => setForm({ ...form, state: e.target.value })}
                         autoComplete="address-level1"
                       />
-                      {errors.state && <p className="text-[10px] text-red-600 mt-1">{errors.state}</p>}
+                      {errors.state && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.state}</p>}
                     </div>
                     <div>
                       <input
                         className={field}
-                        placeholder="Pincode"
+                        placeholder="Pincode (6 digits)"
                         inputMode="numeric"
                         maxLength={6}
                         value={form.pincode}
                         onChange={(e) => setForm({ ...form, pincode: e.target.value })}
                         autoComplete="postal-code"
                       />
-                      {errors.pincode && <p className="text-[10px] text-red-600 mt-1">{errors.pincode}</p>}
+                      {errors.pincode && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.pincode}</p>}
                     </div>
                   </div>
                   {user && (
-                    <label className="flex items-center gap-2 text-xs text-ink-muted pt-1">
+                    <label className="flex items-center gap-2 text-xs text-neutral-600 pt-1 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={saveToAccount}
                         onChange={(e) => setSaveToAccount(e.target.checked)}
-                        className="accent-ink"
+                        className="rounded border-neutral-300 text-black focus:ring-black"
                       />
                       Save this address to my account
                     </label>
@@ -701,38 +711,36 @@ export const Checkout: React.FC = () => {
             </section>
 
             {/* Payment */}
-            <section>
-              <h2 className="font-serif text-lg text-ink mb-4 flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-ink text-cream text-[11px] flex items-center justify-center">2</span>
-                Payment
+            <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xs">
+              <h2 className="font-display text-base font-black uppercase tracking-tight text-neutral-900 mb-4 flex items-center gap-2.5">
+                <span className="w-6 h-6 rounded-full bg-black text-white text-xs font-mono font-bold flex items-center justify-center">2</span>
+                <span>Payment Method</span>
               </h2>
 
-              <div className="space-y-2.5">
-                {/* Online. Razorpay's window IS the method picker — it knows the
-                    customer's saved cards, offers UPI intent on mobile, and
-                    handles netbanking and wallets. Asking "UPI or card?" here and
-                    then again inside the modal is the same question twice, and
-                    every extra decision at this point costs conversion. The page
-                    asks ONE question: pay now, or pay on delivery. */}
+              <div className="space-y-3">
                 <button
                   type="button"
                   disabled={!onlinePayable}
                   onClick={() => setPaymentMethod('upi')}
-                  className={`w-full text-left border p-4 ${
+                  className={`w-full text-left rounded-xl border p-4 transition-all ${
                     !onlinePayable
-                      ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
+                      ? 'border-neutral-200 bg-neutral-100 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'upi'
-                        ? 'border-ink bg-paper'
-                        : 'border-stone bg-paper/50'
+                        ? 'border-black bg-neutral-50 ring-1 ring-black shadow-xs'
+                        : 'border-neutral-200 bg-white hover:border-neutral-300'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-ink">Pay online</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'upi' ? 'border-ink bg-ink' : 'border-stone-strong'}`} />
+                    <span className="text-xs font-black uppercase tracking-wider text-neutral-900">
+                      ⚡ Pay Online (UPI, Cards, Netbanking)
+                    </span>
+                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${paymentMethod === 'upi' ? 'border-black bg-black' : 'border-neutral-300'}`}>
+                      {paymentMethod === 'upi' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </span>
                   </div>
-                  <p className="text-xs text-ink-muted mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     {onlinePayable
-                      ? 'UPI, cards, netbanking and wallets. Secured by Razorpay.'
+                      ? 'Instant UPI Intent, Google Pay, PhonePe, Paytm, Cards & NetBanking. Secured 256-bit.'
                       : 'Unavailable in this build — cash on delivery still works.'}
                   </p>
                 </button>
@@ -741,24 +749,28 @@ export const Checkout: React.FC = () => {
                   type="button"
                   disabled={!codAvailable}
                   onClick={() => setPaymentMethod('cod')}
-                  className={`w-full text-left border p-4 ${
+                  className={`w-full text-left rounded-xl border p-4 transition-all ${
                     !codAvailable
-                      ? 'border-stone bg-paper/30 opacity-60 cursor-not-allowed'
+                      ? 'border-neutral-200 bg-neutral-100 opacity-60 cursor-not-allowed'
                       : paymentMethod === 'cod'
-                        ? 'border-ink bg-paper'
-                        : 'border-stone bg-paper/50'
+                        ? 'border-black bg-neutral-50 ring-1 ring-black shadow-xs'
+                        : 'border-neutral-200 bg-white hover:border-neutral-300'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-ink">Cash on delivery</span>
-                    <span className={`w-3.5 h-3.5 rounded-full border ${paymentMethod === 'cod' ? 'border-ink bg-ink' : 'border-stone-strong'}`} />
+                    <span className="text-xs font-black uppercase tracking-wider text-neutral-900">
+                      💵 Cash on Delivery (COD)
+                    </span>
+                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${paymentMethod === 'cod' ? 'border-black bg-black' : 'border-neutral-300'}`}>
+                      {paymentMethod === 'cod' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </span>
                   </div>
-                  <p className="text-xs text-ink-muted mt-1">
+                  <p className="text-xs text-neutral-500 mt-1">
                     {!codAvailable
                       ? `Not available for ${quote?.units ?? 0} items — COD is limited to ${quote?.cod_max_units ?? 10} per order.`
                       : quote && quote.cod_fee_cents > 0
                         ? `A ${formatPrice(quote.cod_fee_cents)} handling fee applies.`
-                        : 'Verify the amount in cash when your order arrives.'}
+                        : 'Pay cash upon doorstep verification.'}
                   </p>
                 </button>
               </div>
@@ -767,45 +779,51 @@ export const Checkout: React.FC = () => {
 
           {/* ── Right: summary ──────────────────────────────────────── */}
           <aside className="lg:sticky lg:top-[calc(var(--header-height)+2rem)]">
-            <div className="bg-paper border border-stone">
-              <div className="px-5 py-4 border-b border-stone flex items-baseline justify-between">
-                <h2 className="font-serif text-lg text-ink">Order summary</h2>
-                <span className="text-[10px] uppercase tracking-[0.14em] text-ink-muted">
-                  {quote ? `${quote.units} item${quote.units === 1 ? '' : 's'}` : '—'}
+            <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
+                <h2 className="font-display text-sm font-black uppercase tracking-tight text-neutral-900">
+                  Order Summary
+                </h2>
+                <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-bold text-neutral-700">
+                  {quote ? `${quote.units} ${quote.units === 1 ? 'item' : 'items'}` : '—'}
                 </span>
               </div>
 
               {/* Lines */}
-              <div className="px-5 py-4 space-y-3 max-h-[280px] overflow-y-auto">
+              <div className="px-5 py-4 space-y-3 max-h-[280px] overflow-y-auto divide-y divide-neutral-100 no-scrollbar">
                 {cartLines.map((line) => {
                   const q = quote?.lines.find((x) => x.sku === line.variant.sku);
                   const mrp = q ? lineMrpCents(q) : null;
                   const pct = q ? lineDiscountPercent(q) : null;
                   return (
-                    <div key={line.id} className="flex gap-3">
+                    <div key={line.id} className="flex gap-3 pt-3 first:pt-0">
                       {line.product.images[0]?.src && (
                         <img
                           src={line.product.images[0].src}
                           alt=""
-                          className="w-12 h-14 object-cover bg-cream shrink-0"
+                          className="w-12 h-16 object-cover rounded-md border border-neutral-200 bg-neutral-100 shrink-0"
                         />
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-ink truncate">{line.product.name}</p>
-                        <p className="text-[10px] text-ink-muted mt-0.5">
-                          {line.variant.color} · {line.variant.size} · Qty {q?.quantity ?? line.quantity}
+                        <p className="text-xs font-black uppercase tracking-tight text-neutral-900 truncate">{line.product.name}</p>
+                        <p className="text-[10px] text-neutral-500 mt-0.5">
+                          Size: {line.variant.size} · Qty {q?.quantity ?? line.quantity}
                         </p>
-                        <p className="text-xs text-ink mt-1">
-                          {formatPrice(q?.line_total_cents ?? line.lineTotalCents)}
+                        <div className="flex items-baseline gap-2 mt-1">
+                          <span className="font-mono text-xs font-black text-[#D32F2F]">
+                            {formatPrice(q?.line_total_cents ?? line.lineTotalCents)}
+                          </span>
                           {mrp != null && q && (
-                            <span className="ml-2 text-ink-muted line-through text-[10px]">
+                            <span className="font-mono text-[10px] text-neutral-400 line-through">
                               {formatPrice(mrp * q.quantity)}
                             </span>
                           )}
                           {pct != null && (
-                            <span className="ml-1.5 text-[10px] text-success">{pct}% off</span>
+                            <span className="rounded bg-red-100 px-1 py-0.2 text-[9px] font-black text-red-600">
+                              {pct}% off
+                            </span>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </div>
                   );
@@ -813,21 +831,21 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Coupon */}
-              <div className="px-5 py-3 border-t border-stone">
+              <div className="px-5 py-3 border-t border-neutral-200 bg-neutral-50/50">
                 {appliedCode ? (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-ink">
-                      <span className="font-mono bg-cream px-1.5 py-0.5 border border-stone">{appliedCode}</span>
+                  <div className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-black uppercase text-neutral-900">{appliedCode}</span>
                       {quote?.coupon && !quote.coupon.error && (
-                        <span className="ml-2 text-success">
+                        <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-black text-emerald-800">
                           −{formatPrice(quote.coupon.discount_cents ?? 0)}
                         </span>
                       )}
-                    </span>
+                    </div>
                     <button
                       type="button"
                       onClick={removeCoupon}
-                      className="text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink"
+                      className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors"
                     >
                       Remove
                     </button>
@@ -836,8 +854,8 @@ export const Checkout: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <input
-                        className="flex-1 border border-stone bg-cream px-3 py-2 text-xs text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-ink/40 uppercase"
-                        placeholder="Coupon code"
+                        className="h-10 flex-1 rounded-lg border border-neutral-300 bg-white px-3 font-mono text-xs font-bold uppercase tracking-wider text-neutral-900 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal placeholder:text-neutral-400 focus:border-black focus:outline-none"
+                        placeholder="Promo code"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                         onKeyDown={(e) => {
@@ -848,35 +866,34 @@ export const Checkout: React.FC = () => {
                         type="button"
                         disabled={!couponCode.trim()}
                         onClick={() => applyCode(couponCode)}
-                        className="px-4 py-2 bg-ink text-cream text-[10px] uppercase tracking-[0.14em] disabled:opacity-40"
+                        className="h-10 rounded-lg bg-black px-4 text-xs font-black uppercase tracking-wider text-white hover:bg-neutral-800 transition active:scale-95 disabled:opacity-40"
                       >
                         Apply
                       </button>
                     </div>
-                    {couponError && <p className="text-[10px] text-red-600">{couponError}</p>}
+                    {couponError && <p className="text-xs font-semibold text-red-600">{couponError}</p>}
 
-                    {/* Best-coupon prompt. Never auto-applied — the customer
-                        clicks. Server-gated, so it cannot fail on click. */}
                     {bestCoupon && (
                       <button
                         type="button"
                         onClick={() => applyCode(bestCoupon.code)}
-                        className="w-full text-left bg-accent-soft border border-stone px-3 py-2 hover:bg-panel-raised"
+                        className="w-full text-left rounded-lg bg-red-50/80 border border-red-200 p-2.5 hover:bg-red-100/80 transition-colors"
                       >
-                        <p className="text-[10px] uppercase tracking-[0.14em] text-success font-medium">
-                          Save {formatPrice(bestCoupon.value_cents)}
+                        <p className="text-[10px] font-black uppercase tracking-wider text-red-700">
+                          Save {formatPrice(bestCoupon.value_cents)} with {bestCoupon.code}
                         </p>
-                        <p className="text-[11px] text-ink-muted mt-0.5">
-                          Apply <span className="font-mono">{bestCoupon.code}</span>
+                        <p className="text-[11px] text-neutral-600 mt-0.5">
+                          Tap to apply coupon
                           {bestCoupon.min_subtotal_cents > 0
                             ? ` on orders above ${formatPrice(bestCoupon.min_subtotal_cents)}`
                             : ''}
                         </p>
                       </button>
                     )}
+
                     {offers.length > 1 && (
-                      <p className="text-[10px] text-ink-muted">
-                        {offers.length} offers available on this bag.
+                      <p className="text-[11px] text-neutral-500 font-medium">
+                        {offers.length} exclusive offers available for this order.
                       </p>
                     )}
                   </div>
@@ -884,11 +901,11 @@ export const Checkout: React.FC = () => {
               </div>
 
               {/* Totals — server values only */}
-              <div className="px-5 py-4 border-t border-stone space-y-2 text-xs">
+              <div className="px-5 py-4 border-t border-neutral-200 space-y-2 text-xs">
                 {quoteError ? (
-                  <p className="text-[11px] text-red-600 leading-relaxed">{quoteError.message}</p>
+                  <p className="text-xs font-semibold text-red-600 leading-relaxed">{quoteError.message}</p>
                 ) : isLoading || !quote ? (
-                  <p className="text-[11px] text-ink-muted">Pricing your bag…</p>
+                  <p className="text-xs text-neutral-500">Pricing your bag…</p>
                 ) : (
                   <>
                     <Row label="Subtotal" value={formatPrice(quote.subtotal_cents)} />
@@ -897,23 +914,23 @@ export const Checkout: React.FC = () => {
                     )}
                     <Row
                       label="Shipping"
-                      value={quote.shipping_cents === 0 ? 'Free' : formatPrice(quote.shipping_cents)}
+                      value={quote.shipping_cents === 0 ? 'FREE' : formatPrice(quote.shipping_cents)}
                     />
                     {quote.cod_fee_cents > 0 && (
                       <Row label="COD fee" value={formatPrice(quote.cod_fee_cents)} />
                     )}
                     {remainingFree > 0 && (
-                      <p className="text-[10px] text-ink-muted pt-0.5">
-                        Add {formatPrice(remainingFree)} for free delivery.
+                      <p className="text-[11px] text-neutral-500 pt-0.5 font-medium">
+                        Add {formatPrice(remainingFree)} more for free delivery.
                       </p>
                     )}
-                    <div className="pt-2 mt-1 border-t border-stone flex items-baseline justify-between">
-                      <span className="text-sm font-medium text-ink">Total</span>
-                      <span className="font-serif text-xl text-ink">{formatPrice(quote.total_cents)}</span>
+                    <div className="pt-2.5 mt-1 border-t border-neutral-200 flex items-center justify-between">
+                      <span className="text-sm font-black uppercase text-neutral-900">Total Payable</span>
+                      <span className="font-mono text-xl font-black text-[#D32F2F]">{formatPrice(quote.total_cents)}</span>
                     </div>
                     {savings > 0 && (
-                      <p className="text-[10px] text-success pt-1">
-                        You save {formatPrice(savings)} on this order.
+                      <p className="text-xs font-bold text-emerald-700 pt-1">
+                        🎉 Total savings: {formatPrice(savings)} on this order.
                       </p>
                     )}
                   </>
@@ -921,32 +938,25 @@ export const Checkout: React.FC = () => {
               </div>
 
               <div className="px-5 pb-5">
-                {/* Money may have moved. Persistent, above the button, no retry. */}
                 {fatal && (
                   <div
                     role="alert"
-                    className="mb-4 border border-amber-300 bg-amber-50 px-3.5 py-3"
+                    className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-3.5"
                   >
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-amber-900 font-medium">
+                    <p className="text-xs font-black uppercase tracking-wider text-amber-900">
                       Payment received — action needed
                     </p>
-                    <p className="text-[11px] text-amber-900/90 mt-1 leading-relaxed">
+                    <p className="text-xs text-amber-800 mt-1 leading-relaxed">
                       {fatal.message}
                     </p>
                     {fatal.paymentId && (
-                      <p className="text-[10px] text-amber-900/80 mt-2">
-                        Your payment reference:{' '}
-                        <span className="font-mono break-all">{fatal.paymentId}</span>
+                      <p className="text-[11px] text-amber-900 font-mono mt-2">
+                        Ref: {fatal.paymentId}
                       </p>
                     )}
-                    <p className="text-[10px] text-amber-900/70 mt-2">
-                      Do not pay again. Quote this reference if you contact us.
-                    </p>
-                    {/* The customer is stranded without an order id, so give them
-                        a way to look for the order the payment actually created. */}
                     <Link
                       to="/orders"
-                      className="inline-block mt-2.5 text-[10px] uppercase tracking-[0.14em] text-amber-900 underline underline-offset-4 hover:no-underline"
+                      className="inline-block mt-2 text-xs font-bold text-amber-900 underline"
                     >
                       Check your orders →
                     </Link>
@@ -954,25 +964,23 @@ export const Checkout: React.FC = () => {
                 )}
 
                 <button
-                  type="button"
+                  type="submit"
                   onClick={submit}
                   disabled={busy || !quote || Boolean(quoteError) || hardStop}
-                  className="w-full py-3.5 bg-ink text-cream text-[11px] uppercase tracking-[0.2em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink/90 transition-colors"
+                  className="w-full h-12 rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 transition active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {payLabel()}
                 </button>
 
-                {/* Reassurance at the moment of commitment — the reference
-                    teardowns all put trust copy here, not on the way out. */}
-                <p className="text-[10px] text-ink-muted text-center mt-3 leading-relaxed">
+                <p className="text-[11px] text-neutral-500 text-center mt-3 leading-relaxed font-medium">
                   {paymentMethod === 'cod'
-                    ? 'Pay in cash when your order arrives.'
-                    : 'Card details are entered on Razorpay’s secure page, never on ours.'}
+                    ? '🛡️ Pay cash on delivery upon doorstep verification.'
+                    : '🛡️ 256-bit bank encrypted payment via Razorpay.'}
                 </p>
 
                 {stage === 'verifying' && (
-                  <p className="text-[10px] text-ink text-center mt-2 leading-relaxed">
-                    Please don’t close this window — we’re confirming your payment.
+                  <p className="text-xs text-neutral-800 text-center mt-2 leading-relaxed font-bold animate-pulse">
+                    Confirming your order, please do not close this window…
                   </p>
                 )}
               </div>
@@ -989,8 +997,8 @@ const Row: React.FC<{ label: string; value: string; accent?: boolean }> = ({
   value,
   accent,
 }) => (
-  <div className="flex items-baseline justify-between">
-    <span className="text-ink-muted">{label}</span>
-    <span className={accent ? 'text-success' : 'text-ink'}>{value}</span>
+  <div className="flex items-center justify-between text-neutral-600">
+    <span>{label}</span>
+    <span className={`font-mono font-bold ${accent ? 'text-[#D32F2F]' : 'text-neutral-900'}`}>{value}</span>
   </div>
 );

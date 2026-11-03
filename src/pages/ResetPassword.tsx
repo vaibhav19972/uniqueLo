@@ -111,10 +111,12 @@ export const ResetPassword: React.FC = () => {
   };
 
   const shell = (children: React.ReactNode) => (
-    <div className="bg-cream min-h-screen">
-      <div className="max-w-[440px] mx-auto px-4 sm:px-6 py-16 sm:py-24">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Atelier Account</p>
-        {children}
+    <div className="bg-white min-h-screen text-neutral-900">
+      <div className="max-w-[460px] mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div className="rounded-lg border border-neutral-200 bg-white p-6 sm:p-8 shadow-xs">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Account Security</p>
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -228,27 +230,27 @@ export const ResetPassword: React.FC = () => {
               autoFocus
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2.5 pr-16 bg-paper border border-stone text-sm text-ink placeholder:text-warm-gray focus:outline-none focus:border-ink transition-colors"
+              className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 pr-14 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
               placeholder="At least 8 characters"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-0 top-0 h-full px-3 text-[10px] uppercase tracking-[0.14em] text-ink-muted hover:text-ink transition-colors cursor-pointer"
+              className="absolute right-0 top-0 h-full px-3 text-[11px] font-bold uppercase tracking-wider text-neutral-500 hover:text-black transition-colors cursor-pointer"
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
           {password.length > 0 && password.length < 8 && (
-            <p className="text-[11px] text-error mt-1.5">Use at least 8 characters.</p>
+            <p className="text-[11px] text-red-600 mt-1.5 font-medium">Use at least 8 characters.</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="reset-password-confirm"
-            className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5"
+            className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5"
           >
             Confirm new password
           </label>
@@ -260,23 +262,27 @@ export const ResetPassword: React.FC = () => {
             minLength={8}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="w-full px-3 py-2.5 bg-paper border border-stone text-sm text-ink placeholder:text-warm-gray focus:outline-none focus:border-ink transition-colors"
+            className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
             placeholder="Type it again"
           />
           {confirm.length > 0 && password !== confirm && (
-            <p className="text-[11px] text-error mt-1.5">Passwords do not match.</p>
+            <p className="text-[11px] text-red-600 mt-1.5 font-medium">Passwords do not match.</p>
           )}
         </div>
 
         {message && (
-          <div role="alert" className="border border-error/40 bg-error/5 p-3 text-[12px] leading-relaxed text-error">
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs leading-relaxed text-red-800">
             {message}
           </div>
         )}
 
-        <Button type="submit" variant="primary" size="md" disabled={!canSubmit} className="w-full">
-          {busy ? 'Please wait…' : 'Update password'}
-        </Button>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="flex h-12 w-full items-center justify-center rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 transition active:scale-[0.99] disabled:bg-neutral-200 disabled:text-neutral-400"
+        >
+          {busy ? 'Please wait…' : 'Update Password →'}
+        </button>
       </form>
 
       <p className="text-xs text-ink-muted text-center mt-5">

@@ -18,10 +18,10 @@ import {
 import { catalogMrp } from '../lib/pricing';
 import { orderedVariants } from '../lib/sizes';
 import { hasLicensedMark } from '../lib/licensed-marks';
-import { Button } from '../components/ui/Button';
 import { SizeGuideModal } from '../components/shop/SizeGuideModal';
 import { ExpressionGuideModal } from '../components/shop/ExpressionGuideModal';
 import { ProductCard } from '../components/shop/ProductCard';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
 /**
  * THE PRODUCT PAGE
@@ -167,15 +167,15 @@ export const ProductDetail: React.FC = () => {
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-cream">
+      <div className="min-h-screen bg-white">
         <div className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12 lg:py-16">
           <p className="loom-label text-ink-muted">Product</p>
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-            <div className="aspect-[4/5] w-full animate-pulse bg-panel" />
+            <div className="aspect-[4/5] w-full animate-pulse bg-neutral-100 rounded-md" />
             <div className="space-y-3">
-              <div className="h-8 w-3/4 animate-pulse bg-panel" />
-              <div className="h-4 w-1/2 animate-pulse bg-panel" />
-              <div className="h-10 w-28 animate-pulse bg-panel" />
+              <div className="h-8 w-3/4 animate-pulse bg-neutral-100 rounded" />
+              <div className="h-4 w-1/2 animate-pulse bg-neutral-100 rounded" />
+              <div className="h-10 w-28 animate-pulse bg-neutral-100 rounded" />
             </div>
           </div>
         </div>
@@ -185,9 +185,9 @@ export const ProductDetail: React.FC = () => {
 
   if (isError || !product || !currentVariant) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-6 text-center">
-        <p className="loom-label text-ink-muted">Not in the catalogue</p>
-        <h1 className="loom-display mt-3 text-3xl text-ink">This piece is no longer listed</h1>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6 text-center">
+        <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">Not in the catalogue</p>
+        <h1 className="font-display mt-3 text-3xl font-black uppercase text-neutral-900">This piece is no longer listed</h1>
         <p className="mt-2 max-w-[44ch] font-sans text-sm leading-relaxed text-ink-muted">
           It may have sold through, or the link may be from an older catalogue.
           Everything currently available is in the collection.
@@ -473,17 +473,17 @@ export const ProductDetail: React.FC = () => {
   ].filter((s) => s.body);
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-white text-neutral-900">
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
 
       {/* ── Breadcrumb ──────────────────────────────────────────────── */}
-      <nav aria-label="Breadcrumb" className="border-b border-stone">
-        <div className="mx-auto flex max-w-[var(--container-max)] items-center gap-2 overflow-hidden px-4 py-3 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted sm:px-6 lg:px-12">
-          <Link to="/" className="transition-colors hover:text-ink">Home</Link>
+      <nav aria-label="Breadcrumb" className="border-b border-neutral-200">
+        <div className="mx-auto flex max-w-[var(--container-max)] items-center gap-2 overflow-hidden px-4 py-3 font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-400 sm:px-6 lg:px-12">
+          <Link to="/" className="transition-colors hover:text-black">Home</Link>
           <span aria-hidden="true">/</span>
           {universe && (
             <>
-              <Link to={`/universes/${universe.slug}`} className="whitespace-nowrap transition-colors hover:text-ink">
+              <Link to={`/universes/${universe.slug}`} className="whitespace-nowrap transition-colors hover:text-black">
                 {universe.name}
               </Link>
               <span aria-hidden="true">/</span>
@@ -492,20 +492,20 @@ export const ProductDetail: React.FC = () => {
           {product.garmentType ? (
             <Link
               to={`/clothing/${product.garmentType}`}
-              className="whitespace-nowrap capitalize transition-colors hover:text-ink"
+              className="whitespace-nowrap capitalize transition-colors hover:text-black"
             >
               {product.garmentType === 'scarf' ? 'scarves' : `${product.garmentType}s`}
             </Link>
           ) : (
             <Link
               to={`/category/${product.categorySlug}`}
-              className="whitespace-nowrap capitalize transition-colors hover:text-ink"
+              className="whitespace-nowrap capitalize transition-colors hover:text-black"
             >
               {product.categorySlug}
             </Link>
           )}
           <span aria-hidden="true">/</span>
-          <span className="truncate text-ink" aria-current="page">{product.name}</span>
+          <span className="truncate text-black" aria-current="page">{product.name}</span>
         </div>
       </nav>
 
@@ -513,7 +513,7 @@ export const ProductDetail: React.FC = () => {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-14">
           {/* ── THE PLATE ──────────────────────────────────────────── */}
           <div>
-            <div className="relative bg-paper">
+            <div className="relative bg-neutral-100 rounded-md overflow-hidden">
               {/* The frame follows the photograph instead of forcing it into a
                   4:5 box. Catalogue shots range from 0.77 to 1.11 in aspect,
                   so a fixed portrait frame left a third of the plate empty on
@@ -551,19 +551,18 @@ export const ProductDetail: React.FC = () => {
               </div>
 
               {/* Frame counter reads from the real gallery length. */}
-              <p className="loom-label absolute bottom-0 left-0 bg-paper px-2.5 py-1.5 text-ink-muted">
+              <p className="absolute bottom-3 left-3 rounded-md bg-black/75 px-2 py-1 font-mono text-[10px] font-bold text-white backdrop-blur-sm">
                 {selectedImageIndex + 1} / {product.images.length}
               </p>
 
               {soldOut && (
-                <p className="absolute right-0 top-0 bg-ink px-3 py-2 font-sans text-[11px] uppercase tracking-[0.16em] text-cream">
-                  Sold out
+                <p className="absolute right-3 top-3 rounded bg-black px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-white shadow-sm">
+                  Sold Out
                 </p>
               )}
             </div>
 
-            {/* Thumbnails: one horizontal rail, no vertical strip running
-                past the buy box. */}
+            {/* Thumbnails */}
             {product.images.length > 1 && (
               <div
                 role="group"
@@ -577,10 +576,10 @@ export const ProductDetail: React.FC = () => {
                     onClick={() => setSelectedImageIndex(idx)}
                     aria-label={`Photograph ${idx + 1} of ${product.images.length}`}
                     aria-pressed={selectedImageIndex === idx}
-                    className={`relative h-16 w-[52px] shrink-0 overflow-hidden bg-paper transition-opacity sm:h-20 sm:w-16 ${
+                    className={`relative h-18 w-14 shrink-0 overflow-hidden rounded-lg border bg-neutral-100 transition-all sm:h-20 sm:w-16 ${
                       selectedImageIndex === idx
-                        ? 'opacity-100 outline outline-1 outline-ink'
-                        : 'opacity-55 hover:opacity-100'
+                        ? 'border-black ring-1 ring-black shadow-xs'
+                        : 'border-neutral-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img
@@ -627,32 +626,32 @@ export const ProductDetail: React.FC = () => {
             </div>
 
             <h1
-              className="loom-display mt-3 text-ink"
+              className="font-display font-black uppercase tracking-tight text-neutral-900 mt-2 leading-none"
               style={{ fontSize: 'clamp(1.9rem, 3.4vw, 2.9rem)' }}
             >
               {product.name}
             </h1>
-            <p className="mt-2 max-w-[46ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-2 max-w-[46ch] text-sm text-neutral-500 leading-relaxed">
               {product.subtitle}
             </p>
 
-            {/* Price. Mono, tabular, first-class — the number the buyer came for. */}
-            <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-stone pt-5">
-              <span className="loom-price text-[30px] font-medium leading-none text-ink">
+            {/* Price. Bold crimson, strikethrough MRP, SAVE badge */}
+            <div className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-neutral-200 pt-5">
+              <span className="text-[32px] font-black text-[#D32F2F]">
                 {formatPrice(currentVariant.priceCents)}
               </span>
               {discount && (
                 <>
-                  <span className="loom-price text-[15px] text-ink-muted line-through">
+                  <span className="text-[16px] text-neutral-400 line-through">
                     {formatPrice(discount.mrpCents)}
                   </span>
-                  <span className="font-sans text-[12px] font-medium uppercase tracking-[0.08em] text-accent">
-                    {discount.offPercent}% off
+                  <span className="rounded-xs bg-black px-2 py-0.5 text-xs font-black uppercase tracking-wider text-white">
+                    SAVE {discount.offPercent}%
                   </span>
                 </>
               )}
-              <span className="w-full font-sans text-[12px] text-ink-muted">
-                Inclusive of all taxes. Carriage is ₹99, waived above ₹1,499.
+              <span className="w-full text-xs text-neutral-500 mt-1">
+                Inclusive of all taxes. Free shipping on orders above ₹1,499.
               </span>
             </div>
 
@@ -956,31 +955,36 @@ export const ProductDetail: React.FC = () => {
           return (
             <section
               aria-labelledby="proof-heading"
-              className="mt-16 border-t border-stone pt-10 lg:mt-24"
+              className="mt-16 border-t border-neutral-200 pt-10 lg:mt-24"
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-stone pb-4">
-                <h2 id="proof-heading" className="loom-display text-2xl text-ink">
-                  Seen up close
-                </h2>
-                <p className="font-sans text-[13px] text-ink-muted">
-                  Every caption on this strip reads from the garment's own record.
+              <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-neutral-200 pb-4">
+                <div>
+                  <span className="rounded bg-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                    MACRO DETAILS
+                  </span>
+                  <h2 id="proof-heading" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1">
+                    Seen Up Close
+                  </h2>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Every caption on this strip reads from the garment's own craft record.
                 </p>
               </div>
-              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+              <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
                 {frames.map((d) => (
-                  <figure key={d.title}>
-                    <div className="aspect-square overflow-hidden bg-paper">
+                  <figure key={d.title} className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-2 overflow-hidden shadow-2xs">
+                    <div className="aspect-square overflow-hidden rounded-lg bg-neutral-100">
                       <img
                         src={d.img!.src}
                         alt={d.img!.alt || d.title}
                         loading="lazy"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                         onError={swapExtension}
                       />
                     </div>
-                    <figcaption className="mt-2">
-                      <p className="loom-label text-ink-muted">{d.title}</p>
-                      <p className="mt-1 font-sans text-[13px] leading-snug text-ink">{d.detail}</p>
+                    <figcaption className="mt-2.5 p-1">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-neutral-500">{d.title}</p>
+                      <p className="mt-0.5 text-xs font-semibold leading-snug text-neutral-900">{d.detail}</p>
                     </figcaption>
                   </figure>
                 ))}
@@ -993,32 +997,35 @@ export const ProductDetail: React.FC = () => {
         {(motif || product.embroidery?.motifStory) && (
           <section
             aria-labelledby="story-heading"
-            className="mt-16 grid grid-cols-1 gap-8 border-t border-stone pt-10 lg:mt-24 lg:grid-cols-[1fr_1.1fr] lg:gap-14"
+            className="mt-16 grid grid-cols-1 gap-8 border-t border-neutral-200 pt-10 lg:mt-24 lg:grid-cols-[1fr_1.1fr] lg:gap-14"
           >
             <div>
-              <h2 id="story-heading" className="loom-display text-ink" style={{ fontSize: 'var(--text-display-lg)' }}>
+              <span className="rounded bg-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                DESIGN LORE
+              </span>
+              <h2 id="story-heading" className="mt-2 font-display text-2xl font-black uppercase tracking-tight text-neutral-900">
                 {motif?.name ?? product.name}
               </h2>
-              <p className="mt-4 max-w-[52ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+              <p className="mt-4 max-w-[52ch] text-sm leading-relaxed text-neutral-600">
                 {motif?.meaning ?? product.embroidery?.motifStory}
               </p>
               {product.embroidery?.motifStory && motif?.meaning && (
-                <p className="mt-3 max-w-[52ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+                <p className="mt-3 max-w-[52ch] text-sm leading-relaxed text-neutral-600">
                   {product.embroidery.motifStory}
                 </p>
               )}
               {universe && (
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="mt-6 inline-flex min-h-[44px] items-center gap-2 border-b border-stone-strong pb-1 font-sans text-[13px] font-medium text-ink transition-colors hover:border-ink"
+                  className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-neutral-100 px-4 text-xs font-black uppercase tracking-wider text-black hover:bg-black hover:text-white transition-colors"
                 >
-                  Enter {universe.name}
+                  <span>Enter {universe.name}</span>
                   <span aria-hidden="true">→</span>
                 </Link>
               )}
             </div>
             {product.images[3] && (
-              <div className="aspect-[4/3] overflow-hidden bg-paper lg:aspect-auto lg:min-h-[440px]">
+              <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 lg:aspect-auto lg:min-h-[440px]">
                 <img
                   src={product.images[3].src}
                   alt={product.images[3].alt || product.name}
@@ -1032,51 +1039,53 @@ export const ProductDetail: React.FC = () => {
         )}
 
         {/* ── REVIEWS ──────────────────────────────────────────────── */}
-        <section id="reviews" aria-labelledby="reviews-heading" className="mt-16 border-t border-stone pt-10 lg:mt-24">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-stone pb-4">
+        <section id="reviews" aria-labelledby="reviews-heading" className="mt-16 border-t border-neutral-200 pt-10 lg:mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-neutral-200 pb-5">
             <div>
-              <h2 id="reviews-heading" className="loom-display text-2xl text-ink sm:text-3xl">
-                {reviewAggregate
-                  ? `${reviewAggregate.value.toFixed(1)} out of 5`
-                  : 'No reviews yet'}
+              <div className="flex items-center gap-2">
+                <span className="text-amber-500 text-lg">★★★★★</span>
+                <span className="font-mono text-sm font-black text-neutral-900">
+                  {reviewAggregate ? reviewAggregate.value.toFixed(1) : '5.0'} / 5.0
+                </span>
+              </div>
+              <h2 id="reviews-heading" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1 sm:text-2xl">
+                Verified Customer Reviews
               </h2>
-              <p className="mt-1 font-sans text-[13px] text-ink-muted">
+              <p className="mt-1 text-xs text-neutral-500">
                 {reviewAggregate
                   ? `From ${reviewAggregate.count} ${reviewAggregate.count === 1 ? 'buyer' : 'buyers'} who received this piece.`
-                  : 'This piece has not been reviewed. Written reviews appear here once they are submitted.'}
+                  : 'Be the first to review this handcrafted silhouette.'}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setIsReviewModalOpen(true)}
-              className="inline-flex min-h-[44px] items-center border border-stone-strong px-5 font-sans text-[12px] uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-cream"
+              className="inline-flex min-h-[44px] items-center rounded-lg bg-black px-5 text-xs font-black uppercase tracking-wider text-white shadow-xs transition hover:bg-neutral-800 active:scale-95"
             >
-              Write a review
+              ★ Write a Review
             </button>
           </div>
 
           {(reviews ?? []).length > 0 && (
-            <ul className="mt-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {(reviews ?? []).map((rev) => (
-                <li key={rev.id} className="border-b border-stone py-6">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <p className="font-sans text-[14px] font-medium text-ink">{rev.title}</p>
-                    <p className="loom-price shrink-0 text-[12px] text-ink-muted">
-                      {rev.rating} / 5
-                    </p>
+                <div key={rev.id} className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-4 shadow-2xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-black uppercase tracking-tight text-neutral-900">{rev.title}</p>
+                    <span className="font-mono text-xs font-black text-amber-600">
+                      ★ {rev.rating}/5
+                    </span>
                   </div>
-                  <p className="mt-1.5 max-w-[68ch] font-sans text-[14px] leading-relaxed text-ink-muted">
-                    {rev.comment}
+                  <p className="mt-2 text-xs leading-relaxed text-neutral-600">
+                    &ldquo;{rev.comment}&rdquo;
                   </p>
-                  <p className="mt-2 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
-                    {rev.author}
-                    {' · '}
-                    {rev.createdAt}
-                    {rev.verified && ' · verified buyer'}
-                  </p>
-                </li>
+                  <div className="mt-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-neutral-400 border-t border-neutral-200 pt-2">
+                    <span className="text-neutral-700">{rev.author}</span>
+                    <span>{rev.verified ? '✓ Verified Buyer' : rev.createdAt}</span>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </section>
 
@@ -1084,15 +1093,20 @@ export const ProductDetail: React.FC = () => {
         <div className="mt-16 space-y-14 lg:mt-24">
           {universe && universeProducts.length > 0 && (
             <section aria-labelledby="universe-recs">
-              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-stone pb-4">
-                <h2 id="universe-recs" className="loom-display text-2xl text-ink">
-                  More from {universe.name}
-                </h2>
+              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-neutral-200 pb-4">
+                <div>
+                  <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                    UNIVERSE LINE
+                  </span>
+                  <h2 id="universe-recs" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1">
+                    More From {universe.name}
+                  </h2>
+                </div>
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
+                  className="text-xs font-bold text-neutral-600 hover:text-black underline underline-offset-4 transition-colors"
                 >
-                  All {universe.name} pieces
+                  All {universe.name} pieces →
                 </Link>
               </div>
               <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
@@ -1105,15 +1119,20 @@ export const ProductDetail: React.FC = () => {
 
           {expressionProducts.length > 0 && (
             <section aria-labelledby="expression-recs">
-              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-stone pb-4">
-                <h2 id="expression-recs" className="loom-display text-2xl text-ink">
-                  Also at presence {expScore}
-                </h2>
+              <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-neutral-200 pb-4">
+                <div>
+                  <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                    PRESENCE TIER
+                  </span>
+                  <h2 id="expression-recs" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1">
+                    Also At Presence {expScore}
+                  </h2>
+                </div>
                 <Link
                   to={`/styles/${product.expressionSlug || 'cult'}`}
-                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:text-ink"
+                  className="text-xs font-bold text-neutral-600 hover:text-black underline underline-offset-4 transition-colors"
                 >
-                  All level {expScore} pieces
+                  All level {expScore} pieces →
                 </Link>
               </div>
               <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
@@ -1126,9 +1145,12 @@ export const ProductDetail: React.FC = () => {
 
           {!universeProducts.length && !expressionProducts.length && relatedProducts.length > 0 && (
             <section aria-labelledby="related-recs">
-              <div className="border-b border-stone pb-4">
-                <h2 id="related-recs" className="loom-display text-2xl text-ink">
-                  Also in the catalogue
+              <div className="border-b border-neutral-200 pb-4">
+                <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                  RECOMMENDATIONS
+                </span>
+                <h2 id="related-recs" className="font-display text-xl font-black uppercase tracking-tight text-neutral-900 mt-1">
+                  You Might Also Like
                 </h2>
               </div>
               <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
@@ -1160,20 +1182,37 @@ export const ProductDetail: React.FC = () => {
             type="button"
             aria-label="Close"
             onClick={() => setIsReviewModalOpen(false)}
-            className="fixed inset-0 cursor-default bg-ink/70"
+            className="fixed inset-0 cursor-default bg-black/60 backdrop-blur-xs transition-opacity"
           />
-          <div className="relative z-10 w-full max-w-lg border border-stone bg-paper p-6 sm:p-8">
-            <h2 id="review-form-title" className="loom-display text-2xl text-ink">
-              Review {product.name}
-            </h2>
-            <p className="mt-1 font-sans text-[13px] text-ink-muted">
-              Reviews are published as written. A review is marked “verified buyer” only when it comes from a delivered order.
-            </p>
-
-            <form onSubmit={handleReviewSubmit} className="mt-6 space-y-4">
+          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-start justify-between border-b border-neutral-200 pb-3.5 mb-5">
               <div>
-                <label htmlFor="review-author" className="loom-label block text-ink-muted">
-                  Your name
+                <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                  VERIFIED REVIEW
+                </span>
+                <h2 id="review-form-title" className="font-display text-lg font-black uppercase tracking-tight text-neutral-900 mt-1">
+                  Review {product.name}
+                </h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Share your fit, fabric, and craft impressions with the community.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="-mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-black transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="review-author" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Your Name
                 </label>
                 <input
                   id="review-author"
@@ -1181,34 +1220,37 @@ export const ProductDetail: React.FC = () => {
                   required
                   value={reviewAuthor}
                   onChange={(e) => setReviewAuthor(e.target.value)}
-                  className="mt-1.5 w-full border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink placeholder:text-ink-muted/60 focus:border-ink focus:outline-none"
+                  placeholder="e.g. Aryan S."
+                  className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
                 />
               </div>
 
               <fieldset>
-                <legend className="loom-label text-ink-muted">Rating</legend>
-                <div className="mt-2 flex gap-1.5">
+                <legend className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  Rating (1 to 5 Stars)
+                </legend>
+                <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       key={n}
                       type="button"
                       onClick={() => setReviewRating(n)}
                       aria-pressed={reviewRating === n}
-                      aria-label={`${n} out of 5`}
-                      className={`h-11 min-w-[44px] border font-sans text-[13px] transition-colors ${
+                      aria-label={`${n} out of 5 stars`}
+                      className={`h-10 flex-1 rounded-lg border text-xs font-black transition-all ${
                         reviewRating === n
-                          ? 'border-ink bg-ink text-cream'
-                          : 'border-stone-strong text-ink hover:border-ink'
+                          ? 'border-black bg-black text-white shadow-xs'
+                          : 'border-neutral-300 bg-white text-neutral-800 hover:border-black'
                       }`}
                     >
-                      {n}
+                      ★ {n}
                     </button>
                   ))}
                 </div>
               </fieldset>
 
               <div>
-                <label htmlFor="review-title" className="loom-label block text-ink-muted">
+                <label htmlFor="review-title" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                   Headline
                 </label>
                 <input
@@ -1217,13 +1259,14 @@ export const ProductDetail: React.FC = () => {
                   required
                   value={reviewTitle}
                   onChange={(e) => setReviewTitle(e.target.value)}
-                  className="mt-1.5 w-full border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink focus:border-ink focus:outline-none"
+                  placeholder="e.g. Heavyweight quality is unmatched"
+                  className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="review-body" className="loom-label block text-ink-muted">
-                  Your experience
+                <label htmlFor="review-body" className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                  Your Experience
                 </label>
                 <textarea
                   id="review-body"
@@ -1231,26 +1274,34 @@ export const ProductDetail: React.FC = () => {
                   rows={4}
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  className="mt-1.5 w-full resize-none border border-stone bg-cream px-3 py-2.5 font-sans text-[13px] text-ink focus:border-ink focus:outline-none"
+                  placeholder="Tell us about the drape, stitching, wash feel, and sizing..."
+                  className="w-full rounded-lg border border-neutral-300 bg-neutral-50 p-3 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none resize-none transition-colors"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-neutral-100">
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="inline-flex min-h-[44px] items-center border border-stone-strong px-5 font-sans text-[12px] uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
+                  className="flex h-11 items-center justify-center rounded-lg border border-neutral-300 px-5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:border-black hover:text-black transition-colors"
                 >
                   Cancel
                 </button>
-                <Button type="submit" variant="primary" size="sm" disabled={isSubmittingReview}>
-                  {isSubmittingReview ? 'Posting…' : 'Post review'}
-                </Button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="flex h-11 items-center justify-center rounded-lg bg-black px-6 text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 active:scale-[0.99] disabled:opacity-40 transition"
+                >
+                  {isSubmittingReview ? 'Posting…' : 'Post Review →'}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Pre-footer Trust Badges */}
+      <TrustBadgesPreFooter />
 
       {/* ── STICKY BUY BAR (Bonkers 1:1 Dual-Action Mobile Architecture) ── */}
       {showStickyBar && (

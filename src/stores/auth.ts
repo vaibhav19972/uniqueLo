@@ -140,9 +140,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     return () => subscription.unsubscribe();
   },
 
-  openModal: (mode = 'signin') => set({ isOpen: true, mode, error: null }),
+  openModal: (mode = 'signin') => {
+    if (get().user) {
+      useWishlistStore.getState().closeWishlist();
+      set({ isAccountDrawerOpen: true, isOpen: false, error: null });
+    } else {
+      set({ isOpen: true, mode, error: null });
+    }
+  },
   closeModal: () => set({ isOpen: false, error: null }),
-  openAccountDrawer: () => set({ isAccountDrawerOpen: true }),
+  openAccountDrawer: () => {
+    useWishlistStore.getState().closeWishlist();
+    set({ isAccountDrawerOpen: true, isOpen: false });
+  },
   closeAccountDrawer: () => set({ isAccountDrawerOpen: false }),
   clearError: () => set({ error: null }),
 
@@ -207,10 +217,10 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   signOut: async () => {
-    set({ isAccountDrawerOpen: false });
+    set({ isAccountDrawerOpen: false, isOpen: false });
     if (!supabase) return;
     await supabase.auth.signOut();
-    set({ user: null, session: null, addresses: [], isAdmin: false, status: 'idle', error: null });
+    set({ user: null, session: null, addresses: [], isAdmin: false, status: 'idle', error: null, isAccountDrawerOpen: false, isOpen: false });
   },
 
   resetPassword: async (email) => {

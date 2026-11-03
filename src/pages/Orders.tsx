@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { formatPrice } from '../lib/data';
-import { Button } from '../components/ui/Button';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
 interface OrderRow {
   id: string;
@@ -13,12 +13,6 @@ interface OrderRow {
   order_items: { id: string; product_name: string; variant_sku: string; quantity: number; price_cents: number }[];
 }
 
-/**
- * Signed-in order history. Reads `orders` + embedded `order_items` under RLS —
- * the policies added in 20261031/20261032 restrict both to `user_id = auth.uid()`.
- * There is deliberately no client-side filtering: if RLS is wrong, this page
- * must show the leak rather than hide it.
- */
 export const Orders: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const openAuthModal = useAuthStore((s) => s.openModal);
@@ -51,21 +45,33 @@ export const Orders: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="bg-cream min-h-screen">
-        <div className="max-w-[720px] mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Atelier Account</p>
-          <h1 className="font-serif text-3xl text-ink mt-2">Sign in to see your orders</h1>
-          <p className="text-sm text-ink-muted mt-3 max-w-md mx-auto leading-relaxed">
-            Your order history lives with your account. Ordered as a guest? Track it with your order ID and email.
+      <div className="min-h-screen bg-white text-neutral-900">
+        <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Your Account</p>
+          <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 mt-1">
+            Sign in to view orders
+          </h1>
+          <p className="mt-2 text-xs text-neutral-500 leading-relaxed max-w-sm mx-auto">
+            Your purchases and shipment tracking live with your account. Ordered as a guest? Track it instantly with your order ID.
           </p>
-          <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
-            <Button variant="primary" size="md" onClick={() => openAuthModal('signin')}>
-              Sign in
-            </Button>
-            <Link to="/track-order">
-              <Button variant="secondary" size="md">
-                Track a guest order
-              </Button>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => openAuthModal('signin')}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
+            >
+              Sign In
+            </button>
+            <Link
+              to="/track-order"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xs border border-neutral-300 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:border-black transition"
+            >
+              Track Guest Order
             </Link>
           </div>
         </div>
@@ -74,84 +80,118 @@ export const Orders: React.FC = () => {
   }
 
   return (
-    <div className="bg-cream min-h-screen">
-      <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-ink-muted">Account</p>
-        <h1 className="font-serif text-3xl sm:text-4xl text-ink mt-1">Order history</h1>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-4">
+          <Link to="/" className="hover:text-black transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-black">Orders</span>
+        </nav>
+
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-neutral-200 pb-5">
+          <div>
+            <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">
+              Order History
+            </h1>
+            <p className="text-xs text-neutral-500 mt-1">
+              All your placed drops, custom needlework pieces, and shipment records.
+            </p>
+          </div>
+          {orders && orders.length > 0 && (
+            <span className="rounded-full bg-black px-3 py-1 text-xs font-bold text-white">
+              {orders.length} {orders.length === 1 ? 'Order' : 'Orders'}
+            </span>
+          )}
+        </div>
 
         {orders === null && (
-          <div className="mt-10 flex items-center gap-3 text-sm text-ink-muted">
-            <span className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-            Loading your orders…
+          <div className="py-16 text-center text-xs text-neutral-500">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent mb-2" />
+            <p>Loading your orders…</p>
           </div>
         )}
 
         {error && (
-          <div role="alert" className="mt-6 border border-error/40 bg-error/5 p-4 text-sm text-error">
+          <div role="alert" className="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
             Could not load orders: {error}
           </div>
         )}
 
         {orders && orders.length === 0 && !error && (
-          <div className="mt-10 border border-stone bg-paper p-8 text-center">
-            <p className="font-serif text-xl text-ink">No orders yet</p>
-            <p className="text-sm text-ink-muted mt-2">Pieces you order while signed in will appear here.</p>
-            <Link to="/shop" className="inline-block mt-6">
-              <Button variant="primary" size="md">
-                Shop the collection
-              </Button>
+          <div className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-10 text-center">
+            <p className="font-display text-xl font-bold uppercase text-neutral-900">No orders yet</p>
+            <p className="text-xs text-neutral-500 mt-1">Pieces you order while signed in will appear here with live tracking.</p>
+            <Link
+              to="/shop"
+              className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
+            >
+              Explore Fresh Drops →
             </Link>
           </div>
         )}
 
         {orders && orders.length > 0 && (
-          <ul className="mt-8 space-y-4">
+          <div className="mt-6 space-y-4">
             {orders.map((o) => (
-              <li key={o.id} className="border border-stone bg-paper">
-                <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-stone">
+              <div
+                key={o.id}
+                className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs transition-shadow hover:shadow-md"
+              >
+                {/* Header */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-50 px-5 py-3.5">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-                      {new Date(o.created_at).toLocaleDateString('en-IN', {
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+                      Placed {new Date(o.created_at).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric',
                       })}
-                    </p>
-                    <p className="font-mono text-[11px] text-ink-muted mt-0.5">{o.id}</p>
+                    </span>
+                    <p className="font-mono text-xs font-bold text-neutral-900 mt-0.5">#{o.id.slice(0, 8).toUpperCase()}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-ink font-medium">{formatPrice(o.total_cents)}</p>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-muted mt-0.5">{o.status}</p>
+                  <div className="text-right flex items-center gap-3">
+                    <span className="rounded-xs bg-neutral-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                      {o.status.replace(/-/g, ' ')}
+                    </span>
+                    <span className="font-display text-sm font-black text-neutral-900">
+                      {formatPrice(o.total_cents)}
+                    </span>
                   </div>
                 </div>
 
-                <ul className="divide-y divide-stone/60">
+                {/* Items */}
+                <ul className="divide-y divide-neutral-100 px-5">
                   {(o.order_items ?? []).map((item) => (
-                    <li key={item.id} className="px-5 py-3 flex items-baseline justify-between gap-4 text-sm">
-                      <span className="text-ink min-w-0">
-                        {item.product_name}
-                        <span className="text-ink-muted text-[11px] ml-2">{item.variant_sku}</span>
-                      </span>
-                      <span className="text-ink-muted text-[12px] shrink-0">
-                        ×{item.quantity} · {formatPrice(item.price_cents)}
+                    <li key={item.id} className="py-3 flex items-center justify-between gap-4 text-xs">
+                      <div>
+                        <p className="font-bold uppercase text-neutral-900">{item.product_name}</p>
+                        <p className="text-[11px] text-neutral-400">SKU: {item.variant_sku}</p>
+                      </div>
+                      <span className="font-medium text-neutral-600">
+                        Qty {item.quantity} · {formatPrice(item.price_cents)}
                       </span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="px-5 py-3 border-t border-stone">
+                {/* Footer Action */}
+                <div className="flex items-center justify-between border-t border-neutral-100 bg-white px-5 py-3">
+                  <span className="text-[11px] text-neutral-400">Order ID: {o.id}</span>
                   <Link
                     to={`/order-confirmation/${o.id}`}
-                    className="text-[10px] uppercase tracking-[0.16em] text-accent hover:text-accent-hover transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-black hover:text-red-600 transition-colors"
                   >
-                    View order →
+                    <span>View Receipt &amp; Tracking</span>
+                    <span>→</span>
                   </Link>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
+
+      <TrustBadgesPreFooter />
     </div>
   );
 };

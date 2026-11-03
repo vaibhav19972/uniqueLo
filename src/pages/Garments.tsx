@@ -1,131 +1,175 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useGarments, useProducts } from '../hooks/useCatalog';
 import { hasLicensedMark } from '../lib/licensed-marks';
+import { formatPrice, getDefaultVariant } from '../lib/data';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * CLOTHING — /clothing
- *
- * Was a grid of 4:5 cards, each with a scrimmed photograph, an accent bar along
- * its bottom edge, a zoom-on-hover image, and alt text reading "— placeholder
- * campaign art" on a live storefront. The piece count was printed as a badge
- * and every garment type was rendered whether or not anything was in stock.
- *
- * Now: a catalogue table of the fabric terms the buyer actually shops by —
- * garment, category, what it is, how many are in stock — because this page's
- * job is to answer "do you have a shirt" in one scan, not to be a gallery.
- * Types with nothing in stock are omitted rather than shown as dead doors.
- */
 export const Garments: React.FC = () => {
   const { data: garments } = useGarments();
   const { data: products } = useProducts();
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const rows = useMemo(() => {
     const list = (products ?? []).filter((p) => !hasLicensedMark(p));
     return (garments ?? [])
-      .map((g) => ({
-        ...g,
-        count: list.filter((p) => p.garmentType === g.slug).length,
-      }))
+      .map((g) => {
+        const matching = list.filter((p) => p.garmentType === g.slug);
+        const prices = matching
+          .map((p) => getDefaultVariant(p)?.priceCents ?? 0)
+          .filter((price) => price > 0)
+          .sort((a, b) => a - b);
+        const sampleImage = matching[0]?.images?.[0]?.src;
+
+        return {
+          ...g,
+          count: matching.length,
+          startingPrice: prices[0] ?? null,
+          image: sampleImage || g.image || '/images/placeholders/hoodie.jpg',
+        };
+      })
       .filter((g) => g.count > 0)
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   }, [garments, products]);
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const r of rows) {
+      if (r.categorySlug) set.add(r.categorySlug);
+    }
+    return ['all', ...Array.from(set)];
+  }, [rows]);
+
+  const filteredRows = useMemo(() => {
+    if (selectedCategory === 'all') return rows;
+    return rows.filter((r) => r.categorySlug === selectedCategory);
+  }, [rows, selectedCategory]);
+
   const totalPieces = rows.reduce((n, r) => n + r.count, 0);
 
   return (
-    <div className="min-h-screen w-full bg-cream">
-      <section className="border-b border-stone bg-cream pb-8 pt-10">
-        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
-          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
-            <Link to="/" className="transition-colors hover:text-ink">
-              Home
-            </Link>
-            <span aria-hidden="true" className="mx-2">
-              /
-            </span>
-            <span className="text-ink">Clothing</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Streetwear Masthead ── */}
+      <section className="border-b border-neutral-200 bg-white pt-10 pb-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-black">Clothing</span>
           </nav>
 
           <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
-                Shop by garment
+              <div className="inline-flex items-center gap-2 rounded-xs bg-neutral-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-neutral-900 mb-2">
+                <span>✦</span>
+                <span>SIGNATURE STREETWEAR CUTS</span>
+              </div>
+              <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                Shop by Silhouette
               </h1>
-              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
-                What the thing is, rather than which world it comes from. Every
-                garment type currently in stock, in every world.
+              <p className="mt-2 max-w-2xl text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                What the piece is, across every universe. Premium heavyweight cotton, boxy drop-shoulder hoodies, tailored twill jackets, and fine needlework accessories.
               </p>
             </div>
-            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
-              <span className="loom-price text-[15px] text-ink">{totalPieces}</span> pieces
-              across {rows.length} {rows.length === 1 ? 'type' : 'types'}
-            </p>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="rounded-full bg-black px-3.5 py-1.5 text-xs font-bold text-white">
+                {totalPieces} Pieces
+              </span>
+              <span className="rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-bold text-neutral-700">
+                {rows.length} Silhouettes
+              </span>
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`min-h-[38px] rounded-xs px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-black text-white'
+                    : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
+                }`}
+              >
+                {cat === 'all' ? 'All Silhouettes' : cat}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12">
-        <table className="w-full border-collapse text-left">
-          <caption className="sr-only">
-            Garment types in stock, with category, description and number of pieces
-          </caption>
-          <thead>
-            <tr className="border-b border-stone-strong">
-              {['Garment', 'Category', 'What it is', 'In stock'].map((h) => (
-                <th
-                  key={h}
-                  scope="col"
-                  className="py-2.5 pr-6 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-ink-muted last:pr-0 last:text-right"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((g) => (
-              <tr key={g.slug} className="group border-b border-stone">
-                <th scope="row" className="py-4 pr-6 font-normal">
-                  <Link
-                    to={`/clothing/${g.slug}`}
-                    className="loom-display text-ink transition-colors group-hover:text-accent"
-                    style={{ fontSize: '1.25rem' }}
-                  >
-                    {g.name}
-                  </Link>
-                </th>
-                <td className="py-4 pr-6 font-sans text-[13px] uppercase tracking-[0.08em] text-ink-muted">
-                  {g.categorySlug}
-                </td>
-                <td className="max-w-[52ch] py-4 pr-6 font-sans text-[13px] leading-relaxed text-ink-muted">
-                  {g.description}
-                </td>
-                <td className="py-4 text-right">
-                  <Link
-                    to={`/clothing/${g.slug}`}
-                    className="loom-price text-[13px] text-ink transition-colors hover:text-accent"
-                    aria-label={`${g.count} ${g.name} in stock`}
-                  >
-                    {g.count} →
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* ── Visual Silhouettes Grid ── */}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredRows.map((garment) => (
+            <Link
+              key={garment.slug}
+              to={`/clothing/${garment.slug}`}
+              className="group flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs transition-all duration-300 hover:shadow-xl hover:border-black"
+            >
+              {/* Silhouette Image Container */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+                <img
+                  src={garment.image}
+                  alt={garment.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/images/placeholders/hoodie.jpg';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
 
-        <p className="mt-6 font-sans text-[12.5px] text-ink-muted">
-          Prefer to browse by mood?{' '}
-          <Link
-            to="/styles"
-            className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
-          >
-            How loudly it wears
-          </Link>{' '}
-          sorts the same catalogue by how much of the garment the embroidery takes.
-        </p>
+                {/* Top Badge */}
+                <div className="absolute top-3 inset-x-3 flex items-center justify-between">
+                  <span className="rounded-xs bg-white/90 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-neutral-900 backdrop-blur-xs">
+                    {garment.categorySlug || 'APPAREL'}
+                  </span>
+                  <span className="rounded-xs bg-black/80 px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wider text-white">
+                    {garment.count} {garment.count === 1 ? 'Piece' : 'Pieces'}
+                  </span>
+                </div>
+
+                {/* Bottom Title on Image */}
+                <div className="absolute bottom-3 inset-x-4">
+                  <h2 className="font-display text-2xl font-black uppercase tracking-tight text-white drop-shadow-sm">
+                    {garment.name}
+                  </h2>
+                  {garment.startingPrice && (
+                    <p className="mt-0.5 text-xs font-bold text-red-400">
+                      Starting {formatPrice(garment.startingPrice)}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="flex flex-1 flex-col justify-between p-4 bg-white">
+                <p className="text-xs text-neutral-600 leading-relaxed line-clamp-2">
+                  {garment.description}
+                </p>
+
+                <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                    Explore Fits
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-black group-hover:text-red-600 transition-colors">
+                    <span>Shop {garment.name}</span>
+                    <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

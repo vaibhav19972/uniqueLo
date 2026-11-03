@@ -34,17 +34,16 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
   count,
   countLabel,
 }) => (
-  <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-stone pb-4">
+  <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4 border-b border-neutral-200 pb-4">
     <div className="min-w-0">
       <h2
         id={titleId}
-        className="loom-display text-ink"
-        style={{ fontSize: 'var(--text-display-lg)' }}
+        className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight text-neutral-900"
       >
         {title}
       </h2>
       {sub && (
-        <p className="mt-2 max-w-[58ch] font-sans text-[15px] leading-relaxed text-ink-muted">
+        <p className="mt-1.5 max-w-[58ch] text-xs sm:text-sm text-neutral-500 leading-relaxed">
           {sub}
         </p>
       )}
@@ -52,16 +51,16 @@ export const MarketingHeader: React.FC<MarketingHeaderProps> = ({
 
     <div className="flex items-center gap-6">
       {typeof count === 'number' && (
-        <p className="loom-label text-ink-muted">
+        <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-bold text-neutral-600">
           {count} {countLabel ?? 'pieces'}
-        </p>
+        </span>
       )}
       {linkTo && linkLabel && (
         <Link
           to={linkTo}
-          className="group inline-flex items-center gap-1.5 border-b border-stone-strong pb-0.5 font-sans text-[13px] font-medium text-ink transition-colors hover:border-ink"
+          className="group inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-black transition-colors hover:text-red-600"
         >
-          {linkLabel}
+          <span>{linkLabel}</span>
           <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
             →
           </span>

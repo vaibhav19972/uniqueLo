@@ -9,23 +9,23 @@ export const CategoryTabs: React.FC = () => {
   const setCategory = useFiltersStore((state) => state.setCategory);
 
   return (
-    <div className="w-full overflow-x-auto border-b border-stone bg-cream [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="mx-auto flex min-w-max max-w-[var(--container-max)] gap-6 px-4 sm:gap-9 sm:px-6 lg:px-12">
+    <div className="w-full overflow-x-auto border-b border-neutral-200 bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mx-auto flex min-w-max max-w-7xl gap-6 px-4 sm:gap-8 sm:px-6 lg:px-8">
         {(categories ?? []).map((cat) => {
           const isActive = activeCategory === cat.slug;
           return (
             <button
               key={cat.slug}
               onClick={() => setCategory(cat.slug)}
-              className={`relative min-h-[48px] cursor-pointer py-4 font-sans text-[11px] font-medium uppercase tracking-[0.16em] transition-colors focus-visible:outline-accent sm:text-[12px] ${
-                isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'
+              className={`relative min-h-[46px] cursor-pointer py-3.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-black' : 'text-neutral-500 hover:text-black'
               }`}
             >
               {cat.label}
               {isActive && (
                 <motion.div
                   layoutId="activeCategoryTab"
-                  className="absolute bottom-0 left-0 right-0 h-px bg-ink"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-black"
                   transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                 />
               )}

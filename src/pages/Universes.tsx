@@ -2,24 +2,8 @@ import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useUniverses, useProducts } from '../hooks/useCatalog';
 import { useFiltersStore } from '../stores/filters';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * ALL WORLDS — /worlds
- *
- * Was a four-card grid: 16–20px rounded cards with a resting shadow, a hover
- * translate, a serif name that italicised on hover, a bottom scrim over the
- * artwork, an accent bar along the image edge, a "15+" badge in serif, and a
- * rounded accent button. That is the anti-reference this system replaced —
- * and worse, the badge said "15+" when the count was exactly 15.
- *
- * Now it is the same ruled strata as the home band: one row per world, numbered
- * in mono, with its name at display size, its own line, the live count, and an
- * arrow. Each row is scoped to the world's accent so the horizon tint and the
- * hover colour come from that world and nowhere else.
- *
- * A world with nothing in stock is not rendered as a door. An "Enter
- * The Atelier — 0 pieces" row was a promise of a shop that does not exist.
- */
 export const Universes: React.FC = () => {
   const { data: universes } = useUniverses();
   const { data: products } = useProducts();
@@ -40,6 +24,20 @@ export const Universes: React.FC = () => {
     return c;
   }, [products]);
 
+  // Universe sample piece images
+  const sampleImages = useMemo(() => {
+    const imgs: Record<string, string[]> = {};
+    for (const p of products ?? []) {
+      if (!p.universeSlug) continue;
+      if (!imgs[p.universeSlug]) imgs[p.universeSlug] = [];
+      const src = p.images?.[0]?.src;
+      if (src && imgs[p.universeSlug].length < 3 && !imgs[p.universeSlug].includes(src)) {
+        imgs[p.universeSlug].push(src);
+      }
+    }
+    return imgs;
+  }, [products]);
+
   const worlds = useMemo(() => {
     const list = (universes ?? [])
       .map((u) => ({
@@ -47,7 +45,12 @@ export const Universes: React.FC = () => {
         name: u.name,
         tagline: u.tagline,
         lore: u.lore,
+        heroImage: u.hero_image || '/images/placeholders/hero.jpg',
+        emblem: u.emblem_src,
+        accent: u.theme_tokens?.accent || '#D32F2F',
+        cadence: u.drop_cadence || 'Limited seasonal drops',
         count: counts[u.slug] ?? 0,
+        samples: sampleImages[u.slug] ?? [],
         to: `/universes/${u.slug}`,
       }))
       .filter((w) => w.count > 0);
@@ -56,14 +59,19 @@ export const Universes: React.FC = () => {
       list.push({
         id: 'atelier',
         name: 'The Atelier',
-        tagline: 'The base line — craft with no theme',
-        lore: 'Artisanal embroidery for its own sake: technique, textile and construction above every story.',
+        tagline: 'Pure Craft · Technique & Needlework Heritage',
+        lore: 'Artisanal embroidery for its own sake: heritage needlecraft, heavy GSM textiles, and architectural construction without a thematic universe.',
+        heroImage: '/images/placeholders/hero.jpg',
+        emblem: undefined,
+        accent: '#111111',
+        cadence: 'Archival core collection',
         count: atelierCount,
+        samples: (products ?? []).filter((p) => !p.universeSlug).slice(0, 3).map((p) => p.images?.[0]?.src).filter(Boolean) as string[],
         to: '',
       });
     }
     return list;
-  }, [universes, counts, atelierCount]);
+  }, [universes, counts, sampleImages, atelierCount, products]);
 
   const enterAtelier = React.useCallback(() => {
     setUniverse('atelier');
@@ -73,112 +81,160 @@ export const Universes: React.FC = () => {
   const totalPieces = worlds.reduce((n, w) => n + w.count, 0);
 
   return (
-    <div className="min-h-screen w-full bg-cream">
-      <section className="border-b border-stone bg-cream pb-8 pt-10">
-        <div className="mx-auto max-w-[var(--container-max)] px-4 sm:px-6 lg:px-12">
-          <nav aria-label="Breadcrumb" className="loom-label text-ink-muted">
-            <Link to="/" className="transition-colors hover:text-ink">
-              Home
-            </Link>
-            <span aria-hidden="true" className="mx-2">
-              /
-            </span>
-            <span className="text-ink">Worlds</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Streetwear Hero Masthead ── */}
+      <section className="border-b border-neutral-200 bg-white pt-10 pb-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-black">Worlds</span>
           </nav>
 
           <div className="mt-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1 className="loom-display text-ink" style={{ fontSize: 'var(--text-display)' }}>
+              <div className="inline-flex items-center gap-2 rounded-xs bg-neutral-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-neutral-900 mb-2">
+                <span>✦</span>
+                <span>ORIGINAL THEMATIC DIMENSIONS</span>
+              </div>
+              <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
                 Worlds to Wear
               </h1>
-              <p className="mt-2 max-w-[54ch] font-sans text-[15px] leading-relaxed text-ink-muted">
-                Each world is an original set of stories with its own accent,
-                characters and capsule. Enter one and the collection narrows to it.
+              <p className="mt-2 max-w-2xl text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                Step into distinct thematic dimensions. Each universe features original narratives, custom embroidery techniques, dedicated motifs, and limited capsule drops.
               </p>
             </div>
-            <p className="shrink-0 font-sans text-[12px] text-ink-muted">
-              <span className="loom-price text-[15px] text-ink">{totalPieces}</span> pieces across{' '}
-              <span className="loom-price text-[15px] text-ink">{worlds.length}</span>{' '}
-              {worlds.length === 1 ? 'world' : 'worlds'}
-            </p>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="rounded-full bg-black px-3.5 py-1.5 text-xs font-bold text-white">
+                {totalPieces} Pieces
+              </span>
+              <span className="rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-bold text-neutral-700">
+                {worlds.length} Universes
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12">
-        <div className="border-t border-stone">
+      {/* ── Visual Multiverse Cards Grid ── */}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {worlds.map((world) => (
             <div
               key={world.id}
-              data-accent={world.id}
-              className="group relative overflow-hidden border-b border-stone"
+              className="group relative flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs transition-all duration-300 hover:shadow-xl hover:border-black"
             >
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: 'color-mix(in srgb, var(--color-accent) 7%, transparent)',
-                }}
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]"
-                style={{ background: 'var(--color-accent)' }}
-              />
+              {/* Universe Banner Container */}
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-900">
+                <img
+                  src={world.heroImage}
+                  alt={world.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105 opacity-80"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/images/placeholders/hero.jpg';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-              <Link
-                to={world.to || '/shop'}
-                onClick={(e) => {
-                  if (!world.to) {
-                    e.preventDefault();
-                    enterAtelier();
-                  }
-                }}
-                className="relative grid grid-cols-1 items-baseline gap-x-6 gap-y-3 px-1 py-6 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto_auto]"
-                aria-label={`Enter ${world.name} — ${world.count} pieces`}
-              >
-                <h2
-                  className="loom-display text-ink transition-colors group-hover:text-accent"
-                  style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.25rem)' }}
-                >
-                  {world.name}
-                </h2>
-
-                <div className="min-w-0">
-                  <p className="font-sans text-[13px] leading-snug text-ink sm:text-sm">
-                    {world.tagline}
-                  </p>
-                  <p className="mt-1 line-clamp-2 max-w-[64ch] font-sans text-[12.5px] leading-relaxed text-ink-muted">
-                    {world.lore}
-                  </p>
+                {/* Top Badges */}
+                <div className="absolute top-3 inset-x-3 flex items-center justify-between">
+                  <span className="rounded-xs bg-black/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white backdrop-blur-xs">
+                    {world.count} {world.count === 1 ? 'Piece' : 'Pieces'}
+                  </span>
+                  <span className="rounded-xs bg-white/90 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-neutral-900 backdrop-blur-xs">
+                    {world.cadence}
+                  </span>
                 </div>
 
-                <span className="loom-label text-ink-muted">
-                  {world.count} {world.count === 1 ? 'piece' : 'pieces'}
-                </span>
+                {/* Bottom Overlay Title on Image */}
+                <div className="absolute bottom-3 inset-x-4">
+                  <h2 className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight text-white drop-shadow-sm">
+                    {world.name}
+                  </h2>
+                  <p className="mt-0.5 text-xs font-medium text-neutral-200 line-clamp-1">
+                    {world.tagline}
+                  </p>
+                </div>
+              </div>
 
-                <span
-                  aria-hidden="true"
-                  className="font-sans text-lg text-ink transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent"
-                >
-                  →
-                </span>
-              </Link>
+              {/* Card Body */}
+              <div className="flex flex-1 flex-col justify-between p-5 bg-white">
+                <div>
+                  <p className="text-xs text-neutral-600 leading-relaxed line-clamp-2">
+                    {world.lore}
+                  </p>
+
+                  {/* Sample Pieces Thumbnails */}
+                  {world.samples.length > 0 && (
+                    <div className="mt-4">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-2">
+                        Preview Pieces
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {world.samples.map((src, idx) => (
+                          <div key={idx} className="h-14 w-12 shrink-0 overflow-hidden rounded-xs border border-neutral-200 bg-neutral-100">
+                            <img src={src} alt="Piece preview" className="h-full w-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Action */}
+                <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                    Explore Drop
+                  </span>
+
+                  <Link
+                    to={world.to || '/shop'}
+                    onClick={(e) => {
+                      if (!world.to) {
+                        e.preventDefault();
+                        enterAtelier();
+                      }
+                    }}
+                    className="inline-flex min-h-[40px] items-center gap-2 rounded-xs bg-black px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-neutral-800 active:scale-98"
+                  >
+                    <span>Enter {world.name}</span>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-6 font-sans text-[12.5px] text-ink-muted">
-          Not sure which world?{' '}
-          <Link
-            to="/styles"
-            className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
-          >
-            Browse by presence
-          </Link>{' '}
-          — how loudly the embroidery reads, across all of them.
-        </p>
+        {/* Alternative Discovery Prompt */}
+        <div className="mt-12 rounded-lg border border-neutral-200 bg-neutral-50 p-6 sm:p-8 text-center">
+          <h3 className="font-display text-lg font-bold uppercase tracking-tight text-neutral-900">
+            Want to Browse by Style &amp; Embroidery Density?
+          </h3>
+          <p className="mt-1.5 text-xs text-neutral-500 max-w-lg mx-auto">
+            Discover pieces sorted by how loudly the needlework speaks — from minimal tonal monograms to full back-panel statement tapestries.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/styles"
+              className="inline-flex min-h-[42px] items-center rounded-xs bg-black px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
+            >
+              Open Styles &amp; Edits Studio →
+            </Link>
+            <Link
+              to="/clothing"
+              className="inline-flex min-h-[42px] items-center rounded-xs border border-neutral-300 bg-white px-5 py-2 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:border-black transition"
+            >
+              Shop by Garment Silhouette
+            </Link>
+          </div>
+        </div>
       </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

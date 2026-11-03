@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import { useUIStore, type GenderTab } from '../../stores/ui';
 import { useAuthStore } from '../../stores/auth';
+import { useCartStore } from '../../stores/cart';
+import { useWishlistStore } from '../../stores/wishlist';
 
 interface CategoryItem {
   name: string;
@@ -40,7 +42,9 @@ export const MobileNavigationDrawer: React.FC = () => {
   const setOpen = useUIStore((state) => state.setMobileMenuOpen);
   const activeTab = useUIStore((state) => state.activeGenderTab);
   const setActiveTab = useUIStore((state) => state.setActiveGenderTab);
+  const user = useAuthStore((state) => state.user);
   const openAuthModal = useAuthStore((state) => state.openModal);
+  const openAccountDrawer = useAuthStore((state) => state.openAccountDrawer);
 
   if (!isOpen) return null;
 
@@ -141,6 +145,19 @@ export const MobileNavigationDrawer: React.FC = () => {
           {/* Quick Hub Links */}
           <div className="py-3 space-y-1">
             <Link
+              to="/styles"
+              onClick={() => setOpen(false)}
+              className="flex min-h-[44px] items-center justify-between rounded-lg bg-neutral-100 px-3 py-2 text-xs font-black uppercase tracking-wider text-black hover:bg-neutral-200 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-red-600">✦</span>
+                <span>Styles &amp; Edits Studio</span>
+              </div>
+              <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black text-white">
+                5 TIERS
+              </span>
+            </Link>
+            <Link
               to="/shop"
               onClick={() => setOpen(false)}
               className="flex min-h-[44px] items-center justify-between py-1 text-xs font-black uppercase tracking-wider text-black"
@@ -155,6 +172,14 @@ export const MobileNavigationDrawer: React.FC = () => {
             >
               <span>New &amp; Featured Drops</span>
               <span>★</span>
+            </Link>
+            <Link
+              to="/collections"
+              onClick={() => setOpen(false)}
+              className="flex min-h-[44px] items-center justify-between py-1 text-xs font-semibold uppercase tracking-wider text-neutral-700 hover:text-black"
+            >
+              <span>Curated Drops &amp; Capsules</span>
+              <span>📦</span>
             </Link>
             <Link
               to="/our-craft"
@@ -202,12 +227,21 @@ export const MobileNavigationDrawer: React.FC = () => {
               type="button"
               onClick={() => {
                 setOpen(false);
-                openAuthModal('signin');
+                useCartStore.getState().closeCart();
+                useWishlistStore.getState().closeWishlist();
+                if (user) {
+                  openAccountDrawer();
+                } else {
+                  openAuthModal('signin');
+                }
               }}
               className="flex min-h-[44px] items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-xs border border-neutral-200"
             >
               <span>👤</span>
-              <span>Account / Login</span>
+              <span className="truncate">
+                {user ? (user.user_metadata?.full_name || user.email?.split('@')[0] || 'My Account') : 'Account / Login'}
+              </span>
+              {user && <span className="ml-auto h-2 w-2 rounded-full bg-emerald-500" />}
             </button>
           </div>
 

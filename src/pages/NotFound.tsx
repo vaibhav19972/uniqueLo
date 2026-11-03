@@ -1,48 +1,54 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Button } from '../components/ui/Button';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
 export const NotFound: React.FC = () => {
   return (
-    <div className="min-h-[80vh] bg-cream flex items-center justify-center px-4 py-14">
-      <div className="max-w-xl mx-auto text-center space-y-6">
+    <div className="min-h-screen bg-white text-neutral-900 flex flex-col justify-between">
+      <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6">
         {/* Needlework Monogram Identifier */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-paper border border-stone text-[10px] uppercase tracking-[0.25em] text-accent font-medium">
+        <div className="inline-flex items-center gap-2 rounded-xs bg-neutral-100 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-neutral-900 mb-4">
           <span>✦</span>
-          <span>404 // Archive Exception</span>
+          <span>404 // DROP EXCEPTION</span>
         </div>
 
-        {/* Oversized Melodrama Headline */}
-        <h1 className="font-serif text-5xl sm:text-7xl lg:text-8xl text-ink tracking-tight leading-none">
-          Lost Thread.
+        {/* Oversized Headline */}
+        <div className="font-display text-8xl sm:text-9xl font-black uppercase tracking-tighter text-neutral-950 leading-none">
+          404
+        </div>
+
+        <h1 className="font-display text-2xl sm:text-4xl font-black uppercase tracking-tight text-neutral-900 mt-2">
+          Lost Thread in the Matrix
         </h1>
 
-        <div className="w-24 h-px bg-stone/80 mx-auto" />
-
-        <p className="text-sm text-ink-muted font-light max-w-md mx-auto leading-relaxed">
-          The needle has strayed beyond the fabric perimeter. The silhouette, archive dispatch, 
-          or craft dossier you are seeking cannot be located in the current atelier catalogue.
+        <p className="mt-3 text-xs sm:text-sm text-neutral-500 max-w-md mx-auto leading-relaxed">
+          The needle has strayed beyond the garment border. The silhouette, archive drop, or craft dossier you are seeking cannot be located in this edition.
         </p>
 
         {/* Navigation CTAs */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link to="/">
-            <Button variant="primary" size="md" className="w-full sm:w-auto text-xs tracking-widest uppercase">
-              Return to Atelier
-            </Button>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/"
+            className="inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:bg-neutral-800 transition"
+          >
+            Return Home
           </Link>
-          <Link to="/shop">
-            <Button variant="secondary" size="md" className="w-full sm:w-auto text-xs tracking-widest uppercase">
-              The Full Edit
-            </Button>
+          <Link
+            to="/shop"
+            className="inline-flex min-h-[44px] items-center rounded-xs border border-neutral-300 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:border-black transition"
+          >
+            Shop the Collection
           </Link>
-          <Link to="/atelier">
-            <Button variant="ghost" size="md" className="w-full sm:w-auto text-xs tracking-widest uppercase">
-              Craft Taxonomy →
-            </Button>
+          <Link
+            to="/universes"
+            className="inline-flex min-h-[44px] items-center rounded-xs border border-neutral-300 bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:border-black transition"
+          >
+            Explore Worlds →
           </Link>
         </div>
       </div>
+
+      <TrustBadgesPreFooter />
     </div>
   );
 };

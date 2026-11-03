@@ -3,13 +3,8 @@ import { Link, useParams } from 'react-router';
 import { useProducts, useUniverse, useCharacter, useMotifsByUniverse } from '../hooks/useCatalog';
 import { filterProducts, ART_STYLES, GARMENTS, type FilterState, type ArtStyleSlug } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * Character own page — /universes/:universeSlug/characters/:characterId.
- * Lore header (motif name/meaning/notes) + art-style + garment refinement + grid.
- * Breadcrumb law: Home / Universes / {Universe} / {Character}.
- * Follows unified Atelier quiet-luxury design system.
- */
 export const Character: React.FC = () => {
   const { universeSlug, characterId } = useParams<{ universeSlug: string; characterId: string }>();
   const { data: universe } = useUniverse(universeSlug);
@@ -47,120 +42,156 @@ export const Character: React.FC = () => {
 
   if (universe === undefined || character === undefined) {
     return (
-      <div className="py-16 text-center">
-        <p className="font-serif text-2xl text-ink">Unfolding character…</p>
+      <div className="flex min-h-[50vh] items-center justify-center bg-white py-16 text-center">
+        <p className="font-display text-lg font-bold uppercase tracking-wider text-neutral-800 animate-pulse">
+          Unfolding character motif…
+        </p>
       </div>
     );
   }
 
   if (!universe || !character || character.universe_slug !== universe.slug) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4">
-        <h1 className="font-serif text-3xl text-ink">Character not found</h1>
-        <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
-        <Link to="/universes" className="inline-block mt-6 text-sm underline underline-offset-4">
-          Back to the Universes
+      <div className="mx-auto max-w-md px-4 py-20 text-center bg-white">
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">Character Not Found</h1>
+        <p className="mt-2 text-xs text-neutral-500">This character thread leads nowhere yet.</p>
+        <Link to="/universes" className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+          Back to Worlds
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      {/* Editorial Hero — unified Atelier quiet-luxury layout */}
-      <section className="relative overflow-hidden bg-paper border-b border-stone/50 text-ink">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
-          <nav aria-label="Breadcrumb" className="font-sans text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/universes" className="hover:underline">Universes</Link>
-            <span className="mx-2">›</span>
-            <Link to={`/universes/${universe.slug}`} className="hover:underline">{universe.name}</Link>
-            <span className="mx-2">›</span>
-            <span>{character.name}</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Character Spotlight Masthead ── */}
+      <section className="border-b border-neutral-200 bg-neutral-950 text-white pt-10 pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/universes" className="hover:text-white transition-colors">Worlds</Link>
+            <span>/</span>
+            <Link to={`/universes/${universe.slug}`} className="hover:text-white transition-colors">{universe.name}</Link>
+            <span>/</span>
+            <span className="text-white">{character.name}</span>
           </nav>
-          <h1 className="font-serif font-medium tracking-tight leading-[1.05] mt-4 text-5xl sm:text-6xl lg:text-7xl max-w-3xl text-ink">
-            {character.name}
-          </h1>
-          <p className="font-serif italic text-xl sm:text-2xl mt-3 text-ink-muted">{character.meaning}</p>
-          {character.symbol_notes && (
-            <p className="font-serif text-base sm:text-lg mt-4 max-w-2xl leading-relaxed text-ink/80">
-              {character.symbol_notes}
-            </p>
-          )}
-          {(siblings ?? []).length > 1 && (
-            <div className="flex flex-wrap gap-2 mt-8">
-              {(siblings ?? [])
-                .filter((s) => s.id !== character.id)
-                .map((s) => (
-                  <Link
-                    key={s.id}
-                    to={`/universes/${universe.slug}/characters/${s.id}`}
-                    className="rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] border border-stone/70 bg-cream/50 text-ink hover:border-ink transition-colors inline-flex items-center cursor-pointer"
-                  >
-                    {s.name} <span aria-hidden="true" className="ml-1">→</span>
-                  </Link>
-                ))}
+
+          <div className="mt-6 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-xs bg-red-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white mb-3">
+                <span>✦</span>
+                <span>{universe.name.toUpperCase()} CHARACTER CAPSULE</span>
+              </div>
+              <h1 className="font-display text-4xl sm:text-6xl font-black uppercase tracking-tight text-white">
+                {character.name}
+              </h1>
+              <p className="mt-2 text-base sm:text-lg font-bold text-neutral-300">
+                {character.meaning}
+              </p>
+              {character.symbol_notes && (
+                <p className="mt-2 text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                  {character.symbol_notes}
+                </p>
+              )}
+
+              {/* Sibling Characters Switcher */}
+              {(siblings ?? []).length > 1 && (
+                <div className="mt-6">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-2">
+                    Other {universe.name} Characters:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {(siblings ?? [])
+                      .filter((s) => s.id !== character.id)
+                      .map((s) => (
+                        <Link
+                          key={s.id}
+                          to={`/universes/${universe.slug}/characters/${s.id}`}
+                          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-xs border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-xs hover:bg-white hover:text-black transition"
+                        >
+                          {s.name} →
+                        </Link>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Character Artwork Plate */}
+            {character.image && (
+              <div className="h-48 w-48 sm:h-56 sm:w-56 shrink-0 overflow-hidden rounded-lg border-2 border-white/20 shadow-xl bg-neutral-900">
+                <img
+                  src={character.image}
+                  alt={character.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      <section aria-label={`${character.name} collection`} className="bg-cream">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10">
-          <div className="flex flex-wrap items-center gap-2">
+      {/* ── Character Pieces Showcase ── */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Silhouette Filter Chips */}
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-neutral-200 pb-4">
+          <button
+            type="button"
+            onClick={() => { setGarment('all'); setArtStyle('all'); }}
+            className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+              garment === 'all' && artStyle === 'all'
+                ? 'bg-black text-white'
+                : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
+            }`}
+          >
+            All Silhouettes
+          </button>
+
+          {garmentTypes.map((g) => (
             <button
-              onClick={() => { setGarment('all'); setArtStyle('all'); }}
-              aria-pressed={garment === 'all' && artStyle === 'all'}
-              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                garment === 'all' && artStyle === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
-                  : 'text-ink border border-stone bg-paper hover:border-ink'
+              key={g}
+              type="button"
+              onClick={() => setGarment(g === garment ? 'all' : g)}
+              className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer capitalize ${
+                garment === g
+                  ? 'bg-black text-white'
+                  : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
               }`}
             >
-              All
+              {garmentLabel(g)}
             </button>
-            {garmentTypes.map((g) => (
-              <button
-                key={g}
-                onClick={() => setGarment(g === garment ? 'all' : g)}
-                aria-pressed={garment === g}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer capitalize ${
-                  garment === g
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink border border-stone bg-paper hover:border-ink'
-                }`}
-              >
-                {garmentLabel(g)}
-              </button>
-            ))}
-            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
-            {ART_STYLES.filter((s) =>
-              (allProducts ?? []).some(
-                (p) => p.universeSlug === universe.slug && p.artStyleSlug === s.slug,
-              ),
-            ).map((s) => (
-              <button
-                key={s.slug}
-                onClick={() => setArtStyle(s.slug === artStyle ? 'all' : s.slug)}
-                aria-pressed={artStyle === s.slug}
-                title={s.tagline}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
-                  artStyle === s.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink'
-                }`}
-              >
-                {s.name}
-              </button>
-            ))}
-          </div>
-          <p className="font-sans text-xs text-ink-muted mt-5">
-            {filtered.length} product{filtered.length === 1 ? '' : 's'}
-          </p>
-          <ProductGrid products={filtered} />
+          ))}
+
+          <span className="hidden h-5 w-px bg-neutral-200 sm:block mx-1" />
+
+          {ART_STYLES.filter((s) =>
+            (allProducts ?? []).some(
+              (p) => p.universeSlug === universe.slug && p.artStyleSlug === s.slug,
+            ),
+          ).map((s) => (
+            <button
+              key={s.slug}
+              type="button"
+              onClick={() => setArtStyle(s.slug === artStyle ? 'all' : s.slug)}
+              className={`min-h-[38px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                artStyle === s.slug
+                  ? 'bg-red-600 text-white'
+                  : 'border border-neutral-200 bg-white text-neutral-600 hover:border-black'
+              }`}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6">
+          <ProductGrid products={filtered} cardType="quick" />
         </div>
       </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

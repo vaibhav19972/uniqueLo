@@ -3,11 +3,8 @@ import { Link, useParams } from 'react-router';
 import { useExpressions, useProducts } from '../hooks/useCatalog';
 import { filterProducts, type FilterState, type ExpressionSlug, normalizeStyleSlug } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * Single style door — /styles/:styleSlug (and backward-compatible /expression/:expressionSlug).
- * Cross-world: every universe + garment matching this embroidery intensity tier.
- */
 export const Expression: React.FC = () => {
   const { styleSlug, expressionSlug } = useParams<{ styleSlug?: string; expressionSlug?: string }>();
   const activeSlug = styleSlug || expressionSlug;
@@ -34,64 +31,55 @@ export const Expression: React.FC = () => {
 
   if (expressions !== undefined && !currentExp) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4">
-        <h1 className="font-serif text-3xl text-ink">Style not found</h1>
-        <p className="text-sm text-ink-muted mt-2">This embroidery style tier does not exist.</p>
-        <Link to="/styles" className="inline-block mt-6 text-sm underline underline-offset-4">
-          All Styles
+      <div className="mx-auto max-w-md px-4 py-20 text-center bg-white">
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">Style Not Found</h1>
+        <p className="mt-2 text-xs text-neutral-500">This embroidery presence tier does not exist.</p>
+        <Link to="/styles" className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+          All Styles &amp; Presence
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      {/* Editorial Header */}
-      <section className="bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/styles" className="hover:underline">Styles</Link>
-            <span className="mx-2">›</span>
-            <span>{currentExp?.name ?? '…'}</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Streetwear Style Hero ── */}
+      <section className="border-b border-neutral-200 bg-white pt-10 pb-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/styles" className="hover:text-black transition-colors">Styles</Link>
+            <span>/</span>
+            <span className="text-black">{currentExp?.name ?? '…'}</span>
           </nav>
 
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mt-4">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-sans tracking-[0.25em] text-accent uppercase font-medium">
-                  Intensity Level {currentExp?.score} of 5
+          <div className="mt-6 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="rounded-xs bg-black px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                  Level {currentExp?.score} of 5
                 </span>
-                <span className="h-3 w-px bg-stone" />
-                <span className="text-[11px] font-sans text-ink-muted tracking-wide">
+                <span className="rounded-xs bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-600">
                   {currentExp?.characteristics}
                 </span>
               </div>
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink mt-2 tracking-tight">
-                {currentExp?.name ?? 'Style'}
+
+              <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                {currentExp?.name}
               </h1>
-              <p className="mt-2 font-sans text-lg text-ink-muted sm:text-xl">{currentExp?.tagline}</p>
-              <p className="mt-3 max-w-2xl font-sans text-xs leading-relaxed text-ink-muted sm:text-sm">
+              <p className="mt-2 text-sm sm:text-base font-bold text-neutral-600">
+                {currentExp?.tagline}
+              </p>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-500 leading-relaxed max-w-xl">
                 {currentExp?.description}
               </p>
             </div>
 
-            {currentExp?.image && (
-              <div className="relative aspect-[4/5] w-36 shrink-0 overflow-hidden border border-stone self-start lg:self-end">
-                <img
-                  src={currentExp.image}
-                  alt={`${currentExp.name} — placeholder campaign art`}
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
-              </div>
-            )}
-
-            {/* Intensity Level Pill Selector */}
-            <div className="flex flex-wrap items-center gap-1.5 p-2 bg-cream border border-stone/80 self-start lg:self-end">
-              <span className="text-[9px] uppercase tracking-widest text-ink-muted font-medium px-2">
-                Levels:
+            {/* Level Switcher Strip */}
+            <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-neutral-200 bg-neutral-50 p-2 self-start lg:self-end">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-2">
+                Tiers:
               </span>
               {(expressions ?? []).map((exp) => {
                 const isActive = exp.slug === normalizedSlug || exp.slug === activeSlug;
@@ -99,11 +87,10 @@ export const Expression: React.FC = () => {
                   <Link
                     key={exp.slug}
                     to={`/styles/${exp.slug}`}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`px-3 py-1.5 text-xs font-sans border transition-all ${
+                    className={`min-h-[36px] rounded-xs px-3 py-1.5 text-xs font-bold uppercase transition-all ${
                       isActive
-                        ? 'border-accent bg-accent text-on-accent font-medium shadow-xs'
-                        : 'border-transparent bg-paper text-ink hover:border-stone'
+                        ? 'bg-black text-white shadow-xs'
+                        : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
                     }`}
                   >
                     {exp.score}. {exp.name}
@@ -112,17 +99,16 @@ export const Expression: React.FC = () => {
               })}
             </div>
           </div>
-
-          <p className="text-xs text-ink-muted mt-6 uppercase tracking-widest">
-            {filtered.length} product{filtered.length === 1 ? '' : 's'} matching Level {currentExp?.score}
-          </p>
         </div>
       </section>
 
-      {/* Grid */}
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-10 pb-24">
-        <ProductGrid products={filtered} />
-      </div>
+      {/* ── Products Grid ── */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <ProductGrid products={filtered} cardType="quick" />
+      </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

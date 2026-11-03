@@ -12,6 +12,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
     links: [
       { label: 'BEST SELLERS', to: '/shop?sort=bestseller' },
       { label: 'NEW ARRIVALS', to: '/shop?sort=new' },
+      { label: 'Styles & Edits Studio', to: '/styles' },
       { label: 'Oversized T-Shirts', to: '/shop?category=tops&fit=oversized' },
       { label: 'Hoodies & Sweatshirts', to: '/shop?category=outerwear&type=hoodie' },
       { label: 'Cargos & Parachutes', to: '/shop?category=bottoms&type=cargo' },
@@ -22,6 +23,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
   {
     title: 'TRENDING DROPS',
     links: [
+      { label: 'Curated Drops & Capsules', to: '/collections' },
       { label: 'Culture Corner Collab', to: '/shop?universe=itihaas' },
       { label: 'Animeverse Drop 02', to: '/shop?universe=animeverse' },
       { label: 'Heroverse Legacy', to: '/shop?universe=heroverse' },

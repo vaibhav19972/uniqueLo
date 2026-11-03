@@ -15,7 +15,7 @@ const PLACEHOLDERS = [
   'Search for Silk Scarves',
 ];
 
-type NavMenuKey = 'men' | 'women' | 'clothing' | 'worlds' | null;
+type NavMenuKey = 'men' | 'women' | 'clothing' | 'worlds' | 'styles' | null;
 
 export const StickyGlassHeader: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,11 +32,38 @@ export const StickyGlassHeader: React.FC = () => {
   const isAnnouncementDismissed = useUIStore((state) => state.isAnnouncementDismissed);
   const toggleMobileMenu = useUIStore((state) => state.toggleMobileMenu);
   const openCart = useCartStore((state) => state.openCart);
+  const closeCart = useCartStore((state) => state.closeCart);
   const cartCount = useCartStore((state) => state.getTotalItems());
   const wishlistCount = useWishlistStore((state) => state.count());
   const openWishlist = useWishlistStore((state) => state.openWishlist);
+  const closeWishlist = useWishlistStore((state) => state.closeWishlist);
+  const user = useAuthStore((state) => state.user);
   const openAuthModal = useAuthStore((state) => state.openModal);
+  const openAccountDrawer = useAuthStore((state) => state.openAccountDrawer);
+  const closeAccountDrawer = useAuthStore((state) => state.closeAccountDrawer);
   const setSearchQuery = useFiltersStore((state) => state.setSearchQuery);
+
+  const handleOpenAccount = () => {
+    closeCart();
+    closeWishlist();
+    if (user) {
+      openAccountDrawer();
+    } else {
+      openAuthModal('signin');
+    }
+  };
+
+  const handleOpenWishlist = () => {
+    closeAccountDrawer();
+    closeCart();
+    openWishlist();
+  };
+
+  const handleOpenCart = () => {
+    closeAccountDrawer();
+    closeWishlist();
+    openCart();
+  };
 
   // Scroll detection: header tracks announcement bar, then locks at top-0 & turns solid white
   useEffect(() => {
@@ -438,6 +465,121 @@ export const StickyGlassHeader: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* STYLES & EDITS DROPDOWN */}
+              <div
+                className="relative py-2"
+                onMouseEnter={() => handleMenuEnter('styles')}
+                onMouseLeave={handleMenuLeave}
+              >
+                <Link
+                  to="/styles"
+                  onClick={closeDropdown}
+                  className="flex items-center gap-1 hover:text-red-500 transition-colors py-2"
+                >
+                  <span>Styles &amp; Edits</span>
+                  <svg className="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Link>
+
+                {activeMenu === 'styles' && (
+                  <div
+                    className="absolute top-full left-0 z-50 w-80 pt-1"
+                    onMouseEnter={() => handleMenuEnter('styles')}
+                    onMouseLeave={handleMenuLeave}
+                  >
+                    <div className="rounded-lg border border-neutral-200 bg-white p-3.5 shadow-2xl text-black">
+                      <div className="border-b border-neutral-100 pb-2 mb-2 flex items-center justify-between">
+                        <Link
+                          to="/styles"
+                          onClick={closeDropdown}
+                          className="text-xs font-black uppercase text-black hover:text-red-600 flex items-center gap-1.5"
+                        >
+                          <span>✦ Presence &amp; Edits Studio</span>
+                          <span>→</span>
+                        </Link>
+                        <span className="rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-black uppercase text-white">
+                          5 TIERS
+                        </span>
+                      </div>
+
+                      <div className="mb-2">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">
+                          Expression Volumes
+                        </p>
+                        <div className="grid grid-cols-1 gap-1 text-xs">
+                          <Link
+                            to="/styles/whisper"
+                            onClick={closeDropdown}
+                            className="flex items-center justify-between rounded px-2 py-1 font-medium text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-[10px] font-bold text-neutral-400">01</span>
+                              <span className="font-semibold text-neutral-900">Whisper</span>
+                            </span>
+                            <span className="text-[10px] text-neutral-500">Tonal collar &amp; cuffs</span>
+                          </Link>
+                          <Link
+                            to="/styles/subtle"
+                            onClick={closeDropdown}
+                            className="flex items-center justify-between rounded px-2 py-1 font-medium text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-[10px] font-bold text-neutral-400">02</span>
+                              <span className="font-semibold text-neutral-900">Subtle</span>
+                            </span>
+                            <span className="text-[10px] text-neutral-500">Chest insignia</span>
+                          </Link>
+                          <Link
+                            to="/styles/statement"
+                            onClick={closeDropdown}
+                            className="flex items-center justify-between rounded px-2 py-1 font-medium text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-[10px] font-bold text-neutral-400">03</span>
+                              <span className="font-semibold text-neutral-900">Statement</span>
+                            </span>
+                            <span className="text-[10px] text-neutral-500">Center back canvas</span>
+                          </Link>
+                          <Link
+                            to="/styles/bold"
+                            onClick={closeDropdown}
+                            className="flex items-center justify-between rounded px-2 py-1 font-medium text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-[10px] font-bold text-neutral-400">04</span>
+                              <span className="font-semibold text-neutral-900">Bold</span>
+                            </span>
+                            <span className="text-[10px] text-neutral-500">Multi-panel density</span>
+                          </Link>
+                          <Link
+                            to="/styles/maximalist"
+                            onClick={closeDropdown}
+                            className="flex items-center justify-between rounded px-2 py-1 font-medium text-neutral-700 hover:bg-neutral-100 hover:text-black"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span className="font-mono text-[10px] font-bold text-red-600">05</span>
+                              <span className="font-semibold text-neutral-900">Maximalist</span>
+                            </span>
+                            <span className="text-[10px] text-neutral-500">All-over relief</span>
+                          </Link>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-neutral-100 pt-2 flex items-center justify-between text-[11px]">
+                        <Link
+                          to="/collections"
+                          onClick={closeDropdown}
+                          className="font-bold text-neutral-800 hover:text-red-600"
+                        >
+                          Curated Drops &amp; Capsules →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
@@ -497,24 +639,28 @@ export const StickyGlassHeader: React.FC = () => {
               </button>
             </form>
 
-            {/* Desktop Account Icon */}
+            {/* Account Icon (Desktop & Mobile) */}
             <button
               type="button"
-              onClick={() => openAuthModal('signin')}
-              aria-label="Account"
-              className={`hidden lg:flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${
+              onClick={handleOpenAccount}
+              aria-label={user ? `Account (${user.email})` : 'Account / Sign In'}
+              title={user ? `Account (${user.email})` : 'Sign In'}
+              className={`relative flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${
                 isScrolled || !isHome ? 'text-black hover:bg-neutral-100' : 'text-white hover:bg-white/10'
               }`}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
               </svg>
+              {user && (
+                <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+              )}
             </button>
 
             {/* Wishlist Heart Icon */}
             <button
               type="button"
-              onClick={openWishlist}
+              onClick={handleOpenWishlist}
               aria-label="Wishlist"
               className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${
                 isScrolled || !isHome ? 'text-black hover:bg-neutral-100' : 'text-white hover:bg-white/10'
@@ -535,7 +681,7 @@ export const StickyGlassHeader: React.FC = () => {
             {/* Shopping Bag Icon with Numeric Badge */}
             <button
               type="button"
-              onClick={openCart}
+              onClick={handleOpenCart}
               aria-label={`Shopping Bag (${cartCount} items)`}
               className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors -mr-2 ${
                 isScrolled || !isHome ? 'text-black hover:bg-neutral-100' : 'text-white hover:bg-white/10'

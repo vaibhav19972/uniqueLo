@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 import { useCartStore } from '../../stores/cart';
 import { useProducts } from '../../hooks/useCatalog';
 import { getCartLine, formatPrice, getDefaultVariant, type CartLine } from '../../lib/data';
@@ -16,30 +16,10 @@ import { CartLineItem } from './CartLineItem';
 import { useDialogFocus } from '../../hooks/useDialogFocus';
 
 /**
- * THE BAG
+ * THE BAG — Modern Streetwear D2C Bag Drawer
  *
- * The one place in this world that is allowed a curve (PRODUCT.md scopes
- * rounded corners to the bag), so the drawer reads as a different kind of
- * surface from the ruled pages behind it: a paper pouch, not a page.
- *
- * What was removed, and why:
- *  · A modal checkout with its own name / email / PIN / payment form. It could
- *    not be opened by any control in the file — `setIsCheckoutOpen(true)` was
- *    never called — and the real checkout lives at /checkout with saved
- *    addresses and a stable URL. ~430 lines of unreachable duplicate order
- *    flow, including a second copy of the order-placement call, is a bug
- *    waiting to be reintroduced. Removed.
- *  · An offers sheet behind the same kind of dead trigger, listing coupons
- *    with a `setIsOffersModalOpen(true)` that did not exist.
- *  · "Complimentary Monogramming & Worldwide Shipping Unlocked" at a ₹49,800
- *    gift tier. No such tier exists in the pricing function, and there is no
- *    international shipping rule. The only real threshold is free carriage
- *    above ₹1,499, which the quote reports.
- *  · "White-glove archival boxing & 30-day atelier exchange guarantee." The
- *    catalogue's own `returnWindowDays` is 7.
- *  · A hardcoded coupon allow-list that applied a discount client-side and
- *    announced "Coupon Applied" before the server had priced anything. A code
- *    is now only claimed once `quote.coupon` comes back clean.
+ * Clean white ground, gamified progress meter, instant coupon application,
+ * complete-the-look recommendations, and lightning checkout CTA.
  */
 export const CartDrawer: React.FC = () => {
   const isOpen = useCartStore((state) => state.isOpen);
@@ -66,11 +46,9 @@ export const CartDrawer: React.FC = () => {
 
   const unitCount = cartLines.reduce((acc, line) => acc + line.quantity, 0);
 
-  // ── Server pricing: the single source of every number in this drawer ──
+  // ── Server pricing: the single source of truth ──
   const { quote, isLoading: quoteLoading } = useQuote({ couponCode: appliedCode });
 
-  // A stale line is most visible here: the drawer drops unpurchasable lines
-  // while the quote would refuse the whole bag. Prune first, then price.
   useReconcileCart();
 
   const rawSubtotalCents = useMemo(
@@ -84,8 +62,6 @@ export const CartDrawer: React.FC = () => {
   const freeShippingQualified = quote ? quote.shipping_cents === 0 : false;
   const shippingProgressPercent = quote ? freeShippingProgress(quote) : 0;
 
-  // Genuine strike-through: the sum of real MRPs across the bag, only when
-  // every line has one. A partial total would understate the markdown.
   const mrpTotalCents = useMemo(() => {
     if (!quote || quote.lines.length === 0) return null;
     let total = 0;
@@ -122,12 +98,6 @@ export const CartDrawer: React.FC = () => {
     };
   }, [isOpen]);
 
-  /**
-   * The server's verdict on the applied code, derived during render rather than
-   * pushed through an effect. A code is only claimed once the quote prices it:
-   * a code below its minimum subtotal cannot look applied while the total is
-   * unchanged.
-   */
   const couponError = appliedCode && quote?.coupon?.error ? quote.coupon.error : '';
 
   const applyCode = (raw: string) => {
@@ -178,106 +148,116 @@ export const CartDrawer: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-[300] flex justify-end">
+      {/* Backdrop */}
       <button
         type="button"
         aria-label="Close bag"
         onClick={closeCart}
-        className="fixed inset-0 cursor-default bg-ink/45"
+        className="fixed inset-0 cursor-default bg-black/60 backdrop-blur-xs transition-opacity"
       />
 
+      {/* Drawer Panel */}
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="bag-title"
         tabIndex={-1}
-        className="relative z-10 flex h-full w-full max-w-[27rem] flex-col bg-paper"
+        className="relative z-10 flex h-full w-full max-w-[28rem] flex-col bg-white text-neutral-900 shadow-2xl"
       >
         {/* ── Head ─────────────────────────────────────────────────── */}
-        <div className="flex items-baseline justify-between gap-3 border-b border-stone px-5 py-4">
-          <div className="flex items-baseline gap-2">
-            <h2 id="bag-title" className="loom-display text-xl text-ink">Bag</h2>
-            <span className="loom-price text-[12px] text-ink-muted">
-              {unitCount} {unitCount === 1 ? 'piece' : 'pieces'}
+        <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-5">
+          <div className="flex items-center gap-2.5">
+            <h2 id="bag-title" className="font-display text-lg font-black uppercase tracking-tight text-neutral-900">
+              Your Bag
+            </h2>
+            <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-bold text-neutral-700">
+              {unitCount} {unitCount === 1 ? 'item' : 'items'}
             </span>
           </div>
           <button
             type="button"
             onClick={closeCart}
             aria-label="Close bag"
-            className="-mr-2 flex h-11 w-11 items-center justify-center text-ink-muted transition-colors hover:text-ink"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-black"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-              <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" />
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
 
-        {/* ── Gamified Free Shipping & Coupon Meter ────────── */}
+        {/* ── Gamified Free Shipping Meter ─────────────────────────── */}
         {cartLines.length > 0 && (
-          <div className="border-b border-[#EDEDED] bg-emerald-50/70 px-5 py-3.5">
-            <div className="flex items-center justify-between text-xs font-bold text-emerald-950">
+          <div className="border-b border-neutral-200 bg-neutral-50 px-5 py-3">
+            <div className="flex items-center justify-between text-xs font-bold text-neutral-900">
               <span className="flex items-center gap-1.5">
-                <span>🚚</span>
+                <span>{freeShippingQualified ? '🎉' : '🚚'}</span>
                 <span>
                   {freeShippingQualified
-                    ? '🎉 You unlocked FREE SHIPPING & 10% OFF!'
-                    : `Add ${formatPrice(remainingFree)} more to unlock FREE SHIPPING!`}
+                    ? 'Free express shipping unlocked!'
+                    : `Add ${formatPrice(remainingFree)} more for FREE SHIPPING`}
                 </span>
               </span>
-              <span className="font-mono text-[11px] text-emerald-700">
+              <span className="font-mono text-[11px] font-black text-neutral-600">
                 {Math.min(100, Math.round(shippingProgressPercent))}%
               </span>
             </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-emerald-200/80">
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
               <div
-                className="h-full rounded-full bg-emerald-600 transition-[width] duration-500"
-                style={{ width: `${Math.min(100, Math.max(8, shippingProgressPercent))}%` }}
+                className="h-full rounded-full bg-black transition-[width] duration-500"
+                style={{ width: `${Math.min(100, Math.max(6, shippingProgressPercent))}%` }}
               />
             </div>
           </div>
         )}
 
-        {/* ── Lines ────────────────────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto px-5">
+        {/* ── Cart Items List ──────────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto px-5 divide-y divide-neutral-100 no-scrollbar">
           {cartLines.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center py-16 text-center">
-              <h3 className="loom-display text-2xl text-ink">Nothing in the bag yet</h3>
-              <p className="mt-2 max-w-[32ch] font-sans text-[13px] leading-relaxed text-ink-muted">
-                Every piece in the catalogue is priced on its own page, with the
-                technique that made it.
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-neutral-400 mb-4">
+                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg font-black uppercase tracking-tight text-neutral-900">
+                Your Bag is Empty
+              </h3>
+              <p className="mt-1.5 max-w-[28ch] text-xs text-neutral-500 leading-relaxed">
+                Heavyweight handcrafted streetwear pieces and exclusive anime drops are waiting for you.
               </p>
-              <button
-                type="button"
+              <Link
+                to="/shop"
                 onClick={closeCart}
-                className="mt-5 inline-flex min-h-[44px] items-center bg-ink px-5 font-sans text-[11px] uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent"
+                className="mt-6 inline-flex min-h-[46px] items-center rounded-lg bg-black px-6 text-xs font-black uppercase tracking-wider text-white shadow-sm transition hover:bg-neutral-800 active:scale-95"
               >
-                Shop the collection
-              </button>
+                Explore Collection →
+              </Link>
             </div>
           ) : (
             <>
-              <ul>
+              <div className="divide-y divide-neutral-100">
                 {cartLines.map((line) => (
-                  <li key={line.id}>
-                    <CartLineItem
-                      line={line}
-                      priced={quote?.lines.find((q) => q.sku === line.variant.sku)}
-                      onUpdateQuantity={updateQuantity}
-                      onRemove={removeItem}
-                    />
-                  </li>
+                  <CartLineItem
+                    key={line.id}
+                    line={line}
+                    priced={quote?.lines.find((q) => q.sku === line.variant.sku)}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeItem}
+                  />
                 ))}
-              </ul>
+              </div>
 
-              {/* Impulse Add-Ons / Grab an Accessory */}
+              {/* Complete the Look (Upsells) */}
               {upsellProducts.length > 0 && (
-                <div className="border-b border-[#EDEDED] py-4">
+                <div className="py-4 border-t border-neutral-100">
                   <div className="flex items-center justify-between mb-2.5">
-                    <span className="font-mono text-[11px] font-black uppercase tracking-wider text-neutral-900">
-                      ★ COMPLETE THE LOOK
+                    <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 flex items-center gap-1.5">
+                      <span>★</span>
+                      <span>Complete The Look</span>
                     </span>
-                    <span className="text-[10px] text-neutral-500 font-medium">Quick add</span>
+                    <span className="text-[10px] text-neutral-400 font-semibold uppercase">Quick Add</span>
                   </div>
                   <div className="no-scrollbar flex gap-2.5 overflow-x-auto pb-1">
                     {upsellProducts.map((up) => {
@@ -314,24 +294,25 @@ export const CartDrawer: React.FC = () => {
                 </div>
               )}
 
-              <div className="py-4">
-                <label className="flex min-h-[32px] cursor-pointer items-center gap-2.5 font-sans text-[13px] text-ink">
+              {/* Gift Note Accordion */}
+              <div className="py-3.5 border-t border-neutral-100">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-bold text-neutral-700 select-none">
                   <input
                     type="checkbox"
                     checked={hasGiftNote}
                     onChange={(e) => setHasGiftNote(e.target.checked)}
-                    className="h-4 w-4"
+                    className="h-4 w-4 rounded border-neutral-300 text-black focus:ring-black"
                   />
-                  Include a handwritten note
+                  <span>Add a handwritten gift note (free)</span>
                 </label>
                 {hasGiftNote && (
                   <textarea
                     rows={2}
                     value={giftNoteText}
                     onChange={(e) => setGiftNoteText(e.target.value)}
-                    placeholder="What should the note say?"
+                    placeholder="Enter your personal message for the recipient..."
                     aria-label="Gift note"
-                    className="mt-2 w-full resize-none border border-stone bg-cream px-3 py-2 font-sans text-[13px] text-ink placeholder:text-ink-muted/70 focus:border-ink focus:outline-none"
+                    className="mt-2 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none"
                   />
                 )}
               </div>
@@ -339,46 +320,51 @@ export const CartDrawer: React.FC = () => {
           )}
         </div>
 
-        {/* ── Totals ───────────────────────────────────────────────── */}
+        {/* ── Totals & Checkout ────────────────────────────────────── */}
         {cartLines.length > 0 && (
-          <div className="border-t border-stone px-5 pb-5 pt-4">
+          <div className="border-t border-neutral-200 bg-neutral-50/50 px-5 pb-5 pt-3.5">
             {/* Quick 1-Tap Coupon Pill */}
             {!appliedCode && (
-              <div className="mb-2 flex items-center justify-between rounded-md bg-amber-50 px-2.5 py-1.5 border border-amber-200">
-                <span className="text-[11px] font-bold text-amber-900">
-                  ✨ Extra 10% OFF: <span className="font-mono font-black">HUSTLE10</span>
-                </span>
+              <div className="mb-2.5 flex items-center justify-between rounded-lg bg-red-50/80 px-3 py-2 border border-red-200">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-red-950">
+                  <span>✨</span>
+                  <span>
+                    Get extra 10% OFF with code <strong className="font-mono font-black text-red-700">HUSTLE10</strong>
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => applyCode('HUSTLE10')}
-                  className="rounded bg-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white hover:bg-neutral-800"
+                  className="rounded bg-black px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white hover:bg-neutral-800 active:scale-95"
                 >
                   Apply
                 </button>
               </div>
             )}
 
-            {/* Coupon */}
+            {/* Custom Coupon Input */}
             {!appliedCode && !isCouponInputOpen ? (
               <button
                 type="button"
                 onClick={() => setIsCouponInputOpen(true)}
-                className="font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                className="text-xs font-bold text-neutral-600 underline underline-offset-2 hover:text-black"
               >
-                Add a code
+                + Have a promo code? Enter here
               </button>
             ) : appliedCode ? (
-              <div className="flex items-center justify-between gap-3 border border-stone px-3 py-2">
-                <span className="loom-price text-[12px] text-ink">
-                  {appliedCode}
+              <div className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold uppercase text-neutral-900">{appliedCode}</span>
                   {quote?.coupon && !quote.coupon.error && quote.discount_cents > 0 && (
-                    <span className="ml-2 text-accent">−{formatPrice(quote.discount_cents)}</span>
+                    <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-black text-emerald-800">
+                      −{formatPrice(quote.discount_cents)} applied
+                    </span>
                   )}
-                </span>
+                </div>
                 <button
                   type="button"
                   onClick={removeCoupon}
-                  className="font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                  className="text-xs font-bold text-neutral-400 hover:text-red-600"
                 >
                   Remove
                 </button>
@@ -391,19 +377,18 @@ export const CartDrawer: React.FC = () => {
                 }}
                 className="flex gap-2"
               >
-                <label htmlFor="bag-coupon" className="sr-only">Discount code</label>
                 <input
                   id="bag-coupon"
                   type="text"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  placeholder="Code"
+                  placeholder="Enter Promo Code"
                   autoComplete="off"
-                  className="min-h-[44px] min-w-0 flex-1 border border-stone bg-cream px-3 font-sans text-[13px] uppercase tracking-[0.08em] text-ink placeholder:normal-case placeholder:tracking-normal placeholder:text-ink-muted/70 focus:border-ink focus:outline-none"
+                  className="h-10 flex-1 rounded-lg border border-neutral-300 bg-white px-3 font-mono text-xs font-bold uppercase tracking-wider text-neutral-900 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal placeholder:text-neutral-400 focus:border-black focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="min-h-[44px] shrink-0 border border-stone-strong px-4 font-sans text-[11px] uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink"
+                  className="h-10 rounded-lg bg-black px-4 text-xs font-black uppercase tracking-wider text-white hover:bg-neutral-800 active:scale-95"
                 >
                   Apply
                 </button>
@@ -411,14 +396,12 @@ export const CartDrawer: React.FC = () => {
             )}
 
             {couponError && (
-              <p role="alert" className="mt-2 font-sans text-[12px] text-error">
+              <p role="alert" className="mt-1.5 text-xs font-semibold text-red-600">
                 {couponError}
               </p>
             )}
 
-            {/* An eligible offer the buyer has not applied. Never auto-applied:
-                a discount the customer did not ask for is a surprise at the
-                payment step. */}
+            {/* Available Offer Prompt */}
             {!appliedCode && availableOffers.length > 0 && (
               <button
                 type="button"
@@ -426,70 +409,73 @@ export const CartDrawer: React.FC = () => {
                   setIsCouponInputOpen(true);
                   setCouponCode(availableOffers[0].code);
                 }}
-                className="mt-2 block text-left font-sans text-[12px] text-ink-muted transition-colors hover:text-ink"
+                className="mt-1.5 block text-left text-xs font-medium text-neutral-600 hover:text-black"
               >
-                <span className="font-medium text-ink">{availableOffers[0].code}</span>{' '}
-                {availableOffers[0].description ?? 'is available on this bag'} →
+                <strong className="font-bold text-neutral-900">{availableOffers[0].code}</strong>:{' '}
+                {availableOffers[0].description ?? 'is available on this order'} →
               </button>
             )}
 
-            {/* The arithmetic, as the server returned it. */}
-            <dl className="mt-4 space-y-1.5 border-t border-stone pt-3">
-              <div className="flex items-baseline justify-between">
-                <dt className="font-sans text-[13px] text-ink-muted">Subtotal</dt>
-                <dd className="flex items-baseline gap-2">
+            {/* Order Price Breakdown */}
+            <dl className="mt-3.5 space-y-1.5 border-t border-neutral-200 pt-3 text-xs">
+              <div className="flex items-center justify-between text-neutral-600">
+                <dt>Subtotal</dt>
+                <dd className="flex items-center gap-2">
                   {mrpTotalCents != null && (
-                    <span className="loom-price text-[12px] text-ink-muted line-through">
+                    <span className="font-mono text-neutral-400 line-through">
                       {formatPrice(mrpTotalCents)}
                     </span>
                   )}
-                  <span className="loom-price text-[13px] text-ink">
+                  <span className="font-mono font-bold text-neutral-900">
                     {money(serverSubtotal ?? (quoteLoading ? null : rawSubtotalCents))}
                   </span>
                   {totalDiscountPercent != null && (
-                    <span className="font-sans text-[11px] text-accent">{totalDiscountPercent}% off</span>
+                    <span className="rounded bg-red-100 px-1 py-0.2 text-[9px] font-black text-red-600">
+                      {totalDiscountPercent}% OFF
+                    </span>
                   )}
                 </dd>
               </div>
 
               {(quote?.discount_cents ?? 0) > 0 && (
-                <div className="flex items-baseline justify-between">
-                  <dt className="font-sans text-[13px] text-ink-muted">
-                    {quote?.coupon?.code ?? 'Discount'}
-                  </dt>
-                  <dd className="loom-price text-[13px] text-accent">
-                    −{formatPrice(quote?.discount_cents ?? 0)}
-                  </dd>
+                <div className="flex items-center justify-between font-bold text-[#D32F2F]">
+                  <dt>{quote?.coupon?.code ?? 'Discount'} Savings</dt>
+                  <dd className="font-mono">−{formatPrice(quote?.discount_cents ?? 0)}</dd>
                 </div>
               )}
 
-              <div className="flex items-baseline justify-between">
-                <dt className="font-sans text-[13px] text-ink-muted">Carriage</dt>
-                <dd className="loom-price text-[13px] text-ink">
-                  {!quote ? '—' : freeShippingQualified ? 'Free' : formatPrice(quote.shipping_cents)}
+              <div className="flex items-center justify-between text-neutral-600">
+                <dt>Shipping</dt>
+                <dd className="font-mono font-bold text-neutral-900">
+                  {!quote ? '—' : freeShippingQualified ? (
+                    <span className="font-black text-emerald-600 uppercase">FREE</span>
+                  ) : (
+                    formatPrice(quote.shipping_cents)
+                  )}
                 </dd>
               </div>
 
-              <div className="flex items-baseline justify-between border-t border-stone pt-2.5">
-                <dt className="font-sans text-[13px] font-medium text-ink">Total</dt>
-                <dd className="loom-price text-[17px] font-medium text-ink">
+              <div className="flex items-center justify-between border-t border-neutral-200 pt-2.5">
+                <dt className="text-sm font-black uppercase text-neutral-900">Total Amount</dt>
+                <dd className="font-mono text-base font-black text-[#D32F2F]">
                   {money(displayTotalCents)}
                 </dd>
               </div>
             </dl>
 
+            {/* Checkout Button */}
             <button
               type="button"
               onClick={goToCheckout}
               disabled={!quote}
-              className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 bg-ink font-sans text-[12px] font-medium uppercase tracking-[0.16em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
+              className="mt-3.5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md transition hover:bg-neutral-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-neutral-300"
             >
-              Checkout
+              <span>Proceed to Checkout</span>
               <span aria-hidden="true">→</span>
             </button>
 
-            <p className="mt-2.5 text-center font-sans text-[11px] text-ink-muted">
-              Inclusive of taxes. Cash on delivery available.
+            <p className="mt-2 text-center text-[11px] text-neutral-500 font-medium">
+              🛡️ 100% Secure Checkout · COD Available · 7-Day Exchange
             </p>
           </div>
         )}

@@ -8,11 +8,8 @@ import {
   type ExpressionScore,
 } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * Single garment door — /clothing/:garmentSlug or /garments/:garmentSlug.
- * Cross-world: every universe + expression level that ships this garment.
- */
 export const Garment: React.FC = () => {
   const { garmentSlug } = useParams<{ garmentSlug: string }>();
   const { data: garments } = useGarments();
@@ -45,112 +42,118 @@ export const Garment: React.FC = () => {
 
   if (garments !== undefined && !garment) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4">
-        <h1 className="font-serif text-3xl text-ink">Garment not found</h1>
-        <p className="text-sm text-ink-muted mt-2">This thread leads nowhere — yet.</p>
-        <Link to="/clothing" className="inline-block mt-6 text-sm underline underline-offset-4">
-          All garments
+      <div className="mx-auto max-w-md px-4 py-20 text-center bg-white">
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">Garment Not Found</h1>
+        <p className="mt-2 text-xs text-neutral-500">This silhouette thread leads nowhere yet.</p>
+        <Link to="/clothing" className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
+          All Silhouettes
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      <section className="bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/clothing" className="hover:underline">Clothing</Link>
-            <span className="mx-2">›</span>
-            <span>{garment?.name ?? '…'}</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Silhouette Hero ── */}
+      <section className="border-b border-neutral-200 bg-white pt-10 pb-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/clothing" className="hover:text-black transition-colors">Clothing</Link>
+            <span>/</span>
+            <span className="text-black">{garment?.name ?? '…'}</span>
           </nav>
-          <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+
+          <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink tracking-tight">
+              <div className="inline-flex items-center gap-2 rounded-xs bg-neutral-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-neutral-900 mb-2">
+                <span>✦</span>
+                <span>{garment?.categorySlug?.toUpperCase() || 'SILHOUETTE'} ARCHIVE</span>
+              </div>
+              <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
                 {garment?.name ?? 'Garment'}
               </h1>
-              <p className="mt-3 max-w-2xl font-sans text-sm text-ink-muted">{garment?.description}</p>
+              <p className="mt-2 max-w-2xl text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                {garment?.description}
+              </p>
             </div>
-            {garment?.image && (
-              <div className="relative aspect-[4/5] w-32 shrink-0 overflow-hidden border border-stone sm:w-44">
-                <img
-                  src={garment.image}
-                  alt={`${garment.name} — placeholder campaign art`}
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
-              </div>
-            )}
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="rounded-full bg-black px-3.5 py-1.5 text-xs font-bold text-white">
+                {filtered.length} In Stock
+              </span>
+            </div>
           </div>
 
-          {/* Context-Sensitive Filter Chips: World & Expression */}
-          <div className="mt-8 flex flex-wrap items-center gap-2 pt-6 border-t border-stone/40">
-            <span className="text-[10px] uppercase font-sans tracking-widest text-ink-muted font-semibold mr-1">
-              Filter By:
+          {/* Cross-World & Expression Filter Chips */}
+          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-4">
+            <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              Universe:
             </span>
 
-            {/* Reset All */}
             <button
+              type="button"
               onClick={() => {
                 setUniverseFilter('all');
                 setExpressionFilter('all');
               }}
-              aria-pressed={universeFilter === 'all' && expressionFilter === 'all'}
-              className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+              className={`min-h-[36px] rounded-xs px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                 universeFilter === 'all' && expressionFilter === 'all'
-                  ? 'bg-ink text-cream border border-transparent font-medium'
-                  : 'text-ink border border-stone bg-paper hover:border-ink'
+                  ? 'bg-black text-white'
+                  : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
               }`}
             >
-              All
+              All Worlds
             </button>
 
-            {/* Universes */}
             {availableUniverses.map((u) => (
               <button
                 key={u.slug}
+                type="button"
                 onClick={() => setUniverseFilter(u.slug === universeFilter ? 'all' : u.slug)}
-                aria-pressed={universeFilter === u.slug}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest font-sans min-h-[44px] transition-colors cursor-pointer ${
+                className={`min-h-[36px] rounded-xs px-3 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                   universeFilter === u.slug
-                    ? 'bg-ink text-cream border border-transparent font-medium'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
+                    ? 'bg-black text-white'
+                    : 'border border-neutral-200 bg-white text-neutral-700 hover:border-black'
                 }`}
               >
                 {u.name}
               </button>
             ))}
 
-            <span className="mx-2 h-5 w-px bg-stone/70 hidden sm:block" aria-hidden="true" />
+            <span className="mx-1 hidden h-5 w-px bg-neutral-200 sm:block" />
 
-            {/* Expression Tiers */}
+            <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              Style:
+            </span>
+
             {EXPRESSION_LEVELS.map((e) => (
               <button
                 key={e.score}
+                type="button"
                 onClick={() => setExpressionFilter(e.score === expressionFilter ? 'all' : e.score)}
-                aria-pressed={expressionFilter === e.score}
                 title={e.tagline}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-sans min-h-[44px] transition-colors cursor-pointer ${
+                className={`min-h-[36px] rounded-xs px-2.5 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                   expressionFilter === e.score
-                    ? 'bg-accent text-cream border border-transparent font-medium shadow-sm'
-                    : 'text-ink-muted border border-stone bg-paper hover:border-ink hover:text-ink'
+                    ? 'bg-red-600 text-white'
+                    : 'border border-neutral-200 bg-white text-neutral-600 hover:border-black'
                 }`}
               >
-                ✦ L{e.score} {e.name}
+                L{e.score} {e.name}
               </button>
             ))}
           </div>
-
-          <p className="text-xs text-ink-muted mt-5 uppercase tracking-widest">
-            {filtered.length} piece{filtered.length === 1 ? '' : 's'} available
-          </p>
         </div>
       </section>
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12 pb-24">
-        <ProductGrid products={filtered} />
-      </div>
+
+      {/* ── Product Grid ── */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <ProductGrid products={filtered} cardType="quick" />
+      </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

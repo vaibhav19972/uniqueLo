@@ -3,11 +3,8 @@ import { Link, useParams } from 'react-router';
 import { useCollection, useProducts } from '../hooks/useCatalog';
 import { filterProducts, type FilterState } from '../lib/data';
 import { ProductGrid } from '../components/shop/ProductGrid';
+import { TrustBadgesPreFooter } from '../components/home/TrustBadgesPreFooter';
 
-/**
- * Single Collection Door — /collections/:collectionSlug.
- * Cross-category: every garment silhouette rendered in this collection drop.
- */
 export const Collection: React.FC = () => {
   const { collectionSlug, styleSlug } = useParams<{ collectionSlug?: string; styleSlug?: string }>();
   const activeSlug = collectionSlug || styleSlug;
@@ -28,18 +25,20 @@ export const Collection: React.FC = () => {
 
   if (collection === undefined) {
     return (
-      <div className="py-16 text-center min-h-[50vh] flex items-center justify-center bg-cream">
-        <p className="font-serif text-2xl text-ink animate-pulse">Unfolding collection drop…</p>
+      <div className="flex min-h-[50vh] items-center justify-center bg-white py-16 text-center">
+        <p className="font-display text-lg font-bold uppercase tracking-wider text-neutral-800 animate-pulse">
+          Unfolding collection drop…
+        </p>
       </div>
     );
   }
 
   if (!collection) {
     return (
-      <div className="py-16 text-center max-w-md mx-auto px-4 min-h-[50vh] flex flex-col items-center justify-center bg-cream">
-        <h1 className="font-serif text-3xl text-ink">Collection Not Found</h1>
-        <p className="text-sm text-ink-muted mt-2">This collection thread leads nowhere — yet.</p>
-        <Link to="/collections" className="inline-block mt-6 text-sm underline underline-offset-4">
+      <div className="mx-auto max-w-md px-4 py-20 text-center bg-white">
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900">Collection Not Found</h1>
+        <p className="mt-2 text-xs text-neutral-500">This collection thread leads nowhere yet.</p>
+        <Link to="/collections" className="mt-6 inline-flex min-h-[44px] items-center rounded-xs bg-black px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
           All Collections
         </Link>
       </div>
@@ -47,53 +46,58 @@ export const Collection: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-cream min-h-screen">
-      <section className="bg-paper border-b border-stone/50">
-        <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 py-12">
-          <nav aria-label="Breadcrumb" className="text-[11px] uppercase tracking-[0.2em] text-ink-muted">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/collections" className="hover:underline">Collections</Link>
-            <span className="mx-2">›</span>
-            <span className="text-accent">{collection.name}</span>
+    <div className="min-h-screen w-full bg-white text-neutral-900">
+      {/* ── Collection Drop Masthead ── */}
+      <section className="border-b border-neutral-200 bg-white pt-10 pb-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            <Link to="/" className="hover:text-black transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/collections" className="hover:text-black transition-colors">Collections</Link>
+            <span>/</span>
+            <span className="text-black">{collection.name}</span>
           </nav>
-          <div className="mt-3 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="font-serif text-4xl text-ink tracking-tight sm:text-5xl lg:text-6xl">
-                  {collection.name}
-                </h1>
+
+          <div className="mt-6 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+            <div className="max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="rounded-xs bg-red-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                  LIMITED DROP
+                </span>
                 {collection.universeSlug && (
-                  <span className="border border-accent-border bg-accent-soft px-2.5 py-1 text-[11px] uppercase tracking-widest text-accent">
-                    {collection.universeSlug}
+                  <span className="rounded-xs bg-neutral-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-700">
+                    {collection.universeSlug} CAPSULE
                   </span>
                 )}
               </div>
-              <p className="mt-2 font-sans text-lg text-ink-muted">{collection.tagline}</p>
-              <p className="mt-3 max-w-2xl font-sans text-sm leading-relaxed text-ink-muted">
-                {collection.description}
+
+              <h1 className="font-display text-3xl font-black uppercase tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                {collection.name}
+              </h1>
+              <p className="mt-2 text-sm sm:text-base font-bold text-neutral-600">
+                {collection.tagline}
               </p>
-              <p className="mt-4 font-sans text-xs uppercase tracking-widest text-ink-muted">
-                {filtered.length} piece{filtered.length === 1 ? '' : 's'} in release
+              <p className="mt-2 text-xs sm:text-sm text-neutral-500 leading-relaxed max-w-xl">
+                {collection.description}
               </p>
             </div>
 
-            {collection.image && (
-              <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden border border-stone sm:w-64">
-                <img
-                  src={collection.image}
-                  alt={`${collection.name} — placeholder campaign art`}
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute inset-x-0 bottom-0 h-1 bg-accent" aria-hidden="true" />
-              </div>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="rounded-full bg-black px-3.5 py-1.5 text-xs font-bold text-white">
+                {filtered.length} Pieces
+              </span>
+            </div>
           </div>
         </div>
       </section>
-      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-12 pb-24 pt-8">
-        <ProductGrid products={filtered} />
-      </div>
+
+      {/* ── Product Grid ── */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <ProductGrid products={filtered} cardType="quick" />
+      </section>
+
+      {/* Trust Badges */}
+      <TrustBadgesPreFooter />
     </div>
   );
 };

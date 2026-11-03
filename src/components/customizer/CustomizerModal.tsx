@@ -1,8 +1,8 @@
 import React from 'react';
 import { useCustomizerStore } from '../../stores/customizer';
 import { useCartStore } from '../../stores/cart';
+import { useToastStore } from '../../stores/toast';
 import { getDefaultVariant } from '../../lib/data';
-import { Button } from '../ui/Button';
 
 const THREAD_COLORS = [
   { name: '24K Gold Zari', hex: '#d4af37' },
@@ -16,6 +16,12 @@ const THREAD_COLORS = [
 const PLACEMENTS = ['Left Chest', 'Sleeve Cuff', 'Back Yoke', 'Hemline'];
 const STYLES = ['Serif Monogram', 'Botanical Needlepoint', 'Heritage Crest', 'Contemporary Minimal'];
 
+/**
+ * BESPOKE MONOGRAM STUDIO MODAL — Modern Streetwear D2C Revamp
+ *
+ * Live garment thread preview, color palette selectors, placement controls,
+ * and seamless one-click addition to the bag.
+ */
 export const CustomizerModal: React.FC = () => {
   const {
     isOpen,
@@ -33,6 +39,8 @@ export const CustomizerModal: React.FC = () => {
   } = useCustomizerStore();
 
   const addItem = useCartStore((state) => state.addItem);
+  const openCart = useCartStore((state) => state.openCart);
+  const showToast = useToastStore((state) => state.showToast);
 
   if (!isOpen || !product) return null;
 
@@ -44,34 +52,43 @@ export const CustomizerModal: React.FC = () => {
       placement: placement,
     });
     closeCustomizer();
+    openCart();
+    showToast({
+      title: 'Added to Bag',
+      description: `Custom embroidered piece added with "${text || 'UNIQUELO'}" monogram.`,
+      type: 'success',
+    });
   };
 
   return (
-    <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-6 lg:p-8">
       {/* Backdrop */}
       <div
         onClick={closeCustomizer}
-        className="fixed inset-0 bg-ink/70 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
       />
 
-      {/* Atelier Studio Window */}
-      <div className="relative w-full max-w-4xl bg-cream border border-stone/80 shadow-2xl rounded-sm overflow-hidden z-10 flex flex-col md:flex-row max-h-[90vh]">
-        {/* Left: Interactive Embroidery Canvas Live Preview */}
-        <div className="w-full md:w-1/2 bg-ink p-8 flex flex-col items-center justify-between relative overflow-hidden text-cream border-b md:border-b-0 md:border-r border-stone/20">
-          <div className="w-full flex items-center justify-between text-xs tracking-widest text-warm-gray uppercase">
-            <span>Atelier Live Canvas</span>
-            <span>{placement}</span>
+      {/* Studio Window */}
+      <div className="relative z-10 flex h-full max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl md:flex-row">
+        {/* Left: Live Canvas Simulation Plate */}
+        <div className="relative flex w-full flex-col justify-between bg-neutral-950 p-6 text-white md:w-1/2 md:p-8 border-b md:border-b-0 md:border-r border-neutral-800">
+          {/* Header */}
+          <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+            <span>LIVE EMBROIDERY CANVAS</span>
+            <span className="rounded bg-neutral-800 px-2 py-0.5 text-[10px] text-white">
+              {placement}
+            </span>
           </div>
 
-          {/* Simulated Garment Fabric Texture with Needlework SVG */}
-          <div className="my-8 w-64 h-64 sm:w-72 sm:h-72 rounded-sm bg-ink border border-stone/20 flex flex-col items-center justify-center relative overflow-hidden">
+          {/* Simulated Garment Fabric Texture with Needlework */}
+          <div className="my-6 mx-auto flex h-60 w-60 sm:h-72 sm:w-72 flex-col items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900/90 relative overflow-hidden shadow-2xl">
             {/* Fabric weave grain */}
-            <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(var(--color-paper)_1px,transparent_1px)] [background-size:12px_12px]" />
+            <div className="pointer-events-none absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:10px_10px]" />
 
-            {/* Simulated Embroidery Needlework Stitches */}
+            {/* Simulated Embroidery Needlework */}
             <div className="relative z-10 flex flex-col items-center">
               {style === 'Heritage Crest' && (
-                <svg className="w-16 h-16 mb-2" viewBox="0 0 100 100" fill="none">
+                <svg className="h-16 w-16 mb-2" viewBox="0 0 100 100" fill="none">
                   <path
                     d="M50 15 L80 30 L80 65 Q50 95 50 95 Q20 65 20 30 Z"
                     stroke={threadHex}
@@ -83,7 +100,7 @@ export const CustomizerModal: React.FC = () => {
               )}
 
               {style === 'Botanical Needlepoint' && (
-                <svg className="w-20 h-10 mb-1" viewBox="0 0 120 60" fill="none">
+                <svg className="h-10 w-20 mb-1" viewBox="0 0 120 60" fill="none">
                   <path
                     d="M10 50 Q60 10 110 50"
                     stroke={threadHex}
@@ -97,95 +114,111 @@ export const CustomizerModal: React.FC = () => {
 
               {/* Stitched Monogram Letters */}
               <div
-                className={`text-5xl font-serif tracking-widest transition-colors duration-300 ${
-                  style === 'Contemporary Minimal' ? 'font-sans font-light' : 'font-serif'
+                className={`text-5xl tracking-widest transition-colors duration-300 font-black ${
+                  style === 'Contemporary Minimal' ? 'font-mono' : 'font-display'
                 }`}
                 style={{
                   color: threadHex,
-                  textShadow: `1px 1px 0px rgba(0,0,0,0.8), 0 0 8px ${threadHex}40`,
+                  textShadow: `0 0 12px ${threadHex}60, 1px 1px 2px rgba(0,0,0,0.9)`,
                   letterSpacing: '0.2em',
                 }}
               >
                 {text || '—'}
               </div>
 
-              {/* Thread luster specular highlight bar */}
+              {/* Specular luster bar */}
               <div
-                className="w-16 h-0.5 mt-3 rounded-full opacity-70"
+                className="mt-3 h-0.5 w-16 rounded-full opacity-80"
                 style={{ backgroundColor: threadHex }}
               />
             </div>
 
-            <span className="absolute bottom-3 text-[10px] tracking-widest uppercase text-warm-gray/70">
-              {threadColor} Thread
+            <span className="absolute bottom-3 text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+              Thread: {threadColor}
             </span>
           </div>
 
+          {/* Bottom Lore Note */}
           <div className="text-center">
-            <p className="text-xs font-serif text-cream">{product.name}</p>
-            <p className="text-[10px] text-warm-gray mt-0.5">
-              Hand-guided satin stitch by master artisans
+            <p className="font-display text-xs font-bold uppercase tracking-wider text-neutral-200">
+              {product.name}
+            </p>
+            <p className="text-[11px] text-neutral-500 mt-0.5">
+              Precision hand-guided embroidery on 400 GSM heavyweight cotton
             </p>
           </div>
         </div>
 
         {/* Right: Customization Controls */}
-        <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto bg-cream">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-stone/60">
+        <div className="flex w-full flex-col justify-between overflow-y-auto bg-white p-6 sm:p-8 md:w-1/2 no-scrollbar">
+          <div className="space-y-5">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-neutral-200 pb-3.5">
               <div>
-                <h3 className="font-serif text-2xl text-ink">Bespoke Monogram Studio</h3>
-                <p className="text-xs text-ink-muted mt-0.5">
-                  Personalize with tailored embroidery initials
+                <span className="rounded bg-black px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                  BESPOKE STUDIO
+                </span>
+                <h3 className="font-display text-lg font-black uppercase tracking-tight text-neutral-900 mt-1">
+                  Personalize Your Piece
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Complimentary bespoke monogramming included
                 </p>
               </div>
               <button
+                type="button"
                 onClick={closeCustomizer}
-                className="text-ink-muted hover:text-ink transition-colors p-1"
+                className="-mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-black transition-colors"
                 aria-label="Close"
               >
-                ✕
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
             {/* Initials Input */}
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-ink mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
                 Initials (Max 4 Characters)
               </label>
               <input
                 type="text"
                 maxLength={4}
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="E.G. UL"
-                className="w-full bg-paper border border-stone px-4 py-2.5 text-lg font-serif tracking-widest text-ink focus:outline-none focus:border-accent uppercase"
+                onChange={(e) => setText(e.target.value.toUpperCase())}
+                placeholder="e.g. UQ"
+                className="h-11 w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 text-center font-mono text-base font-black uppercase tracking-widest text-neutral-900 focus:border-black focus:bg-white focus:outline-none transition-colors"
               />
             </div>
 
             {/* Thread Palette */}
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-ink mb-2">
-                Thread Selection: <span className="font-semibold text-accent">{threadColor}</span>
-              </label>
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="font-bold uppercase tracking-wider text-neutral-700 text-[11px]">
+                  Thread Color
+                </span>
+                <span className="font-bold text-neutral-900 text-xs">{threadColor}</span>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 {THREAD_COLORS.map((color) => {
                   const isSelected = threadColor === color.name;
                   return (
                     <button
                       key={color.name}
+                      type="button"
                       onClick={() => setThreadColor(color.name, color.hex)}
-                      className={`flex items-center space-x-2 p-2 border text-xs font-sans text-left transition-all cursor-pointer ${
+                      className={`flex items-center gap-2 rounded-lg border p-2 text-left transition-all ${
                         isSelected
-                          ? 'border-ink bg-paper shadow-sm ring-1 ring-ink'
-                          : 'border-stone hover:border-ink/50 bg-paper/60'
+                          ? 'border-black bg-neutral-100 ring-1 ring-black shadow-2xs font-bold'
+                          : 'border-neutral-200 bg-white hover:border-neutral-400'
                       }`}
                     >
                       <span
-                        className="w-3.5 h-3.5 rounded-full border border-stone flex-shrink-0"
+                        className="h-3.5 w-3.5 rounded-full border border-black/20 shrink-0 shadow-2xs"
                         style={{ backgroundColor: color.hex }}
                       />
-                      <span className="truncate text-[11px] text-ink">{color.name}</span>
+                      <span className="truncate text-[11px] text-neutral-800">{color.name}</span>
                     </button>
                   );
                 })}
@@ -194,18 +227,19 @@ export const CustomizerModal: React.FC = () => {
 
             {/* Placement Selection */}
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-ink mb-2">
-                Needlework Placement
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-2">
+                Placement
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {PLACEMENTS.map((item) => (
                   <button
                     key={item}
+                    type="button"
                     onClick={() => setPlacement(item)}
-                    className={`py-2 px-3 text-xs border text-center transition-all cursor-pointer ${
+                    className={`h-10 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all ${
                       placement === item
-                        ? 'border-ink bg-ink text-cream'
-                        : 'border-stone bg-paper text-ink hover:border-ink/50'
+                        ? 'border-black bg-black text-white shadow-xs'
+                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-black'
                     }`}
                   >
                     {item}
@@ -214,20 +248,21 @@ export const CustomizerModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Typography / Motif Style */}
+            {/* Motif Style */}
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-ink mb-2">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-2">
                 Embroidered Style
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {STYLES.map((s) => (
                   <button
                     key={s}
+                    type="button"
                     onClick={() => setStyle(s)}
-                    className={`py-2 px-3 text-xs border text-center transition-all cursor-pointer ${
+                    className={`h-10 rounded-lg border px-2 text-[11px] font-bold uppercase tracking-wider transition-all ${
                       style === s
-                        ? 'border-accent bg-paper text-accent font-medium'
-                        : 'border-stone bg-paper text-ink hover:border-ink/50'
+                        ? 'border-black bg-black text-white shadow-xs'
+                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-black'
                     }`}
                   >
                     {s}
@@ -237,16 +272,16 @@ export const CustomizerModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Add to Atelier Bag with Monogram */}
-          <div className="pt-6 mt-6 border-t border-stone/60">
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full tracking-widest text-xs"
+          {/* Add to Bag CTA */}
+          <div className="pt-5 mt-5 border-t border-neutral-100">
+            <button
+              type="button"
               onClick={handleAddToCart}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md transition hover:bg-neutral-800 active:scale-[0.99]"
             >
-              Add Bespoke Garment to Bag — Free Monogram
-            </Button>
+              <span>Add Custom Piece to Bag — Free Monogram</span>
+              <span aria-hidden="true">→</span>
+            </button>
           </div>
         </div>
       </div>
