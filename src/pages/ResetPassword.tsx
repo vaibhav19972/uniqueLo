@@ -124,8 +124,8 @@ export const ResetPassword: React.FC = () => {
   if (!configured) {
     return shell(
       <>
-        <h1 className="font-serif text-3xl text-ink mt-2">Accounts unavailable</h1>
-        <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 mt-2">Accounts unavailable</h1>
+        <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
           This build is not connected to the account database, so passwords cannot be reset here.
         </p>
         <Link to="/" className="inline-block mt-7">
@@ -140,12 +140,12 @@ export const ResetPassword: React.FC = () => {
   if (phase === 'checking') {
     return shell(
       <>
-        <h1 className="font-serif text-3xl text-ink mt-2">Verifying your link</h1>
-        <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 mt-2">Verifying your link</h1>
+        <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
           One moment while we confirm this reset request.
         </p>
-        <div className="mt-8 flex items-center gap-3 text-sm text-ink-muted">
-          <span className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="mt-8 flex items-center gap-3 text-sm text-neutral-500">
+          <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
           Checking…
         </div>
       </>
@@ -155,13 +155,13 @@ export const ResetPassword: React.FC = () => {
   if (phase === 'invalid') {
     return shell(
       <>
-        <h1 className="font-serif text-3xl text-ink mt-2">This link is no longer valid</h1>
-        <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 mt-2">This link is no longer valid</h1>
+        <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
           Reset links expire quickly and can only be used once. Request a fresh one and open it on the same
           device, in this browser.
         </p>
         {arrivedFromLink && (
-          <p className="text-[11px] text-warm-gray mt-3 leading-relaxed">
+          <p className="text-[11px] text-neutral-400 mt-3 leading-relaxed">
             If you opened this link on a different device or an in-app browser, copy it into your usual
             browser and try again.
           </p>
@@ -183,8 +183,8 @@ export const ResetPassword: React.FC = () => {
   if (phase === 'done') {
     return shell(
       <>
-        <h1 className="font-serif text-3xl text-ink mt-2">Password updated</h1>
-        <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 mt-2">Password updated</h1>
+        <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
           You are signed in on this device. Use your new password next time you sign in.
         </p>
         <div className="mt-7 flex flex-col sm:flex-row gap-3">
@@ -207,8 +207,8 @@ export const ResetPassword: React.FC = () => {
 
   return shell(
     <>
-      <h1 className="font-serif text-3xl text-ink mt-2">Choose a new password</h1>
-      <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+      <h1 className="font-display text-2xl font-black uppercase tracking-tight text-neutral-900 mt-2">Choose a new password</h1>
+      <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
         Pick something at least 8 characters long that you have not used here before.
       </p>
 
@@ -216,7 +216,7 @@ export const ResetPassword: React.FC = () => {
         <div>
           <label
             htmlFor="reset-password"
-            className="block text-[10px] uppercase tracking-[0.18em] text-ink-muted mb-1.5"
+            className="block text-[10px] uppercase tracking-[0.18em] text-neutral-400 mb-1.5"
           >
             New password
           </label>
@@ -285,12 +285,12 @@ export const ResetPassword: React.FC = () => {
         </button>
       </form>
 
-      <p className="text-xs text-ink-muted text-center mt-5">
+      <p className="text-xs text-neutral-500 text-center mt-5">
         Link expired?{' '}
         <button
           type="button"
           onClick={requestFreshLink}
-          className="text-ink underline underline-offset-4 hover:text-accent transition-colors cursor-pointer"
+          className="text-neutral-900 font-bold underline underline-offset-4 hover:text-black transition-colors cursor-pointer"
         >
           Request a new one
         </button>

@@ -169,7 +169,7 @@ export const ProductDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-white">
         <div className="mx-auto max-w-[var(--container-max)] px-4 py-10 sm:px-6 lg:px-12 lg:py-16">
-          <p className="loom-label text-ink-muted">Product</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">Product</p>
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
             <div className="aspect-[4/5] w-full animate-pulse bg-neutral-100 rounded-md" />
             <div className="space-y-3">
@@ -188,13 +188,13 @@ export const ProductDetail: React.FC = () => {
       <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6 text-center">
         <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">Not in the catalogue</p>
         <h1 className="font-display mt-3 text-3xl font-black uppercase text-neutral-900">This piece is no longer listed</h1>
-        <p className="mt-2 max-w-[44ch] font-sans text-sm leading-relaxed text-ink-muted">
+        <p className="mt-2 max-w-[44ch] font-sans text-sm leading-relaxed text-neutral-500">
           It may have sold through, or the link may be from an older catalogue.
           Everything currently available is in the collection.
         </p>
         <Link
           to="/shop"
-          className="mt-6 inline-flex min-h-[48px] items-center justify-center bg-ink px-6 font-sans text-[13px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent"
+          className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-lg bg-black px-6 font-sans text-xs font-black uppercase tracking-wider text-white shadow-md hover:bg-neutral-800 transition-colors"
         >
           Shop the collection
           <span aria-hidden="true">→</span>
@@ -347,10 +347,10 @@ export const ProductDetail: React.FC = () => {
       title: 'Needlework & technique',
       body: product.embroidery ? (
         <div className="space-y-3">
-          <p className="font-sans text-[14px] font-medium text-ink">
+          <p className="font-sans text-[14px] font-bold text-neutral-900">
             {product.embroidery.techniqueLabel}
           </p>
-          <p className="font-sans text-[14px] leading-relaxed text-ink-muted">
+          <p className="font-sans text-[13px] leading-relaxed text-neutral-600">
             {product.embroidery.motifStory}
           </p>
           <dl className="grid grid-cols-1 gap-x-8 gap-y-2 pt-2 sm:grid-cols-2">
@@ -371,10 +371,10 @@ export const ProductDetail: React.FC = () => {
               .filter(([, v]) => Boolean(v))
               .map(([k, v]) => (
                 <div key={k as string} className="flex gap-3">
-                  <dt className="w-28 shrink-0 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                  <dt className="w-28 shrink-0 font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-400">
                     {k}
                   </dt>
-                  <dd className="font-sans text-[13px] text-ink">{v}</dd>
+                  <dd className="font-sans text-[13px] font-semibold text-neutral-900">{v}</dd>
                 </div>
               ))}
           </dl>
@@ -386,26 +386,26 @@ export const ProductDetail: React.FC = () => {
       title: 'Cloth & composition',
       body: (
         <div className="space-y-3">
-          <p className="max-w-[62ch] font-sans text-[14px] leading-relaxed text-ink-muted">
+          <p className="max-w-[62ch] font-sans text-[13px] leading-relaxed text-neutral-600">
             {product.description}
           </p>
           {product.material && product.material.length > 0 && (
             <ul className="space-y-1">
               {product.material.map((m) => (
-                <li key={m} className="font-sans text-[13px] text-ink">
-                  {m}
+                <li key={m} className="font-sans text-[13px] font-medium text-neutral-900">
+                  • {m}
                 </li>
               ))}
             </ul>
           )}
           {product.attributes && Object.keys(product.attributes).length > 0 && (
-            <dl className="grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-stone pt-3 sm:grid-cols-2">
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-1.5 border-t border-neutral-200 pt-3 sm:grid-cols-2">
               {Object.entries(product.attributes).map(([k, v]) => (
                 <div key={k} className="flex gap-3">
-                  <dt className="w-36 shrink-0 font-sans text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                  <dt className="w-36 shrink-0 font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-neutral-400">
                     {k.replace(/_/g, ' ')}
                   </dt>
-                  <dd className="font-sans text-[13px] text-ink">{String(v).replace(/-/g, ' ')}</dd>
+                  <dd className="font-sans text-[13px] font-semibold text-neutral-900">{String(v).replace(/-/g, ' ')}</dd>
                 </div>
               ))}
             </dl>
@@ -419,10 +419,10 @@ export const ProductDetail: React.FC = () => {
       body: (
         <div className="space-y-3">
           {product.fitNotes && (
-            <p className="font-sans text-[14px] leading-relaxed text-ink">{product.fitNotes}</p>
+            <p className="font-sans text-[13px] font-medium leading-relaxed text-neutral-900">{product.fitNotes}</p>
           )}
           {(product.modelHeightCm || product.modelWornSize) && (
-            <p className="font-sans text-[13px] text-ink-muted">
+            <p className="font-sans text-[13px] text-neutral-500">
               {product.modelHeightCm ? `Model is ${product.modelHeightCm} cm` : 'Model'}
               {product.modelWornSize ? ` and wears size ${product.modelWornSize}.` : '.'}
             </p>
@@ -430,9 +430,9 @@ export const ProductDetail: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsSizeGuideOpen(true)}
-            className="inline-flex min-h-[44px] items-center font-sans text-[13px] text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+            className="inline-flex min-h-[44px] items-center font-sans text-[13px] font-bold text-neutral-900 underline underline-offset-4 transition-colors hover:text-red-600"
           >
-            Garment measurements for every size
+            Garment measurements for every size →
           </button>
         </div>
       ),
@@ -443,8 +443,8 @@ export const ProductDetail: React.FC = () => {
       body: (
         <ul className="space-y-1.5">
           {(product.care ?? ['Cold wash, inside out. Dry flat away from direct sun.']).map((c) => (
-            <li key={c} className="font-sans text-[13px] leading-relaxed text-ink-muted">
-              {c}
+            <li key={c} className="font-sans text-[13px] leading-relaxed text-neutral-600">
+              • {c}
             </li>
           ))}
         </ul>
@@ -454,7 +454,7 @@ export const ProductDetail: React.FC = () => {
       id: 'delivery',
       title: 'Dispatch & returns',
       body: (
-        <div className="space-y-2 font-sans text-[13px] leading-relaxed text-ink-muted">
+        <div className="space-y-2 font-sans text-[13px] leading-relaxed text-neutral-600">
           <p>{deliveryLine}. Every order leaves with its own numbered certificate.</p>
           <p>
             {product.codAvailable
@@ -466,7 +466,7 @@ export const ProductDetail: React.FC = () => {
               ? `${returnLine} from delivery, unworn and with the tags attached.`
               : 'Cut to order for this size, so it cannot be returned.'}
           </p>
-          <p>Carriage is ₹99, waived on orders above ₹1,499.</p>
+          <p className="font-medium text-neutral-900">Carriage is ₹99, waived on orders above ₹1,499.</p>
         </div>
       ),
     },
@@ -604,16 +604,16 @@ export const ProductDetail: React.FC = () => {
           {/* ── THE BUY BOX ────────────────────────────────────────── */}
           <div ref={buyBoxRef}>
             {/* Provenance line: where you are, how it was made. */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[11px] uppercase tracking-[0.14em] text-ink-muted">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">
               {universe ? (
                 <Link
                   to={`/universes/${universe.slug}`}
-                  className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                  className="text-neutral-900 underline underline-offset-4 transition-colors hover:text-black"
                 >
                   {universe.name}
                 </Link>
               ) : (
-                <span className="text-ink">The Atelier</span>
+                <span className="text-neutral-900">The Atelier</span>
               )}
               <span aria-hidden="true">·</span>
               <span>{product.embroidery?.techniqueLabel ?? 'Hand embroidery'}</span>
@@ -659,12 +659,12 @@ export const ProductDetail: React.FC = () => {
             <div className="mt-3 flex items-center gap-3">
               {reviewAggregate ? (
                 <>
-                  <span className="loom-price text-[13px] text-ink">
+                  <span className="font-mono text-[13px] font-bold text-neutral-900">
                     {reviewAggregate.value.toFixed(1)} / 5
                   </span>
                   <a
                     href="#reviews"
-                    className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                    className="font-sans text-[13px] text-neutral-500 underline underline-offset-4 transition-colors hover:text-black"
                   >
                     {reviewAggregate.count} {reviewAggregate.count === 1 ? 'review' : 'reviews'}
                   </a>
@@ -673,7 +673,7 @@ export const ProductDetail: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(true)}
-                  className="font-sans text-[13px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                  className="font-sans text-[13px] text-neutral-500 underline underline-offset-4 transition-colors hover:text-black"
                 >
                   No reviews yet — be the first
                 </button>
@@ -683,13 +683,13 @@ export const ProductDetail: React.FC = () => {
             {/* Sizes. Square chips; the chest figure only where it is true. */}
             <fieldset className="mt-7">
               <div className="flex items-baseline justify-between gap-3">
-                <legend className="loom-label text-ink-muted">
-                  Size <span className="ml-2 normal-case tracking-normal text-ink">{currentVariant.size}</span>
+                <legend className="text-xs font-bold uppercase tracking-wider text-neutral-700">
+                  Size <span className="ml-2 font-black text-neutral-900">{currentVariant.size}</span>
                 </legend>
                 <button
                   type="button"
                   onClick={() => setIsSizeGuideOpen(true)}
-                  className="font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                  className="text-xs font-bold text-neutral-500 underline underline-offset-2 transition-colors hover:text-black"
                 >
                   Measurements
                 </button>
@@ -706,12 +706,12 @@ export const ProductDetail: React.FC = () => {
                       disabled={isOut}
                       aria-label={`Size ${v.size}${isOut ? ' — sold out' : ''}`}
                       aria-pressed={isSelected}
-                      className={`flex h-11 min-w-[56px] items-center justify-center border px-3 font-sans text-[13px] transition-colors ${
+                      className={`flex h-11 min-w-[56px] items-center justify-center rounded-xs border px-3 text-xs font-bold uppercase tracking-wider transition-colors ${
                         isOut
-                          ? 'cursor-not-allowed border-stone text-ink-muted/60 line-through'
+                          ? 'cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-300 line-through'
                           : isSelected
-                            ? 'border-ink bg-ink text-cream'
-                            : 'border-stone-strong text-ink hover:border-ink'
+                            ? 'border-black bg-black text-white shadow-xs'
+                            : 'border-neutral-300 bg-white text-neutral-900 hover:border-black hover:bg-neutral-50'
                       }`}
                     >
                       {v.size}
@@ -719,7 +719,7 @@ export const ProductDetail: React.FC = () => {
                   );
                 })}
               </div>
-              <p className="mt-2 font-sans text-[12px] text-ink-muted">
+              <p className="mt-2 text-xs font-medium text-neutral-500">
                 {soldOut
                   ? 'This size is sold out.'
                   : maxQty <= 2
@@ -730,22 +730,22 @@ export const ProductDetail: React.FC = () => {
 
             {/* Add to bag */}
             <div className="mt-6 flex gap-2">
-              <div className="flex items-center border border-stone-strong">
+              <div className="flex items-center rounded-lg border border-neutral-300 bg-neutral-50 overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   aria-label="Decrease quantity"
-                  className="flex h-12 w-11 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-40"
+                  className="flex h-12 w-11 items-center justify-center text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-200 hover:text-black disabled:opacity-30"
                   disabled={quantity <= 1}
                 >
                   –
                 </button>
-                <span className="loom-price w-8 text-center text-[13px] text-ink">{quantity}</span>
+                <span className="w-8 text-center font-mono text-xs font-black text-neutral-900">{quantity}</span>
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
                   aria-label="Increase quantity"
-                  className="flex h-12 w-11 items-center justify-center text-ink transition-colors hover:text-accent disabled:opacity-40"
+                  className="flex h-12 w-11 items-center justify-center text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-200 hover:text-black disabled:opacity-30"
                   disabled={quantity >= maxQty}
                 >
                   +
@@ -756,7 +756,7 @@ export const ProductDetail: React.FC = () => {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={soldOut}
-                className="flex h-12 flex-1 items-center justify-center gap-2 bg-ink font-sans text-[13px] font-medium uppercase tracking-[0.14em] text-cream transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-stone-strong"
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-black text-xs font-black uppercase tracking-wider text-white shadow-md transition hover:bg-neutral-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
               >
                 {soldOut ? 'Sold out' : 'Add to bag'}
                 {!soldOut && <span aria-hidden="true">→</span>}
@@ -767,18 +767,18 @@ export const ProductDetail: React.FC = () => {
                 onClick={handleWishlistToggle}
                 aria-label={isWish ? 'Remove from saved' : 'Save this piece'}
                 aria-pressed={isWish}
-                className={`flex h-12 w-12 shrink-0 items-center justify-center border transition-colors ${
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border transition-colors ${
                   isWish
-                    ? 'border-accent text-accent'
-                    : 'border-stone-strong text-ink hover:border-ink'
+                    ? 'border-red-600 bg-red-50 text-red-600'
+                    : 'border-neutral-300 bg-white text-neutral-700 hover:border-black hover:text-black hover:bg-neutral-50'
                 }`}
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-[18px] w-[18px]"
+                  className="h-5 w-5"
                   fill={isWish ? 'currentColor' : 'none'}
                   stroke="currentColor"
-                  strokeWidth="1.6"
+                  strokeWidth="1.8"
                   aria-hidden="true"
                 >
                   <path d="M12 20.5 4.9 13.6a4.5 4.5 0 0 1 6.4-6.3l.7.7.7-.7a4.5 4.5 0 0 1 6.4 6.3Z" strokeLinejoin="round" />
@@ -834,15 +834,15 @@ export const ProductDetail: React.FC = () => {
             </div>
 
             {/* Logistics: the fields the buyer checks before paying. */}
-            <dl className="mt-6 grid grid-cols-1 gap-px border-y border-stone sm:grid-cols-3">
+            <dl className="mt-6 grid grid-cols-1 gap-px border-y border-neutral-200 sm:grid-cols-3">
               {[
                 ['Delivery', deliveryLine],
                 ['Payment', product.codAvailable ? 'COD or prepaid' : 'Prepaid only'],
                 ['Returns', returnLine],
               ].map(([term, def]) => (
-                <div key={term} className="py-3 sm:border-r sm:border-stone sm:pr-4 sm:last:border-r-0">
-                  <dt className="loom-label text-ink-muted">{term}</dt>
-                  <dd className="mt-1 font-sans text-[13px] leading-snug text-ink">{def}</dd>
+                <div key={term} className="py-3 sm:border-r sm:border-neutral-200 sm:pr-4 sm:last:border-r-0">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">{term}</dt>
+                  <dd className="mt-1 text-xs font-bold leading-snug text-neutral-900">{def}</dd>
                 </div>
               ))}
             </dl>
@@ -852,8 +852,8 @@ export const ProductDetail: React.FC = () => {
               <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
                 {specFacts.map(([term, value]) => (
                   <div key={term}>
-                    <dt className="loom-label text-ink-muted">{term}</dt>
-                    <dd className="mt-1 font-sans text-[13px] leading-snug text-ink">{value}</dd>
+                    <dt className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">{term}</dt>
+                    <dd className="mt-1 text-xs font-bold leading-snug text-neutral-900">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -861,12 +861,12 @@ export const ProductDetail: React.FC = () => {
 
             {/* Expression level — the brand's own intensity axis, kept because
                 it is a real catalogue field, presented as a ruled aside. */}
-            <div className="mt-6 flex items-start justify-between gap-4 border-t border-stone pt-4">
+            <div className="mt-6 flex items-start justify-between gap-4 border-t border-neutral-200 pt-4">
               <div>
-                <p className="loom-label text-ink-muted">Presence</p>
-                <p className="mt-1 font-sans text-[13px] text-ink">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Presence</p>
+                <p className="mt-1 text-xs font-bold text-neutral-900">
                   {expScore} of 5 — {expInfo?.name ?? 'Balanced'}
-                  <span className="text-ink-muted">
+                  <span className="font-normal text-neutral-500">
                     {expInfo?.tagline ? ` · ${expInfo.tagline}` : ''}
                   </span>
                 </p>
@@ -874,18 +874,18 @@ export const ProductDetail: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsExpressionModalOpen(true)}
-                className="shrink-0 font-sans text-[12px] text-ink-muted underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                className="shrink-0 text-xs font-bold text-neutral-500 underline underline-offset-2 transition-colors hover:text-black"
               >
                 What this measures
               </button>
             </div>
 
             {product.collectionSlug && (
-              <p className="mt-4 font-sans text-[13px] text-ink-muted">
+              <p className="mt-4 text-xs text-neutral-500">
                 Part of{' '}
                 <Link
                   to={`/collections/${product.collectionSlug}`}
-                  className="text-ink underline decoration-stone-strong underline-offset-4 transition-colors hover:decoration-ink"
+                  className="font-bold text-neutral-900 underline underline-offset-2 transition-colors hover:text-black"
                 >
                   {COLLECTIONS.find((c) => c.slug === product.collectionSlug)?.name ??
                     product.collectionSlug.replace(/-/g, ' ')}
@@ -894,19 +894,19 @@ export const ProductDetail: React.FC = () => {
             )}
 
             {/* Disclosures — ruled rows, one open at a time. */}
-            <div className="mt-10 border-t border-stone">
+            <div className="mt-10 border-t border-neutral-200">
               {sections.map((section) => {
                 const open = activeSection === section.id;
                 return (
-                  <div key={section.id} className="border-b border-stone">
+                  <div key={section.id} className="border-b border-neutral-200">
                     <button
                       type="button"
                       onClick={() => setActiveSection(open ? null : section.id)}
                       aria-expanded={open}
-                      className="flex min-h-[52px] w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-accent"
+                      className="flex min-h-[52px] w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-black"
                     >
-                      <span className="loom-label text-ink">{section.title}</span>
-                      <span aria-hidden="true" className="relative h-3 w-3 shrink-0">
+                      <span className="text-xs font-black uppercase tracking-wider text-neutral-900">{section.title}</span>
+                      <span aria-hidden="true" className="relative h-3 w-3 shrink-0 text-neutral-400">
                         <span className="absolute left-0 top-1/2 h-px w-3 -translate-y-1/2 bg-current" />
                         <span
                           className={`absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-current transition-opacity ${

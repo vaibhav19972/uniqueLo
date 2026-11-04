@@ -53,17 +53,17 @@ function readStoredMode(): ThemeMode | null {
 }
 
 function systemMode(): ThemeMode {
-  if (typeof window === 'undefined' || !window.matchMedia) return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'light';
 }
 
 function applyMode(mode: ThemeMode) {
   if (typeof document === 'undefined') return;
-  document.documentElement.setAttribute('data-mode', mode);
-  // Keeps the browser's own UI (form controls, scrollbars, autofill) in step.
-  document.documentElement.style.colorScheme = mode;
+  // Enforce light theme as canonical streetwear surface
+  const targetMode = mode === 'dark' ? 'light' : mode;
+  document.documentElement.setAttribute('data-mode', targetMode);
+  document.documentElement.style.colorScheme = targetMode;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', mode === 'dark' ? '#000000' : '#f7f3ec');
+  if (meta) meta.setAttribute('content', '#ffffff');
 }
 
 /**
@@ -139,32 +139,12 @@ export function useThemeMode(): {
  * - Tracks the OS preference live, but only while the customer has not chosen.
  */
 export function useThemeBoot(): ThemeMode {
-  const [mode, setModeState] = useState<ThemeMode>(
-    () => currentMode ?? readStoredMode() ?? systemMode(),
-  );
+  const [mode, setModeState] = useState<ThemeMode>('light');
 
   useEffect(() => {
-    // Sync with an external system (localStorage + the OS colour scheme), which
-    // is exactly what an effect is for — the lint rule can't tell the difference.
-    // Re-applies after hydration because the inline index.html boot script has
-    // already set the attribute, but `currentMode` may not know about it yet.
-    const resolved = readStoredMode() ?? systemMode();
-    setModeGlobal(resolved);
+    setModeGlobal('light');
     // eslint-disable-next-line react/set-state-in-effect
-    setModeState((prev) => (prev === resolved ? prev : resolved));
-
-    if (!window.matchMedia) return;
-    const query = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = (event: MediaQueryListEvent) => {
-      // A stored choice always wins over the OS.
-      if (readStoredMode()) return;
-      const next: ThemeMode = event.matches ? 'dark' : 'light';
-      setModeGlobal(next);
-      setModeState(next);
-    };
-
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
+    setModeState('light');
   }, []);
 
   return mode;
